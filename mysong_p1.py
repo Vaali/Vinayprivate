@@ -22,6 +22,7 @@ import difflib
 import libxml2
 import collections
 from datetime import datetime, date, timedelta
+import logging
 import songs_api as api
 reload(sys)
 sys.setdefaultencoding('utf8')

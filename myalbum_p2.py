@@ -189,8 +189,10 @@ def genXML(vid,avgcnt,avgcntrece):
 		n = re.search(re.compile("[0-9]{2}[:][0-9]{2}[:][0-9]{2}"),vid['published'])
 		ydate = m.group()+" "+n.group()
 	else:
-		ydate = '0001-01-01 00:00:00'			
-	mysong.set_youtubeId(url)
+		ydate = '0001-01-01 00:00:00'
+	temp_id = url[:url.find('&feature=youtube_gdata')]
+
+	mysong.set_youtubeId(temp_id[-11:])
 	if (artistName == artistName):
 		mysong.set_artistId(int(artistId))			
 	mysong.set_songName(songName)	
@@ -294,14 +296,36 @@ def genXML(vid,avgcnt,avgcntrece):
 	iar = api.indexedArtist()
 	iar.add_indexedArtistName(artistName) 
 	mysong.set_indexedArtist(iar)
-	mysong.set_url(url)
+	mysong.set_url(url[:url.find('&d=')])
 
 	albList = api.albumList()
+	youtubeVideoList = api.youtubeList()
+	video = api.video()
 	album = api.album()
 	releaseyear = 1001
 	#for x in range(len(albumsList)):
 	for x in albumsList:
-		curr_album = x	
+		curr_album = x
+		albumtimesMap = x['times']
+		albumtime = x['albumtime']
+		if('matched_youtube_links' in curr_album):
+			myl = curr_album['matched_youtube_links']
+			for link in myl:
+				if(isinstance(myl[link], dict) and 'times' in myl[link] and albumtime in myl[link]['times']):
+					#print myl[link]
+					video = api.video()
+
+					video.set_Id(link.replace('&feature=youtube_gdata','')[-11:])
+					video.set_startTime(int(x['times'][str(albumtime)][0]))
+					video.set_endTime(int(x['times'][str(albumtime)][0]) + int(x['times'][str(albumtime)][1]))
+					video.set_totalTime(albumtime)
+					video.set_viewcountRate(myl[link]['viewcountRate'])
+					video.set_viewcount(int(myl[link]['viewcount']))
+					video.set_rating(myl[link]['rating'])
+					#video.export(sys.stdout,0)
+					youtubeVideoList.add_video(video)
+
+
 		album.set_albumName(curr_album['albumname'])
 		#album.set_albumReleasedate((curr_album['year']))
 		if('country' in curr_album):
@@ -325,6 +349,7 @@ def genXML(vid,avgcnt,avgcntrece):
 		mysong.set_songCountry('Unknown')
 
 	mysong.set_albumList(albList)
+	mysong.set_youtubeList(youtubeVideoList)
 	ydate = datetime.strptime(ydate,'%Y-%m-%d %H:%M:%S')
 	#mysong.set_youtubeDate(ydate)
 	if vid.has_key('crawldate'):
@@ -384,13 +409,15 @@ def genXML(vid,avgcnt,avgcntrece):
 	idVal = url[-11:]
 	dirtec = idVal[:8]
 	fileN = idVal[8:]
+	start_id = url[url.find('&t=')+3:url.find('&d=')]
+	end_id = url[url.find('&d=')+3:]
 	#path = opdir+'/'+dirtec
 	path = opdir
 	if not os.path.exists(path):
 		os.mkdir(path)
 	test = str(int(random.random()* 100000))
-	fname = path + "/0000" + test+ ".xml"
-	if os.path.exists(fname):
+	fname = path + "/0000" + temp_id[-11:] +'_'+str(start_id)+'_'+str(end_id) +  ".xml"
+	'''if os.path.exists(fname):
 		fr = codecs.open(fname,'r','utf-8')
 		oldsong = api.parse(fname)
 		if(round(oldsong.totalMatch) <= round(mysong.totalMatch)): 
@@ -449,7 +476,7 @@ def genXML(vid,avgcnt,avgcntrece):
 			#print mysong.overLap
 			#print oldsong.overLap
 			#print fname
-			mysong = oldsong
+			mysong = oldsong'''
 
 	fx = codecs.open(fname,"w","utf-8")
 	fx.write('<?xml version="1.0" ?>\n')
@@ -524,7 +551,7 @@ def GetAlias(directory):
 	lines = fread.readlines()
 	for l in lines:
 		aliases.append(l.strip())
-	print lines
+	#print lines
 
 def CalculateAverages(directory):
 	averageCount = 0

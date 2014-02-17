@@ -12,6 +12,8 @@ import libxml2
 import collections
 from datetime import datetime, date, timedelta
 import time
+import logging
+logging.basicConfig(filename='example.log',level=logging.DEBUG,format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
 
 import songs_api as api
 reload(sys)
@@ -109,7 +111,11 @@ def getTimes(line):
 		stime = round(int(times[3])/1000)
 	else:
 		stime = 0
-	return atime,stime
+	if(times[1]!=''):
+		sduration = round(int(times[1])/1000)
+	else:
+		sduration = 0
+	return atime,stime,sduration
 #########################################################
 def CalculateMatch(curr_elem,vid_title):
 	list = ""
@@ -327,22 +333,22 @@ def CalculateMatch(curr_elem,vid_title):
 		decision = "Incorrect"
 	#fwritetext.write(vid_title + "\t" + decision + "\n")
 	if(decision == "Incorrect"):
-		print yname+ "----" + songName + "------"+match
+		logging.warning(yname+ "----" + songName + "------"+match)
 	#if(decision == "correct"):
 	#	print vid_title
 	if(curr_elem['albumname'].lower() == 'Young Americans'):
-		print decision
+		logging.warning(decision)
 	return decision,match,tm,sm,am
 
 
 
 def getYoutubeVideoforAlbum(album_name,artist_name,album_time):
 	#album_name = album_name.replace('-')
-	url = "https://gdata.youtube.com/feeds/api/videos/-/Music?q=allintitle%3A"+urllib.quote_plus(str(album_name))+"+"+urllib.quote_plus(str(artist_name))+"+"+urllib.quote_plus(str("full album"))+"&alt=json&max-results=5&key=AI39si508le_IQuKYfcn6ypItfVuy02D0k7yTR4OOYb1Bcs2bN97vRJcHXkEu3sHc-VtYxFfk0vuMfq79AxiEE_RJ9ZCSCPE4A"
+	url = "https://gdata.youtube.com/feeds/api/videos/-/Music?q=allintitle%3A"+urllib.quote_plus(str(album_name))+"+"+urllib.quote_plus(str(artist_name))+"+"+urllib.quote_plus(str("full album"))+"&alt=json&max-results=5&key=AI39si533lh1K1CnVTpmF6G6FI2kdWzSdjYE2jnsxo5-Nx-5VKkMgqBCB0-fd2sCxavZPOJQ8XQUEwqsUvBHRhFnzWNDQTM8FA"
 	try:
 		result = simplejson.load(urllib2.urlopen(url),"utf-8")
 	except Exception as e:
-		print e
+		logging.warning(e)
 		return
 	now = datetime.now()
 	curr_elem = {}
@@ -351,77 +357,81 @@ def getYoutubeVideoforAlbum(album_name,artist_name,album_time):
 	#print url
 	#print result
 	album_link_list = {}
-	if result['feed'].has_key('entry'):
-		i = 0
-		vcount=0
-		newvcount=0
-		iindex=-1	
-		flag = 0
-		vmatch = ""
-		vtm = 0
-		vsm = 0
-		vam = 0
-		duration = 0
-		for videoresult in result['feed']['entry']:
-			entry = result['feed']['entry'][i]
-			tempduration = entry['media$group']['yt$duration']['seconds']
-			if entry.has_key('yt$statistics'):
-				newvcount = entry['yt$statistics']['viewCount']
-				newtime = entry['yt$statistics']
-				tempduration = round(int(tempduration))
-				video1 = {}
-				match =0
-				print album_time
-				for time in album_time:
-					#print album_time
-					time = round(time)
-					if(int(tempduration) in range(int(time) - 30,int(time) + 30)):
-				  		print "times match ---tempduration "+ str(tempduration) +" --- time" + str(time)
-				  		#print entry['link'][0]['href']
-				  		#print album_link_list
-				  		#fwritetext.write(entry['link'][0]['href']+"\n")
-				  		match = 1
-				  		if(entry['link'][0]['href'] not in album_link_list):
-				  			album_link_list[entry['link'][0]['href']] ={}
-				  			album_link_list[entry['link'][0]['href']]['times']= [time]
-				  		else:
-				  			album_link_list[entry['link'][0]['href']]['times'].append(time)
-				  		#print album_link_list
-				if(match == 1):
-					album_link_list[entry['link'][0]['href']]['title'] = entry['title']['$t']
-					album_link_list[entry['link'][0]['href']]['author'] = entry['author']	
-					album_link_list[entry['link'][0]['href']]['img'] = entry['media$group']['media$thumbnail'][0]['url']
-					album_link_list[entry['link'][0]['href']]['published'] = entry['published']['$t']
-					album_link_list[entry['link'][0]['href']]['length'] = entry['media$group']['yt$duration']['seconds']
-					album_link_list[entry['link'][0]['href']]['name'] = album_name
-					m = re.search(re.compile("[0-9]{4}[-][0-9]{2}[-][0-9]{2}"),album_link_list[entry['link'][0]['href']]['published'])
-					n = re.search(re.compile("[0-9]{2}[:][0-9]{2}[:][0-9]{2}"),album_link_list[entry['link'][0]['href']]['published'])
-					ydate = m.group()+" "+n.group()
-					dd = ydate
-					yy = int(str(dd)[0:4])
-					mm = int(str(dd)[5:7])
-					total = (now.year-yy)*12+(now.month-mm)
-					if total < 1:
-						total = 1	
-					album_link_list[entry['link'][0]['href']]['length'] = entry['media$group']['yt$duration']['seconds']
-					if(now.month<10):
-						mm = '0'+str(now.month)
-					else:
-						mm = str(now.month)
-					if(now.day<10):
-						dd = '0'+str(now.day)
-					else:
-						dd = str(now.day)
-					album_link_list[entry['link'][0]['href']]['crawldate'] = str(now.year)+"-"+mm+"-"+dd
-					if entry.has_key('yt$statistics'):
-						album_link_list[entry['link'][0]['href']]['viewcount'] = entry['yt$statistics']['viewCount']
-						if(total != 0):
-							album_link_list[entry['link'][0]['href']]['viewcountRate'] = float(album_link_list[entry['link'][0]['href']]['viewcount'])/total
-					if entry.has_key('gd$rating'):
-						album_link_list[entry['link'][0]['href']]['rating'] = entry['gd$rating']['average']
-			i = i + 1
+	try:
+		if result['feed'].has_key('entry'):
+			i = 0
+			vcount=0
+			newvcount=0
+			iindex=-1	
+			flag = 0
+			vmatch = ""
+			vtm = 0
+			vsm = 0
+			vam = 0
+			duration = 0
+			for videoresult in result['feed']['entry']:
+				entry = result['feed']['entry'][i]
+				tempduration = entry['media$group']['yt$duration']['seconds']
+				if entry.has_key('yt$statistics'):
+					newvcount = entry['yt$statistics']['viewCount']
+					newtime = entry['yt$statistics']
+					tempduration = round(int(tempduration))
+					video1 = {}
+					match =0
+					logging.warning(album_time)
+					for time in album_time:
+						#print album_time
+						time = round(time)
+						if(int(tempduration) in range(int(time) - 30,int(time) + 30)):
+					  		logging.warning("times match ---tempduration "+ str(tempduration) +" --- time" + str(time))
+					  		#print entry['link'][0]['href']
+					  		#print album_link_list
+					  		#fwritetext.write(entry['link'][0]['href']+"\n")
+					  		match = 1
+					  		if(entry['link'][0]['href'] not in album_link_list):
+					  			album_link_list[entry['link'][0]['href']] ={}
+					  			album_link_list[entry['link'][0]['href']]['times']= [time]
+					  		else:
+					  			album_link_list[entry['link'][0]['href']]['times'].append(time)
+					  		#print album_link_list
+					if(match == 1):
+						album_link_list[entry['link'][0]['href']]['title'] = entry['title']['$t']
+						album_link_list[entry['link'][0]['href']]['author'] = entry['author']	
+						album_link_list[entry['link'][0]['href']]['img'] = entry['media$group']['media$thumbnail'][0]['url']
+						album_link_list[entry['link'][0]['href']]['published'] = entry['published']['$t']
+						album_link_list[entry['link'][0]['href']]['length'] = entry['media$group']['yt$duration']['seconds']
+						album_link_list[entry['link'][0]['href']]['name'] = album_name
+						m = re.search(re.compile("[0-9]{4}[-][0-9]{2}[-][0-9]{2}"),album_link_list[entry['link'][0]['href']]['published'])
+						n = re.search(re.compile("[0-9]{2}[:][0-9]{2}[:][0-9]{2}"),album_link_list[entry['link'][0]['href']]['published'])
+						ydate = m.group()+" "+n.group()
+						dd = ydate
+						yy = int(str(dd)[0:4])
+						mm = int(str(dd)[5:7])
+						total = (now.year-yy)*12+(now.month-mm)
+						if total < 1:
+							total = 1	
+						album_link_list[entry['link'][0]['href']]['length'] = entry['media$group']['yt$duration']['seconds']
+						if(now.month<10):
+							mm = '0'+str(now.month)
+						else:
+							mm = str(now.month)
+						if(now.day<10):
+							dd = '0'+str(now.day)
+						else:
+							dd = str(now.day)
+						album_link_list[entry['link'][0]['href']]['crawldate'] = str(now.year)+"-"+mm+"-"+dd
+						if entry.has_key('yt$statistics'):
+							album_link_list[entry['link'][0]['href']]['viewcount'] = entry['yt$statistics']['viewCount']
+							if(total != 0):
+								album_link_list[entry['link'][0]['href']]['viewcountRate'] = float(album_link_list[entry['link'][0]['href']]['viewcount'])/total
+						if entry.has_key('gd$rating'):
+							album_link_list[entry['link'][0]['href']]['rating'] = entry['gd$rating']['average']
+				i = i + 1
 
-		return album_link_list
+			return album_link_list
+	except Exception as e:
+		logging.warning(e)
+		return
 
 def write(self,filename):
 	with codecs.open(filename,"w","utf-8") as output:
@@ -457,7 +467,7 @@ def getMostFrequentTime(songTimeList):
 		tempstr = s[:s.find('&feature=youtube_gdata')]
 		#print tempstr[-11:]
 		tid = tempstr[-11:]
-		stime = int(s[s.find('&t=')+3:])
+		stime = int(s[s.find('&t=')+3:s.find('&d=')])
 		if(stime not in song_times):
 			song_times[stime] = 1
 		else:
@@ -499,7 +509,7 @@ t1=time.time()
 
 directory = str(sys.argv[1])
 
-print "slist========================================" 
+logging.warning("slist========================================")
 fread = codecs.open(directory+'/songs.txt','r','utf8')
 curr_line = fread.readline()
 crawled_albums = []
@@ -516,7 +526,7 @@ path = directory + "/artist.txt"
 try:
 	fa = codecs.open(path,"r","utf-8")
 except IOError as e:
-#	print "Missing artist file!!"
+	logging.warning("Missing artist file!!")
 	exit()
 line = fa.readline()
 if not line:
@@ -559,13 +569,13 @@ while curr_line:
 		song['albumInfo'] = [albumInfo]
 
 		curr_album_name = albumInfo['albumname'].lower()
-		albumInfo['albumtime'],albumInfo['songtime'] = getTimes(curr_line)
+		albumInfo['albumtime'],albumInfo['songtime'],albumInfo['songduration'] = getTimes(curr_line)
 		#times[albumInfo['albumtime']] = albumInfo['songtime']
 		if('times' not in albumInfo):
 			albumInfo['times'] = {}
-			albumInfo['times'][albumInfo['albumtime']] = albumInfo['songtime']
+			albumInfo['times'][albumInfo['albumtime']] = [albumInfo['songtime'],albumInfo['songduration']]
 		else:
-			albumInfo['times'][albumInfo['albumtime']] = albumInfo['songtime']
+			albumInfo['times'][albumInfo['albumtime']] = [albumInfo['songtime'],albumInfo['songduration']]
 
 		if(curr_album_name not in total_albums):
 		#total_albums.append(curr_album_name)
@@ -593,7 +603,7 @@ for album in total_albums:
 		album_list[album.lower()] ={}
 	#print youtubelink_list
 	for link in youtubelink_list:
-		print link
+		logging.warning(link)
 		if(youtubelink_list[link]['name'].lower() in album_list):
 			album_list[album.lower()][link] = youtubelink_list[link]
 for album in album_list:
@@ -648,7 +658,7 @@ for song in sorted_list:
 				final_song_list[Item_id]['viewcountRate'] = album_list[album['albumname'].lower()]['viewcountRate']
 				final_song_list[Item_id]['rating'] = album_list[album['albumname'].lower()]['rating']	
 				for link in link_mapping:
-					final_song_list[Item_id]['urllist'].append(link_mapping[link]+'&t='+str(int(album['times'][link])))
+					final_song_list[Item_id]['urllist'].append(link_mapping[link]+'&t='+str(int(album['times'][link][0]))+'&d='+str(int(album['times'][link][1])))
 				#print album['times']
 		final_song_list[Item_id]['year'] = song['albumInfo'][0]['year']
 		final_song_list[Item_id]['language'] = song['albumInfo'][0]['language']
@@ -667,7 +677,7 @@ for song in sorted_list:
 				#print s['matched_youtube_links']
 				link_mapping = getalbumtime(s['matched_youtube_links'],s['times'])
 				for link in link_mapping:
-					final_song_list[Item_id]['urllist'].append(link_mapping[link]+'&t='+str(int(s['times'][link])))
+					final_song_list[Item_id]['urllist'].append(link_mapping[link]+'&t='+str(int(s['times'][link][0]))+'&d='+str(int(s['times'][link][1])))
 
 			lang_count = {}
 			if(stemp.has_key('lang_count')):
@@ -725,5 +735,5 @@ write(song_list_dump,directory+"/dump")
 fwritetext.close()
 #print final_song_list"""
 print len(album_list)
-print "album crawl time=" + str(time.time()-t1)
+logging.warning("album crawl time=" + str(time.time()-t1))
 

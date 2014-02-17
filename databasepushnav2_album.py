@@ -2,6 +2,8 @@ from multiprocessing import Process
 import os
 import re
 import time
+import logging
+logging.basicConfig(filename='example.log',level=logging.DEBUG,format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
 def func(strg):
 	os.system(strg)
 
