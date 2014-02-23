@@ -4,6 +4,7 @@ import re
 import time
 def func(strg):
 	os.system(strg)
+logging.basicConfig(filename='songsparserpart1.log',level=logging.DEBUG,format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
 
 directory = raw_input("Enter directory: ")
 m = raw_input("Enter m: ")
