@@ -25,6 +25,22 @@ from datetime import datetime, date, timedelta
 import logging
 import songs_api as api
 reload(sys)
+
+import logging
+reload(sys)
+directory = str(sys.argv[1])
+sys.setdefaultencoding('utf8')
+formatter = logging.Formatter('%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
+logger = logging.getLogger('simple_logger')
+hdlr_1 = logging.FileHandler('songsparserpart1.log')
+hdlr_1.setFormatter(formatter)
+logger.addHandler(hdlr_1)
+
+# second file logger
+logger_finished = logging.getLogger('simple_logger_2')
+hdlr_2 = logging.FileHandler(directory+'/../../finishedpart1.log')    
+hdlr_2.setFormatter(formatter)
+logger_finished.addHandler(hdlr_2)
 sys.setdefaultencoding('utf8')
 #fwritetext = codecs.open("id2.txt",'a','utf8')
 hits = 0
@@ -614,7 +630,21 @@ print "slist========================================"
 ########################################## sort the songs to eliminate duplicates ###################################
 try:
 	fread = codecs.open(directory+'/songs.txt','r','utf8')
-
+	path = directory + "/artist.txt"
+	try:
+		fa = codecs.open(path,"r","utf-8")
+	except IOError as e:
+#	print "Missing artist file!!"
+		exit()
+	line = fa.readline()
+	if not line:
+		print "artist name not found"
+		line = ""
+	fa.close()
+	artistNameFromArtist = str(line)
+	artistNameFromArtist = artistNameFromArtist.replace("&amp;", "&")
+	artistNameFromArtist = artistNameFromArtist.replace('\n','',1)
+	artistNameFromArtist = artistNameFromArtist.strip()
 	
 	fwrite_country = codecs.open(directory+'/country_percentage.txt','w','utf8')
 	fchange_country = codecs.open(directory+'/changecountry.txt','w','utf8')
@@ -776,8 +806,8 @@ try:
 
 		#print s['language'] 
 		#print s['lang_count']
-		if(not s.has_key('artistName')):
-			print s
+		if(not s.has_key('artistName') or not(s['artistName'].lower() == artistNameFromArtist.lower())):
+			#print s
 			continue
 		if(s['artistName'] in artist_alias_list):
 			for art_alias in  artist_alias_list:
