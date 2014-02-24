@@ -37,10 +37,7 @@ hdlr_1.setFormatter(formatter)
 logger.addHandler(hdlr_1)
 
 # second file logger
-logger_finished = logging.getLogger('simple_logger_2')
-hdlr_2 = logging.FileHandler(directory+'/../../finishedpart1.log')    
-hdlr_2.setFormatter(formatter)
-logger_finished.addHandler(hdlr_2)
+
 sys.setdefaultencoding('utf8')
 #fwritetext = codecs.open("id2.txt",'a','utf8')
 hits = 0
@@ -49,6 +46,20 @@ full_country_list = {}
 full_country_list_sort = {}
 
 misses = 0
+
+def GetAlias(directory):
+	#global aliases
+	aliases = []
+
+	if(os.path.exists(directory+'/alias.txt') == False):
+		print "mistake"
+		return []
+	fread = codecs.open(directory+'/alias.txt','r','utf-8')
+	lines = fread.readlines()
+	for l in lines:
+		if(l.strip().lower()):
+			aliases.append(l.strip().lower())
+	return aliases
 class Album_Data():
 	pass
 
@@ -626,7 +637,7 @@ directory = str(sys.argv[1])
 
 print "slist========================================" 
 
-
+aliases = GetAlias(directory)
 ########################################## sort the songs to eliminate duplicates ###################################
 try:
 	fread = codecs.open(directory+'/songs.txt','r','utf8')
@@ -645,7 +656,7 @@ try:
 	artistNameFromArtist = artistNameFromArtist.replace("&amp;", "&")
 	artistNameFromArtist = artistNameFromArtist.replace('\n','',1)
 	artistNameFromArtist = artistNameFromArtist.strip()
-	
+	aliases.append(artistNameFromArtist.lower())
 	fwrite_country = codecs.open(directory+'/country_percentage.txt','w','utf8')
 	fchange_country = codecs.open(directory+'/changecountry.txt','w','utf8')
 	fchange_language = codecs.open(directory+'/changelanguage.txt','w','utf8')
@@ -806,7 +817,7 @@ try:
 
 		#print s['language'] 
 		#print s['lang_count']
-		if(not s.has_key('artistName') or not(s['artistName'].lower() == artistNameFromArtist.lower())):
+		if(not s.has_key('artistName') or s['artistName'].lower() not in aliases):
 			#print s
 			continue
 		if(s['artistName'] in artist_alias_list):
