@@ -14,7 +14,7 @@ import songs_api as api
 import logging
 reload(sys)
 sys.setdefaultencoding('utf8')
-directory = str(sys.argv[1])
+#directory = str(sys.argv[1])
 formatter = logging.Formatter('%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
 logger = logging.getLogger('simple_logger')
 hdlr_1 = logging.FileHandler('songsparserpart2.log')
@@ -23,7 +23,7 @@ logger.addHandler(hdlr_1)
 
 # second file logger
 logger_finished = logging.getLogger('simple_logger_2')
-hdlr_2 = logging.FileHandler(directory+'/../../finishedpart2.log')    
+hdlr_2 = logging.FileHandler('finishedpart2.log')    
 hdlr_2.setFormatter(formatter)
 logger_finished.addHandler(hdlr_2)
 #logging.basicConfig(filename='songsparserpart2.log',level=logging.DEBUG,format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
@@ -145,25 +145,13 @@ def _decode_dict(data):
     return rv
 """
 
-def genXML(vid,avgcnt,avgcntrece):
+def genXML(vid,avgcnt,avgcntrece,genre,stylelist,subgenlist,artistNameFromArtist):
 	try:
-		global genre
-		global stylelist
 		global opdir
-		global subgenlist
-		global totalCount
-		global hitCount
-		global failCount
-		global absoluteCount
-		global flist
-		global songMatch 
-		global artistMatch 
-		global tempArMatch
-		global leftMatch 
-		global rightMatch
-		global percentMatch
-		global albumsList
-		global yearsList
+		artistMatch = 0.0
+		percentMatch = 0.0
+		albumsList = []
+		yearsList = []
 		aliases = []
 		xmlsng = "</songs>\n"
 		flist = ""
@@ -187,7 +175,6 @@ def genXML(vid,avgcnt,avgcntrece):
 		songName = vid['name']
 		#print (line)
 		albumName = vid['album']
-		totalCount = totalCount + 1
 		#print "=============================================TOTAL COUNT+++++++++++++++++++++++++++++++++++++++++++++++++++++++"
 		#print totalCount
 		for f in ftArtistName:
@@ -570,33 +557,7 @@ leftMatch = 0.0
 rightMatch = 0.0
 percentMatch = 0.0
 doc = libxml2.parseFile('genres_manual.xml')
-directory = str(sys.argv[1])
-dindex = directory.rfind("/")
 
-avgcnt,avgcntrece =  CalculateAverages(directory)
-"""
-try:
-	json_data = codecs.open(directory+'/dump',"r","utf-8")
-	#strg = json_data.read()
-	vids = json.load(json_data)
-	#vids = json.loads(strg, object_hook=_decode_dict)
-except IOError as e:
-	print "Missing dump file"
-	exit()
-"""
-vids = []
-try:
-	load(directory+'/dump')
-except Exception as e:
-	exit()
-#print vids
-#write(vids,directory+"/dumps")
-
-#print dindex
-artistId = directory[dindex+1:]
-useBelow = directory[0:dindex]
-uindex = useBelow.rfind("/")
-dirt = useBelow[uindex+1:]
 #print "Working on this Artist Now: "
 #print artistId
 flagstyle = 1
@@ -641,119 +602,150 @@ fname = path
 fx = codecs.open(fname,"w","utf-8")
 fx.write("")
 fx.close()
-path = directory + "/artist.txt"
-try:
-	fa = codecs.open(path,"r","utf-8")
-except IOError as e:
-#	print "Missing artist file!!"
-	exit()
-line = fa.readline()
-if not line:
-	print "artist name not found"
-	fa.close()
-	exit()
-fa.close()
-global artistNameFromArtist
-artistNameFromArtist = str(line)
-artistNameFromArtist = artistNameFromArtist.replace("&amp;", "&")
-artistNameFromArtist = artistNameFromArtist.replace('\n','',1)
-artistNameFromArtist = artistNameFromArtist.strip()
-path = directory + "/genres.txt"
+#print "testing"
+dirlist =  sys.argv[1].split(',')
+#print dirlist
+for d in dirlist:
+	if(len(d.strip()) == 0):
+		continue
+	directory = d.strip()
+	dindex = directory.rfind("/")
 
-try:
-	fg = codecs.open(path,"r","utf-8")
-	while 1:
-		line = fg.readline()
-		if not line:
-			break
-		line=str(line).replace("&amp;", "&")
-		line = line.replace('\n','')
-		if line not in genre:
-			genre.append(line)
-	fg.close()
-except IOError as e:
-	print "Missing genres for Artist:"+artistNameFromArtist+" Folder:"+directory+"\n"
-path = directory + "/styles.txt"
-length = 0
-try:
-	fs = codecs.open(path,"r","utf-8")
-	while 1:
-		line = fs.readline()
-		if not line:
-			break
-		line=str(line).replace("&amp;", "&")
-		#styleHandleString = styleHandleString + line
-		length = length + len(line.strip())
-		style.append(line.replace('\n',''))
-	fs.close()
-except IOError as e:
-	print "Missing styles for Artist:"+artistNameFromArtist+" Folder:"+directory+"\n"
-	flagstyle = 0
-genl1 = doc.xpathEval("/categories/*")
-for l in genl1:
-	#print l.name
-	lev1.append(l.name)
-"""for g in genre:
-	#print g
-	if g in lev1:
-		if g not in level1g:
-			level1g.append(g)
-	else:
-		wronggen.append(g)"""
-print "Before styles loop"		
-if length > 0:
-	for st in style:
-		st = st.strip()
-		if(st == ''):
-			continue;
-		st = str(st).replace("&amp;", "&")
-		if st in lev1 and st not in genre:
-			genre.append(st)
-		stE = encodexml(st)
-		print "stE   " +str(stE)
+	avgcnt,avgcntrece =  CalculateAverages(directory)
+	"""
+	try:
+		json_data = codecs.open(directory+'/dump',"r","utf-8")
+		#strg = json_data.read()
+		vids = json.load(json_data)
+		#vids = json.loads(strg, object_hook=_decode_dict)
+	except IOError as e:
+		print "Missing dump file"
+		exit()
+	"""
+	vids = []
+	try:
+		load(directory+'/dump')
+	except Exception as e:
+		exit()
+	#print vids
+	#write(vids,directory+"/dumps")
+
+	#print dindex
+	artistId = directory[dindex+1:]
+
+	path = directory + "/artist.txt"
+	try:
+		fa = codecs.open(path,"r","utf-8")
+	except IOError as e:
+	#	print "Missing artist file!!"
+		exit()
+	line = fa.readline()
+	if not line:
+		print "artist name not found"
+		fa.close()
+		exit()
+	fa.close()
+	artistNameFromArtist =""
+	artistNameFromArtist = str(line)
+	artistNameFromArtist = artistNameFromArtist.replace("&amp;", "&")
+	artistNameFromArtist = artistNameFromArtist.replace('\n','',1)
+	artistNameFromArtist = artistNameFromArtist.strip()
+	path = directory + "/genres.txt"
+
+	try:
+		fg = codecs.open(path,"r","utf-8")
+		while 1:
+			line = fg.readline()
+			if not line:
+				break
+			line=str(line).replace("&amp;", "&")
+			line = line.replace('\n','')
+			if line not in genre:
+				genre.append(line)
+		fg.close()
+	except IOError as e:
+		print "Missing genres for Artist:"+artistNameFromArtist+" Folder:"+directory+"\n"
+	path = directory + "/styles.txt"
+	length = 0
+	try:
+		fs = codecs.open(path,"r","utf-8")
+		while 1:
+			line = fs.readline()
+			if not line:
+				break
+			line=str(line).replace("&amp;", "&")
+			#styleHandleString = styleHandleString + line
+			length = length + len(line.strip())
+			style.append(line.replace('\n',''))
+		fs.close()
+	except IOError as e:
+		print "Missing styles for Artist:"+artistNameFromArtist+" Folder:"+directory+"\n"
+		flagstyle = 0
+	genl1 = doc.xpathEval("/categories/*")
+	for l in genl1:
+		#print l.name
+		lev1.append(l.name)
+	"""for g in genre:
+		#print g
+		if g in lev1:
+			if g not in level1g:
+				level1g.append(g)
+		else:
+			wronggen.append(g)"""
+	print "Before styles loop"		
+	if length > 0:
+		for st in style:
+			st = st.strip()
+			if(st == ''):
+				continue;
+			st = str(st).replace("&amp;", "&")
+			if st in lev1 and st not in genre:
+				genre.append(st)
+			stE = encodexml(st)
+			print "stE   " +str(stE)
+			xmlpath = "//"+stE+"/.."
+			print "xmlpath  " +str(xmlpath)
+			try:
+				parentnode = doc.xpathEval(xmlpath)
+				for node in parentnode:
+					parent = node.name
+					if parent in lev1: 
+						if st not in subgenlist:
+							subgenlist.append(st)
+					elif parent == "categories":
+						if st not in genre:
+							genre.append(st)
+					elif parent not in subgenlist:
+						subgenlist.append(parent)
+						if st not in stylelist:
+							stylelist.append(st)
+			except:
+				print "Calling write1"
+				write1("Error in styles    xmlpath   " +str(xmlpath) +str(directory),errordir+"/StyleError")
+				print "Error in styles    xmlpath   " +str(xmlpath)
+	for l2 in subgenlist:
+		stE = encodexml(l2)
 		xmlpath = "//"+stE+"/.."
-		print "xmlpath  " +str(xmlpath)
 		try:
 			parentnode = doc.xpathEval(xmlpath)
 			for node in parentnode:
 				parent = node.name
-				if parent in lev1: 
-					if st not in subgenlist:
-						subgenlist.append(st)
-				elif parent == "categories":
-					if st not in genre:
-						genre.append(st)
-				elif parent not in subgenlist:
-					subgenlist.append(parent)
-					if st not in stylelist:
-						stylelist.append(st)
+				if parent in lev1 and parent not in genre:
+					genre.append(parent)
 		except:
-			print "Calling write1"
-			write1("Error in styles    xmlpath   " +str(xmlpath) +str(directory),errordir+"/StyleError")
-			print "Error in styles    xmlpath   " +str(xmlpath)
-for l2 in subgenlist:
-	stE = encodexml(l2)
-	xmlpath = "//"+stE+"/.."
-	try:
-		parentnode = doc.xpathEval(xmlpath)
-		for node in parentnode:
-			parent = node.name
-			if parent in lev1 and parent not in genre:
-				genre.append(parent)
-	except:
-		logger.error("Error in styles    xmlpath   " +str(xmlpath))
+			logger.error("Error in styles    xmlpath   " +str(xmlpath))
+			
 		
-	
 
 
-for v in vids:
-	ttt=ttt+1
-	t3=datetime.now()
-	#print "v in vid============================================================================"
-	#print v
-	#print "ttt in vids=========================================================================================="
-	#print ttt
-	genXML(v,avgcnt,avgcntrece)
+	for v in vids:
+		ttt=ttt+1
+		t3=datetime.now()
+		#print "v in vid============================================================================"
+		#print v
+		#print "ttt in vids=========================================================================================="
+		#print ttt
+		genXML(v,avgcnt,avgcntrece,genre,stylelist,subgenlist,artistNameFromArtist)
 	#print "time for xmlifpresent= " +str(datetime.now()-t3)
 #print "len"+str(length)
 t2=datetime.now()

@@ -24,20 +24,22 @@ t1=time.time()
 
 for dirs in os.listdir(directory):
   	found = re.search(r'[0-9]+',str(dirs),0)
-	print dirs
+	#print dirs
 #ipdir = str(sys.argv[1])
   	if found:
 		for curr_dir, sub_dir, filenames in os.walk(directory+'/'+dirs):
 			for sd in sub_dir:
-				print os.path.join(curr_dir,sd)
+				#print os.path.join(curr_dir,sd)
 				f = re.search(r'[0-9]+',str(sd),0)
-				print f
+				#print f
 				if not f:
 					continue
-				strg = "python mysong_p2.py " + os.path.join(curr_dir,sd) +' '+ sd
+				#strg = "python mysong_p2.py " + ','.join([os.path.join(curr_dir,sd)])
+				strg = os.path.join(curr_dir,sd)
+
 				#print strg
 				foldlist.append(strg)
-
+#print foldlist
 
 """for d in os.listdir(dirt):
 #for d in os.listdir(str(os.getcwd())+"/"+dirt):
@@ -63,7 +65,11 @@ for j in range(1,blocknumber+1):
 		q = t
 	else:
 		q = m
-	for i in foldlist[p*m:p*m+q]:
+	print foldlist[p*m:p*m+q]
+	if(len(foldlist[p*m:p*m+q]) != 0):
+		arguments = 'python mysong_p2.py '+','.join(foldlist[p*m:p*m+q])
+		proc = Process(target=func,args=(arguments,))
+		'''for i in foldlist[p*m:p*m+q]:
 		p = Process(target=func,args=(i,))
 		findex = i.rfind(' ')
 		foldname = i[findex+1:len(i)]
@@ -71,8 +77,9 @@ for j in range(1,blocknumber+1):
 		print foldname
 		count = count + 1
 		print "count="+str(count)
-		jobs.append(p)
-		p.start()
-	p.join()
+		#jobs.append(p)'''
+		proc.start()
+	proc.join()
+
 print "databasetime=" + str(time.time()-t1)
 		
