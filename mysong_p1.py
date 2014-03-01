@@ -3,7 +3,7 @@ Vinay Kumar pamarthi
 Program to get the songs from the songs.txt and then crawl youtube to get the appropriate video for the song if present.
 The song is selected based on the match percent of the artist,song and total match.
 
-
+key=AI39si533lh1K1CnVTpmF6G6FI2kdWzSdjYE2jnsxo5-Nx-5VKkMgqBCB0-fd2sCxavZPOJQ8XQUEwqsUvBHRhFnzWNDQTM8FA
 
 '''
 
@@ -257,6 +257,8 @@ def CalculateMatch(curr_elem,vid_title):
 		common2 = (set(anameset).intersection(set(areadset)))
 		if float(len(anameset)) !=0:
 			artistMatch = len(common2)*100/float(len(anameset))
+		else:
+			artistMatch = 0
 		tempArMatch = artistMatch
 		arnameset = re.findall("\w+",artistName.lower(),re.U)
 		leftset = yresultset[:len(arnameset)]
@@ -296,6 +298,8 @@ def CalculateMatch(curr_elem,vid_title):
 		common2 = (set(anameset).intersection(set(areadset)))
 		if float(len(anameset)) !=0:
 			artistMatch = len(common2)*100/float(len(anameset))
+		else:
+			artistMatch = 0
 		arnameset = re.findall("\w+",artistName.lower(),re.U)
 		leftset = yresultset[:len(arnameset)]
 		rightset = yresultset[-len(arnameset):]
@@ -436,9 +440,9 @@ def getVideo(curr_elem,v):
 	ftartists = flist[1:]
 	#Apostolos allArtists = video.artist+" "+ftartists
 	allArtists = video.artist.strip("-")+" "+ftartists
-	url = "https://gdata.youtube.com/feeds/api/videos/-/Music?q=allintitle%3A"+urllib.quote_plus(str(allArtists))+"+"+urllib.quote_plus(str(video.name))+"&alt=json&max-results=5&key=AI39si508le_IQuKYfcn6ypItfVuy02D0k7yTR4OOYb1Bcs2bN97vRJcHXkEu3sHc-VtYxFfk0vuMfq79AxiEE_RJ9ZCSCPE4A"
+	url = "https://gdata.youtube.com/feeds/api/videos/-/Music?q=allintitle%3A"+urllib.quote_plus(str(allArtists))+"+"+urllib.quote_plus(str(video.name))+"&alt=json&max-results=5&key=AI39si533lh1K1CnVTpmF6G6FI2kdWzSdjYE2jnsxo5-Nx-5VKkMgqBCB0-fd2sCxavZPOJQ8XQUEwqsUvBHRhFnzWNDQTM8FA"
 	#print url  
-	#Youtube Key AI39si508le_IQuKYfcn6ypItfVuy02D0k7yTR4OOYb1Bcs2bN97vRJcHXkEu3sHc-VtYxFfk0vuMfq79AxiEE_RJ9ZCSCPE4A
+	#Youtube key=AI39si533lh1K1CnVTpmF6G6FI2kdWzSdjYE2jnsxo5-Nx-5VKkMgqBCB0-fd2sCxavZPOJQ8XQUEwqsUvBHRhFnzWNDQTM8FA
 	try:
 		result = simplejson.load(urllib2.urlopen(url),"utf-8")
 	except Exception as e:
