@@ -3,8 +3,23 @@ import os
 import re
 import time
 import logging
+import codecs
+
+fwritetext = codecs.open("parallelprocess.txt",'a','utf8')
+
+
+def info():
+    print 'module name:', __name__
+    if hasattr(os, 'getppid'):  # only available on Unix
+        fwritetext.write('parent process: ') 
+        fwritetext.write(str(os.getppid()))
+        fwritetext.write('\n')
+    fwritetext.write('process id:')
+    fwritetext.write(str(os.getpid()))
+    fwritetext.write('\n')
 
 def func(strg):
+	info()
 	os.system(strg)
 logging.basicConfig(filename='songsparserpart2.log',level=logging.DEBUG,format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
 
