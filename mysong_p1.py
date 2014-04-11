@@ -23,7 +23,6 @@ import libxml2
 import collections
 from datetime import datetime, date, timedelta
 import logging
-import songs_api as api
 reload(sys)
 
 import logging
@@ -35,7 +34,7 @@ logger = logging.getLogger('simple_logger')
 hdlr_1 = logging.FileHandler('songsparserpart1.log')
 hdlr_1.setFormatter(formatter)
 logger.addHandler(hdlr_1)
-
+request_count = 87025
 # second file logger
 
 sys.setdefaultencoding('utf8')
@@ -52,7 +51,7 @@ def GetAlias(directory):
 	aliases = []
 
 	if(os.path.exists(directory+'/alias.txt') == False):
-		print "mistake"
+		print "Alias.txt not found"
 		return []
 	fread = codecs.open(directory+'/alias.txt','r','utf-8')
 	lines = fread.readlines()
@@ -210,7 +209,7 @@ def CalculateMatch(curr_elem,vid_title):
 	if(len(ftArtistSet)!=0):
 		ftMatch = ftAMatch*100/len(ftArtistSet)
 	#mysong.set_substring_ftartist(ftMatch);
-	remove = "lyrics official video hd hq edit music lyric audio acoustic videoclip featuring ft feat radio remix "
+	remove = "lyrics official video hd hq edit music lyric audio acoustic videoclip featuring ft feat radio remix and"
 	diffset = re.findall("\w+",remove.lower(),re.U)
 	yfullset = re.findall("\w+",yname.lower(),re.U)
 	ydiffset = set(yfullset) - set(diffset) 
@@ -242,13 +241,14 @@ def CalculateMatch(curr_elem,vid_title):
 			sname = yname[y2+1:]
 		aname.strip()
 		sname.strip()
-		snameset1 = set(re.findall("\w+",sname.lower(),re.U))-set(diffset)
+		snameset1 = set(re.findall("\w+",sname.lower(),re.U))-set(diffset) - set(ftArtistSet)
 		snameset = set(snameset1)
 		sreadset = re.findall("\w+",songName.lower(),re.U)
 		common1 = (set(snameset).intersection(set(sreadset)))
 		if float(len(snameset)) !=0:
 			songMatch = len(common1)*100/float(len(snameset))
 		anameset = re.findall("\w+",aname.lower(),re.U)
+		anameset = set(anameset) - set(diffset) - set(ftArtistSet)
 		#if "feat" in anameset:
 		#	areadset = re.findall("\w+",allArtists.lower()+"."+conlist.lower(),re.U)
 		#else:
@@ -276,7 +276,7 @@ def CalculateMatch(curr_elem,vid_title):
 		#if (leftMatch == 100.0):
 		#	mysong.set_decision("Correct")
 		#print match
-	if(((y1 != -1) or (y2 != -1)) and leftMatch != 100.0): # right match if left match is zero.
+	if(((y1 != -1) or (y2 != -1)) and (leftMatch != 100.0 and am != 100.0 and sm!= 100.0)): # right match if left match is zero.
 		bhiphen = True
 		#print "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
 		if(y1 != -1):
@@ -287,7 +287,7 @@ def CalculateMatch(curr_elem,vid_title):
 			aname = yname[y2+1:]
 		aname.strip()
 		sname.strip()
-		snameset1 = set(re.findall("\w+",sname.lower(),re.U))-set(diffset)
+		snameset1 = set(re.findall("\w+",sname.lower(),re.U))-set(diffset) - set(ftArtistSet)
 		snameset = set(snameset1)-set(ftArtistSet)
 		sreadset = re.findall("\w+",songName.lower(),re.U)	
 		common1 = (set(snameset).intersection(set(sreadset)))
@@ -320,7 +320,7 @@ def CalculateMatch(curr_elem,vid_title):
 		#mysong.set_overLap(match)
 	if((y1 == -1) and (y2 == -1)):	
 		#print("YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY")
-		arnameset = re.findall("\w+",artistName.lower(),re.U)
+		arnameset = set(re.findall("\w+",artistName.lower(),re.U)) - set(diffset) - set(ftArtistSet)
 		leftset = yresultset[:len(arnameset)]
 		rightset = yresultset[-len(arnameset):]
 		leftIntersection = (set(leftset).intersection(set(arnameset)))
@@ -334,7 +334,7 @@ def CalculateMatch(curr_elem,vid_title):
 		#if float(len(yresultset)) !=0:
 		#	songMatch = len(common_set)*100/float(len(yresultset))
 		if(leftMatch > rightMatch):
-			songreadset = re.findall("\w+",songName.lower(),re.U)		
+			songreadset = set(re.findall("\w+",songName.lower(),re.U)) - set(diffset) - set(ftArtistSet)	
 			common_set = (set(yresultset[-len(songreadset):]).intersection(set(songreadset)))
 			yresultset = (set(yresultset) - set(arnameset))
 			if float(len(songreadset)) !=0:
@@ -344,7 +344,7 @@ def CalculateMatch(curr_elem,vid_title):
 			sm = songMatch
 			am = leftMatch
 		else:
-			songreadset = re.findall("\w+",songName.lower(),re.U)		
+			songreadset = set(re.findall("\w+",songName.lower(),re.U)) - set(diffset) - set(ftArtistSet)	
 			common_set = (set(yresultset[:len(songreadset)]).intersection(set(songreadset)))
 			yresultset = (set(yresultset) - set(arnameset))
 			if float(len(songreadset)) !=0:
@@ -388,9 +388,24 @@ def CalculateMatch(curr_elem,vid_title):
 	#	fwritetext.write(match + "\t" + artistName + "\t" + songName + "\t" + vid_title + "\t" + decision + "\n")
 	return decision,match,tm,sm,am
 
-
+def ParseTime(time):
+	time = time.replace('PT','')
+	hours = 0
+	minutes = 0
+	seconds = 0
+	if(time.find('H') != -1):
+		hours = time[:time.find('H')]
+		time = time[time.find('H')+1:]
+	if(time.find('M')!= -1): 
+		minutes = time[:time.find('M')]
+		time = time[time.find('M')+1:]
+	if(time.find('S')!= -1):
+		seconds = time[:time.find('S')]
+		time = time[time.find('S')+1:]
+	return (((int(hours)*60)+int(minutes))*60 + int(seconds))
 def getVideo(curr_elem,v):
 	global hits
+	global request_count
 	global misses
 	alist = list()
 	ylist = list()
@@ -440,93 +455,82 @@ def getVideo(curr_elem,v):
 	ftartists = flist[1:]
 	#Apostolos allArtists = video.artist+" "+ftartists
 	allArtists = video.artist.strip("-")+" "+ftartists
-	url = "https://gdata.youtube.com/feeds/api/videos/-/Music?q=allintitle%3A"+urllib.quote_plus(str(allArtists))+"+"+urllib.quote_plus(str(video.name))+"&alt=json&max-results=5&key=AI39si533lh1K1CnVTpmF6G6FI2kdWzSdjYE2jnsxo5-Nx-5VKkMgqBCB0-fd2sCxavZPOJQ8XQUEwqsUvBHRhFnzWNDQTM8FA"
-	#print url  
+	#url = "https://gdata.youtube.com/feeds/api/videos/-/Music?q=allintitle%3A"+urllib.quote_plus(str(allArtists))+"+"+urllib.quote_plus(str(video.name))+"&alt=json&max-results=5&key=AI39si533lh1K1CnVTpmF6G6FI2kdWzSdjYE2jnsxo5-Nx-5VKkMgqBCB0-fd2sCxavZPOJQ8XQUEwqsUvBHRhFnzWNDQTM8FA"
+	searchUrl = "https://www.googleapis.com/youtube/v3/search?part=snippet&q=allintitle%3A"+urllib.quote_plus(str(allArtists))+"+"+urllib.quote_plus(str(video.name))+"&alt=json&type=video&channelID=UC-9-kyTW8ZkZNDHQJ6FgpwQ&max-results=5&key=AIzaSyBE5nUPdQ7J_hlc3345_Z-I4IG-Po1ItPU"
+	
+	#print searchUrl  
 	#Youtube key=AI39si533lh1K1CnVTpmF6G6FI2kdWzSdjYE2jnsxo5-Nx-5VKkMgqBCB0-fd2sCxavZPOJQ8XQUEwqsUvBHRhFnzWNDQTM8FA
 	try:
-		result = simplejson.load(urllib2.urlopen(url),"utf-8")
+		searchResult = simplejson.load(urllib2.urlopen(searchUrl),"utf-8")
+		request_count = request_count + 2
 	except Exception as e:
-		#print curr_elem['name']
-		#print e
+		request_count = request_count + 2
+
 		misses = misses + 1
 		return
 		#logging.warning('No results from google',e)
 	now = datetime.now()
-	if result['feed'].has_key('entry'):
+	if searchResult.has_key('items') and len(searchResult['items'])!= 0:
 		i = 0
-		vcount=0
-		newvcount=0
+		selectedVideoViewCount=0
+		currentVideoViewCount=0
 		iindex=-1	
-		flag = 0
-		vmatch = ""
-		vtm = 0
-		vsm = 0
-		vam = 0
-		for videoresult in result['feed']['entry']:
-			entry = result['feed']['entry'][i]
-			[decision,match,tm,sm,am] = CalculateMatch(curr_elem,entry['title']['$t'])
-			#fwritetext.write( entry['link'][0]['href'] + "\n")
-			#fwritetext.write(entry['link'][0]['href'] + "\n")
-			if entry.has_key('yt$statistics'):
-				newvcount = entry['yt$statistics']['viewCount']
-				if (decision == "correct" and int(vcount) < int(newvcount)):
-					vcount = newvcount
-					vmatch = match
-					vtm = tm
-					vsm = sm
-					vam = am
-					iindex=i
+		selectedVideoMatch = ""
+		selectedVideoTotalMatch = 0
+		selectedVideoSongMatch = 0
+		selectedVideoArtistMatch = 0
+		selectedVideoTitle = ""
+		selectedVideoUrl = ""
+		selectedVideoDuration = 0
+		selectedVideolikes = 0
+		selectedVideodislikes = 0
+		#selectedVideoImgUrl = ""
+		selectedVideoPublishedDate = ""
+		for videoresult in searchResult['items']:
+			searchEntry = searchResult['items'][i]
+			[currentVideoDecision,currentVideoMatch,currentVideoTotalMatch,currentVideoSongMatch,currentVideoArtistMatch] = CalculateMatch(curr_elem,searchEntry['snippet']['title'])
+			#print currentVideoDecision
+			if(currentVideoDecision == "correct"):
+				youtubeVideoId = searchEntry['id']['videoId']
+				videoUrl = "https://www.googleapis.com/youtube/v3/videos?id="+str(youtubeVideoId)+"&key=AIzaSyBE5nUPdQ7J_hlc3345_Z-I4IG-Po1ItPU&part=statistics,contentDetails,status"
+				#print videoUrl
+				try:
+					videoResult = simplejson.load(urllib2.urlopen(videoUrl),"utf-8")
+					request_count = request_count + 7
+
+				except Exception as e:
+					request_count = request_count + 7
+					continue
+					#logging.warning('No results from google',e)
+					#exit()
+				
+				
+				if videoResult.has_key('items'):
+					videoEntry = videoResult['items'][0]
+					currentVideoViewCount = videoEntry['statistics']['viewCount']
+					currentVideolikes = videoEntry['statistics']['likeCount']
+					currentVideodislikes = videoEntry['statistics']['dislikeCount']
+					currentVideoEmbedded = videoEntry['status']['embeddable']
+					if(currentVideoEmbedded == False):
+						continue
+					if (int(selectedVideoViewCount) < int(currentVideoViewCount)):
+						selectedVideoViewCount = currentVideoViewCount
+						selectedVideoMatch = currentVideoMatch
+						selectedVideoTotalMatch = currentVideoTotalMatch
+						selectedVideoSongMatch = currentVideoSongMatch
+						selectedVideoArtistMatch = currentVideoArtistMatch
+						selectedVideoTitle = searchEntry['snippet']['title']
+						selectedVideoUrl = "https://www.youtube.com/watch?v="+str(youtubeVideoId)
+						selectedVideoPublishedDate = searchEntry['snippet']['publishedAt']
+						selectedVideoDuration = ParseTime(videoEntry['contentDetails']['duration'])
+						selectedVideolikes = currentVideolikes
+						selectedVideodislikes = currentVideodislikes
+
+						iindex=i
 			i = i + 1
 		if(iindex == -1):
-			#print len(result['feed']['entry'])
 			misses = misses + 1
-
-			#print curr_elem['name']
-			#fwritetext.write(curr_elem['artistName']+ "\t" + curr_elem['name']+"\n")
-
 			return						
-
-		'''	entry = result['feed']['entry'][i]	
-			video1.url = entry['link'][0]['href']
-			print video1.url
-			print entry['title']['$t']
-			video1.title = entry['title']['$t']
-			video1.author = entry['author']	
-			video1.img = entry['media$group']['media$thumbnail'][0]['url']
-			video1.published = entry['published']['$t']
-			video1.length = entry['media$group']['yt$duration']['seconds']
-			m = re.search(re.compile("[0-9]{4}[-][0-9]{2}[-][0-9]{2}"),video1.published)
-			n = re.search(re.compile("[0-9]{2}[:][0-9]{2}[:][0-9]{2}"),video1.published)
-			ydate = m.group()+" "+n.group()
-			dd = ydate
-			yy = int(str(dd)[0:4])
-			mm = int(str(dd)[5:7])
-			total = (now.year-yy)*12+(now.month-mm)
-			if total < 1:
-				total = 1	
-			video1.length = entry['media$group']['yt$duration']['seconds']
-			if(now.month<10):
-				mm = '0'+str(now.month)
-			else:
-				mm = str(now.month)
-			if(now.day<10):
-				dd = '0'+str(now.day)
-			else:
-				dd = str(now.day)
-			video1.crawldate = str(now.year)+"-"+mm+"-"+dd
-			if entry.has_key('yt$statistics'):
-				video1.viewcount = entry['yt$statistics']['viewCount']
-				video1.viewcountRate = float(video1.viewcount)/total
-			if entry.has_key('gd$rating'):
-				video1.rating = entry['gd$rating']['average']
-		#fwritetext.write (line)
-		#fwritetext.write(':')
-			fwritetext.write(video1.url)
-			i = i + 1
-			#print v
-			v.append(video1.__dict__)
-			video1 = None
-			fwritetext.write('\n')'''
 		video1 = Video()
 		video1.artist = curr_elem['artistName']
 		video1.ftArtist = curr_elem['featArtists']
@@ -536,20 +540,20 @@ def getVideo(curr_elem,v):
 		video1.year = curr_elem['year']
 		video1.language = curr_elem['language']
 		video1.songcountry = curr_elem['songcountry']
-		entry = result['feed']['entry'][iindex]	
-		video1.url = entry['link'][0]['href']
+		if(int(selectedVideolikes) !=0 and int(selectedVideodislikes)!=0):
+			video1.rating = (int(selectedVideolikes)*5)/(int(selectedVideolikes)+int(selectedVideodislikes))
+			print video1.rating
+		#searchEntry = searchResult['items'][index]
+		#video1.url = searchEntry['link'][0]['href']
 		video1.lang_count = curr_elem['lang_count']
-		video1.match = vmatch
-		video1.tm = vtm
-		video1.sm = vsm
-		video1.am = vam
-		#print video1.url
-		#print entry['title']['$t']
-		video1.title = entry['title']['$t']
-		video1.author = entry['author']	
-		video1.img = entry['media$group']['media$thumbnail'][0]['url']
-		video1.published = entry['published']['$t']
-		video1.length = entry['media$group']['yt$duration']['seconds']
+		video1.url = selectedVideoUrl
+		video1.match = selectedVideoMatch
+		video1.tm = selectedVideoTotalMatch
+		video1.sm = selectedVideoSongMatch
+		video1.am = selectedVideoArtistMatch
+		video1.title = selectedVideoTitle
+		#video1.img = searchEntry['media$group']['media$thumbnail'][0]['url']
+		video1.published = selectedVideoPublishedDate
 		m = re.search(re.compile("[0-9]{4}[-][0-9]{2}[-][0-9]{2}"),video1.published)
 		n = re.search(re.compile("[0-9]{2}[:][0-9]{2}[:][0-9]{2}"),video1.published)
 		ydate = m.group()+" "+n.group()
@@ -559,7 +563,7 @@ def getVideo(curr_elem,v):
 		total = (now.year-yy)*12+(now.month-mm)
 		if total < 1:
 			total = 1	
-		video1.length = entry['media$group']['yt$duration']['seconds']
+		video1.length = selectedVideoDuration
 		if(now.month<10):
 			mm = '0'+str(now.month)
 		else:
@@ -569,22 +573,14 @@ def getVideo(curr_elem,v):
 		else:
 			dd = str(now.day)
 		video1.crawldate = str(now.year)+"-"+mm+"-"+dd
-		if entry.has_key('yt$statistics'):
-			video1.viewcount = entry['yt$statistics']['viewCount']
-			if(total != 0):
-				video1.viewcountRate = float(video1.viewcount)/total
-		if entry.has_key('gd$rating'):
-			video1.rating = entry['gd$rating']['average']
-		#fwritetext.write (line)
-		#fwritetext.write(':')
-			#print v
+		video1.viewcount = selectedVideoViewCount
+		if(total != 0):
+			video1.viewcountRate = float(video1.viewcount)/total
 		v.append(video1.__dict__)
 		video1 = None
 		hits = hits + 1
 	else:
 		misses = misses + 1
-		#print curr_elem['name']
-		#print "no Entry"
 	
 def getArtistAliasList(sorted_list):
 	artist_alias_list = {}
@@ -797,7 +793,7 @@ try:
 	if(len(full_country_list) != 0):
 		if(artist_country not in full_country_list):
 			artist_country = full_country_list_sort[0][0]
-	print artist_country
+	#print artist_country
 	vid = list()
 
 	for s in final_song_list.values():
@@ -818,7 +814,8 @@ try:
 			fchange_language.write(s['name']+ '\t'+s['language'] + '\t' + change_language+'\n')
 			s['language'] = change_language
 
-
+		#print s['artistName']
+		#print s['name']
 		#print s['language'] 
 		#print s['lang_count']
 		if(not s.has_key('artistName') or s['artistName'].lower() not in aliases):
@@ -839,5 +836,6 @@ try:
 	#fwritetext.close()
 	fchange_country.close()
 	fchange_language.close()
+	print request_count
 except Exception as e:
 	print "Unexpected error:", e
