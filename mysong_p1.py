@@ -541,7 +541,7 @@ def getVideo(curr_elem,v):
 		video1.language = curr_elem['language']
 		video1.songcountry = curr_elem['songcountry']
 		if(int(selectedVideolikes) !=0 and int(selectedVideodislikes)!=0):
-			video1.rating = (int(selectedVideolikes)*5)/(int(selectedVideolikes)+int(selectedVideodislikes))
+			video1.rating = (float(selectedVideolikes)*5)/(float(selectedVideolikes)+float(selectedVideodislikes))
 			print video1.rating
 		#searchEntry = searchResult['items'][index]
 		#video1.url = searchEntry['link'][0]['href']

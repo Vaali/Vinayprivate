@@ -8,10 +8,13 @@ import urllib
 import urlparse
 import urllib2
 import difflib
-import libxml2
+#import libxml2
+from lxml import etree
 from datetime import datetime, date, timedelta
 import songs_api as api
 import logging
+import ConfigParser
+config = ConfigParser.ConfigParser()
 reload(sys)
 sys.setdefaultencoding('utf8')
 #directory = str(sys.argv[1])
@@ -145,7 +148,7 @@ def _decode_dict(data):
     return rv
 """
 
-def genXML(vid,avgcnt,avgcntrece,genre,stylelist,subgenlist,artistNameFromArtist):
+def genXML(vid,avgcnt,avgcntrece,genres_levels,artistNameFromArtist):
 	try:
 		global opdir
 		artistMatch = 0.0
@@ -185,8 +188,9 @@ def genXML(vid,avgcnt,avgcntrece,genre,stylelist,subgenlist,artistNameFromArtist
 		allArtists = artistName+" "+ftartists
 		for c in connectorList:
 			conlist = conlist+" "+c
-		i = vid['url'].rfind('&')				
-		url = vid['url'][:i].replace('https','http',1)
+		#i = vid['url'].rfind('&')				
+		url = vid['url'].replace('https','http',1)
+		print url[-11:]
 		if vid.has_key('published'):
 			m = re.search(re.compile("[0-9]{4}[-][0-9]{2}[-][0-9]{2}"),vid['published'])
 			n = re.search(re.compile("[0-9]{2}[:][0-9]{2}[:][0-9]{2}"),vid['published'])
@@ -277,19 +281,29 @@ def genXML(vid,avgcnt,avgcntrece,genre,stylelist,subgenlist,artistNameFromArtist
 		aliases.append(artistNameFromArtist)
 
 		ar.add_artistName(artistNameFromArtist)
+		iAliaslist = api.indexedArtistAliasList()
 		if(len(aliases) != 0):
-			print aliases
+			#print aliases
 			ar.set_artistAlias(aliases)
+			for alias in aliases:
+				iAliaslist.add_indexedArtistAliasName(alias)
+
+
+
+		mysong.set_indexedArtistAliasList(iAliaslist)
 
 		mysong.set_artist(ar)
 
 		#featuring artist is a list too
 		fAr = api.ftArtistList()
+		fIAr = api.indexedftArtistList()
 		#print ftArtistName
 		for f in ftArtistName:
 			fAr.add_ftArtistName(f)
+			fIAr.add_indexedftArtistName(f)
 			#mysong.add_ftArtistName(f)
 		mysong.set_ftArtistList(fAr)
+		mysong.set_indexedftArtistList(fIAr)
 		#connector of artists is a list
 		cr = api.connPhraseList()
 		for c in connectorList:
@@ -350,10 +364,86 @@ def genXML(vid,avgcnt,avgcntrece,genre,stylelist,subgenlist,artistNameFromArtist
 		mysong.set_rating(rating)
 		#except:
 		#	pass
-		gr = api.genre()
+		for i in genres_levels:
+			if(i == 0):
+				level1Genres = api.level1Genres()
+
+				for level1 in genres_levels[i]:
+					level1 = decodexml(level1)
+					level1Genres.add_genreName(level1)
+				mysong.set_level1Genres(level1Genres)
+				continue
+			if(i == 1):
+				level2Genres = api.level2Genres()
+
+				for level2 in genres_levels[i]:
+					level2 = decodexml(level2)
+					level2Genres.add_genreName(level2)
+				mysong.set_level2Genres(level2Genres)
+				continue
+			if(i == 2):
+				level3Genres = api.level3Genres()
+
+				for level3 in genres_levels[i]:
+					level3 = decodexml(level3)
+					level3Genres.add_genreName(level3)
+				mysong.set_level3Genres(level3Genres)
+				continue
+			if(i == 3):
+				level4Genres = api.level4Genres()
+
+				for level4 in genres_levels[i]:
+					level4 = decodexml(level4)
+					level4Genres.add_genreName(level4)
+				mysong.set_level4Genres(level4Genres)
+				continue
+			if(i == 4):
+				level5Genres = api.level5Genres()
+
+				for level5 in genres_levels[i]:
+					level5 = decodexml(level5)
+					level5Genres.add_genreName(level5)
+				mysong.set_level5Genres(level5Genres)
+				continue
+			if(i == 5):
+				level6Genres = api.level6Genres()
+
+				for level6 in genres_levels[i]:
+					level6 = decodexml(level6)
+					level6Genres.add_genreName(level6)
+				mysong.set_level6Genres(level6Genres)
+				continue
+			if(i == 6):
+				level7Genres = api.level7Genres()
+
+				for level7 in genres_levels[i]:
+					level7 = decodexml(level7)
+					level1Genres.add_genreName(level7)
+				mysong.set_level7Genres(level7Genres)
+				continue
+			if(i == 7):
+				level8Genres = api.level8Genres()
+
+				for level8 in genres_levels[i]:
+					level8 = decodexml(level8)
+					level8Genres.add_genreName(level8)
+				mysong.set_level8Genres(level8Genres)
+				continue
+			if(i == 8):
+				level9Genres = api.level9Genres()
+
+				for level9 in genres_levels[i]:
+					level9 = decodexml(level9)
+					level9Genres.add_genreName(level9)
+				mysong.set_level9Genres(level9Genres)
+		'''gr = api.genre()
 		genrenew = list()
 		for g in genre:
+		        print "genre before decode"
+			print g
 			g = decodexml(g)
+			print "genre AFTER decode"
+			print g
 			genrenew.append(g)
 			
 		genrenew = list(set(genrenew))
@@ -365,7 +455,11 @@ def genXML(vid,avgcnt,avgcntrece,genre,stylelist,subgenlist,artistNameFromArtist
 
 		subgenlistnew = list()
 		for g in subgenlist:
+		        print "subgenre before decode"
+			print g
 			g = decodexml(g)
+			print "subgenre AFTER decode"
+			print g
 			subgenlistnew.append(g)
 			
 		subgenlistnew = list(set(subgenlistnew))
@@ -375,20 +469,24 @@ def genXML(vid,avgcnt,avgcntrece,genre,stylelist,subgenlist,artistNameFromArtist
 		sty = api.styles()
 		stylelistnew = list()
 		for g in stylelist:
+		        print "style before decode"
+			print g
 			g = decodexml(g)
+			print "style AFTER decode"
+			print g
 			stylelistnew.append(g)
 
 		stylelistnew = list(set(stylelistnew))
 		for s in stylelistnew:
 			sty.add_level3Genres(s)
-		mysong.set_styles(sty)
+		mysong.set_styles(sty)'''
 		#mysong.set_artist(artistName)
 		mysong.set_duration(timedelta(seconds=int(vid['length'])))
 		if vid.has_key('viewcountRate'):
 			mysong.set_viewcountRate(vid['viewcountRate'])
-		idVal = url[-11:]
-		dirtec = idVal[:8]
-		fileN = idVal[8:]
+		#idVal = url[-11:]
+		#dirtec = idVal[:8]
+		#fileN = idVal[8:]
 		#path = opdir+'/'+dirtec
 		path = opdir
 		if not os.path.exists(path):
@@ -398,61 +496,30 @@ def genXML(vid,avgcnt,avgcntrece,genre,stylelist,subgenlist,artistNameFromArtist
 			fr = codecs.open(fname,'r','utf-8')
 			oldsong = api.parse(fname)
 			if(round(oldsong.totalMatch) <= round(mysong.totalMatch)): 
-				print "overwriting :"
-				print oldsong.overLap
-				print oldsong.totalMatch
+				#print "overwriting :"
+				print oldsong.overlap
+				#print oldsong.totalMatch
 				print "With this :"
-				print mysong.overLap
-				#print mysong.songName
-				#print mysong.artist.artistName
-				print mysong.totalMatch
-				print fname
-				#mysong = oldsong
-				print mysong.overLap
+				#print mysong.over
 			elif ((round(oldsong.totalMatch) == round(mysong.totalMatch)) and (round(oldsong.songMatch) <= round(mysong.songMatch))):
-				print "overwriting :"
-				print oldsong.overLap
+				#print "overwriting :"
+				print oldsong.match
 				print oldsong.songMatch
 				print "With this :"
-				print mysong.overLap
-				#print mysong.songName
-				#print mysong.artist.artistName
-				print mysong.songMatch
-				#mysong = oldsong
-				print fname
-				print mysong.overLap
+				print mysong.match
 			elif ((round(oldsong.songMatch) == round(mysong.songMatch)) and (round(oldsong.artistMatch) <= round(mysong.artistMatch))):
-				print "overwriting :"
-				#print oldsong.overLap
-				print oldsong.artistMatch
+				#print "overwriting :"
+				print oldsong.match
 				print "With this :"
-				#print mysong.overLap
-				#print mysong.songName
-				#print mysong.artist.artistName
-				print mysong.artistMatch
-				#mysong = oldsong
-				print fname
-				#print mysong.overLap
+				print mysong.match
 			elif(round(oldsong.totalMatch) == round(mysong.totalMatch) and round(oldsong.songMatch) == round(mysong.songMatch) and round(oldsong.artistMatch) == round(mysong.artistMatch)):
 				if(oldsong.releaseDate < mysong.releaseDate):
 					mysong.releaseDate = oldsong.releaseDate
-				print "overwriting :"
-				print oldsong.overLap
-				print oldsong.artistMatch
+				#print "overwriting :"
+				print oldsong.match
 				print "With this :"
-				print mysong.overLap
-				#print mysong.songName
-				#print mysong.artist.artistName
-				print mysong.artistMatch
-				#mysong = oldsong
-				print fname
-				#print mysong.overLap
-
+				print mysong.match
 			else:
-				#print "testing"
-				#print mysong.overLap
-				#print oldsong.overLap
-				#print fname
 				mysong = oldsong
 
 		fx = codecs.open(fname,"w","utf-8")
@@ -509,7 +576,7 @@ def GetAlias(directory):
 	aliases = []
 
 	if(os.path.exists(directory+'/alias.txt') == False):
-		print "mistake"
+		#print "alias not present"
 		return []
 	fread = codecs.open(directory+'/alias.txt','r','utf-8')
 	lines = fread.readlines()
@@ -556,8 +623,14 @@ tempArMatch = 0.0
 leftMatch = 0.0
 rightMatch = 0.0
 percentMatch = 0.0
-doc = libxml2.parseFile('genres_manual.xml')
-
+doc_str = ""
+#myfile = codecs.open('levels.xml','r','utf8');
+#doc_str = myfile.read()
+#doc_str = doc_str.encode("UTF-8")
+doc = etree.parse(open('levels_cleaned_genres.xml'))
+#doc = libxml2.parseFile('genres_manual.xml')
+#doc = libxml2.xmlReadFile("levels.xml","utf8")
+#doc = libxml2.parseDoc(doc_str)
 #print "Working on this Artist Now: "
 #print artistId
 flagstyle = 1
@@ -575,15 +648,27 @@ stylelist = list()
 level1Gen = list()
 slist = list()
 lev1 = list()
-opdir = "/Volumes/Secondone/vina/solr_newData7"
-errordir="/Volumes/Secondone/vina/ERRORS"
-failedxmls = "/Volumes/Secondone/vina/solr_newData7/failedxml"
-#opdir = "/aurora.cs/local2/apo/solr_newData8"
-#errordir="/aurora.cs/local2/apo/ERRORS"
-#failedxmls = "/aurora.cs/local2/apo/solr_newData8/failedxml"
-#opdir = "/venti/local2/apo/solr_newData8"
-#errordir="/venti/local2/apo/solr_newData8/ERRORS"
-#failedxmls = "/venti/local2/apo/solr_newData8/failedxml"
+config.read('test.ini')
+try:
+	opdir = config.get('Paths','opdir')
+except:
+	opdir = "/Volumes/Secondone/vina/solr_newData7"
+try:
+	errordir = config.get('Paths','errordir')
+except:
+	errordir="/Volumes/Secondone/vina/ERRORS"
+try:
+	failedxmls = config.get('Paths','failedxmls')
+except:
+	failedxmls = "/Volumes/Secondone/vina/solr_newData7/failedxml"
+#errordir="/Volumes/Secondone/vina/ERRORS"
+##failedxmls = "/Volumes/Secondone/vina/solr_newData7/failedxml"
+#opdir = "/aurora.cs/local2/apo/solr_newData_output6"
+#errordir="/aurora.cs/local2/aposolr_newData_output6/ERRORS"
+#failedxmls = "/aurora.cs/local2/apo/solr_newData_output6/failedxml"
+#opdir = "solr_newData8"
+#errordir="solr_newData8/ERRORS"
+#failedxmls = "solr_newData8/failedxml"
 
 
 #opdir = "/home/navneet/Desktop/june1/mydata"
@@ -592,7 +677,7 @@ failedxmls = "/Volumes/Secondone/vina/solr_newData7/failedxml"
 #failedxmls = "solr_newData4/failedxml"
 #opdir = "/home/anudeep/Desktop/newData"
 #failedxmls = "/home/anudeep/Desktop/newData/failedxml"
-
+genres_levels = {}
 if(os.path.exists(opdir) == False):
 	os.mkdir(opdir)
 if(os.path.exists(failedxmls) == False):
@@ -603,10 +688,11 @@ fx = codecs.open(fname,"w","utf-8")
 fx.write("")
 fx.close()
 #print "testing"
-dirlist =  sys.argv[1].split(',')
+dirlist =  [sys.argv[1]]
 #print dirlist
 for d in dirlist:
 	if(len(d.strip()) == 0):
+		print 'here'
 		continue
 	directory = d.strip()
 	dindex = directory.rfind("/")
@@ -662,6 +748,7 @@ for d in dirlist:
 			line = line.replace('\n','')
 			if line not in genre:
 				genre.append(line)
+				genre.append(line.replace('_music',''))
 		fg.close()
 	except IOError as e:
 		print "Missing genres for Artist:"+artistNameFromArtist+" Folder:"+directory+"\n"
@@ -677,12 +764,50 @@ for d in dirlist:
 			#styleHandleString = styleHandleString + line
 			length = length + len(line.strip())
 			style.append(line.replace('\n',''))
+			style.append(line.replace('\n','').replace('_music',''))
 		fs.close()
 	except IOError as e:
 		print "Missing styles for Artist:"+artistNameFromArtist+" Folder:"+directory+"\n"
 		flagstyle = 0
-	genl1 = doc.xpathEval("/categories/*")
-	for l in genl1:
+	#genl1 = doc.xpathEval("/categories/*")
+	for g in genre:
+		print "genre" + g
+		xmlpath = "//"+str(g)
+		#print "xmla oath :" +xmlpath
+
+		genre_paths = doc.xpath(xmlpath)
+		#print genre_paths
+		for gp in genre_paths:
+			sAbsolutePath = doc.getpath(gp)
+			pathList = sAbsolutePath.split('/')
+			#print pathList
+			pathlength = len(pathList)
+			for k,l in enumerate(pathList[2:]):
+				if k in genres_levels:
+					if l not in genres_levels[k]:
+						genres_levels[k].append(l)
+				else:
+					genres_levels[k] = [l]
+	for g in style:
+		xmlpath = "//"+str(g)
+		#print "xmla styles :" +xmlpath
+
+		genre_paths = doc.xpath(xmlpath)
+
+		for gp in genre_paths:
+			sAbsolutePath = doc.getpath(gp)
+			pathList = sAbsolutePath.split('/')
+			#print pathList
+			pathlength = len(pathList)
+			for k,l in enumerate(pathList[2:]):
+				if k in genres_levels:
+					if l not in genres_levels[k]:
+						genres_levels[k].append(l)
+				else:
+					genres_levels[k] = [l]
+
+	print genres_levels
+	'''for l in genl1:
 		#print l.name
 		lev1.append(l.name)
 	"""for g in genre:
@@ -692,9 +817,10 @@ for d in dirlist:
 				level1g.append(g)
 		else:
 			wronggen.append(g)"""
-	print "Before styles loop"		
+	print "Before styles loop"
 	if length > 0:
 		for st in style:
+
 			st = st.strip()
 			if(st == ''):
 				continue;
@@ -704,21 +830,42 @@ for d in dirlist:
 			stE = encodexml(st)
 			print "stE   " +str(stE)
 			xmlpath = "//"+stE+"/.."
-			print "xmlpath  " +str(xmlpath)
+			#xmlpath = xmlpath.lower()
+			#print "xmlpath  " +str(xmlpath)
+			levels = []
+			levels.append(stE)
+			parentnode = doc.xpathEval(xmlpath)
 			try:
-				parentnode = doc.xpathEval(xmlpath)
+				#parentnode = doc.xpathEval(xmlpath)
+				#print parentnode.name
 				for node in parentnode:
 					parent = node.name
+					#print node.name
+
 					if parent in lev1: 
 						if st not in subgenlist:
 							subgenlist.append(st)
+						else:
+							print "not present in subgenlist"
+
 					elif parent == "categories":
 						if st not in genre:
 							genre.append(st)
+						else:
+							print "not present in genlist"
+
 					elif parent not in subgenlist:
 						subgenlist.append(parent)
 						if st not in stylelist:
 							stylelist.append(st)
+						else:
+							print "not present in stylelist"
+
+					else:
+						print "not present anywhere"
+						print lev1
+						print subgenlist
+						print genre
 			except:
 				print "Calling write1"
 				write1("Error in styles    xmlpath   " +str(xmlpath) +str(directory),errordir+"/StyleError")
@@ -726,28 +873,25 @@ for d in dirlist:
 	for l2 in subgenlist:
 		stE = encodexml(l2)
 		xmlpath = "//"+stE+"/.."
+		#xmlpath = xmlpath.lower()
 		try:
-			parentnode = doc.xpathEval(xmlpath)
+			#parentnode = doc.xpathEval(xmlpath)
 			for node in parentnode:
 				parent = node.name
 				if parent in lev1 and parent not in genre:
 					genre.append(parent)
 		except:
-			logger.error("Error in styles    xmlpath   " +str(xmlpath))
-			
-		
-
-
-	for v in vids:
+			logger.error("Error in styles    xmlpath   " +str(xmlpath))'''	
+for v in vids:
 		ttt=ttt+1
 		t3=datetime.now()
 		#print "v in vid============================================================================"
 		#print v
 		#print "ttt in vids=========================================================================================="
 		#print ttt
-		genXML(v,avgcnt,avgcntrece,genre,stylelist,subgenlist,artistNameFromArtist)
+		genXML(v,avgcnt,avgcntrece,genres_levels,artistNameFromArtist)
 	#print "time for xmlifpresent= " +str(datetime.now()-t3)
-#print "len"+str(length)
+#print "len"+str(length)'''
 t2=datetime.now()
 logger_finished.error('Completed for directory '+ str(directory))
 print "time=" +str(t2-t1)
