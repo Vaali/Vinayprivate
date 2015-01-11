@@ -266,13 +266,37 @@ def genXML(vid,avgcnt,avgcntrece,genres_levels,artistNameFromArtist):
 		mysong.set_artistMatch(vid['am'])
 		mysong.set_overLap(vid['match'])
 		
-		mysong.set_decision(decision)	
+		mysong.set_decision(decision)
+
+		###adding audio details 
+		audioList = api.soundcloudList()
+		audioDetails = api.audio()
+		soundcloudDetails = vid['audio']
+		aflag = 0
+		if('url' in soundcloudDetails):
+			aflag = 1
+			audioDetails.set_soundcloudUrl(soundcloudDetails['url'])
+		if('listenCount' in soundcloudDetails):
+			aflag = 1			
+			audioDetails.set_soundcloudViewcount(soundcloudDetails['listenCount'])
+		if('likeCount' in soundcloudDetails):
+			aflag = 1
+			audioDetails.set_soundcloudLikes(soundcloudDetails['likeCount'])
+		if('genres' in soundcloudDetails):
+			aflag = 1
+			audioGenres = api.soundcloudGenres()
+			audioGenres.add_genreName(soundcloudDetails['genres'])
+			audioDetails.set_soundcloudGenres(audioGenres)
+		if(aflag == 1):
+			audioList.add_audio(audioDetails)
+			mysong.set_soundcloudList(audioList)
 		#print "songMatch: "
 		#print songMatch
 		#print songName
 		#print yname
 		#since artist is a list
 		ar = api.artist()
+		
 		aliases = GetAlias(directory)
 		ar.set_artistPopularityAll(avgcnt)
 		ar.set_artistPopularityRecent(avgcntrece)
@@ -287,7 +311,6 @@ def genXML(vid,avgcnt,avgcntrece,genres_levels,artistNameFromArtist):
 			ar.set_artistAlias(aliases)
 			for alias in aliases:
 				iAliaslist.add_indexedArtistAliasName(alias)
-
 
 
 		mysong.set_indexedArtistAliasList(iAliaslist)

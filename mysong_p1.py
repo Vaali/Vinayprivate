@@ -23,6 +23,7 @@ import libxml2
 import collections
 from datetime import datetime, date, timedelta
 import logging
+import soundcloud
 reload(sys)
 
 import logging
@@ -63,6 +64,9 @@ class Album_Data():
 	pass
 
 class Video(object):
+	pass
+
+class Audio(object):
 	pass
 
 def getArtistName(line):
@@ -143,7 +147,30 @@ def getBarcode(line):
 	#lindex2 = line.find('')
 	barcode = line[lindex1+len('|:~|'):len(line)]
 	return barcode
-
+#Get the song url from soundcloud
+def GetSoundCloudDetails(curr_elem):
+    try:	
+	client = soundcloud.Client(client_id='3e653180b8ebe6015e614bd7edb3c0a8')
+	audio = Audio()
+	artistName = curr_elem['artistName']
+	ftArtistName = curr_elem['featArtists']
+	songName = curr_elem['name']
+	query = songName
+	query = query + " " + artistName
+	tracks = client.get('/tracks', q= query)
+	for track in tracks:
+    		[decision,match,tm,sm,am] = CalculateMatch(curr_elem,str(track.title))
+    		if(decision == 'correct'):
+			audio.url = str(track.permalink_url)
+			audio.listenCount = track.playback_count
+			audio.likeCount = track.favoritings_count
+			audio.genres	= str(track.genre)
+			break
+	return audio
+    except Exception as e:
+	print query
+	return None
+	
 
 #Calculates the match of the original song with the  youtube video 
 
@@ -511,7 +538,8 @@ def getVideo(curr_elem,v):
 					currentVideolikes = videoEntry['statistics']['likeCount']
 					currentVideodislikes = videoEntry['statistics']['dislikeCount']
 					currentVideoEmbedded = videoEntry['status']['embeddable']
-					if(currentVideoEmbedded == False):
+					currentVideoStatus = videoEntry['status']['privacyStatus']
+					if(currentVideoEmbedded == False or currentVideoStatus != 'public'):
 						continue
 					if (int(selectedVideoViewCount) < int(currentVideoViewCount)):
 						selectedVideoViewCount = currentVideoViewCount
@@ -574,6 +602,10 @@ def getVideo(curr_elem,v):
 			dd = str(now.day)
 		video1.crawldate = str(now.year)+"-"+mm+"-"+dd
 		video1.viewcount = selectedVideoViewCount
+		audio = GetSoundCloudDetails(curr_elem)
+		if(audio != None):
+			video1.audio = audio.__dict__
+			
 		if(total != 0):
 			video1.viewcountRate = float(video1.viewcount)/total
 		v.append(video1.__dict__)
@@ -836,6 +868,6 @@ try:
 	#fwritetext.close()
 	fchange_country.close()
 	fchange_language.close()
-	print request_count
+	#print request_count
 except Exception as e:
 	print "Unexpected error:", e
