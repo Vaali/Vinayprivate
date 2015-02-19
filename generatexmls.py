@@ -15,6 +15,7 @@ import songs_api as api
 from multiprocessing import Pool
 import logging
 import ConfigParser
+import random
 import time
 config = ConfigParser.ConfigParser()
 reload(sys)
@@ -442,6 +443,7 @@ def genXML(vid,avgcnt,avgcntrece,genres_levels,artistNameFromArtist,artistId):
 		#fileN = idVal[8:]
 		#path = opdir+'/'+dirtec
 		path = opdir
+		path = opdir + '/' + str(random.randint(1, 5))
 		if not os.path.exists(path):
 			os.mkdir(path)
 		fname = path + "/0000" +url[-11:] + ".xml"
@@ -629,7 +631,7 @@ fx = codecs.open(fname,"w","utf-8")
 fx.write("")
 fx.close()
 #print "testing"
-def generatexmls(dirlist,flag):
+def generatexmls(dirlist):
 		d = dirlist
 	#for d in dirlist:
 		if(len(d.strip()) == 0):
