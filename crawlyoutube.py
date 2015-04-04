@@ -21,6 +21,7 @@ import urllib2
 import difflib
 import libxml2
 import collections
+import pickle
 from datetime import datetime, date, timedelta
 import logging
 from multiprocessing import Pool
@@ -430,10 +431,8 @@ def ParseTime(time):
 		seconds = time[:time.find('S')]
 		time = time[time.find('S')+1:]
 	return (((int(hours)*60)+int(minutes))*60 + int(seconds))
-def getVideo(curr_elem,v):
-	#global hits
+def getVideo(curr_elem,v,hits,misses):
 	#global request_count
-	#global misses
 	alist = list()
 	ylist = list()
 	video = Video()
@@ -495,9 +494,8 @@ def getVideo(curr_elem,v):
 		#request_count = request_count + 2
 	except Exception as e:
 		#request_count = request_count + 2
-
-		#misses = misses + 1
-		return
+		misses = misses + 1
+		return hits,misses
 		#logging.warning('No results from google',e)
 	now = datetime.now()
 	if searchResult.has_key('items') and len(searchResult['items'])!= 0:
@@ -566,8 +564,8 @@ def getVideo(curr_elem,v):
 						iindex=i
 			i = i + 1
 		if(iindex == -1):
-			#misses = misses + 1
-			return						
+			misses = misses + 1
+			return hits,misses					
 		video1 = Video()
 		video1.artist = curr_elem['artistName']
 		video1.ftArtist = curr_elem['featArtists']
@@ -619,11 +617,10 @@ def getVideo(curr_elem,v):
 			video1.viewcountRate = float(video1.viewcount)/total
 		v.append(video1.__dict__)
 		video1 = None
-		#hits = hits + 1
+		hits = hits + 1
 	else:
-		#misses = misses + 1
-		miss = 0
-	
+		misses = misses + 1
+	return hits,misses
 def getArtistAliasList(sorted_list):
 	artist_alias_list = {}
 	final_artist_alias_list = []
@@ -840,8 +837,8 @@ def crawlArtist(directory):
 				artist_country = full_country_list_sort[0][0]
 		#print artist_country
 		vid = list()
-		#with open(directory + '/uniquelist.txt', 'wb') as f:
-    	#	pickle.dump(my_list, f)
+		with open(directory + '/uniquelist.txt', 'wb') as f:
+			pickle.dump(final_song_list.keys(), f)
 		for s in final_song_list.values():
 			lang_dict = s['lang_count']
 			if(artist_country != 'Unknown' and artist_country != s['songcountry'] ):
@@ -870,9 +867,9 @@ def crawlArtist(directory):
 			if(s['artistName'] in artist_alias_list):
 				for art_alias in  artist_alias_list:
 					s['artistName'] = art_alias
-					getVideo(s,vid)
+					hits,misses = getVideo(s,vid,hits,misses)
 			else:
-				getVideo(s,vid)
+				hits,misses = getVideo(s,vid,hits,misses)
 
 		print "Hits:"+str(hits)+" Misses:"+str(misses)
 
@@ -885,8 +882,8 @@ def crawlArtist(directory):
 	except Exception as e:
 		print "Unexpected error:", e
 		logging.exception("Error")
-		
-directory = raw_input("Enter directory: ")
+
+'''directory = raw_input("Enter directory: ")		
 m = raw_input("Enter m: ")
 m=int(m)
 foldlist = list()
@@ -907,12 +904,22 @@ for dirs in os.listdir(directory):
 				if not f:
 					continue
 				strg = os.path.join(curr_dir,sd)
-				foldlist.append(strg)
-print foldlist
+				foldlist.append(strg)'''
+'''print foldlist
 try:
 	p =Pool(processes=int(m))
 	p.map(crawlArtist,foldlist)
 	p.close()
 	p.join()
 except Exception as e:
-		logging.exception("Error")
+		logging.exception("Error")'''
+reload(sys)
+sys.setdefaultencoding('utf8')
+filenameList = sys.argv[1:]
+
+for filename in filenameList:
+	try:
+		crawlArtist(str(filename))
+		logger.exception("completed")
+	except Exception as e:
+		print e,filename
