@@ -660,12 +660,12 @@ def generatexmls(dirlist):
 			fa = codecs.open(path,"r","utf-8")
 		except IOError as e:
 		#	print "Missing artist file!!"
-			exit()
+			return
 		line = fa.readline()
 		if not line:
 			print "artist name not found"
 			fa.close()
-			exit()
+			return
 		fa.close()
 		artistNameFromArtist =""
 		artistNameFromArtist = str(line)
