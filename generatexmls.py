@@ -625,6 +625,8 @@ if(os.path.exists(opdir) == False):
 	os.mkdir(opdir)
 if(os.path.exists(failedxmls) == False):
 	os.mkdir(failedxmls)
+if(os.path.exists(errordir) == False):
+	os.mkdir(errordir)
 path = opdir+"/failedurls.txt"
 fname = path
 fx = codecs.open(fname,"w","utf-8")
