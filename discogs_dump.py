@@ -11,6 +11,7 @@ from datetime import datetime, date, timedelta
 import re
 from solr import SolrConnection
 from solr.core import SolrException
+from multiprocessing import Pool
 import time
 
 
@@ -552,7 +553,7 @@ def getVideo(curr_elem):
         hits = hits + 1
         return video1
     else:
-		misses = misses + 1
+        misses = misses + 1
         return None
 
 def crawlArtist(directory):
@@ -656,7 +657,7 @@ def crawlArtist(directory):
             if(not s.has_key('artistName')):# or s['artistName'] not in aliases):
                 continue
             
-            t1=time.time()
+            
             if(s['artistName'] in artist_alias_list):
                 for art_alias in  artist_alias_list:
                     s['artistName'] = art_alias
@@ -667,9 +668,20 @@ def crawlArtist(directory):
                 #curr_vid = getVideo(s,vid)
                 parallel_songs_list.append(s)
             
-            #print time.time() - t1
+        t1=time.time()
+        print len(parallel_songs_list)
+        songs_pool = Pool()
+        songs_pool =Pool(processes=10)
+        return_pool = songs_pool.map(getVideo,parallel_songs_list)
         
+        for ret_val in return_pool:
+            if(ret_val == None):
+                misses = misses+1
+            else:
+                vid.append(ret_val.__dict__)
+                hits = hits + 1
         print "Hits:"+str(hits)+" Misses:"+str(misses)
+        print time.time() - t1
         write(vid,directory+"/dump")
 
     except Exception, e:
