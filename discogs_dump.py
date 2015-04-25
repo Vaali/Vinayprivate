@@ -6,17 +6,19 @@ import codecs
 import urllib
 import urllib2
 import simplejson
+import pickle
 from datetime import datetime, date, timedelta
 import re
 from solr import SolrConnection
 from solr.core import SolrException
+import time
 
 
 reload(sys)
 sys.setdefaultencoding('utf8')
 formatter = logging.Formatter('%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
 logger = logging.getLogger('simple_logger')
-logging.basicConfig(format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s',level=logging.DEBUG, filename='errors_discogs_dump.log')
+logging.basicConfig(format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s',level=logging.DEBUG, filename='errors_discogs_dump11.log')
 solrConnection = SolrConnection('http://aurora.cs.rutgers.edu:8181/solr/discogs_artists')
 
 class Video(object):
@@ -75,16 +77,16 @@ def getAliasFromArtistsSolr(final_artist_alias_list,artist_id):
             return final_artist_alias_list
         for result in response.results:
             if('artistName' in result):
-                if(result['artistName'].lower() not in final_artist_alias_list):
-                        final_artist_alias_list.append(result['artistName'].lower()) 
-            if('artistAliasesName' in result):
-                for artalias in result['artistAliasesName']:
-                    if(artalias.lower() not in final_artist_alias_list):
-                        final_artist_alias_list.append(artalias.lower())
-            if('artistNameVariations' in result):
-                for artnamevar in result['artistNameVariations']:
-                    if(artnamevar.lower() not in final_artist_alias_list):
-                        final_artist_alias_list.append(artnamevar.lower())
+                if(result['artistName'] not in final_artist_alias_list):
+                        final_artist_alias_list.append(result['artistName']) 
+            #if('artistAliasesName' in result):
+            #    for artalias in result['artistAliasesName']:
+            #        if(artalias.lower() not in final_artist_alias_list):
+            #            final_artist_alias_list.append(artalias.lower())
+            #if('artistNameVariations' in result):
+            #    for artnamevar in result['artistNameVariations']:
+            #        if(artnamevar.lower() not in final_artist_alias_list):
+            #            final_artist_alias_list.append(artnamevar.lower())
     except Exception, e:
             logging.exception(e)
     return final_artist_alias_list
@@ -133,17 +135,17 @@ def get_song_list(directory,songs_list,full_country_list,aliases):
             filename = release
             with codecs.open(filename,"r","utf-8") as input:
                 curr_album = json.load(input)
-            if('anv' in curr_album and curr_album['anv'] != None and curr_album['anv'].lower() not in aliases):
-                aliases.append(curr_album['anv'].lower())
-            if(curr_album['artist_name'].lower() not in aliases):
-                aliases.append(curr_album['artist_name'].lower())
+            #if('anv' in curr_album and curr_album['anv'] != None and curr_album['anv'].lower() not in aliases):
+            #    aliases.append(curr_album['anv'].lower())
+            #if(curr_album['artist_name'].lower() not in aliases):
+            #    aliases.append(curr_album['artist_name'].lower())
             for track in curr_album['tracks']:
                 if(track == None):
                     continue
                 song = {}
                 song['styles'] = curr_album['styles']
                 song['genres'] = curr_album['genres']
-                song['artistName'] = curr_album['artist_name']
+                song['artistName'] = re.sub(r'\(.*?\)', '', curr_album['artist_name']).strip()
                 song['artist_id'] = curr_album['artist_id']
                 song['featArtists'] = []
                 song['connectors'] = []
@@ -151,12 +153,13 @@ def get_song_list(directory,songs_list,full_country_list,aliases):
                     for artist in track['artists']:
                         if(artist == None):
                             continue
-                        if('artist_name' in artist):
+                        artist['artist_name'] = re.sub(r'\(.*?\)', '', artist['artist_name']).strip()
+                        if('artist_name' in artist and artist['artist_name'].lower() != song['artistName'].lower()):
                             song['featArtists'].append(artist['artist_name'])
                             song['connectors'].append(artist['join_relation'])
-                song['name'] = curr_album['title']
+                song['name'] = track['title']
                 if('duration' in curr_album):
-                    song['duration'] = curr_album['duration']
+                    song['duration'] = track['duration']
                 albumInfo = {}
                 albumInfo['albumName'] = curr_album['title']
                 albumInfo['year'] = curr_album['released_date']
@@ -173,209 +176,214 @@ def get_song_list(directory,songs_list,full_country_list,aliases):
     return songs_list,full_country_list,aliases
 
 def CalculateMatch(curr_elem,vid_title):
-    list = ""
-    conlist = ""
-    artistName = curr_elem['artistName']
-    ftArtistName = curr_elem['featArtists']
-    connectorList = curr_elem['connectors']
-    songName = curr_elem['name']
-    tm = 0
-    sm = 0
-    am = 0
-    fList = ""
-    for f in ftArtistName:
-		fList = fList+" "+f
-    ftartists = ""
-    if(len(fList)!=0):
-		ftartists = fList[0:]
-    allArtists = artistName+" "+ftartists
-    for c in connectorList:
-        if(c != None):
-            conlist = conlist+" "+c	
-    vid_title = vid_title.replace(',','')
-    songName = songName.replace(',','')
-    tempName = songName.replace('-','')
-    temp_title = vid_title.replace('-','')
-    tempName = tempName.replace('\'','')
-    temp_title = temp_title.replace('\'','')
-    if(temp_title.lower().find(tempName.lower())!= -1):
-		substring_song = "true"
-    else:
-		substring_song = "false"
-    if(vid_title.lower().find(artistName.lower())!= -1):
-		substring_artist = "true"
-    else:
-		substring_artist = "false"
-    yname = vid_title
-    bhiphen = False
-	#Remove the unwanted words
-    yname = yname.lower().replace("full version","")
-    yname = yname.lower().replace("lyrics on screen","")
-    yname = yname.lower().replace("official music video","")
-    yname = yname.lower().replace("with lyrics","")
-    yname = yname.lower().replace("full album","")
-    yname = yname.lower().replace("official song","")
-    yname = yname.lower().replace("radio edit","")
-    yname = yname.lower().replace("m/v","")
-    
-    ftArtistSet = re.findall("\w+",ftartists.lower(),re.U)
-    ftAMatch = 0
-    ftMatch = 0
-    songMatch = 0
-    for artist in ftArtistSet:
-		if(yname.find(artist)!= -1):
-			ftAMatch = ftAMatch + 1
-    if(len(ftArtistSet)!=0):
-		ftMatch = ftAMatch*100/len(ftArtistSet)
-    remove = "lyrics official video hd hq edit music lyric audio acoustic videoclip featuring ft feat radio remix and"
-    diffset = re.findall("\w+",remove.lower(),re.U)
-    yfullset = re.findall("\w+",yname.lower(),re.U)
-    ydiffset = set(yfullset) - set(diffset)
-    yresultset = [o for o in yfullset if o in ydiffset]
-    if "feat" in yresultset:
-		totalset = re.findall("\w+",allArtists.lower()+"."+songName.lower()+"."+conlist.lower(),re.U)
-    else:
-		totalset = re.findall("\w+",allArtists.lower()+"."+songName.lower()+"."+conlist.lower().replace("feat","ft"),re.U)
-    common =[]
-    common = (set(yresultset).intersection(set(totalset)))
-    if float(len(yresultset)) !=0:
-		percentMatch = len(common)*100/float(len(yresultset))
-	#print percentMatch
-    for f in ftArtistSet:
-		yname.replace(f,"")
-    yname = yname.lower().replace("feat.","")
-    yname = yname.lower().replace("ft.","")
-    yname = yname.lower().replace("featuring","")
-    y1 = yname.find("-")
-    y2 = yname.find(":")
-	#check if - is present
-    if((y1 != -1) or (y2 != -1)):
-		bhiphen = True
-		if(y1 != -1):
-			aname = yname[0:y1]
-			sname = yname[y1+1:]
-		else:
-			aname = yname[0:y2]
-			sname = yname[y2+1:]
-		aname.strip()
-		sname.strip()
-		snameset1 = set(re.findall("\w+",sname.lower(),re.U))-set(diffset) - set(ftArtistSet)
-		snameset = set(snameset1)
-		sreadset = re.findall("\w+",songName.lower(),re.U)
-		common1 = (set(snameset).intersection(set(sreadset)))
-		if float(len(snameset)) !=0:
-			songMatch = len(common1)*100/float(len(snameset))
-		anameset = re.findall("\w+",aname.lower(),re.U)
-		anameset = set(anameset) - set(diffset) - set(ftArtistSet)
-		areadset = re.findall("\w+",artistName.lower(),re.U)
-		common2 = (set(anameset).intersection(set(areadset)))
-		if float(len(anameset)) !=0:
-			artistMatch = len(common2)*100/float(len(anameset))
-		else:
-			artistMatch = 0
-		tempArMatch = artistMatch
-		arnameset = re.findall("\w+",artistName.lower(),re.U)
-		leftset = yresultset[:len(arnameset)]
-		rightset = yresultset[-len(arnameset):]
-		leftIntersection = (set(leftset).intersection(set(arnameset)))
-		rightIntersection = (set(rightset).intersection(set(arnameset)))
-		if float(len(arnameset))  !=0:
-			leftMatch = len(leftIntersection)*100/float(len(arnameset))
-			rightMatch = len(rightIntersection)*100/float(len(arnameset))
-		match = "tm:"+str(percentMatch)+", sm:"+str(songMatch)+", am:"+str(artistMatch)+", lam:"+str(leftMatch)+", ram:"+str(rightMatch)
-		tm = percentMatch
-		sm = songMatch
-		am = artistMatch
-    if(((y1 != -1) or (y2 != -1)) and (leftMatch != 100.0 and am != 100.0 and sm!= 100.0)): # right match if left match is zero.
-		bhiphen = True
-		#print "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
-		if(y1 != -1):
-			sname = yname[0:y1]
-			aname = yname[y1+1:]
-		else:
-			sname = yname[0:y2]
-			aname = yname[y2+1:]
-		aname.strip()
-		sname.strip()
-		snameset1 = set(re.findall("\w+",sname.lower(),re.U))-set(diffset) - set(ftArtistSet)
-		snameset = set(snameset1)-set(ftArtistSet)
-		sreadset = re.findall("\w+",songName.lower(),re.U)	
-		common1 = (set(snameset).intersection(set(sreadset)))
-		if float(len(snameset)) !=0:
-			songMatch = len(common1)*100/float(len(snameset))
-		anameset = re.findall("\w+",aname.lower(),re.U)
-		areadset = re.findall("\w+",artistName.lower(),re.U)
-		common2 = (set(anameset).intersection(set(areadset)))
-		if float(len(anameset)) !=0:
-			artistMatch = len(common2)*100/float(len(anameset))
-		else:
-			artistMatch = 0
-		arnameset = re.findall("\w+",artistName.lower(),re.U)
-		leftset = yresultset[:len(arnameset)]
-		rightset = yresultset[-len(arnameset):]
-		leftIntersection = (set(leftset).intersection(set(arnameset)))
-		rightIntersection = (set(rightset).intersection(set(arnameset)))
-		if float(len(arnameset))  !=0:
-			leftMatch = len(leftIntersection)*100/float(len(arnameset))
-			rightMatch = len(rightIntersection)*100/float(len(arnameset))
-		#print			
-		#if artistMatch > tempArMatch:
-		match = "tm:"+str(percentMatch)+", sm:"+str(songMatch)+", am:"+str(artistMatch)+", lam:"+str(leftMatch)+", ram:"+str(rightMatch)
-		tm = percentMatch
-		sm = songMatch
-		am = artistMatch
-    if((y1 == -1) and (y2 == -1)):	
-		#print("YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY")
-		arnameset = set(re.findall("\w+",artistName.lower(),re.U)) - set(diffset) - set(ftArtistSet)
-		leftset = yresultset[:len(arnameset)]
-		rightset = yresultset[-len(arnameset):]
-		leftIntersection = (set(leftset).intersection(set(arnameset)))
-		rightIntersection = (set(rightset).intersection(set(arnameset)))
-		if float(len(arnameset))  !=0:
-			leftMatch = len(leftIntersection)*100/float(len(arnameset)) 
-			rightMatch = len(rightIntersection)*100/float(len(arnameset))
-		if(leftMatch > rightMatch):
-			songreadset = set(re.findall("\w+",songName.lower(),re.U)) - set(diffset) - set(ftArtistSet)	
-			common_set = (set(yresultset[-len(songreadset):]).intersection(set(songreadset)))
-			yresultset = (set(yresultset) - set(arnameset))
-			if float(len(songreadset)) !=0:
-				songMatch = len(common_set)*100/float(len(songreadset))
-			match = "tm:"+str(percentMatch)+", sm:"+str(songMatch)+", lam:"+str(leftMatch)+", ram:"+str(rightMatch)
-			tm = percentMatch
-			sm = songMatch
-			am = leftMatch
-		else:
-			songreadset = set(re.findall("\w+",songName.lower(),re.U)) - set(diffset) - set(ftArtistSet)	
-			common_set = (set(yresultset[:len(songreadset)]).intersection(set(songreadset)))
-			yresultset = (set(yresultset) - set(arnameset))
-			if float(len(songreadset)) !=0:
-				songMatch = len(common_set)*100/float(len(songreadset))
-			match = "tm:"+str(percentMatch)+", sm:"+str(songMatch)+", lam:"+str(leftMatch)+", ram:"+str(rightMatch)
-			tm = percentMatch
-			sm = songMatch
-			am = leftMatch
-    decision = "Incorrect"
+    try:
+        list = ""
+        conlist = ""
+        artistName = curr_elem['artistName']
+        ftArtistName = curr_elem['featArtists']
+        connectorList = curr_elem['connectors']
+        songName = curr_elem['name']
+        tm = 0
+        sm = 0
+        am = 0
+        fList = ""
+        for f in ftArtistName:
+            fList = fList+" "+f
+        ftartists = ""
+        if(len(fList)!=0):
+            ftartists = fList[0:]
+        allArtists = artistName+" "+ftartists
+        for c in connectorList:
+            if(c != None):
+                conlist = conlist+" "+c	
+        vid_title = vid_title.replace(',','')
+        songName = songName.replace(',','')
+        tempName = songName.replace('-','')
+        temp_title = vid_title.replace('-','')
+        tempName = tempName.replace('\'','')
+        temp_title = temp_title.replace('\'','')
+        if(temp_title.lower().find(tempName.lower())!= -1):
+            substring_song = "true"
+        else:
+            substring_song = "false"
+        if(vid_title.lower().find(artistName.lower())!= -1):
+            substring_artist = "true"
+        else:
+            substring_artist = "false"
+        yname = vid_title
+        bhiphen = False
+        #Remove the unwanted words
+        yname = yname.lower().replace("full version","")
+        yname = yname.lower().replace("lyrics on screen","")
+        yname = yname.lower().replace("official music video","")
+        yname = yname.lower().replace("with lyrics","")
+        yname = yname.lower().replace("full album","")
+        yname = yname.lower().replace("official song","")
+        yname = yname.lower().replace("radio edit","")
+        yname = yname.lower().replace("m/v","")
 
-	# if all substraing match is true for all and the number of words is greater than 1 for atleast one.
-    if(substring_artist == "true" and substring_song == "true" and (len(ftartists) == 0 or (len(ftartists)!=0 and ftMatch == 100.0)) and (len(songName.strip().split()) > 1 or len(artistName.strip().split()) > 1) and percentMatch > 60.0):
-		decision = "correct"
-	#if song is false then look for song match and length must be greater than 1
-    elif(substring_song == "false" and songMatch  >= 80.0 and (len(songName.strip().split()) > 1 or len(artistName.strip().split()) > 1)):
-		decision = "correct"
-	#if artist  is false look for artistmatch left or [right and total match]
-    elif(substring_artist == "false" and (leftMatch == 100.0  or  (rightMatch == 100.0 and percentMatch  > 60.0)) and (len(songName.strip().split()) > 1 or len(artistName.strip().split()) > 1)):
-		decision = "correct"
-	#if only one words for both song and artist ,check total match and leftmatch for - case.
-    elif(substring_artist == "true" and substring_song == "true"  and (percentMatch > 80.0 or (leftMatch == 100.0 and bhiphen))):
-		decision = "correct"
-	#no hiphen , song match shd be 100 and left or right should be 100 
-    elif(substring_artist == "true" and substring_song == "true" and not bhiphen and songMatch == 100.0 and (leftMatch == 100.0 or rightMatch == 100.0) and percentMatch > 60.0):
-		decision = "correct"
-    if(bhiphen == "true" and (songMatch == 0  or (leftMatch == 0.0 and rightMatch == 0.0))):
+        ftArtistSet = re.findall("\w+",ftartists.lower(),re.U)
+        ftAMatch = 0
+        ftMatch = 0
+        songMatch = 0
+        for artist in ftArtistSet:
+            if(yname.find(artist)!= -1):
+                ftAMatch = ftAMatch + 1
+        if(len(ftArtistSet)!=0):
+            ftMatch = ftAMatch*100/len(ftArtistSet)
+        remove = "lyrics official video hd hq edit music lyric audio acoustic videoclip featuring ft feat radio remix and"
+        diffset = re.findall("\w+",remove.lower(),re.U)
+        yfullset = re.findall("\w+",yname.lower(),re.U)
+        ydiffset = set(yfullset) - set(diffset)
+        yresultset = [o for o in yfullset if o in ydiffset]
+        if "feat" in yresultset:
+            totalset = re.findall("\w+",allArtists.lower()+"."+songName.lower()+"."+conlist.lower(),re.U)
+        else:
+            totalset = re.findall("\w+",allArtists.lower()+"."+songName.lower()+"."+conlist.lower().replace("feat","ft"),re.U)
+        common =[]
+        common = (set(yresultset).intersection(set(totalset)))
+        if float(len(yresultset)) !=0:
+            percentMatch = len(common)*100/float(len(yresultset))
+        #print percentMatch
+        for f in ftArtistSet:
+            yname.replace(f,"")
+        yname = yname.lower().replace("feat.","")
+        yname = yname.lower().replace("ft.","")
+        yname = yname.lower().replace("featuring","")
+        y1 = yname.find("-")
+        y2 = yname.find(":")
+        #check if - is present
+        if((y1 != -1) or (y2 != -1)):
+            bhiphen = True
+            if(y1 != -1):
+                aname = yname[0:y1]
+                sname = yname[y1+1:]
+            else:
+                aname = yname[0:y2]
+                sname = yname[y2+1:]
+            aname.strip()
+            sname.strip()
+            snameset1 = set(re.findall("\w+",sname.lower(),re.U))-set(diffset) - set(ftArtistSet)
+            snameset = set(snameset1)
+            sreadset = re.findall("\w+",songName.lower(),re.U)
+            common1 = (set(snameset).intersection(set(sreadset)))
+            if float(len(snameset)) !=0:
+                songMatch = len(common1)*100/float(len(snameset))
+            anameset = re.findall("\w+",aname.lower(),re.U)
+            anameset = set(anameset) - set(diffset) - set(ftArtistSet)
+            areadset = re.findall("\w+",artistName.lower(),re.U)
+            common2 = (set(anameset).intersection(set(areadset)))
+            if float(len(anameset)) !=0:
+                artistMatch = len(common2)*100/float(len(anameset))
+            else:
+                artistMatch = 0
+            tempArMatch = artistMatch
+            arnameset = re.findall("\w+",artistName.lower(),re.U)
+            leftset = yresultset[:len(arnameset)]
+            rightset = yresultset[-len(arnameset):]
+            leftIntersection = (set(leftset).intersection(set(arnameset)))
+            rightIntersection = (set(rightset).intersection(set(arnameset)))
+            if float(len(arnameset))  !=0:
+                leftMatch = len(leftIntersection)*100/float(len(arnameset))
+                rightMatch = len(rightIntersection)*100/float(len(arnameset))
+            match = "tm:"+str(percentMatch)+", sm:"+str(songMatch)+", am:"+str(artistMatch)+", lam:"+str(leftMatch)+", ram:"+str(rightMatch)
+            tm = percentMatch
+            sm = songMatch
+            am = artistMatch
+        if(((y1 != -1) or (y2 != -1)) and (leftMatch != 100.0 and am != 100.0 and sm!= 100.0)): # right match if left match is zero.
+            bhiphen = True
+            #print "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+            if(y1 != -1):
+                sname = yname[0:y1]
+                aname = yname[y1+1:]
+            else:
+                sname = yname[0:y2]
+                aname = yname[y2+1:]
+            aname.strip()
+            sname.strip()
+            snameset1 = set(re.findall("\w+",sname.lower(),re.U))-set(diffset) - set(ftArtistSet)
+            snameset = set(snameset1)-set(ftArtistSet)
+            sreadset = re.findall("\w+",songName.lower(),re.U)	
+            common1 = (set(snameset).intersection(set(sreadset)))
+            if float(len(snameset)) !=0:
+                songMatch = len(common1)*100/float(len(snameset))
+            anameset = re.findall("\w+",aname.lower(),re.U)
+            areadset = re.findall("\w+",artistName.lower(),re.U)
+            common2 = (set(anameset).intersection(set(areadset)))
+            if float(len(anameset)) !=0:
+                artistMatch = len(common2)*100/float(len(anameset))
+            else:
+                artistMatch = 0
+            arnameset = re.findall("\w+",artistName.lower(),re.U)
+            leftset = yresultset[:len(arnameset)]
+            rightset = yresultset[-len(arnameset):]
+            leftIntersection = (set(leftset).intersection(set(arnameset)))
+            rightIntersection = (set(rightset).intersection(set(arnameset)))
+            if float(len(arnameset))  !=0:
+                leftMatch = len(leftIntersection)*100/float(len(arnameset))
+                rightMatch = len(rightIntersection)*100/float(len(arnameset))
+            #print			
+            #if artistMatch > tempArMatch:
+            match = "tm:"+str(percentMatch)+", sm:"+str(songMatch)+", am:"+str(artistMatch)+", lam:"+str(leftMatch)+", ram:"+str(rightMatch)
+            tm = percentMatch
+            sm = songMatch
+            am = artistMatch
+        if((y1 == -1) and (y2 == -1)):	
+            #print("YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY")
+            arnameset = set(re.findall("\w+",artistName.lower(),re.U)) - set(diffset) - set(ftArtistSet)
+            leftset = yresultset[:len(arnameset)]
+            rightset = yresultset[-len(arnameset):]
+            leftIntersection = (set(leftset).intersection(set(arnameset)))
+            rightIntersection = (set(rightset).intersection(set(arnameset)))
+            leftMatch = 0
+            rightMatch = 0
+            if float(len(arnameset))  !=0:
+                leftMatch = len(leftIntersection)*100/float(len(arnameset)) 
+                rightMatch = len(rightIntersection)*100/float(len(arnameset))
+            if(leftMatch > rightMatch):
+                songreadset = set(re.findall("\w+",songName.lower(),re.U)) - set(diffset) - set(ftArtistSet)	
+                common_set = (set(yresultset[-len(songreadset):]).intersection(set(songreadset)))
+                yresultset = (set(yresultset) - set(arnameset))
+                if float(len(songreadset)) !=0:
+                    songMatch = len(common_set)*100/float(len(songreadset))
+                match = "tm:"+str(percentMatch)+", sm:"+str(songMatch)+", lam:"+str(leftMatch)+", ram:"+str(rightMatch)
+                tm = percentMatch
+                sm = songMatch
+                am = leftMatch
+            else:
+                songreadset = set(re.findall("\w+",songName.lower(),re.U)) - set(diffset) - set(ftArtistSet)	
+                common_set = (set(yresultset[:len(songreadset)]).intersection(set(songreadset)))
+                yresultset = (set(yresultset) - set(arnameset))
+                if float(len(songreadset)) !=0:
+                    songMatch = len(common_set)*100/float(len(songreadset))
+                match = "tm:"+str(percentMatch)+", sm:"+str(songMatch)+", lam:"+str(leftMatch)+", ram:"+str(rightMatch)
+                tm = percentMatch
+                sm = songMatch
+                am = leftMatch
         decision = "Incorrect"
+
+        # if all substraing match is true for all and the number of words is greater than 1 for atleast one.
+        if(substring_artist == "true" and substring_song == "true" and (len(ftartists) == 0 or (len(ftartists)!=0 and ftMatch == 100.0)) and (len(songName.strip().split()) > 1 or len(artistName.strip().split()) > 1) and percentMatch > 60.0):
+            decision = "correct"
+        #if song is false then look for song match and length must be greater than 1
+        elif(substring_song == "false" and songMatch  >= 80.0 and (len(songName.strip().split()) > 1 or len(artistName.strip().split()) > 1)):
+            decision = "correct"
+        #if artist  is false look for artistmatch left or [right and total match]
+        elif(substring_artist == "false" and (leftMatch == 100.0  or  (rightMatch == 100.0 and percentMatch  > 60.0)) and (len(songName.strip().split()) > 1 or len(artistName.strip().split()) > 1)):
+            decision = "correct"
+        #if only one words for both song and artist ,check total match and leftmatch for - case.
+        elif(substring_artist == "true" and substring_song == "true"  and (percentMatch > 80.0 or (leftMatch == 100.0 and bhiphen))):
+            decision = "correct"
+        #no hiphen , song match shd be 100 and left or right should be 100 
+        elif(substring_artist == "true" and substring_song == "true" and not bhiphen and songMatch == 100.0 and (leftMatch == 100.0 or rightMatch == 100.0) and percentMatch > 60.0):
+            decision = "correct"
+        if(bhiphen == "true" and (songMatch == 0  or (leftMatch == 0.0 and rightMatch == 0.0))):
+            decision = "Incorrect"
+    except Exception, e:
+            logging.exception(e)
     return decision,match,tm,sm,am
 
-def getVideo(curr_elem,v):
+def getVideo(curr_elem):
     global hits
     global request_count
     global misses
@@ -432,7 +440,7 @@ def getVideo(curr_elem,v):
 		request_count = request_count + 2
 		logging.exception("Error")
 		misses = misses + 1
-		return
+		return None
 		#logging.warning('No results from google',e)
     now = datetime.now()
     if searchResult.has_key('items') and len(searchResult['items'])!= 0:
@@ -492,7 +500,7 @@ def getVideo(curr_elem,v):
             i = i + 1
         if(iindex == -1):
 			misses = misses + 1
-			return
+			return None
         video1 = Video()
         video1.artist = curr_elem['artistName']
         video1.ftArtist = curr_elem['featArtists']
@@ -508,7 +516,7 @@ def getVideo(curr_elem,v):
         video1.styles = curr_elem['styles']
         if(int(selectedVideolikes) !=0 and int(selectedVideodislikes)!=0):
 			video1.rating = (float(selectedVideolikes)*5)/(float(selectedVideolikes)+float(selectedVideodislikes))
-			print video1.rating
+			#print video1.rating
         video1.lang_count = curr_elem['lang_count']
         video1.url = selectedVideoUrl
         video1.match = selectedVideoMatch
@@ -539,11 +547,13 @@ def getVideo(curr_elem,v):
         video1.viewcount = selectedVideoViewCount
         if(total != 0):
 			video1.viewcountRate = float(video1.viewcount)/total
-        v.append(video1.__dict__)
-        video1 = None
+        #v.append(video1.__dict__)
+        #video1 = None
         hits = hits + 1
+        return video1
     else:
 		misses = misses + 1
+        return None
 
 def crawlArtist(directory):
     songs_list = list()
@@ -629,7 +639,9 @@ def crawlArtist(directory):
             if(artist_country not in full_country_list):
                 artist_country = full_country_list_sort[0][0]'''
         vid = list()
-        print artist_alias_list
+        with open(directory + '/uniquelist.txt', 'wb') as f:
+			pickle.dump(final_song_list.keys(), f)
+        parallel_songs_list = []
         for s in final_song_list.values():
             lang_dict = s['lang_count']
             s['songcountry'] = ''
@@ -641,15 +653,22 @@ def crawlArtist(directory):
             if(change_language != '' and s['language']!= change_language):
                 fchange_language.write(s['name']+ '\t'+s['language'] + '\t' + change_language+'\n')
                 s['language'] = change_language
-            if(not s.has_key('artistName') or s['artistName'].lower() not in aliases):
+            if(not s.has_key('artistName')):# or s['artistName'] not in aliases):
                 continue
-            if(s['artistName'].lower() in artist_alias_list):
+            
+            t1=time.time()
+            if(s['artistName'] in artist_alias_list):
                 for art_alias in  artist_alias_list:
                     s['artistName'] = art_alias
                     s['artistalias'] = artist_alias_list
-                    getVideo(s,vid)
+                    #curr_vid = getVideo(s,vid)
+                    parallel_songs_list.append(s)
             else:
-                getVideo(s,vid)
+                #curr_vid = getVideo(s,vid)
+                parallel_songs_list.append(s)
+            
+            #print time.time() - t1
+        
         print "Hits:"+str(hits)+" Misses:"+str(misses)
         write(vid,directory+"/dump")
 
@@ -659,7 +678,9 @@ def crawlArtist(directory):
         
 reload(sys)
 sys.setdefaultencoding('utf8')
-filenameList = sys.argv[1:]
+filenameList = []
+if(len(sys.argv) > 0):
+    filenameList = sys.argv[1:]
 for filename in filenameList:
 	try:
 		crawlArtist(str(filename))
