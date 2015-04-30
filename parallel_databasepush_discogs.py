@@ -7,7 +7,7 @@ import codecs
 from datetime import datetime, date, timedelta
 def func(strg):
 	os.system(strg)
-logging.basicConfig(filename='songsparserpart1.log',level=logging.DEBUG,format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
+logging.basicConfig(filename='songsparserpart111.log',level=logging.DEBUG,format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
 
 directory = raw_input("Enter directory: ")
 m = raw_input("Enter m: ")
@@ -37,7 +37,12 @@ print n
 argcount=0
 blockcount = 0
 #m = 1
+if(n<m):
+    temp = n
+    n = m
+    m = temp
 k = n/m
+
 if(k > 2500):
 	k = n/2500
 	argcount = 2500
@@ -52,24 +57,25 @@ for i in range(0,blockcount):
 index = 0
 count = 0
 for j in range(0,blockcount):
-	last = index+argcount
-	print index
-	if(last > n):
+    last = index+argcount
+    if(last > n):
 		last = n
-	for i in foldlist[index:last]:
+    for i in foldlist[index:last]:
 		filepartition[j] = filepartition[j] + " " +i
-	index = last
+    index = last
 print filepartition
 while (count < len(filepartition)):
-	if(count + m > len(filepartition)):
+    if(count + m > len(filepartition)):
 		m = len(filepartition) - count
-	for i in range(0,m):
-		proc = Process(target=func,args=(filepartition[count],))
-		jobs.append(proc)
-		proc.start()
-		#jobs.append(proc)
+    for i in range(0,m):
+        proc = Process(target=func,args=(filepartition[count],))
+        jobs.append(proc)
+        proc.start()
         count = count + 1
+        #print filepartition[count]
+    for proc in jobs:
         proc.join()
+    jobs = []
 print time.time()-t1
 
 		
