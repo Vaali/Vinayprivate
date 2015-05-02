@@ -19,7 +19,7 @@ reload(sys)
 sys.setdefaultencoding('utf8')
 formatter = logging.Formatter('%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
 logger = logging.getLogger('simple_logger')
-logging.basicConfig(format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s',level=logging.DEBUG, filename='errors_discogs_dump11.log')
+logging.basicConfig(format = '%(asctime)s - %(name)s - %(levelname)s - %(process)s - %(thread)s:%(message)s',level=logging.DEBUG, filename='errors_discogs_dump11.log')
 solrConnection = SolrConnection('http://aurora.cs.rutgers.edu:8181/solr/discogs_artists')
 
 class Video(object):
