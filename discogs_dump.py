@@ -645,7 +645,7 @@ def crawlArtist(directory):
         parallel_songs_list = []
         for s in final_song_list.values():
             lang_dict = s['lang_count']
-            s['songcountry'] = ''
+            #s['songcountry'] = ''
             temp_lang_list = sorted(lang_dict.iteritems(), key=lambda (k,v): (v,k),reverse = True)
             if( len(temp_lang_list) >1 and temp_lang_list[0][1] == temp_lang_list[1][1]):
                 s['language'] = full_lang_list[0][0]
