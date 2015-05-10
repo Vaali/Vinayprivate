@@ -13,6 +13,7 @@ from solr import SolrConnection
 from solr.core import SolrException
 from multiprocessing import Pool
 import time
+import copy
 
 
 reload(sys)
@@ -143,6 +144,8 @@ def get_song_list(directory,songs_list,full_country_list,aliases):
             for track in curr_album['tracks']:
                 if(track == None):
                     continue
+                if(track['title'] == ""):
+                    continue
                 song = {}
                 song['styles'] = curr_album['styles']
                 song['genres'] = curr_album['genres']
@@ -158,6 +161,7 @@ def get_song_list(directory,songs_list,full_country_list,aliases):
                         if('artist_name' in artist and artist['artist_name'].lower() != song['artistName'].lower()):
                             song['featArtists'].append(artist['artist_name'])
                             song['connectors'].append(artist['join_relation'])
+                
                 song['name'] = track['title']
                 if('duration' in curr_album):
                     song['duration'] = track['duration']
@@ -385,9 +389,7 @@ def CalculateMatch(curr_elem,vid_title):
     return decision,match,tm,sm,am
 
 def getVideo(curr_elem):
-    global hits
     global request_count
-    global misses
     alist = list()
     ylist = list()
     video = Video()
@@ -435,126 +437,127 @@ def getVideo(curr_elem):
     else:
 		searchUrl = "https://www.googleapis.com/youtube/v3/search?part=snippet&q=allintitle%3A"+urllib.quote_plus(str(allArtists))+"+"+urllib.quote_plus(str(video.name))+"&alt=json&type=video&channelID=UC-9-kyTW8ZkZNDHQJ6FgpwQ&max-results=5&key=AIzaSyBE5nUPdQ7J_hlc3345_Z-I4IG-Po1ItPU"
     try:
-		searchResult = simplejson.load(urllib2.urlopen(searchUrl),"utf-8")
-		request_count = request_count + 2
+        searchResult = simplejson.load(urllib2.urlopen(searchUrl),"utf-8")
+        request_count = request_count + 2
+        #print searchResult
     except Exception as e:
-		request_count = request_count + 2
-		logging.exception("Error")
-		misses = misses + 1
-		return None
+        request_count = request_count + 2
+        logging.exception("Error")
+        return None
 		#logging.warning('No results from google',e)
     now = datetime.now()
-    if searchResult.has_key('items') and len(searchResult['items'])!= 0:
-        i = 0
-        selectedVideoViewCount=0
-        currentVideoViewCount=0
-        iindex=-1	
-        selectedVideoMatch = ""
-        selectedVideoTotalMatch = 0
-        selectedVideoSongMatch = 0
-        selectedVideoArtistMatch = 0
-        selectedVideoTitle = ""
-        selectedVideoUrl = ""
-        selectedVideoDuration = 0
-        selectedVideolikes = 0
-        selectedVideodislikes = 0
-		#selectedVideoImgUrl = ""
-        selectedVideoPublishedDate = ""
-        for videoresult in searchResult['items']:
-            searchEntry = searchResult['items'][i]
-            [currentVideoDecision,currentVideoMatch,currentVideoTotalMatch,currentVideoSongMatch,currentVideoArtistMatch] = CalculateMatch(curr_elem,searchEntry['snippet']['title'])
-            if(currentVideoDecision == "correct"):
-                youtubeVideoId = searchEntry['id']['videoId']
-                videoUrl = "https://www.googleapis.com/youtube/v3/videos?id="+str(youtubeVideoId)+"&key=AIzaSyBE5nUPdQ7J_hlc3345_Z-I4IG-Po1ItPU&part=statistics,contentDetails,status"
-                try:
-                    videoResult = simplejson.load(urllib2.urlopen(videoUrl),"utf-8")
-                    request_count = request_count + 7
-                except Exception as e:
-                    request_count = request_count + 7
-                    logging.exception("Error")
-                    continue
-                if videoResult.has_key('items'):
-                    videoEntry = videoResult['items'][0]
-                    currentVideoViewCount = videoEntry['statistics']['viewCount']
-                    currentVideolikes = videoEntry['statistics']['likeCount']
-                    currentVideodislikes = videoEntry['statistics']['dislikeCount']
-                    currentVideoEmbedded = videoEntry['status']['embeddable']
-                    currentVideoStatus = videoEntry['status']['privacyStatus']
-                    if(currentVideoEmbedded == False or currentVideoStatus != 'public'):
+    try:
+        if searchResult.has_key('items') and len(searchResult['items'])!= 0:
+            i = 0
+            selectedVideoViewCount=0
+            currentVideoViewCount=0
+            iindex=-1	
+            selectedVideoMatch = ""
+            selectedVideoTotalMatch = 0
+            selectedVideoSongMatch = 0
+            selectedVideoArtistMatch = 0
+            selectedVideoTitle = ""
+            selectedVideoUrl = ""
+            selectedVideoDuration = 0
+            selectedVideolikes = 0
+            selectedVideodislikes = 0
+            #selectedVideoImgUrl = ""
+            selectedVideoPublishedDate = ""
+            for videoresult in searchResult['items']:
+                searchEntry = searchResult['items'][i]
+                [currentVideoDecision,currentVideoMatch,currentVideoTotalMatch,currentVideoSongMatch,currentVideoArtistMatch] = CalculateMatch(curr_elem,searchEntry['snippet']['title'])
+                if(currentVideoDecision == "correct"):
+                    youtubeVideoId = searchEntry['id']['videoId']
+                    videoUrl = "https://www.googleapis.com/youtube/v3/videos?id="+str(youtubeVideoId)+"&key=AIzaSyBE5nUPdQ7J_hlc3345_Z-I4IG-Po1ItPU&part=statistics,contentDetails,status"
+                    try:
+                        videoResult = simplejson.load(urllib2.urlopen(videoUrl),"utf-8")
+                        request_count = request_count + 7
+                    except Exception as e:
+                        request_count = request_count + 7
+                        logging.exception("Error")
+                        print e
                         continue
-                    if (int(selectedVideoViewCount) < int(currentVideoViewCount)):
-                        selectedVideoViewCount = currentVideoViewCount
-                        selectedVideoMatch = currentVideoMatch
-                        selectedVideoTotalMatch = currentVideoTotalMatch
-                        selectedVideoSongMatch = currentVideoSongMatch
-                        selectedVideoArtistMatch = currentVideoArtistMatch
-                        selectedVideoTitle = searchEntry['snippet']['title']
-                        selectedVideoUrl = "https://www.youtube.com/watch?v="+str(youtubeVideoId)
-                        selectedVideoPublishedDate = searchEntry['snippet']['publishedAt']
-                        selectedVideoDuration = ParseTime(videoEntry['contentDetails']['duration'])
-                        selectedVideolikes = currentVideolikes
-                        selectedVideodislikes = currentVideodislikes
-                        iindex=i
+                    if videoResult.has_key('items'):
+                        videoEntry = videoResult['items'][0]
+                        currentVideoViewCount = videoEntry['statistics']['viewCount']
+                        currentVideolikes = videoEntry['statistics']['likeCount']
+                        currentVideodislikes = videoEntry['statistics']['dislikeCount']
+                        currentVideoEmbedded = videoEntry['status']['embeddable']
+                        currentVideoStatus = videoEntry['status']['privacyStatus']
+                        if(currentVideoEmbedded == False or currentVideoStatus != 'public'):
+                            continue
+                        if (int(selectedVideoViewCount) < int(currentVideoViewCount)):
+                            selectedVideoViewCount = currentVideoViewCount
+                            selectedVideoMatch = currentVideoMatch
+                            selectedVideoTotalMatch = currentVideoTotalMatch
+                            selectedVideoSongMatch = currentVideoSongMatch
+                            selectedVideoArtistMatch = currentVideoArtistMatch
+                            selectedVideoTitle = searchEntry['snippet']['title']
+                            selectedVideoUrl = "https://www.youtube.com/watch?v="+str(youtubeVideoId)
+                            selectedVideoPublishedDate = searchEntry['snippet']['publishedAt']
+                            selectedVideoDuration = ParseTime(videoEntry['contentDetails']['duration'])
+                            selectedVideolikes = currentVideolikes
+                            selectedVideodislikes = currentVideodislikes
+                            iindex=i
+                else:
+                    j=0
+                    #print currentVideoMatch,currentVideoTotalMatch,currentVideoSongMatch,currentVideoArtistMatch,curr_elem['name'],searchEntry['snippet']['title']
+                i = i + 1
+            if(iindex == -1):
+                return None
+            video1 = Video()
+            video1.artist = curr_elem['artistName']
+            video1.ftArtist = curr_elem['featArtists']
+            video1.name = curr_elem['name']
+            video1.connectors = curr_elem['connectors']
+            video1.album = alist
+            video1.year = curr_elem['year']
+            video1.language = curr_elem['language']
+            video1.songcountry = curr_elem['songcountry']
+            if('artistalias' in curr_elem):
+                video1.artistalias = curr_elem['artistalias']
+            video1.genres = curr_elem['genres']
+            video1.styles = curr_elem['styles']
+            if(int(selectedVideolikes) !=0 and int(selectedVideodislikes)!=0):
+                video1.rating = (float(selectedVideolikes)*5)/(float(selectedVideolikes)+float(selectedVideodislikes))
+                #print video1.rating
+            video1.lang_count = curr_elem['lang_count']
+            video1.url = selectedVideoUrl
+            video1.match = selectedVideoMatch
+            video1.tm = selectedVideoTotalMatch
+            video1.sm = selectedVideoSongMatch
+            video1.am = selectedVideoArtistMatch
+            video1.title = selectedVideoTitle
+            video1.published = selectedVideoPublishedDate
+            m = re.search(re.compile("[0-9]{4}[-][0-9]{2}[-][0-9]{2}"),video1.published)
+            n = re.search(re.compile("[0-9]{2}[:][0-9]{2}[:][0-9]{2}"),video1.published)
+            ydate = m.group()+" "+n.group()
+            dd = ydate
+            yy = int(str(dd)[0:4])
+            mm = int(str(dd)[5:7])
+            total = (now.year-yy)*12+(now.month-mm)
+            if total < 1:
+                total = 1
+            video1.length = selectedVideoDuration
+            if(now.month<10):
+                mm = '0'+str(now.month)
             else:
-                j=0
-                #print currentVideoMatch,currentVideoTotalMatch,currentVideoSongMatch,currentVideoArtistMatch,curr_elem['name'],searchEntry['snippet']['title']
-            i = i + 1
-        if(iindex == -1):
-			misses = misses + 1
-			return None
-        video1 = Video()
-        video1.artist = curr_elem['artistName']
-        video1.ftArtist = curr_elem['featArtists']
-        video1.name = curr_elem['name']
-        video1.connectors = curr_elem['connectors']
-        video1.album = alist
-        video1.year = curr_elem['year']
-        video1.language = curr_elem['language']
-        video1.songcountry = curr_elem['songcountry']
-        if('artistalias' in curr_elem):
-            video1.artistalias = curr_elem['artistalias']
-        video1.genres = curr_elem['genres']
-        video1.styles = curr_elem['styles']
-        if(int(selectedVideolikes) !=0 and int(selectedVideodislikes)!=0):
-			video1.rating = (float(selectedVideolikes)*5)/(float(selectedVideolikes)+float(selectedVideodislikes))
-			#print video1.rating
-        video1.lang_count = curr_elem['lang_count']
-        video1.url = selectedVideoUrl
-        video1.match = selectedVideoMatch
-        video1.tm = selectedVideoTotalMatch
-        video1.sm = selectedVideoSongMatch
-        video1.am = selectedVideoArtistMatch
-        video1.title = selectedVideoTitle
-        video1.published = selectedVideoPublishedDate
-        m = re.search(re.compile("[0-9]{4}[-][0-9]{2}[-][0-9]{2}"),video1.published)
-        n = re.search(re.compile("[0-9]{2}[:][0-9]{2}[:][0-9]{2}"),video1.published)
-        ydate = m.group()+" "+n.group()
-        dd = ydate
-        yy = int(str(dd)[0:4])
-        mm = int(str(dd)[5:7])
-        total = (now.year-yy)*12+(now.month-mm)
-        if total < 1:
-            total = 1
-        video1.length = selectedVideoDuration
-        if(now.month<10):
-			mm = '0'+str(now.month)
+                mm = str(now.month)
+            if(now.day<10):
+                dd = '0'+str(now.day)
+            else:
+                dd = str(now.day)
+            video1.crawldate = str(now.year)+"-"+mm+"-"+dd
+            video1.viewcount = selectedVideoViewCount
+            if(total != 0):
+                video1.viewcountRate = float(video1.viewcount)/total
+            #v.append(video1.__dict__)
+            #video1 = None
+            return video1
         else:
-			mm = str(now.month)
-        if(now.day<10):
-			dd = '0'+str(now.day)
-        else:
-			dd = str(now.day)
-        video1.crawldate = str(now.year)+"-"+mm+"-"+dd
-        video1.viewcount = selectedVideoViewCount
-        if(total != 0):
-			video1.viewcountRate = float(video1.viewcount)/total
-        #v.append(video1.__dict__)
-        #video1 = None
-        hits = hits + 1
-        return video1
-    else:
-        misses = misses + 1
-        return None
+            return None
+    except Exception as e:
+        print e
 
 def crawlArtist(directory):
     songs_list = list()
@@ -643,7 +646,8 @@ def crawlArtist(directory):
         with open(directory + '/uniquelist.txt', 'wb') as f:
 			pickle.dump(final_song_list.keys(), f)
         parallel_songs_list = []
-        for s in final_song_list.values():
+        finalsongs = final_song_list.values()
+        for s in finalsongs:
             lang_dict = s['lang_count']
             #s['songcountry'] = ''
             temp_lang_list = sorted(lang_dict.iteritems(), key=lambda (k,v): (v,k),reverse = True)
@@ -656,24 +660,20 @@ def crawlArtist(directory):
                 s['language'] = change_language
             if(not s.has_key('artistName')):# or s['artistName'] not in aliases):
                 continue
-            
-            
             if(s['artistName'] in artist_alias_list):
                 for art_alias in  artist_alias_list:
-                    s['artistName'] = art_alias
-                    s['artistalias'] = artist_alias_list
-                    #curr_vid = getVideo(s,vid)
-                    parallel_songs_list.append(s)
+                    curr_elem = dict(s)
+                    curr_elem['artistName'] = art_alias
+                    parallel_songs_list.append(curr_elem)
             else:
-                #curr_vid = getVideo(s,vid)
-                parallel_songs_list.append(s)
+                parallel_songs_list.append(curr_elem)
             
         t1=time.time()
         print len(parallel_songs_list)
         songs_pool = Pool()
         songs_pool =Pool(processes=10)
         return_pool = songs_pool.map(getVideo,parallel_songs_list)
-        
+        print len(return_pool)
         for ret_val in return_pool:
             if(ret_val == None):
                 misses = misses+1
@@ -696,6 +696,6 @@ if(len(sys.argv) > 0):
 for filename in filenameList:
 	try:
 		crawlArtist(str(filename))
-		logger.exception("completed")
+		#logger.info("completed for artist :"+filename)
 	except Exception as e:
 		print e,filename
