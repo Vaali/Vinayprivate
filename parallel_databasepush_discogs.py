@@ -11,6 +11,7 @@ def func(strg):
 logging.basicConfig(filename='parallel_discogs_part1.log',level=logging.DEBUG,format='%(asctime)s %(process)s %(thread)s: %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
 
 try:
+    lastdirectory = 0
     logging.debug("Discogs Main Program Starting")
     directory = raw_input("Enter directory: ")
     m1 = raw_input("Enter m: ")
@@ -18,15 +19,22 @@ try:
     folders = int(folders)
     m1=int(m1)
     directorylist = list()
-
+    if(os.path.exists(directory+'/lastdirecotry.txt')):
+        fread = codecs.open(directory+'/lastdirecotry.txt','r','utf-8')
+        lines = fread.readlines()
+        if(len(lines) > 0):
+            lastdirectory = int(lines[-1])
+        fread.close()
+    fwrite = codecs.open(directory+'/lastdirecotry.txt','a','utf-8')
     
     ''' Folders list count to control the numebr of folders done'''
     for dirs in os.listdir(directory):
         found = re.search(r'[0-9]+',str(dirs),0)
-        if found:
-            directorylist.append(dirs)
+        if (found and (lastdirectory < int(dirs))):
+            directorylist.append(int(dirs))
+    directorylist = sorted(directorylist)
     splitlist = list(itertools.izip_longest(*(iter(directorylist),) * folders))
-    print splitlist
+    logging.debug(splitlist)
     for split in splitlist:
         jobs=[]
         foldlist = list()
@@ -37,7 +45,7 @@ try:
         for dirs in split:
             if(dirs == None):
                 continue
-            for curr_dir, sub_dir, filenames in os.walk(directory+'/'+dirs):
+            for curr_dir, sub_dir, filenames in os.walk(directory+'/'+str(dirs)):
                             strg = curr_dir
                             foldlist.append(strg)
         logging.debug("Folders List:")
@@ -98,6 +106,12 @@ try:
             jobs = []
         print time.time()-t1
         logging.debug("completed for split : "+','.join(map(str,split)))
+        fwrite.write(str(split[0]))
+        fwrite.write("\n")
+        if(split[-1]!= None):
+            fwrite.write(str(split[-1]))
+            fwrite.write("\n")
+    fwrite.close()
 except Exception as e:
 		logging.exception(e)
 

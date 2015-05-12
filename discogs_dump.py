@@ -466,7 +466,7 @@ def getVideo(curr_elem):
             for videoresult in searchResult['items']:
                 searchEntry = searchResult['items'][i]
                 [currentVideoDecision,currentVideoMatch,currentVideoTotalMatch,currentVideoSongMatch,currentVideoArtistMatch] = CalculateMatch(curr_elem,searchEntry['snippet']['title'])
-                if(currentVideoDecision == "correct"):
+                if(currentVideoDecision == "correct"):# || currentVideoDecision == "Incorrect"):
                     youtubeVideoId = searchEntry['id']['videoId']
                     videoUrl = "https://www.googleapis.com/youtube/v3/videos?id="+str(youtubeVideoId)+"&key=AIzaSyBE5nUPdQ7J_hlc3345_Z-I4IG-Po1ItPU&part=statistics,contentDetails,status"
                     try:
@@ -573,6 +573,8 @@ def crawlArtist(directory):
     misses = 0
     global request_count
     request_count = 0
+    if(len(sorted_list) == 0):
+        return
     try:
         curr_time = "2020-14-33"
         curr_language = ""
@@ -649,6 +651,7 @@ def crawlArtist(directory):
         finalsongs = final_song_list.values()
         for s in finalsongs:
             lang_dict = s['lang_count']
+            curr_elem = dict(s)
             #s['songcountry'] = ''
             temp_lang_list = sorted(lang_dict.iteritems(), key=lambda (k,v): (v,k),reverse = True)
             if( len(temp_lang_list) >1 and temp_lang_list[0][1] == temp_lang_list[1][1]):
