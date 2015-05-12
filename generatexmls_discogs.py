@@ -20,12 +20,12 @@ import time
 config = ConfigParser.ConfigParser()
 reload(sys)
 sys.setdefaultencoding('utf8')
-#directory = str(sys.argv[1])
 formatter = logging.Formatter('%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
-logger = logging.getLogger('simple_logger')
-hdlr_1 = logging.FileHandler('songsparserpart2.log')
+logger_genre = logging.getLogger('simple_logger')
+hdlr_1 = logging.FileHandler('genres.log')
 hdlr_1.setFormatter(formatter)
-logger.addHandler(hdlr_1)
+logger_genre.addHandler(hdlr_1)
+logger_genre = logging.getLogger('simple_logger')
 formatter = logging.Formatter('%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
 logging.basicConfig(format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s',level=logging.DEBUG, filename='errors_part2.log')
 # second file logger
@@ -124,6 +124,7 @@ def getMatch(strg,matchstring):
 	return float(st)
 
 def genXML(vid,avgcnt,avgcntrece,artistId):
+    xmlpath = ""
     try:
         global opdir
         global doc
@@ -161,7 +162,8 @@ def genXML(vid,avgcnt,avgcntrece,artistId):
         ftartists = flist[0:]
         allArtists = artistName+" "+ftartists
         for c in connectorList:
-			conlist = conlist+" "+c
+            if(c != None):
+                conlist = conlist+" "+c
 		#i = vid['url'].rfind('&')
         url = vid['url'].replace('https','http',1)
         print url[-11:]
@@ -261,17 +263,15 @@ def genXML(vid,avgcnt,avgcntrece,artistId):
 		if(aflag == 1):
 			audioList.add_audio(audioDetails)
 			mysong.set_soundcloudList(audioList)'''
-		#print "songMatch: "
-		#print songMatch
-		#print songName
-		#print yname
 		#since artist is a list
         ar = api.artist()
         aliases = GetAlias(directory)
         ar.set_artistPopularityAll(avgcnt)
         ar.set_artistPopularityRecent(avgcntrece)
-		#if(artistName not in aliases):
-		#	aliases.append(artistName)
+        ar.add_artistName(artistName)
+        print artistName
+        #if(artistName not in aliases):
+        #	aliases.append(artistName)
         iAliaslist = api.indexedArtistAliasList()
         if(len(aliases) != 0):
 			#print aliases
@@ -283,39 +283,38 @@ def genXML(vid,avgcnt,avgcntrece,artistId):
             if(len(aliases) != 0):
                 #ar.set_artistAlias(aliases)
                 for alias in aliases:
-                    print alias
+                    #print alias
                     iAliaslist.add_indexedArtistAliasName(alias)
                     ar.add_artistAlias(alias)
-		mysong.set_indexedArtistAliasList(iAliaslist)
+        mysong.set_indexedArtistAliasList(iAliaslist)
+        mysong.set_artist(ar)
         
-		mysong.set_artist(ar)
-
-		#featuring artist is a list too
-		fAr = api.ftArtistList()
-		fIAr = api.indexedftArtistList()
+        #featuring artist is a list too
+        fAr = api.ftArtistList()
+        fIAr = api.indexedftArtistList()
 		#print ftArtistName
-		for f in ftArtistName:
+        for f in ftArtistName:
 			fAr.add_ftArtistName(f)
 			fIAr.add_indexedftArtistName(f)
-			#mysong.add_ftArtistName(f)
-		mysong.set_ftArtistList(fAr)
-		mysong.set_indexedftArtistList(fIAr)
+			#mysong.add_ftArtistName
+        mysong.set_ftArtistList(fAr)
+        mysong.set_indexedftArtistList(fIAr)
 		#connector of artists is a list
-		cr = api.connPhraseList()
-		for c in connectorList:
+        cr = api.connPhraseList()
+        for c in connectorList:
 			cr.add_connPhrase(c)
-		mysong.set_connPhraseList(cr)
-		#index artist is a list
-		iar = api.indexedArtist()
-		iar.add_indexedArtistName(artistName) 
-		mysong.set_indexedArtist(iar)
-		mysong.set_url(url)
-
-		albList = api.albumList()
-		album = api.album()
-		releaseyear = 1001
+        mysong.set_connPhraseList(cr)
+        #index artist is a list
+        iar = api.indexedArtist()
+        iar.add_indexedArtistName(artistName)
+        mysong.set_indexedArtist(iar)
+        mysong.set_url(url)
+        
+        albList = api.albumList()
+        album = api.album()
+        releaseyear = 1001
 		#for x in range(len(albumsList)):
-		for x in albumsList:
+        for x in albumsList:
 			curr_album = x	
 			album.set_albumName(curr_album['albumname'])
 			#album.set_albumReleasedate((curr_album['year']))
@@ -327,87 +326,122 @@ def genXML(vid,avgcnt,avgcntrece,artistId):
 				album.set_barCode(curr_album['barcode'])
 			albList.add_album(album)
 			album = api.album()
-			
-		mysong.set_songLanguage(vid['language'])
+        mysong.set_songLanguage(vid['language'])
 		#print vid['language']
-		releaseyear = vid['year'].split('-')[0]
-		mysong.set_releaseDate(int(releaseyear))
-		mysong.set_decade(int(releaseyear)/10)
-		mysong.set_earliestDate(vid['year'])
-		if('songcountry' in vid):
+        releaseyear = vid['year'].split('-')[0]
+        mysong.set_releaseDate(int(releaseyear))
+        mysong.set_decade(int(releaseyear)/10)
+        mysong.set_earliestDate(vid['year'])
+        if('songcountry' in vid):
 			mysong.set_songCountry(vid['songcountry'])
-		else:
+        else:
 			mysong.set_songCountry('Unknown')
-
-		mysong.set_albumList(albList)
-		ydate = datetime.strptime(ydate,'%Y-%m-%d %H:%M:%S')
-		mysong.set_youtubeDate(ydate)
-		if vid.has_key('crawldate'):
+        mysong.set_albumList(albList)
+        ydate = datetime.strptime(ydate,'%Y-%m-%d %H:%M:%S')
+        mysong.set_youtubeDate(ydate)
+        if vid.has_key('crawldate'):
 			crdt = vid['crawldate']+" 00:00:00"
 			crdt = datetime.strptime(crdt,'%Y-%m-%d %H:%M:%S')
 			mysong.set_crawlDate(crdt)
-		if vid.has_key('viewcount'):
+        if vid.has_key('viewcount'):
 			vc = int(vid['viewcount'])
-		else:
-			vc=0
-		mysong.set_viewcount(vc)
-		mysong.set_viewCountGroup(CalculateScale(vc))
-
-		if vid.has_key('rating'):
+        else:
+            vc=0
+        print vc
+        mysong.set_viewcount(vc)
+        mysong.set_viewCountGroup(CalculateScale(vc))
+        if vid.has_key('rating'):
 			rating = vid['rating']
-		else:
+        else:
 			rating = 0.0
-		mysong.set_rating(rating)
-		#except:
-		#	pass
+        mysong.set_rating(rating)
         genres_levels = {}
         genre = vid['genres']
-        genre = genre.replace("{","")
-        genre = genre.replace("}","")
-        genre = genre.split(',')
-        for g in genre:
-            print "genre ---" + g
-            xmlpath = "//"+str(g)
-			#print "xmla oath :" +xmlpath
-            genre_paths = doc.xpath(xmlpath)
-			#print genre_paths
-            if(len(genre_paths) == 0):
-                xmlpath = "//"+str(g+"_music")
-                genre_paths = doc.xpath(xmlpath)
-            for gp in genre_paths:
-				sAbsolutePath = doc.getpath(gp)
-				pathList = sAbsolutePath.split('/')
-				#print pathList
-				pathlength = len(pathList)
-				for k,l in enumerate(pathList[2:]):
-					if k in genres_levels:
-						if l not in genres_levels[k]:
-							genres_levels[k].append(l)
-					else:
-						genres_levels[k] = [l]
+        if(genre != None):
+            genre = genre.replace("{","")
+            genre = genre.replace("}","")
+            genre = genre.split(',')
+            for g in genre:
+                g = g.replace("\"","")
+                g = g.replace(" ","_")
+                g = g.lower()
+                g = g[0].upper()+g[1:]
+                #print "genre ---" + g
+                if(g == 'Rock_&_roll'):
+                    g = 'Rock_and_roll'
+                else:
+                    g = g.replace('&','')
+                    g.strip()
+                xmlpath = "//"+str(g)
+                #print "xmla oath :" +xmlpath
+                genre_paths = []
+                try:
+                    genre_paths = doc.xpath(xmlpath)
+                except Exception as ex:
+                    logger_genre.error(xmlpath)
+                    logging.exception("Error in path for "+xmlpath)
+                #print genre_paths
+                if(len(genre_paths) == 0):
+                    xmlpath = "//"+str(g+"_music")
+                    try:
+                        genre_paths = doc.xpath(xmlpath)
+                    except Exception as ex:
+                        logger_genre.error(xmlpath)
+                        logging.exception("Error in path for "+xmlpath)
+                for gp in genre_paths:
+                    sAbsolutePath = doc.getpath(gp)
+                    pathList = sAbsolutePath.split('/')
+                    #print pathList
+                    pathlength = len(pathList)
+                    for k,l in enumerate(pathList[2:]):
+                        if k in genres_levels:
+                            if l not in genres_levels[k]:
+                                genres_levels[k].append(l)
+                        else:
+                            genres_levels[k] = [l]
         style = []
         style = vid['styles']
-        style = style.replace("{","")
-        style = style.replace("}","")
-        style = style.split(',')
-        for g in style:
-            xmlpath = "//"+str(g)
-            print "xmla styles :" +g
-            genre_paths = doc.xpath(xmlpath)
-            if(len(genre_paths) == 0):
-                xmlpath = "//"+str(g+"_music")
-                genre_paths = doc.xpath(xmlpath)
-            for gp in genre_paths:
-				sAbsolutePath = doc.getpath(gp)
-				pathList = sAbsolutePath.split('/')
-				#print pathList
-				pathlength = len(pathList)
-				for k,l in enumerate(pathList[2:]):
-					if k in genres_levels:
-						if l not in genres_levels[k]:
-							genres_levels[k].append(l)
-					else:
-						genres_levels[k] = [l]
+        if(style != None):
+            style = style.replace("{","")
+            style = style.replace("}","")
+            style = style.split(',')
+            
+            for g in style:
+                g = g.replace("\"","")
+                g = g.replace(" ","_")
+                g = g.lower()
+                g = g[0].upper()+g[1:]
+                if(g == 'Rock_&_roll'):
+                    g = 'Rock_and_roll'
+                else:
+                    g = g.replace('&','')
+                    g.strip()
+                xmlpath = "//"+str(g)
+                #print "xmla styles :" +g
+                genre_paths = []
+                try:
+                    genre_paths = doc.xpath(xmlpath)
+                except Exception as ex:
+                    logger_genre.error(xmlpath)
+                    logging.exception("Error in path for "+xmlpath)
+                if(len(genre_paths) == 0):
+                    xmlpath = "//"+str(g+"_music")
+                    try:
+                        genre_paths = doc.xpath(xmlpath)
+                    except Exception as ex:
+                        logger_genre.error(xmlpath)
+                        logging.exception("Error in path for "+xmlpath)
+                for gp in genre_paths:
+                    sAbsolutePath = doc.getpath(gp)
+                    pathList = sAbsolutePath.split('/')
+                    #print pathList
+                    pathlength = len(pathList)
+                    for k,l in enumerate(pathList[2:]):
+                        if k in genres_levels:
+                            if l not in genres_levels[k]:
+                                genres_levels[k].append(l)
+                        else:
+                            genres_levels[k] = [l]
         print genres_levels
         for i in genres_levels:
 			if(i == 0):
@@ -481,7 +515,7 @@ def genXML(vid,avgcnt,avgcntrece,artistId):
 					level9 = decodexml(level9)
 					level9Genres.add_genreName(level9)
 				mysong.set_level9Genres(level9Genres)
-		#mysong.set_artist(artistName)
+        #mysong.set_artist(artistName)
         mysong.set_duration(timedelta(seconds=int(vid['length'])))
         if vid.has_key('viewcountRate'):
 			mysong.set_viewcountRate(vid['viewcountRate'])
@@ -490,7 +524,7 @@ def genXML(vid,avgcnt,avgcntrece,artistId):
 		#fileN = idVal[8:]
 		#path = opdir+'/'+dirtec
         path = opdir
-        path = opdir + '/' + str(random.randint(1, 5))
+        #path = opdir + '/' + str(random.randint(1, 5))
         if not os.path.exists(path):
 			os.mkdir(path)
         fname = path + "/0000" +url[-11:] + ".xml"
@@ -505,24 +539,24 @@ def genXML(vid,avgcnt,avgcntrece,artistId):
 				print mysong.overLap
 			elif ((round(oldsong.totalMatch) == round(mysong.totalMatch)) and (round(oldsong.songMatch) <= round(mysong.songMatch))):
 				#print "overwriting :"
-				print oldsong.match
+				print oldsong.totalMatch
 				print oldsong.songMatch
 				print "With this :"
 				print mysong.match
 			elif ((round(oldsong.songMatch) == round(mysong.songMatch)) and (round(oldsong.artistMatch) <= round(mysong.artistMatch))):
 				#print "overwriting :"
-				print oldsong.match
+				print oldsong.totalMatch
 				print "With this :"
-				print mysong.match
+				print mysong.totalMatch
 			elif(round(oldsong.totalMatch) == round(mysong.totalMatch) and round(oldsong.songMatch) == round(mysong.songMatch) and round(oldsong.artistMatch) == round(mysong.artistMatch)):
 				if(oldsong.artistPopularityAll > mysong.artistPopularityAll):
 					mysong = oldsong
 				if(oldsong.releaseDate < mysong.releaseDate):
 					mysong.releaseDate = oldsong.releaseDate
 				#print "overwriting :"
-				print oldsong.match
+				print oldsong.totalMatch
 				print "With this :"
-				print mysong.match
+				print mysong.totalMatch
 			else:
 				mysong = oldsong
         fx = codecs.open(fname,"w","utf-8")
@@ -547,7 +581,7 @@ def genXML(vid,avgcnt,avgcntrece,artistId):
 			fx.write(artistId) 
 			fx.close()
     except Exception as ex:
-		logging.exception("Error")
+		logging.exception(ex)
 
 
 
@@ -638,15 +672,15 @@ config.read('test.ini')
 try:
 	opdir = config.get('Paths','opdir')
 except:
-	opdir = "/Volumes/Secondone/vina/solr_newData8"
+	opdir = "solr_newData11"
 try:
 	errordir = config.get('Paths','errordir')
 except:
-	errordir="/Volumes/Secondone/vina/ERRORS"
+	errordir="ERRORS"
 try:
 	failedxmls = config.get('Paths','failedxmls')
 except:
-	failedxmls = "/Volumes/Secondone/vina/solr_newData8/failedxml"
+	failedxmls = "failedxml"
 #errordir="/Volumes/Secondone/vina/ERRORS"
 ##failedxmls = "/Volumes/Secondone/vina/solr_newData7/failedxml"
 #opdir = "/aurora.cs/local2/apo/solr_newData_output6"
@@ -677,28 +711,30 @@ fx.write("")
 fx.close()
 #print "testing"
 def generatexmls(dirlist):
-		d = dirlist
-	#for d in dirlist:
-		if(len(d.strip()) == 0):
+    try:
+        d = dirlist
+        #for d in dirlist:
+        if(len(d.strip()) == 0):
 			#continue
 			return
-		directory = d.strip()
-		dindex = directory.rfind("/")
-
-		avgcnt,avgcntrece =  CalculateAverages(directory)
-		vids = []
-		try:
+        directory = d.strip()
+        dindex = directory.rfind("/")
+        avgcnt,avgcntrece =  CalculateAverages(directory)
+        vids = []
+        try:
 			vids = load(directory+'/dump')
-		except Exception as e:
+        except Exception as e:
 			#continue
 			return
-		
-		artistId = directory[dindex+1:]
-        
-		for v in vids:
-			t3=datetime.now()
-			genXML(v,avgcnt,avgcntrece,artistId)
-		logger_finished.error('Completed for directory '+ str(directory))
+        artistId = directory[dindex+1:]
+        for v in vids:
+            t3=datetime.now()
+            if(int(artistId) == 194):
+                artistId = v['artist_id']
+            genXML(v,avgcnt,avgcntrece,artistId)
+        #logger_finished.error('Completed for directory '+ str(directory))
+    except Exception as e:
+        logging.exception(e)
 
 t2=datetime.now()
 directory = raw_input("Enter directory: ")
@@ -728,7 +764,7 @@ try:
 	p.close()
 	p.join()
 except Exception as e:
-		logging.exception("Error")
+		logging.exception(e)
 t2=datetime.now()
 
 print "time=" +str(t2-t1)
