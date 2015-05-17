@@ -23,9 +23,12 @@ try:
         fread = codecs.open(directory+'/lastdirecotry.txt','r','utf-8')
         lines = fread.readlines()
         if(len(lines) > 0):
-            lastdirectory = int(lines[-1])
+            if(lines[-1].strip() != ""):
+                lastdirectory = int(lines[-1])
         fread.close()
-    fwrite = codecs.open(directory+'/lastdirecotry.txt','a','utf-8')
+        fwrite = codecs.open(directory+'/lastdirecotry.txt','a','utf-8')
+    else:
+        fwrite = codecs.open(directory+'/lastdirecotry.txt','w','utf-8')
     
     ''' Folders list count to control the numebr of folders done'''
     for dirs in os.listdir(directory):
