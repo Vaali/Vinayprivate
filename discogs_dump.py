@@ -154,6 +154,7 @@ def get_song_list(directory,songs_list,full_country_list,aliases):
                 for artist in curr_album['releaseartists']:
                     if(artist == None):
                         continue
+                    artist['artist_name'] = re.sub(r'\(.*?\)', '', artist['artist_name']).strip()
                     if(artist['position'] == 1):
                         song['artistName'] = re.sub(r'\(.*?\)', '', artist['artist_name']).strip()
                         song['artist_id'] = artist['artist_id']
@@ -214,6 +215,7 @@ def get_song_list_master(directory,songs_list,full_country_list,aliases):
                     for artist in curr_album['releaseartists']:
                         if(artist == None):
                             continue
+                        artist['artist_name'] = re.sub(r'\(.*?\)', '', artist['artist_name']).strip()
                         if(artist['position'] == 1):
                             song['artistName'] = re.sub(r'\(.*?\)', '', artist['artist_name']).strip()
                             song['artist_id'] = artist['artist_id']
@@ -723,6 +725,9 @@ def crawlArtist(directory):
 			pickle.dump(final_song_list.keys(), f)
         parallel_songs_list = []
         finalsongs = final_song_list.values()
+        '''for s in final_song_list:
+            if('uptown funk' in s.lower()):
+                print final_song_list[s]'''
         for s in finalsongs:
             lang_dict = s['lang_count']
             curr_elem = dict(s)
