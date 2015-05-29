@@ -28,7 +28,8 @@ class Video(object):
 
 class Album_Data():
 	pass
-
+class selectedVideo():
+    pass
 class Audio(object):
 	pass
 
@@ -52,15 +53,16 @@ def getArtistAliasList(sorted_list):
     artist_alias_list = {}
     final_artist_alias_list = []
     for song in sorted_list:
-		if(song['artist_id'] in artist_alias_list):
+        if(song['artist_id'] in artist_alias_list):
 			artist_alias_list[song['artist_id']] = artist_alias_list[song['artist_id']] + 1
-		else:
+        else:
 			artist_alias_list[song['artist_id']] = 1
     for i in artist_alias_list:
 		artist_alias_list[i] = (artist_alias_list[i]*100)/len(sorted_list)
     artist_alias_list = sorted(artist_alias_list.iteritems(), key=lambda (k,v): (v,k),reverse = True)
+    print artist_alias_list
     for artist in artist_alias_list:
-		if(artist[1] > 4.0):
+		if(artist[1] > 6.0):
 			final_artist_alias_list = getAliasFromArtistsSolr(final_artist_alias_list,artist[0])
     return final_artist_alias_list
 
@@ -107,28 +109,28 @@ def check(date1,date2):
     if(len(list2) != 3):
         list2.append(13)
         list2.append(32)
-	if(list1[0] == 1001):
-		return 2
-	if(list2[0] == 1001):
-		return 1
-	if(list1[0] > list2[0]):
-		return 2
-	if(list1[0] < list2[0]):
-		return 1
-	if(len(list1) == 1 and len(list2) == 1):
-		return 1
-	if(len(list1) > len(list2)):
-		return 1
-	if(len(list2) > len(list2)):
-		return 2
-	if(list1[1] > list2[1]):
-		return 2
-	if(list1[1]< list2[1]):
-		return 1
-	if(list1[2] > list2[2]):
-		return 2
-	if(list1[2]< list2[2]):
-		return 1
+    if(list1[0] == 1001):
+        return 2
+    if(list2[0] == 1001):
+        return 1
+    if(list1[0] > list2[0]):
+        return 2
+    if(list1[0] < list2[0]):
+        return 1
+    if(len(list1) == 1 and len(list2) == 1):
+        return 1
+    if(len(list1) > len(list2)):
+        return 1
+    if(len(list2) > len(list2)):
+        return 2
+    if(list1[1] > list2[1]):
+        return 2
+    if(list1[1]< list2[1]):
+        return 1
+    if(list1[2] > list2[2]):
+        return 2
+    if(list1[2]< list2[2]):
+        return 1
 
 def get_song_list(directory,songs_list,full_country_list,aliases):
     releases_list = glob.glob(directory+"/release*.json")
@@ -150,6 +152,7 @@ def get_song_list(directory,songs_list,full_country_list,aliases):
                 song['styles'] = curr_album['styles']
                 song['genres'] = curr_album['genres']
                 song['featArtists'] = []
+                song['featArtistIds'] = []
                 song['connectors'] = []
                 for artist in curr_album['releaseartists']:
                     if(artist == None):
@@ -158,17 +161,25 @@ def get_song_list(directory,songs_list,full_country_list,aliases):
                     if(artist['position'] == 1):
                         song['artistName'] = re.sub(r'\(.*?\)', '', artist['artist_name']).strip()
                         song['artist_id'] = artist['artist_id']
+                        if(artist['join_relation'] != None):
+                            song['connectors'].append(artist['join_relation'])
                     elif(artist['artist_name'] not in song['featArtists']):
                         song['featArtists'].append(artist['artist_name'])
-                        song['connectors'].append(artist['join_relation'])
+                        if(artist['join_relation'] != None):
+                            song['connectors'].append(artist['join_relation'])
                 if('artists' in track):
                     for artist in track['artists']:
                         if(artist == None):
                             continue
                         artist['artist_name'] = re.sub(r'\(.*?\)', '', artist['artist_name']).strip()
-                        if('artist_name' in artist and artist['artist_name'].lower() != song['artistName'].lower() and artist['artist_name'] not in song['featArtists']):
-                            song['featArtists'].append(artist['artist_name'])
-                            song['connectors'].append(artist['join_relation'])
+                        if('artist_name' in artist and artist['artist_name'].lower() != song['artistName'].lower()):
+                            if(artist['artist_name'] not in song['featArtists']):
+                                    song['featArtists'].append(artist['artist_name'])
+                            if(artist['join_relation'] not in song['featArtists']):
+                                    song['connectors'].append(artist['join_relation'])
+                        if('artist_name' in artist and artist['artist_name'].lower() == song['artistName'].lower()):
+                                if(artist['join_relation'] not in song['featArtists']):
+                                    song['connectors'].append(artist['join_relation'])
                 
                 song['name'] = track['title']
                 if('duration' in curr_album):
@@ -219,18 +230,26 @@ def get_song_list_master(directory,songs_list,full_country_list,aliases):
                         if(artist['position'] == 1):
                             song['artistName'] = re.sub(r'\(.*?\)', '', artist['artist_name']).strip()
                             song['artist_id'] = artist['artist_id']
+                            if(artist['join_relation'] != None):
+                                song['connectors'].append(artist['join_relation'])
                         elif(artist['artist_name'] not in song['featArtists']):
                             song['featArtists'].append(artist['artist_name'])
-                            song['connectors'].append(artist['join_relation'])
+                            if(artist['join_relation'] != None):
+                                song['connectors'].append(artist['join_relation'])
                     if('artists' in track):
                         for artist in track['artists']:
                             if(artist == None):
                                 continue
                             artist['artist_name'] = re.sub(r'\(.*?\)', '', artist['artist_name']).strip()
-                            if('artist_name' in artist and artist['artist_name'].lower() != song['artistName'].lower() and artist['artist_name'] not in song['featArtists']):
-                                song['featArtists'].append(artist['artist_name'])
-                                song['connectors'].append(artist['join_relation'])
-
+                            if('artist_name' in artist and artist['artist_name'].lower() != song['artistName'].lower()):
+                                if(artist['artist_name'] not in song['featArtists']):
+                                    song['featArtists'].append(artist['artist_name'])
+                                if(artist['join_relation'] not in song['featArtists']):
+                                    song['connectors'].append(artist['join_relation'])
+                            if('artist_name' in artist and artist['artist_name'].lower() == song['artistName'].lower()):
+                                if(artist['join_relation'] not in song['featArtists']):
+                                    song['connectors'].append(artist['join_relation'])
+                    
                     song['name'] = track['title']
                     if('duration' in curr_album):
                         song['duration'] = track['duration']
@@ -456,6 +475,13 @@ def CalculateMatch(curr_elem,vid_title):
             decision = "Incorrect"
     except Exception, e:
             logging.exception(e)
+    #print decision
+    #print match
+    #print tm,sm,am
+    #print artistName
+    #print songName
+    #print ftArtistName
+    #print vid_title
     return decision,match,tm,sm,am
 
 def getVideo(curr_elem):
@@ -503,8 +529,6 @@ def getVideo(curr_elem):
 		searchUrl = "https://www.googleapis.com/youtube/v3/search?part=snippet&q=allintitle%3A"+urllib.quote_plus(str(allArtists))+"+"+urllib.quote_plus(str(video.name))+"+-cover"+"&alt=json&type=video&channelID=UC-9-kyTW8ZkZNDHQJ6FgpwQ&max-results=5&key=AIzaSyBE5nUPdQ7J_hlc3345_Z-I4IG-Po1ItPU"
     else:
 		searchUrl = "https://www.googleapis.com/youtube/v3/search?part=snippet&q=allintitle%3A"+urllib.quote_plus(str(allArtists))+"+"+urllib.quote_plus(str(video.name))+"&alt=json&type=video&channelID=UC-9-kyTW8ZkZNDHQJ6FgpwQ&max-results=5&key=AIzaSyBE5nUPdQ7J_hlc3345_Z-I4IG-Po1ItPU"
-    #if('Uptown Funk' in curr_elem['name']):
-    #    print searchUrl
     try:
         searchResult = simplejson.load(urllib2.urlopen(searchUrl),"utf-8")
         request_count = request_count + 2
@@ -530,17 +554,10 @@ def getVideo(curr_elem):
             selectedVideoDuration = 0
             selectedVideolikes = 0
             selectedVideodislikes = 0
-            #selectedVideoImgUrl = ""
             selectedVideoPublishedDate = ""
             for videoresult in searchResult['items']:
                 searchEntry = searchResult['items'][i]
                 [currentVideoDecision,currentVideoMatch,currentVideoTotalMatch,currentVideoSongMatch,currentVideoArtistMatch] = CalculateMatch(curr_elem,searchEntry['snippet']['title'])
-                '''if(curr_elem['name'] == "Uptown Funk"):
-                    print searchUrl
-                    print curr_elem
-                    print searchEntry['snippet']['title']
-                    print searchEntry['id']['videoId']
-                    print currentVideoDecision,currentVideoMatch,currentVideoTotalMatch,currentVideoSongMatch,currentVideoArtistMatch'''
                 if(currentVideoDecision == "correct"):# || currentVideoDecision == "Incorrect"):
                     youtubeVideoId = searchEntry['id']['videoId']
                     videoUrl = "https://www.googleapis.com/youtube/v3/videos?id="+str(youtubeVideoId)+"&key=AIzaSyBE5nUPdQ7J_hlc3345_Z-I4IG-Po1ItPU&part=statistics,contentDetails,status"
@@ -578,6 +595,8 @@ def getVideo(curr_elem):
                     #print currentVideoMatch,currentVideoTotalMatch,currentVideoSongMatch,currentVideoArtistMatch,curr_elem['name'],searchEntry['snippet']['title']
                 i = i + 1
             if(iindex == -1):
+                
+                
                 return None
             video1 = Video()
             video1.artist = curr_elem['artistName']
@@ -642,6 +661,7 @@ def crawlArtist(directory):
     aliases = []
     songs_list,full_country_list,aliases = get_song_list_master(directory,songs_list,full_country_list,aliases)
     songs_list,full_country_list,aliases = get_song_list(directory,songs_list,full_country_list,aliases)
+    print aliases
     sorted_list = sorted(songs_list,key = lambda x:x['name'].lower()) 
     final_song_list = {}
     hits = 0
@@ -677,6 +697,9 @@ def crawlArtist(directory):
                 final_song_list[Item_id]['lang_count'] = lang_count
             else:
                 stemp = final_song_list[Item_id]
+                for cl in song['connectors']:
+                    if(cl not in stemp['connectors'] and cl != None):
+                        stemp['connectors'].append(cl)
                 for s in song['albumInfo']:
                     lang_count = {}
                     if(stemp.has_key('lang_count')):
