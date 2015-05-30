@@ -29,6 +29,7 @@ class Video(object):
 class Album_Data():
 	pass
 class selectedVideo():
+    
     pass
 class Audio(object):
 	pass
@@ -484,7 +485,7 @@ def CalculateMatch(curr_elem,vid_title):
     #print vid_title
     return decision,match,tm,sm,am
 
-def getVideo(curr_elem):
+def getVideo(curr_elem,flag):
     global request_count
     alist = list()
     ylist = list()
@@ -525,10 +526,16 @@ def getVideo(curr_elem):
 		flist = flist+" "+ttt
     ftartists = flist
     allArtists = video.artist.strip("-")+" "+ftartists
-    if('cover' not in video.name.lower()):
-		searchUrl = "https://www.googleapis.com/youtube/v3/search?part=snippet&q=allintitle%3A"+urllib.quote_plus(str(allArtists))+"+"+urllib.quote_plus(str(video.name))+"+-cover"+"&alt=json&type=video&channelID=UC-9-kyTW8ZkZNDHQJ6FgpwQ&max-results=5&key=AIzaSyBE5nUPdQ7J_hlc3345_Z-I4IG-Po1ItPU"
+    if(flag == 0):
+        if('cover' not in video.name.lower()):
+            searchUrl = "https://www.googleapis.com/youtube/v3/search?part=snippet&q=allintitle%3A"+urllib.quote_plus(str(allArtists))+"+"+urllib.quote_plus(str(video.name))+"+-cover"+"&alt=json&type=video&channelID=UC-9-kyTW8ZkZNDHQJ6FgpwQ&max-results=5&key=AIzaSyBE5nUPdQ7J_hlc3345_Z-I4IG-Po1ItPU"
+        else:
+            searchUrl = "https://www.googleapis.com/youtube/v3/search?part=snippet&q=allintitle%3A"+urllib.quote_plus(str(allArtists))+"+"+urllib.quote_plus(str(video.name))+"&alt=json&type=video&channelID=UC-9-kyTW8ZkZNDHQJ6FgpwQ&max-results=5&key=AIzaSyBE5nUPdQ7J_hlc3345_Z-I4IG-Po1ItPU"
     else:
-		searchUrl = "https://www.googleapis.com/youtube/v3/search?part=snippet&q=allintitle%3A"+urllib.quote_plus(str(allArtists))+"+"+urllib.quote_plus(str(video.name))+"&alt=json&type=video&channelID=UC-9-kyTW8ZkZNDHQJ6FgpwQ&max-results=5&key=AIzaSyBE5nUPdQ7J_hlc3345_Z-I4IG-Po1ItPU"
+        if('cover' not in video.name.lower()):
+            searchUrl = "https://www.googleapis.com/youtube/v3/search?part=snippet&q="+urllib.quote_plus(str(allArtists))+"+"+urllib.quote_plus(str(video.name))+"+-cover"+"&alt=json&type=video&channelID=UC-9-kyTW8ZkZNDHQJ6FgpwQ&max-results=5&key=AIzaSyBE5nUPdQ7J_hlc3345_Z-I4IG-Po1ItPU"
+        else:
+            searchUrl = "https://www.googleapis.com/youtube/v3/search?part=snippet&q="+urllib.quote_plus(str(allArtists))+"+"+urllib.quote_plus(str(video.name))+"&alt=json&type=video&channelID=UC-9-kyTW8ZkZNDHQJ6FgpwQ&max-results=5&key=AIzaSyBE5nUPdQ7J_hlc3345_Z-I4IG-Po1ItPU"
     try:
         searchResult = simplejson.load(urllib2.urlopen(searchUrl),"utf-8")
         request_count = request_count + 2
@@ -644,13 +651,18 @@ def getVideo(curr_elem):
             video1.viewcount = selectedVideoViewCount
             if(total != 0):
                 video1.viewcountRate = float(video1.viewcount)/total
-            #v.append(video1.__dict__)
-            #video1 = None
             return video1
         else:
             return None
     except Exception as e:
         print e
+        return None
+
+def getVideoFromYoutube(curr_elem):
+    retvid = getVideo(curr_elem,0)
+    if(retvid == None):
+        retvid = getVideo(curr_elem,1)
+    return retvid
 
 def crawlArtist(directory):
     songs_list = list()
@@ -777,7 +789,7 @@ def crawlArtist(directory):
         print len(parallel_songs_list)
         songs_pool = Pool()
         songs_pool =Pool(processes=10)
-        return_pool = songs_pool.map(getVideo,parallel_songs_list)
+        return_pool = songs_pool.map(getVideoFromYoutube,parallel_songs_list)
         print len(return_pool)
         for ret_val in return_pool:
             if(ret_val == None):
