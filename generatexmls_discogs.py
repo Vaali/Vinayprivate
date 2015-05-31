@@ -163,7 +163,7 @@ def genXML(vid,avgcnt,avgcntrece,artistId):
         allArtists = artistName+" "+ftartists
         for c in connectorList:
             if(c != None):
-                conlist = conlist+" "+c
+                conlist = conlist+" "+c 
 		#i = vid['url'].rfind('&')
         url = vid['url'].replace('https','http',1)
         print url[-11:]
@@ -302,7 +302,8 @@ def genXML(vid,avgcnt,avgcntrece,artistId):
 		#connector of artists is a list
         cr = api.connPhraseList()
         for c in connectorList:
-			cr.add_connPhrase(c)
+            if(c != None):
+                cr.add_connPhrase(c)
         mysong.set_connPhraseList(cr)
         #index artist is a list
         iar = api.indexedArtist()
@@ -347,7 +348,6 @@ def genXML(vid,avgcnt,avgcntrece,artistId):
 			vc = int(vid['viewcount'])
         else:
             vc=0
-        print vc
         mysong.set_viewcount(vc)
         mysong.set_viewCountGroup(CalculateScale(vc))
         if vid.has_key('rating'):
@@ -357,6 +357,7 @@ def genXML(vid,avgcnt,avgcntrece,artistId):
         mysong.set_rating(rating)
         genres_levels = {}
         genre = vid['genres']
+        #print genre
         if(genre != None):
             genre = genre.replace("{","")
             genre = genre.replace("}","")
@@ -366,7 +367,6 @@ def genXML(vid,avgcnt,avgcntrece,artistId):
                 g = g.replace(" ","_")
                 g = g.lower()
                 g = g[0].upper()+g[1:]
-                #print "genre ---" + g
                 if(g == 'Rock_&_roll'):
                     g = 'Rock_and_roll'
                 else:
@@ -378,6 +378,7 @@ def genXML(vid,avgcnt,avgcntrece,artistId):
                 try:
                     genre_paths = doc.xpath(xmlpath)
                 except Exception as ex:
+                    #print ex
                     logger_genre.error(xmlpath)
                     logging.exception("Error in path for "+xmlpath)
                 #print genre_paths
@@ -386,8 +387,11 @@ def genXML(vid,avgcnt,avgcntrece,artistId):
                     try:
                         genre_paths = doc.xpath(xmlpath)
                     except Exception as ex:
+                        #print ex
                         logger_genre.error(xmlpath)
                         logging.exception("Error in path for "+xmlpath)
+                if(len(genre_paths) == 0):
+                    logger_genre.error(g)
                 for gp in genre_paths:
                     sAbsolutePath = doc.getpath(gp)
                     pathList = sAbsolutePath.split('/')
@@ -431,6 +435,8 @@ def genXML(vid,avgcnt,avgcntrece,artistId):
                     except Exception as ex:
                         logger_genre.error(xmlpath)
                         logging.exception("Error in path for "+xmlpath)
+                if(len(genre_paths) == 0):
+                    logger_genre.error(g)
                 for gp in genre_paths:
                     sAbsolutePath = doc.getpath(gp)
                     pathList = sAbsolutePath.split('/')
@@ -442,7 +448,7 @@ def genXML(vid,avgcnt,avgcntrece,artistId):
                                 genres_levels[k].append(l)
                         else:
                             genres_levels[k] = [l]
-        print genres_levels
+                
         for i in genres_levels:
 			if(i == 0):
 				level1Genres = api.level1Genres()
@@ -672,7 +678,7 @@ config.read('test.ini')
 try:
 	opdir = config.get('Paths','opdir')
 except:
-	opdir = "solr_newData11"
+	opdir = "solr_newData12"
 try:
 	errordir = config.get('Paths','errordir')
 except:
