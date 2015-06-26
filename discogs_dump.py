@@ -15,6 +15,7 @@ from solr.core import SolrException
 from multiprocessing import Pool
 import time
 import copy
+import operator
 #from fuzzywuzzy import fuzz
 #import fuzzy
 #from apiclient.errors import HttpError
@@ -174,13 +175,16 @@ def get_song_list(directory,songs_list,full_country_list,aliases):
                     if(artist == None):
                         continue
                     artist['artist_name'] = re.sub(r'\(.*?\)', '', artist['artist_name']).strip()
+                    if(', the' in artist['artist_name'].lower()):
+                                artist['artist_name'] = artist['artist_name'].lower().replace(', the','')
+                                artist['artist_name'] = 'the '+ artist['artist_name']
                     if(artist['position'] == 1):
-                        song['artistName'] = re.sub(r'\(.*?\)', '', artist['artist_name']).strip()
+                        song['artistName'] = re.sub(r'\(.*?\)', '', artist['artist_name'].lower()).strip()
                         song['artist_id'] = artist['artist_id']
                         if(artist['join_relation'] != None):
                             song['connectors'].append(artist['join_relation'])
-                    elif(artist['artist_name'] not in song['featArtists']):
-                        song['featArtists'].append(artist['artist_name'])
+                    elif(artist['artist_name'].lower() not in song['featArtists'] and ('artistName' not in song or (artist['artist_name'].lower() != song['artistName'].lower()))):
+                        song['featArtists'].append(artist['artist_name'].lower())
                         if(artist['join_relation'] != None):
                             song['connectors'].append(artist['join_relation'])
                 if('artists' in track):
@@ -188,6 +192,9 @@ def get_song_list(directory,songs_list,full_country_list,aliases):
                         if(artist == None):
                             continue
                         artist['artist_name'] = re.sub(r'\(.*?\)', '', artist['artist_name']).strip()
+                        if(', the' in artist['artist_name'].lower()):
+                                artist['artist_name'] = artist['artist_name'].lower().replace(', the','')
+                                artist['artist_name'] = 'the '+ artist['artist_name']
                         if('artist_name' in artist and artist['artist_name'].lower() != song['artistName'].lower()):
                             if(artist['artist_name'] not in song['featArtists']):
                                     song['featArtists'].append(artist['artist_name'])
@@ -202,14 +209,18 @@ def get_song_list(directory,songs_list,full_country_list,aliases):
                         for extart in extartists:
                             if(extart == None):
                                 continue
+                            extart['artist_name'] = re.sub(r'\(.*?\)', '', extart['artist_name']).strip()
+                            if(', the' in extart['artist_name'].lower()):
+                                extart['artist_name'] = extart['artist_name'].lower().replace(', the','')
+                                extart['artist_name'] = 'the '+ extart['artist_name']
                             if('role' in extart and extart['role'] != None):
-                                if(extart['role'].lower() == 'featuring'):
+                                if(extart['role'].lower() == 'featuring' and ('artistName' not in song or (extart['artist_name'].lower() != song['artistName'].lower()))):
                                     if(extart['artist_name'] not in song['featArtists']):
-                                        song['featArtists'].append(extart['artist_name'])
+                                        song['featArtists'].append(extart['artist_name'].lower())
                                     if(extart['role'] not in song['connectors']):
                                         song['connectors'].append(extart['role'])
                                 else:
-                                    song['extraArtists'].append(extart['artist_name'])
+                                    song['extraArtists'].append(extart['artist_name'].lower())
                                     song['extraArtistsconnectors'].append(extart['role'])
                 
                 song['name'] = track['title']
@@ -262,13 +273,16 @@ def get_song_list_master(directory,songs_list,full_country_list,aliases):
                         if(artist == None):
                             continue
                         artist['artist_name'] = re.sub(r'\(.*?\)', '', artist['artist_name']).strip()
+                        if(', the' in artist['artist_name'].lower()):
+                                artist['artist_name'] = artist['artist_name'].lower().replace(', the','')
+                                artist['artist_name'] = 'the '+ artist['artist_name']
                         if(artist['position'] == 1):
-                            song['artistName'] = re.sub(r'\(.*?\)', '', artist['artist_name']).strip()
+                            song['artistName'] = re.sub(r'\(.*?\)', '', artist['artist_name'].lower()).strip()
                             song['artist_id'] = artist['artist_id']
                             if(artist['join_relation'] != None):
                                 song['connectors'].append(artist['join_relation'])
-                        elif(artist['artist_name'] not in song['featArtists']):
-                            song['featArtists'].append(artist['artist_name'])
+                        elif(artist['artist_name'].lower() not in song['featArtists'] and ('artistName' not in song or (artist['artist_name'].lower() != song['artistName'].lower()))):
+                            song['featArtists'].append(artist['artist_name'].lower())
                             if(artist['join_relation'] != None):
                                 song['connectors'].append(artist['join_relation'])
                     if('artists' in track):
@@ -276,6 +290,9 @@ def get_song_list_master(directory,songs_list,full_country_list,aliases):
                             if(artist == None):
                                 continue
                             artist['artist_name'] = re.sub(r'\(.*?\)', '', artist['artist_name']).strip()
+                            if(', the' in artist['artist_name'].lower()):
+                                        artist['artist_name'] = artist['artist_name'].lower().replace(', the','')
+                                        artist['artist_name'] = 'the '+ artist['artist_name']
                             if('artist_name' in artist and artist['artist_name'].lower() != song['artistName'].lower()):
                                 if(artist['artist_name'] not in song['featArtists']):
                                     song['featArtists'].append(artist['artist_name'])
@@ -289,14 +306,18 @@ def get_song_list_master(directory,songs_list,full_country_list,aliases):
                         for extart in extartists:
                             if(extart == None):
                                 continue
+                            extart['artist_name'] = re.sub(r'\(.*?\)', '', extart['artist_name']).strip()
+                            if(', the' in extart['artist_name'].lower()):
+                                        extart['artist_name'] = extart['artist_name'].lower().replace(', the','')
+                                        extart['artist_name'] = 'the '+ extart['artist_name']
                             if('role' in extart and extart['role'] != None):
                                 if(extart['role'].lower() == 'featuring'):
-                                    if(extart['artist_name'] not in song['featArtists']):
-                                        song['featArtists'].append(extart['artist_name'])
+                                    if(extart['artist_name'].lower() not in song['featArtists'] and ('artistName' not in song or (extart['artist_name'].lower() != song['artistName'].lower()))):
+                                        song['featArtists'].append(extart['artist_name'].lower())
                                     if(extart['role'] not in song['connectors']):
                                         song['connectors'].append(extart['role'])
                                 else:
-                                    song['extraArtists'].append(extart['artist_name'])
+                                    song['extraArtists'].append(extart['artist_name'].lower())
                                     song['extraArtistsconnectors'].append(extart['role'])
                                     
                         
@@ -1202,10 +1223,10 @@ def getVideo(curr_elem,flag):
             #else:
             #    return None
         except Exception as e:
-            print e
+            logging.exception(e)
             return None,bret
     except Exception as e:
-            print e
+            logging.exception(e)
             return None,bret
 
     
@@ -1229,6 +1250,7 @@ def getYoutubeUrl(video,flag):
                 searchUrl = "https://www.googleapis.com/youtube/v3/search?part=snippet&q="+urllib.quote_plus(str(allArtists))+"+"+urllib.quote_plus(str(video.name))+"+-cover"+"&alt=json&type=video&max-results=5&key=AIzaSyBE5nUPdQ7J_hlc3345_Z-I4IG-Po1ItPU"
             else:
                 searchUrl = "https://www.googleapis.com/youtube/v3/search?part=snippet&q="+urllib.quote_plus(str(allArtists))+"+"+urllib.quote_plus(str(video.name))+"&alt=json&type=video&max-results=5&key=AIzaSyBE5nUPdQ7J_hlc3345_Z-I4IG-Po1ItPU"
+        print searchUrl
         try:
             searchResult = simplejson.load(urllib2.urlopen(searchUrl),"utf-8")
             request_count = request_count + 2
@@ -1329,11 +1351,9 @@ def getYoutubeUrl(video,flag):
         except Exception as e:
             logging.exception('getYoutubeUrl')
             logging.exception(e)
-            print e
     except Exception as e:
         logging.exception('getYoutubeUrl')
         logging.exception(e)
-        print e
     return video,bret
 
 def getVideoFromYoutube(curr_elem):
@@ -1341,11 +1361,12 @@ def getVideoFromYoutube(curr_elem):
     bret = False
     try:
         retvid,bret = getVideo(curr_elem,0)
-        if(retvid == None):
+        if((retvid == None) or ('url' not in retvid.__dict__)):
+            print 'here'
             retvid,bret = getVideo(curr_elem,1)
+        
     except Exception as e:
         logging.exception('getVideoFromYoutube')
-        print e
     return retvid,bret
 
 def getVideo_1(curr_elem,flag):
@@ -1524,9 +1545,9 @@ def getVideo_1(curr_elem,flag):
             else:
                 return None,True
         except Exception as e:
-            print e
+            logging.exception(e)
     except Exception as e:
-            print e
+            logging.exception(e)
 
 def crawlArtist(directory):
     songs_list = list()
@@ -1537,6 +1558,13 @@ def crawlArtist(directory):
     aliases = []
     songs_list,full_country_list,aliases = get_song_list_master(directory,songs_list,full_country_list,aliases)
     songs_list,full_country_list,aliases = get_song_list(directory,songs_list,full_country_list,aliases)
+    print full_country_list
+    sorted_list_country = sorted(full_country_list.items(), key=operator.itemgetter(1),reverse = True)
+    #sorted(full_country_list,key = lambda x:x['name'].lower())
+    artist_country = "No country"
+    if(len(sorted_list_country) > 0):
+        artist_country = sorted_list_country[0][0]
+    print artist_country
     sorted_list = sorted(songs_list,key = lambda x:x['name'].lower()) 
     final_song_list = {}
     hits = 0
@@ -1603,7 +1631,7 @@ def crawlArtist(directory):
                 if(final_song_list[Item_id]['year'] == None):
                     final_song_list[Item_id]['year'] = '1001'
                 #final_song_list[Item_id]['language'] = song['language']
-                final_song_list[Item_id]['songcountry'] = song['country']
+                final_song_list[Item_id]['songcountry'] = artist_country
                 
                 #lang_count = {}
                 #lang_count[final_song_list[Item_id]['language']] = 1
@@ -1656,7 +1684,7 @@ def crawlArtist(directory):
                         stemp['year'] = song['year']
                         stemp['genres']= genre
                         stemp['styles']= style
-                        stemp['country'] = song['country']
+                        stemp['country'] = artist_country
                     else:
                         k = check(song['year'],stemp['year'])
                         if(k == 1):
@@ -1727,8 +1755,10 @@ def crawlArtist(directory):
                 for art_alias in  artist_alias_list:
                     curr_elem = dict(s)
                     curr_elem['artistName'] = art_alias
+                    curr_elem['songcountry'] = artist_country
                     parallel_songs_list.append(curr_elem)
             else:
+                curr_elem['songcountry'] = artist_country
                 parallel_songs_list.append(curr_elem)
             
         t1=time.time()
@@ -1738,11 +1768,14 @@ def crawlArtist(directory):
         return_pool = songs_pool.map(getVideoFromYoutube,parallel_songs_list)
         print len(return_pool)
         for ret_val in return_pool:
-            if(ret_val[0] == None):
+            if(ret_val[0] == None ):
                 misses = misses+1
             else:
-                vid.append(ret_val[0].__dict__)
-                hits = hits + 1
+                if('url' not in ret_val[0].__dict__):
+                    misses = misses + 1
+                else:
+                    vid.append(ret_val[0].__dict__)
+                    hits = hits + 1
         print "Hits:"+str(hits)+" Misses:"+str(misses)
         print time.time() - t1
         write(vid,directory+"/dump")
@@ -1761,4 +1794,4 @@ for filename in filenameList:
 		crawlArtist(str(filename))
 		#logger.info("completed for artist :"+filename)
 	except Exception as e:
-		print e,filename
+		logging.exception(e)
