@@ -224,6 +224,10 @@ def get_song_list(directory,songs_list,full_country_list,aliases):
                                     song['extraArtistsconnectors'].append(extart['role'])
                 
                 song['name'] = track['title']
+                '''if('sugar' in song['name'].lower()):
+                        print song['genres']
+                        print song['year']
+                        print 'release' '''
                 if('duration' in curr_album):
                     song['duration'] = track['duration']
                 albumInfo = {}
@@ -322,6 +326,10 @@ def get_song_list_master(directory,songs_list,full_country_list,aliases):
                                     
                         
                     song['name'] = track['title']
+                    '''if('sugar' in song['name'].lower()):
+                        print song['genres']
+                        print song['year']
+                        print 'master' '''
                     if('duration' in curr_album):
                         song['duration'] = track['duration']
                     albumInfo = {}
@@ -1362,7 +1370,6 @@ def getVideoFromYoutube(curr_elem):
     try:
         retvid,bret = getVideo(curr_elem,0)
         if((retvid == None) or ('url' not in retvid.__dict__)):
-            print 'here'
             retvid,bret = getVideo(curr_elem,1)
         
     except Exception as e:
@@ -1629,7 +1636,7 @@ def crawlArtist(directory):
                 final_song_list[Item_id] = song
                 final_song_list[Item_id]['year'] = song['year']
                 if(final_song_list[Item_id]['year'] == None):
-                    final_song_list[Item_id]['year'] = '1001'
+                    final_song_list[Item_id]['year'] = 1001
                 #final_song_list[Item_id]['language'] = song['language']
                 final_song_list[Item_id]['songcountry'] = artist_country
                 
@@ -1687,14 +1694,12 @@ def crawlArtist(directory):
                         stemp['country'] = artist_country
                     else:
                         k = check(song['year'],stemp['year'])
+                        
                         if(k == 1):
                             stemp['year'] = song['year']
                             stemp['genres']= genre
                             stemp['styles']= style
                             stemp['country'] = song['country']
-                        
-                
-                
         total_count = 0
         for i in full_lang_list:
             total_count = total_count + full_lang_list[i]
@@ -1717,7 +1722,6 @@ def crawlArtist(directory):
                 #logger_decisions.error(percent)
             '''
             logger_decisions.error('----------------------------------------')     
-            
             
         '''if(len(percent_lang) != 0 and percent_lang[0][1] > 97.0):
             change_language = percent_lang[0][0]
