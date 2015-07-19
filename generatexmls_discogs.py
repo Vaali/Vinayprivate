@@ -165,6 +165,8 @@ def genXML(vid,avgcnt,avgcntrece,artistId):
             if(c != None):
                 conlist = conlist+" "+c 
 		#i = vid['url'].rfind('&')
+        if('url' not in vid):
+            return
         url = vid['url'].replace('https','http',1)
         print url[-11:]
         if vid.has_key('published'):
@@ -359,9 +361,9 @@ def genXML(vid,avgcnt,avgcntrece,artistId):
         genre = vid['genres']
         #print genre
         if(genre != None):
-            genre = genre.replace("{","")
-            genre = genre.replace("}","")
-            genre = genre.split(',')
+            #genre = genre.replace("{","")
+            #genre = genre.replace("}","")
+            #genre = genre.split(',')
             for g in genre:
                 g = g.replace("\"","")
                 g = g.replace(" ","_")
@@ -370,7 +372,7 @@ def genXML(vid,avgcnt,avgcntrece,artistId):
                 if(g == 'Rock_&_roll'):
                     g = 'Rock_and_roll'
                 else:
-                    g = g.replace('&','')
+                    g = g.replace('&','and')
                     g.strip()
                 xmlpath = "//"+str(g)
                 #print "xmla oath :" +xmlpath
@@ -406,9 +408,9 @@ def genXML(vid,avgcnt,avgcntrece,artistId):
         style = []
         style = vid['styles']
         if(style != None):
-            style = style.replace("{","")
-            style = style.replace("}","")
-            style = style.split(',')
+            #style = style.replace("{","")
+            #style = style.replace("}","")
+            #style = style.split(',')
             
             for g in style:
                 g = g.replace("\"","")
@@ -418,7 +420,7 @@ def genXML(vid,avgcnt,avgcntrece,artistId):
                 if(g == 'Rock_&_roll'):
                     g = 'Rock_and_roll'
                 else:
-                    g = g.replace('&','')
+                    g = g.replace('&','and')
                     g.strip()
                 xmlpath = "//"+str(g)
                 #print "xmla styles :" +g
@@ -537,19 +539,19 @@ def genXML(vid,avgcnt,avgcntrece,artistId):
         if os.path.exists(fname):
 			fr = codecs.open(fname,'r','utf-8')
 			oldsong = api.parse(fname)
-			if(round(oldsong.totalMatch) <= round(mysong.totalMatch)): 
+			if(round(oldsong.totalMatch) < round(mysong.totalMatch)): 
 				#print "overwriting :"
 				print oldsong.overLap
 				#print oldsong.totalMatch
 				print "With this :"
 				print mysong.overLap
-			elif ((round(oldsong.totalMatch) == round(mysong.totalMatch)) and (round(oldsong.songMatch) <= round(mysong.songMatch))):
+			elif ((round(oldsong.totalMatch) == round(mysong.totalMatch)) and (round(oldsong.songMatch) < round(mysong.songMatch))):
 				#print "overwriting :"
 				print oldsong.totalMatch
 				print oldsong.songMatch
 				print "With this :"
 				print mysong.match
-			elif ((round(oldsong.songMatch) == round(mysong.songMatch)) and (round(oldsong.artistMatch) <= round(mysong.artistMatch))):
+			elif ((round(oldsong.songMatch) == round(mysong.songMatch)) and (round(oldsong.artistMatch) < round(mysong.artistMatch))):
 				#print "overwriting :"
 				print oldsong.totalMatch
 				print "With this :"
@@ -625,36 +627,32 @@ def GetAlias(directory):
 	return aliases
 
 def CalculateAverages(directory):
-	averageCount = 0
-	averageCountRecent = 0
-	path = directory + "/dump"
-	print path
-	try:
+    averageCount = 0
+    averageCountRecent = 0
+    path = directory + "/dump"
+    print path
+    try:
 		json_data = open(path)
-	except IOError as e:
+    except IOError as e:
 		print "File does not exist"
 		return 0,0
-	songs = json.load(json_data)
-	json_data.close()
-	count = 0
-	ViewcountSum = 0
-	ViewCountRateSum = 0
-	#now = datetime.datetime.now()
-	for s in songs:
-		ViewcountSum = ViewcountSum + int(s['viewcount'])
-		ViewCountRateSum = ViewCountRateSum + int(s['viewcountRate'])
-		count = count + 1
-	#print "ratingnumber:"
-	#print "length : "
-	#print len(songs)
-	#print count
-	if(len(songs) != 0):
+    songs = json.load(json_data)
+    json_data.close()
+    count = 0
+    ViewcountSum = 0
+    ViewCountRateSum = 0
+    for s in songs:
+        if('viewcount' in s):
+            ViewcountSum = ViewcountSum + int(s['viewcount'])
+            ViewCountRateSum = ViewCountRateSum + int(s['viewcountRate'])
+            count = count + 1
+    if(len(songs) != 0):
 		averageCount = ViewcountSum / len(songs)
 		#print "Averages: "
 		#print averageCount
 		averageCountRecent = ViewCountRateSum / len(songs) 
 		#print averagerating
-	return averageCount,averageCountRecent
+    return averageCount,averageCountRecent
 
 #Main starts here
 t1=datetime.now()
@@ -678,7 +676,7 @@ config.read('test.ini')
 try:
 	opdir = config.get('Paths','opdir')
 except:
-	opdir = "solr_newData12"
+	opdir = "solr_newData11"
 try:
 	errordir = config.get('Paths','errordir')
 except:
