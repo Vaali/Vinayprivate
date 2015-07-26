@@ -191,6 +191,9 @@ def get_song_list(directory,songs_list,full_country_list,aliases,ear_count,ear_y
                     if(artist['position'] == 1):
                         song['artistName'] = re.sub(r'\(.*?\)', '', artist['artist_name'].lower()).strip()
                         song['artist_id'] = artist['artist_id']
+                        #add anvs for the main artist alone
+                        if('anv' in artist and artist['anv'] != None):
+                            song['anv'] = artist['anv']
                         if(artist['join_relation'] != None):
                             song['connectors'].append(artist['join_relation'])
                     elif(artist['artist_name'].lower() not in song['featArtists'] and ('artistName' not in song or (artist['artist_name'].lower() != song['artistName'].lower()))):
@@ -206,8 +209,8 @@ def get_song_list(directory,songs_list,full_country_list,aliases,ear_count,ear_y
                                 artist['artist_name'] = artist['artist_name'].lower().replace(', the','')
                                 artist['artist_name'] = 'the '+ artist['artist_name']
                         if('artist_name' in artist and artist['artist_name'].lower() != song['artistName'].lower()):
-                            if(artist['artist_name'] not in song['featArtists']):
-                                    song['featArtists'].append(artist['artist_name'])
+                            if(artist['artist_name'].lower() not in song['featArtists']):
+                                    song['featArtists'].append(artist['artist_name'].lower())
                             if(artist['join_relation'] not in song['connectors']):
                                     song['connectors'].append(artist['join_relation'])
                         if('artist_name' in artist and artist['artist_name'].lower() == song['artistName'].lower()):
@@ -270,19 +273,32 @@ def get_song_list_master(directory,songs_list,full_country_list,aliases,ear_coun
                     continue    
                 if(curr_album['release_id'] == release_album):
                     curr_rel = True
-                    song['release_album'] = True
+                    #song['release_album'] = True
                 option = check(curr_album['released_date'],ear_year)
                 if(option == 3 and ear_rel== False and curr_rel == True):
+                    '''print '----------------------------'
                     print curr_album['release_id']
+                    print curr_master['id']
+                    print curr_album['country']
+                    print curr_album['released_date']
+                    print '----------------------------' '''
                     ear_count = curr_album['country']
                     ear_year = curr_album['released_date']
                     ear_rel = curr_rel
                 '''print '----------------------------'
                 print curr_album['released_date']
                 print ear_year
-                print curr_album['country']'''
+                print curr_album['country']
+                print curr_master['id']
+                print curr_album['release_id']'''
                 
                 if(option == 1):
+                    '''print '-------------xxxxxxx---------------'
+                    print curr_album['release_id']
+                    print curr_master['id']
+                    print curr_album['country']
+                    print curr_album['released_date']
+                    print '------------xxxxxxx----------------' '''
                     ear_count = curr_album['country']
                     ear_year = curr_album['released_date']
                     ear_rel = curr_rel
@@ -313,6 +329,9 @@ def get_song_list_master(directory,songs_list,full_country_list,aliases,ear_coun
                         if(artist['position'] == 1):
                             song['artistName'] = re.sub(r'\(.*?\)', '', artist['artist_name'].lower()).strip()
                             song['artist_id'] = artist['artist_id']
+                            #add anvs for the main artist alone
+                            if('anv' in artist and artist['anv'] != None):
+                                song['anv'] = artist['anv']
                             if(artist['join_relation'] != None):
                                 song['connectors'].append(artist['join_relation'])
                         elif(artist['artist_name'].lower() not in song['featArtists'] and ('artistName' not in song or (artist['artist_name'].lower() != song['artistName'].lower()))):
@@ -328,8 +347,8 @@ def get_song_list_master(directory,songs_list,full_country_list,aliases,ear_coun
                                         artist['artist_name'] = artist['artist_name'].lower().replace(', the','')
                                         artist['artist_name'] = 'the '+ artist['artist_name']
                             if('artist_name' in artist and artist['artist_name'].lower() != song['artistName'].lower()):
-                                if(artist['artist_name'] not in song['featArtists']):
-                                    song['featArtists'].append(artist['artist_name'])
+                                if(artist['artist_name'].lower() not in song['featArtists']):
+                                    song['featArtists'].append(artist['artist_name'].lower())
                                 if(artist['join_relation'] not in song['connectors']):
                                     song['connectors'].append(artist['join_relation'])
                             if('artist_name' in artist and artist['artist_name'].lower() == song['artistName'].lower()):
@@ -356,13 +375,13 @@ def get_song_list_master(directory,songs_list,full_country_list,aliases,ear_coun
                                     
                         
                     song['name'] = track['title']
-                    '''if('sugar' in song['name'].lower()):
+                    '''if('lazy' in song['name'].lower()):
                         print '------------------------------------'
                         print song['genres']
                         print song['year']
+                        print song['styles']
                         print curr_album['release_id']
-                        if('release_album' in song):
-                            print song['release_album']'''
+                        print curr_master['id']'''
                     if('duration' in curr_album):
                         song['duration'] = track['duration']
                     albumInfo = {}
@@ -609,18 +628,18 @@ hq','band','audio','album','world','instrumental','intro','house','acoustic','so
         elif(sm+am+ram>140  and not bhiphen and (len(artistName.strip().split()) > 1) and tm>30 and sm>30):
             decision = "correct"
             condition = 7 
-        elif(tm>70 and (len(songName.strip().split()) > 1 or len(artistName.strip().split()) > 1) and sm>30):
+        elif(tm>70 and (len(songName.strip().split()) > 1 or len(artistName.strip().split()) > 1) and sm>30 and (am>0 or lam>0 or ram>0)):
             decision = "correct"
             condition = 8 
         elif(substring_artist == "true" and substring_song == "true" and (len(ftartists) == 0 or (len(ftartists)!=0 and ftMatch == 100.0)) and ( len(artistName.strip().split()) > 1) and percentMatch > 60.0):
             decision = "correct"
             condition = 1
         #if song is false then look for song match and length must be greater than 1
-        elif(substring_song == "false" and songMatch  >= 80.0 and ( len(artistName.strip().split()) > 1)):
+        elif(substring_song == "false" and songMatch  >= 80.0 and ( len(artistName.strip().split()) > 1) and (am>0 or lam>0 or ram>0)):
             decision = "correct"
             condition = 2
         #if artist  is false look for artistmatch left or [right and total match]
-        elif(substring_artist == "false" and (leftMatch == 100.0  or  (rightMatch == 100.0 and percentMatch  > 60.0)) and (len(songName.strip().split()) > 1 or len(artistName.strip().split()) > 1)):
+        elif(substring_artist == "false" and (leftMatch == 100.0  or  (rightMatch == 100.0 and percentMatch  > 60.0)) and (len(songName.strip().split()) > 1 or len(artistName.strip().split()) > 1) and sm>30):
             decision = "correct"
             condition = 3
         #if only one words for both song and artist ,check total match and leftmatch for - case.
@@ -891,18 +910,18 @@ hq','band','audio','album','world','instrumental','intro','house','acoustic','so
         elif(sm+am+ram>140  and not bhiphen and (len(artistName.strip().split()) > 1) and tm>30 and sm>30):
             decision = "correct"
             condition = 7 
-        elif(tm>70 and (len(songName.strip().split()) > 1 or len(artistName.strip().split()) > 1) and sm>30):
+        elif(tm>70 and (len(songName.strip().split()) > 1 or len(artistName.strip().split()) > 1) and sm>30 and  (am>0 or lam>0 or ram>0)):
             decision = "correct"
             condition = 8 
         elif(substring_artist == "true" and substring_song == "true" and (len(ftartists) == 0 or (len(ftartists)!=0 and ftMatch == 100.0)) and ( len(artistName.strip().split()) > 1) and percentMatch > 60.0):
             decision = "correct"
             condition = 1
         #if song is false then look for song match and length must be greater than 1
-        elif(substring_song == "false" and songMatch  >= 80.0 and ( len(artistName.strip().split()) > 1)):
+        elif(substring_song == "false" and songMatch  >= 80.0 and ( len(artistName.strip().split()) > 1) and  (am>0 or lam>0 or ram>0)):
             decision = "correct"
             condition = 2
         #if artist  is false look for artistmatch left or [right and total match]
-        elif(substring_artist == "false" and (leftMatch == 100.0  or  (rightMatch == 100.0 and percentMatch  > 60.0)) and (len(songName.strip().split()) > 1 or len(artistName.strip().split()) > 1)):
+        elif(substring_artist == "false" and (leftMatch == 100.0  or  (rightMatch == 100.0 and percentMatch  > 60.0)) and (len(songName.strip().split()) > 1 or len(artistName.strip().split()) > 1) and sm>30):
             decision = "correct"
             condition = 3
         #if only one words for both song and artist ,check total match and leftmatch for - case.
@@ -1402,9 +1421,16 @@ def getYoutubeUrl(video,flag):
 def getVideoFromYoutube(curr_elem):
     retvid = None
     bret = False
+    artname = curr_elem['artistName']
     try:
         retvid,bret = getVideo(curr_elem,0)
+        if('anv' in curr_elem):
+            curr_elem['artistName'] = curr_elem['anv']
+            retvid,bret = getVideo(curr_elem,0)
+            if(retvid != None):
+                retvid.artist = artname
         if((retvid == None) or ('url' not in retvid.__dict__)):
+            curr_elem['artistName'] = artname
             retvid,bret = getVideo(curr_elem,1)
         
     except Exception as e:
@@ -1726,16 +1752,11 @@ def crawlArtist(directory):
                         stemp['language'] = s['language']+'&'+stemp['language']
                         stemp['songcountry']  = s['country']
                     stemp['albumInfo'].append(s)'''
-                '''if('sugar' in song['name'].lower()):
+                '''if('lazy' in song['name'].lower()):
                     print '-----------------------------'
                     print song['year']
                     print song['genres']
-                    print stemp['year']
-                    print stemp['genres']
-                    if('release_album' in song):
-                        print 'song'
-                    if('release_album' in stemp):
-                        print 'stemp'
+                    print song['styles']
                     print '##########################' '''
                 if(song['year'] != None):
                     if(stemp['year'] == None or stemp['year'] == 1001):
@@ -1746,17 +1767,30 @@ def crawlArtist(directory):
                             stemp['country'] = song['country']
                             if('release_album' in song):
                                     stemp['release_album'] = song['release_album']
+                            if('anv' in song):
+                                stemp['anv'] = song['anv']
                     else:
                         k = check(song['year'],stemp['year'])
-                        if(k == 1):
-                            #if('release_album' not in stemp):
-                                
+                        if(k == 1):                                
                                 stemp['year'] = song['year']
                                 stemp['genres']= genre
                                 stemp['styles']= style
                                 stemp['country'] = song['country']
                                 if('release_album' in song):
                                     stemp['release_album'] = song['release_album']
+                                if('anv' in song):
+                                    stemp['anv'] = song['anv']
+                        if(k == 3):
+                            if('release_album' not in stemp):
+                                stemp['year'] = song['year']
+                                stemp['genres']= genre
+                                stemp['styles']= style
+                                stemp['country'] = song['country']
+                                if('release_album' in song):
+                                    stemp['release_album'] = song['release_album']
+                                if('anv' in song):
+                                    stemp['anv'] = song['anv']
+                                
         total_count = 0
         for i in full_lang_list:
             total_count = total_count + full_lang_list[i]
