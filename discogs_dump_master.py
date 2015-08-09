@@ -90,7 +90,7 @@ def getAliasFromArtistsSolr(final_artist_alias_list,artist_id):
             response = solrConnection.query(q="*:*",fq=[artistId],version=2.2,wt = 'json')
             intersect = int(response.results.numFound)
         except SolrException as e:
-            logging.exception(e)
+            logger_error.exception(e)
             return final_artist_alias_list
         if(intersect <= 0):
             return final_artist_alias_list
@@ -107,7 +107,7 @@ def getAliasFromArtistsSolr(final_artist_alias_list,artist_id):
             #        if(artnamevar.lower() not in final_artist_alias_list):
             #            final_artist_alias_list.append(artnamevar.lower())
     except Exception, e:
-            logging.exception(e)
+            logger_error.exception(e)
     return final_artist_alias_list
 
 def write(self,filename):
@@ -121,7 +121,7 @@ def remove_stemwords(songName):
             songName = songName.replace(stem,"")
         if(stem.lower() in songName):
             songName = songName.replace(stem.lower(),"")
-    return songName
+    return songName.strip()
     
 
 def check(date1,date2):
@@ -266,7 +266,7 @@ def get_song_list(directory,songs_list,full_country_list,aliases,ear_count,ear_y
                         ear_count = curr_album['country']
                         ear_year = curr_album['released_date']
         except Exception, e:
-            logging.exception(e)
+            logger_error.exception(e)
     return songs_list,full_country_list,aliases,ear_count,ear_year,ear_rel
 
 
@@ -419,7 +419,7 @@ def get_song_list_master(directory,songs_list,full_country_list,aliases,ear_coun
                         ear_year = curr_album['released_date']
                         ear_rel = curr_rel
         except Exception, e:
-            logging.exception(e)
+            logger_error.exception(e)
     return songs_list,full_country_list,aliases,ear_count,ear_year,ear_rel,ear_conflict
 
 def CalculateMatch_work(curr_elem,vid_title):
@@ -699,7 +699,7 @@ hq','band','audio','album','world','instrumental','intro','house','acoustic','so
         #logger_decisions.error(fuzz.ratio(soundex(youtubematch.lower()),soundex(comparestring.lower())))
         logger_decisions.error('-----------------')
     except Exception, e:
-            logging.exception(e)
+            logger_error.exception(e)
     return decision,match,tm,sm,am
 
 def CalculateMatch(video,vid_title):
@@ -983,7 +983,7 @@ hq','band','audio','album','world','instrumental','intro','house','acoustic','so
         #logger_decisions.error(fuzz.ratio(soundex(youtubematch.lower()),soundex(comparestring.lower())))
         logger_decisions.error('-----------------')
     except Exception, e:
-            logging.exception(e)
+            logger_error.exception(e)
     return decision,match,tm,sm,am
 
 
@@ -1232,7 +1232,7 @@ def CalculateMatch_old(curr_elem,vid_title):
             decision = "Incorrect"
     except Exception, e:
             print 'getVideo'
-            logging.exception(e)
+            logger_error.exception(e)
     logger_decisions.error(decision)
     logger_decisions.error(condition)
     logger_decisions.error(match)
@@ -1292,7 +1292,6 @@ def getVideo(curr_elem,flag):
         try:
 
             video1 = Video()
-            #video1.lang_count = curr_elem['lang_count']
             video1.artist = curr_elem['artistName']
             video1.ftArtist = curr_elem['featArtists']
             video1.name = curr_elem['name']
@@ -1305,19 +1304,19 @@ def getVideo(curr_elem,flag):
                 video1.artistalias = curr_elem['artistalias']
             video1.genres = curr_elem['genres']
             video1.styles = curr_elem['styles']
-            video1,bret = getYoutubeUrl(video1,flag)
+            video1,bret = getYoutubeUrl(video1,flag,0)
             return video1,bret
             #else:
             #    return None
         except Exception as e:
-            logging.exception(e)
+            logger_error.exception(e)
             return None,bret
     except Exception as e:
-            logging.exception(e)
+            logger_error.exception(e)
             return None,bret
 
     
-def getYoutubeUrl(video,flag):
+def getYoutubeUrl(video,flag,mostpopular):
     global request_count
     bret = False
     try:
@@ -1344,7 +1343,7 @@ def getYoutubeUrl(video,flag):
             #print searchResult
         except Exception as e:
             request_count = request_count + 2
-            logging.exception("Error")
+            logger_error.exception("Error")
             return video,bret
         now = datetime.now()
         try:
@@ -1375,7 +1374,7 @@ def getYoutubeUrl(video,flag):
                             request_count = request_count + 7
                         except Exception as e:
                             request_count = request_count + 7
-                            logging.exception(e)
+                            logger_error.exception(e)
                             continue
                         if videoResult.has_key('items'):
                             videoEntry = videoResult['items'][0]
@@ -1399,10 +1398,11 @@ def getYoutubeUrl(video,flag):
                                 selectedVideolikes = currentVideolikes
                                 selectedVideodislikes = currentVideodislikes
                                 iindex=i
-                                if(i< earliestindex):
-                                    earliestindex = i
+                                #if(mostpopular == 1):
+                                #    break
                     i = i + 1
-                    if(iindex != -1):
+                #get the videos
+                if(iindex != -1):
                         bret = True
                         if(int(selectedVideolikes) !=0 and int(selectedVideodislikes)!=0):
                             video.rating = (float(selectedVideolikes)*5)/(float(selectedVideolikes)+float(selectedVideodislikes))
@@ -1436,14 +1436,14 @@ def getYoutubeUrl(video,flag):
                         video.viewcount = selectedVideoViewCount
                         if(total != 0):
                             video.viewcountRate = float(video.viewcount)/total
-                    else:
+                else:
                         misses = 1
         except Exception as e:
-            logging.exception('getYoutubeUrl')
-            logging.exception(e)
+            logger_error.exception('getYoutubeUrl')
+            logger_error.exception(e)
     except Exception as e:
-        logging.exception('getYoutubeUrl')
-        logging.exception(e)
+        logger_error.exception('getYoutubeUrl')
+        logger_error.exception(e)
     return video,bret
 
 def getVideoFromYoutube(curr_elem):
@@ -1462,7 +1462,7 @@ def getVideoFromYoutube(curr_elem):
             retvid,bret = getVideo(curr_elem,1)
         
     except Exception as e:
-        logging.exception('getVideoFromYoutube')
+        logger_error.exception('getVideoFromYoutube')
     return retvid,bret
 
 def getVideo_1(curr_elem,flag):
@@ -1521,9 +1521,8 @@ def getVideo_1(curr_elem,flag):
             #print searchResult
         except Exception as e:
             request_count = request_count + 2
-            logging.exception("Error")
+            logger_error.exception("Error")
             return None,True
-            #logging.warning('No results from google',e)
         now = datetime.now()
         try:
             if searchResult.has_key('items') and len(searchResult['items'])!= 0:
@@ -1559,7 +1558,7 @@ def getVideo_1(curr_elem,flag):
                             request_count = request_count + 7
                         except Exception as e:
                             request_count = request_count + 7
-                            logging.exception(e)
+                            logger_error.exception(e)
                             continue
                         if videoResult.has_key('items'):
                             videoEntry = videoResult['items'][0]
@@ -1641,9 +1640,9 @@ def getVideo_1(curr_elem,flag):
             else:
                 return None,True
         except Exception as e:
-            logging.exception(e)
+            logger_error.exception(e)
     except Exception as e:
-            logging.exception(e)
+            logger_error.exception(e)
 
 def crawlArtist(directory):
     songs_list = list()
@@ -1667,12 +1666,7 @@ def crawlArtist(directory):
     artist_country = ear_count
     if(len(sorted_list_country) > 0):
         artist_country = sorted_list_country[0][0]
-    print '----------------------'
-    print artist_country
-    print ear_count
-    print 'xxxxxxxxxxxxxxxxxxxxxx'
     if(ear_conflict == True):
-        print 'countries mismatch'
         ear_count = artist_country
     sorted_list = sorted(songs_list,key = lambda x:x['name'].lower()) 
     final_song_list = {}
@@ -1690,13 +1684,15 @@ def crawlArtist(directory):
         artist_alias_list = getArtistAliasList(sorted_list)
         for song in sorted_list:
             Item_id = song['name'].lower()
+            
             #Item_id = Item_id + ","
             Item_id = Item_id + "," + song['artistName']
             if(len(song['featArtists'])!= 0):
                 temp_str = ','.join(song['featArtists'])
-                Item_id = Item_id + temp_str.lower()
+                Item_id = Item_id + "," +temp_str.lower()
             Item_id.strip()
             k = 0
+            
             genre = song['genres']
             if(genre != None):
                 genre = genre.replace("{","")
@@ -1723,6 +1719,7 @@ def crawlArtist(directory):
                 song['scount'] = 0
                 song['genres'] = genre
                 song['styles'] = style
+                song['yearList'] = []
                 '''for g in genre:
                     if(g not in song['genres_count']):
                         song['genres_count'][g] = 1
@@ -1741,10 +1738,10 @@ def crawlArtist(directory):
                     song['scount'] = song['scount'] + 1'''
                 
                 final_song_list[Item_id] = song
+                song['yearList'].append(song['year'])
                 final_song_list[Item_id]['year'] = song['year']
                 if(final_song_list[Item_id]['year'] == None):
                     final_song_list[Item_id]['year'] = 1001
-                #final_song_list[Item_id]['language'] = song['language']
                 final_song_list[Item_id]['songcountry'] = ear_count
                 if(ear_count == None):
                     final_song_list[Item_id]['songcountry'] = artist_country
@@ -1753,9 +1750,6 @@ def crawlArtist(directory):
                 elif(ear_count.lower() != artist_country.lower()):
                     final_song_list[Item_id]['songcountry'] = final_song_list[Item_id]['songcountry'] + ',' + artist_country 
                 
-                #lang_count = {}
-                #lang_count[final_song_list[Item_id]['language']] = 1
-                #final_song_list[Item_id]['lang_count'] = lang_count
             else:
                 stemp = final_song_list[Item_id]
                 '''for g in genre:
@@ -1805,6 +1799,9 @@ def crawlArtist(directory):
                     print song['genres']
                     print song['styles']
                     print '##########################' '''
+                stemp['yearList'].append(song['year'])
+                for album in song['albumInfo']:
+                    stemp['albumInfo'].append(album)
                 if(song['year'] != None):
                     if(stemp['year'] == None or stemp['year'] == 1001):
                         #if('release_album' not in stemp): #If the previous songis from a release album , dont replace the year and genre
@@ -1812,6 +1809,7 @@ def crawlArtist(directory):
                             stemp['genres']= genre
                             stemp['styles']= style
                             stemp['country'] = song['country']
+                            
                             if('release_album' in song):
                                     stemp['release_album'] = song['release_album']
                             if('anv' in song):
@@ -1837,7 +1835,7 @@ def crawlArtist(directory):
                                     stemp['release_album'] = song['release_album']
                                 if('anv' in song):
                                     stemp['anv'] = song['anv']
-                                
+                final_song_list[Item_id] = stemp                     
         total_count = 0
         for i in full_lang_list:
             total_count = total_count + full_lang_list[i]
@@ -1876,13 +1874,13 @@ def crawlArtist(directory):
 			pickle.dump(final_song_list.keys(), f)
         parallel_songs_list = []
         finalsongs = final_song_list.values()
-        '''for s in final_song_list:
-            if('uptown funk' in s.lower()):
-                print final_song_list[s]'''
-        for s in finalsongs:
-            #lang_dict = s['lang_count']
+        for s in final_song_list:
+            if("love street" in s.lower()):
+                print s
+                print final_song_list[s]
+        print '############################################################################################################################'
+        for s in finalsongs:            
             curr_elem = dict(s)
-            #s['songcountry'] = ''
             '''temp_lang_list = sorted(lang_dict.iteritems(), key=lambda (k,v): (v,k),reverse = True)
             if( len(temp_lang_list) >1 and temp_lang_list[0][1] == temp_lang_list[1][1]):
                 s['language'] = full_lang_list[0][0]
@@ -1923,7 +1921,7 @@ def crawlArtist(directory):
         write(vid,directory+"/dump")
 
     except Exception, e:
-        logging.exception(e)
+        logger_error.exception(e)
 
         
 reload(sys)
@@ -1936,4 +1934,4 @@ for filename in filenameList:
 		crawlArtist(str(filename))
 		#logger.info("completed for artist :"+filename)
 	except Exception as e:
-		logging.exception(e)
+		logger_error.exception(e)
