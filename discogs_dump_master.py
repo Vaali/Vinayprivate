@@ -39,7 +39,7 @@ logger_error = logging.getLogger('simple_logger2')
 
 solrConnection = SolrConnection('http://aurora.cs.rutgers.edu:8181/solr/discogs_artists')
 #change here to add stem words
-stemwords = ["(Edited Short Version)","(Alternate Early Version)","(Alternate Version)","Mono","(Radio Edit)","(Original Album Version)","(Different Mix)","(Music Film)","Stereo","(Single Version)"]
+stemwords = ["(Edited Short Version)","(Alternate Early Version)","(Alternate Version)","(Mono)","(Radio Edit)","(Original Album Version)","(Different Mix)","(Music Film)","(Stereo)","(Single Version)","Stereo","Mono"]
 class Video():
 	pass
 
@@ -48,7 +48,15 @@ class Album_Data():
 
 class Audio(object):
 	pass
-
+def removeStemCharacters(currString):
+    currString = currString.replace('"','').strip()
+    currString = currString.replace('’','').strip()
+    currString = currString.replace("'",'').strip()
+    currString = currString.replace("‘",'').strip()
+    currString = currString.replace("?",'').strip()
+    currString = currString.replace(',','').strip()
+    return currString
+    
 def ParseTime(time):
 	time = time.replace('PT','')
 	hours = 0
@@ -181,7 +189,7 @@ def get_song_list(directory,songs_list,full_country_list,aliases,ear_count,ear_y
                 for artist in curr_album['releaseartists']:
                     if(artist == None):
                         continue
-                    artist['artist_name'] = re.sub(r'\(.*?\)', '', artist['artist_name']).strip()
+                    artist['artist_name'] = re.sub(r'\(.*?\)', '', artist['artist_name']).strip().lower()
                     if(', the' in artist['artist_name'].lower()):
                                 artist['artist_name'] = artist['artist_name'].lower().replace(', the','')
                                 artist['artist_name'] = 'the '+ artist['artist_name']
@@ -204,7 +212,7 @@ def get_song_list(directory,songs_list,full_country_list,aliases,ear_count,ear_y
                         if(artist['artist_id'] == 355):
                                 earlier_year_skip = True
                                 bskip = True
-                        artist['artist_name'] = re.sub(r'\(.*?\)', '', artist['artist_name']).strip()
+                        artist['artist_name'] = re.sub(r'\(.*?\)', '', artist['artist_name']).strip().lower()
                         if(', the' in artist['artist_name'].lower()):
                                 artist['artist_name'] = artist['artist_name'].lower().replace(', the','')
                                 artist['artist_name'] = 'the '+ artist['artist_name']
@@ -223,7 +231,7 @@ def get_song_list(directory,songs_list,full_country_list,aliases,ear_count,ear_y
                         for extart in extartists:
                             if(extart == None):
                                 continue
-                            extart['artist_name'] = re.sub(r'\(.*?\)', '', extart['artist_name']).strip()
+                            extart['artist_name'] = re.sub(r'\(.*?\)', '', extart['artist_name']).strip().lower()
                             if(', the' in extart['artist_name'].lower()):
                                 extart['artist_name'] = extart['artist_name'].lower().replace(', the','')
                                 extart['artist_name'] = 'the '+ extart['artist_name']
@@ -320,7 +328,7 @@ def get_song_list_master(directory,songs_list,full_country_list,aliases,ear_coun
                     for artist in curr_album['releaseartists']:
                         if(artist == None):
                             continue
-                        artist['artist_name'] = re.sub(r'\(.*?\)', '', artist['artist_name']).strip()
+                        artist['artist_name'] = re.sub(r'\(.*?\)', '', artist['artist_name']).strip().lower()
                         if(', the' in artist['artist_name'].lower()):
                                 artist['artist_name'] = artist['artist_name'].lower().replace(', the','')
                                 artist['artist_name'] = 'the '+ artist['artist_name']
@@ -342,7 +350,7 @@ def get_song_list_master(directory,songs_list,full_country_list,aliases,ear_coun
                                 continue
                             if(artist['artist_id'] == 355):
                                 bskip = True
-                            artist['artist_name'] = re.sub(r'\(.*?\)', '', artist['artist_name']).strip()
+                            artist['artist_name'] = re.sub(r'\(.*?\)', '', artist['artist_name']).strip().lower()
                             if(', the' in artist['artist_name'].lower()):
                                         artist['artist_name'] = artist['artist_name'].lower().replace(', the','')
                                         artist['artist_name'] = 'the '+ artist['artist_name']
@@ -363,7 +371,7 @@ def get_song_list_master(directory,songs_list,full_country_list,aliases,ear_coun
                         for extart in extartists:
                             if(extart == None):
                                 continue
-                            extart['artist_name'] = re.sub(r'\(.*?\)', '', extart['artist_name']).strip()
+                            extart['artist_name'] = re.sub(r'\(.*?\)', '', extart['artist_name']).strip().lower()
                             if(', the' in extart['artist_name'].lower()):
                                         extart['artist_name'] = extart['artist_name'].lower().replace(', the','')
                                         extart['artist_name'] = 'the '+ extart['artist_name']
@@ -1251,6 +1259,8 @@ def CalculateMatch_old(curr_elem,vid_title):
 def getVideo(curr_elem,flag):
     try:
         global request_count
+        mostpopular = 0
+        videolist = []
         #print curr_elem
         #print curr_elem['artistName']
         alist = list()
@@ -1267,7 +1277,7 @@ def getVideo(curr_elem,flag):
         #combine all the album information for the songs into a list.
         for l in songs_list:
             album_details = Album_Data()
-            album_details.albumname = l['albumName']
+            album_details.albumname = removeStemCharacters(l['albumName'])
             album_details.year = l['year']
             if('country' in l and l['country'] != None and len(l['country'])> 0):
                 album_details.country = l['country']
@@ -1278,8 +1288,11 @@ def getVideo(curr_elem,flag):
             else:
                 album_details.country = 'No Language' 
             '''
-            if(l['albumName'].lower() not in unique_albums):
-                unique_albums.append(l['albumName'].lower())
+            if(l['albumName'].lower().strip() not in unique_albums):
+                unique_albums.append(l['albumName'].lower().strip())
+                album_details.albumname = removeStemCharacters(l['albumName'])
+                if(l['year'] != None):
+                    album_details.albumname = album_details.albumname + " " + l['year']
                 alist.append(album_details.__dict__)
         if(len(alist)==0):
             print curr_elem
@@ -1292,6 +1305,7 @@ def getVideo(curr_elem,flag):
         try:
 
             video1 = Video()
+            video2 = Video()
             video1.artist = curr_elem['artistName']
             video1.ftArtist = curr_elem['featArtists']
             video1.name = curr_elem['name']
@@ -1305,7 +1319,7 @@ def getVideo(curr_elem,flag):
             video1.genres = curr_elem['genres']
             video1.styles = curr_elem['styles']
             video1,bret = getYoutubeUrl(video1,flag,0)
-            return video1,bret
+            #video2,bret = getYoutubeUrl(video1,flag,1)#comment it to get more videos Apostolos
             #else:
             #    return None
         except Exception as e:
@@ -1314,6 +1328,7 @@ def getVideo(curr_elem,flag):
     except Exception as e:
             logger_error.exception(e)
             return None,bret
+    return [video1,video2],bret
 
     
 def getYoutubeUrl(video,flag,mostpopular):
@@ -1385,7 +1400,7 @@ def getYoutubeUrl(video,flag,mostpopular):
                             currentVideoStatus = videoEntry['status']['privacyStatus']
                             if(currentVideoEmbedded == False or currentVideoStatus != 'public'):
                                 continue
-                            if (int(selectedVideoViewCount) < int(currentVideoViewCount)):
+                            if (int(selectedVideoViewCount) < int(currentVideoViewCount) and (mostpopular == 0)):
                                 selectedVideoViewCount = currentVideoViewCount
                                 selectedVideoMatch = currentVideoMatch
                                 selectedVideoTotalMatch = currentVideoTotalMatch
@@ -1398,8 +1413,32 @@ def getYoutubeUrl(video,flag,mostpopular):
                                 selectedVideolikes = currentVideolikes
                                 selectedVideodislikes = currentVideodislikes
                                 iindex=i
-                                #if(mostpopular == 1):
-                                #    break
+                            if ((selectedVideoTotalMatch) < int(currentVideoTotalMatch) and (mostpopular == 1)):
+                                selectedVideoViewCount = currentVideoViewCount
+                                selectedVideoMatch = currentVideoMatch
+                                selectedVideoTotalMatch = currentVideoTotalMatch
+                                selectedVideoSongMatch = currentVideoSongMatch
+                                selectedVideoArtistMatch = currentVideoArtistMatch
+                                selectedVideoTitle = searchEntry['snippet']['title']
+                                selectedVideoUrl = "https://www.youtube.com/watch?v="+str(youtubeVideoId)
+                                selectedVideoPublishedDate = searchEntry['snippet']['publishedAt']
+                                selectedVideoDuration = ParseTime(videoEntry['contentDetails']['duration'])
+                                selectedVideolikes = currentVideolikes
+                                selectedVideodislikes = currentVideodislikes
+                                iindex=i
+                            if (selectedVideoTotalMatch == currentVideoTotalMatch and (mostpopular == 1) and int(selectedVideoViewCount) < int(currentVideoViewCount)):
+                                selectedVideoViewCount = currentVideoViewCount
+                                selectedVideoMatch = currentVideoMatch
+                                selectedVideoTotalMatch = currentVideoTotalMatch
+                                selectedVideoSongMatch = currentVideoSongMatch
+                                selectedVideoArtistMatch = currentVideoArtistMatch
+                                selectedVideoTitle = searchEntry['snippet']['title']
+                                selectedVideoUrl = "https://www.youtube.com/watch?v="+str(youtubeVideoId)
+                                selectedVideoPublishedDate = searchEntry['snippet']['publishedAt']
+                                selectedVideoDuration = ParseTime(videoEntry['contentDetails']['duration'])
+                                selectedVideolikes = currentVideolikes
+                                selectedVideodislikes = currentVideodislikes
+                                iindex=i
                     i = i + 1
                 #get the videos
                 if(iindex != -1):
@@ -1456,11 +1495,19 @@ def getVideoFromYoutube(curr_elem):
             curr_elem['artistName'] = curr_elem['anv']
             retvid,bret = getVideo(curr_elem,0)
             if(retvid != None):
-                retvid.artist = artname
-        if((retvid == None) or ('url' not in retvid.__dict__)):
+                for rv in retvid:
+                    rv.artist = artname
+        if(retvid == None):
             curr_elem['artistName'] = artname
             retvid,bret = getVideo(curr_elem,1)
-        
+        else:
+            emptyvid = 0
+            for rv in retvid:
+                if('url' in rv.__dict__):
+                    emptyvid = 1
+            if(emptyvid == 0):
+                curr_elem['artistName'] = artname
+                retvid,bret = getVideo(curr_elem,1)
     except Exception as e:
         logger_error.exception('getVideoFromYoutube')
     return retvid,bret
@@ -1684,7 +1731,10 @@ def crawlArtist(directory):
         artist_alias_list = getArtistAliasList(sorted_list)
         for song in sorted_list:
             Item_id = song['name'].lower()
-            
+            if('love story' in Item_id):
+                print Item_id
+                print song['year']
+                print "--------xxxxxxxxxxx---------"
             #Item_id = Item_id + ","
             Item_id = Item_id + "," + song['artistName']
             if(len(song['featArtists'])!= 0):
@@ -1748,7 +1798,7 @@ def crawlArtist(directory):
                 elif(artist_country == None):
                     final_song_list[Item_id]['songcountry'] = ear_count
                 elif(ear_count.lower() != artist_country.lower()):
-                    final_song_list[Item_id]['songcountry'] = final_song_list[Item_id]['songcountry'] + ',' + artist_country 
+                    final_song_list[Item_id]['songcountry'] = ear_count.lower()
                 
             else:
                 stemp = final_song_list[Item_id]
@@ -1802,7 +1852,7 @@ def crawlArtist(directory):
                 stemp['yearList'].append(song['year'])
                 for album in song['albumInfo']:
                     stemp['albumInfo'].append(album)
-                if(song['year'] != None):
+                if(song['year'] != None and song['year'] != 1001):
                     if(stemp['year'] == None or stemp['year'] == 1001):
                         #if('release_album' not in stemp): #If the previous songis from a release album , dont replace the year and genre
                             stemp['year'] = song['year']
@@ -1846,6 +1896,7 @@ def crawlArtist(directory):
         change_language = ''
         for s in final_song_list:
             logger_decisions.error(s)
+            logger_decisions.error(final_song_list[s]['year'])
             logger_decisions.error(final_song_list[s]['genres'])
             logger_decisions.error(final_song_list[s]['styles'])
             '''for g in final_song_list[s]['genres']:
@@ -1874,11 +1925,6 @@ def crawlArtist(directory):
 			pickle.dump(final_song_list.keys(), f)
         parallel_songs_list = []
         finalsongs = final_song_list.values()
-        for s in final_song_list:
-            if("love street" in s.lower()):
-                print s
-                print final_song_list[s]
-        print '############################################################################################################################'
         for s in finalsongs:            
             curr_elem = dict(s)
             '''temp_lang_list = sorted(lang_dict.iteritems(), key=lambda (k,v): (v,k),reverse = True)
@@ -1904,18 +1950,19 @@ def crawlArtist(directory):
         t1=time.time()
         print len(parallel_songs_list)
         songs_pool = Pool()
-        songs_pool =Pool(processes=10)
+        songs_pool =Pool(processes=20)
         return_pool = songs_pool.map(getVideoFromYoutube,parallel_songs_list)
         print len(return_pool)
         for ret_val in return_pool:
             if(ret_val[0] == None ):
                 misses = misses+1
             else:
-                if('url' not in ret_val[0].__dict__):
-                    misses = misses + 1
-                else:
-                    vid.append(ret_val[0].__dict__)
-                    hits = hits + 1
+                for rv in ret_val[0]:
+                    if('url' not in rv.__dict__):
+                        misses = misses + 1
+                    else:
+                        vid.append(rv.__dict__)
+                        hits = hits + 1
         print "Hits:"+str(hits)+" Misses:"+str(misses)
         print time.time() - t1
         write(vid,directory+"/dump")
