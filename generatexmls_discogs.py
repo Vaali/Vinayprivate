@@ -138,6 +138,7 @@ def genXML(vid,avgcnt,avgcntrece,artistId):
         conlist = ""
         mysong = api.songs()
         artistName = vid['artist']
+        artistName = artistName[0].upper()+ artistName[1:]
         artistName.strip("-")
         ftArtistName = vid['ftArtist']
         try:
@@ -168,7 +169,7 @@ def genXML(vid,avgcnt,avgcntrece,artistId):
         if('url' not in vid):
             return
         url = vid['url'].replace('https','http',1)
-        print url[-11:]
+        #print url[-11:]
         if vid.has_key('published'):
 			m = re.search(re.compile("[0-9]{4}[-][0-9]{2}[-][0-9]{2}"),vid['published'])
 			n = re.search(re.compile("[0-9]{2}[:][0-9]{2}[:][0-9]{2}"),vid['published'])
@@ -271,7 +272,7 @@ def genXML(vid,avgcnt,avgcntrece,artistId):
         ar.set_artistPopularityAll(avgcnt)
         ar.set_artistPopularityRecent(avgcntrece)
         ar.add_artistName(artistName)
-        print artistName
+        #print artistName
         #if(artistName not in aliases):
         #	aliases.append(artistName)
         iAliaslist = api.indexedArtistAliasList()
@@ -296,9 +297,10 @@ def genXML(vid,avgcnt,avgcntrece,artistId):
         fIAr = api.indexedftArtistList()
 		#print ftArtistName
         for f in ftArtistName:
-			fAr.add_ftArtistName(f)
-			fIAr.add_indexedftArtistName(f)
-			#mysong.add_ftArtistName
+            f = f[0].upper()+f[1:]
+            fAr.add_ftArtistName(f)
+            fIAr.add_indexedftArtistName(f)
+            #mysong.add_ftArtistName
         mysong.set_ftArtistList(fAr)
         mysong.set_indexedftArtistList(fIAr)
 		#connector of artists is a list
@@ -331,7 +333,7 @@ def genXML(vid,avgcnt,avgcntrece,artistId):
 			album = api.album()
         mysong.set_songLanguage(vid['language'])
 		#print vid['language']
-        releaseyear = vid['year'].split('-')[0]
+        releaseyear = str(vid['year']).split('-')[0]
         mysong.set_releaseDate(int(releaseyear))
         mysong.set_decade(int(releaseyear)/10)
         mysong.set_earliestDate(vid['year'])
@@ -357,7 +359,7 @@ def genXML(vid,avgcnt,avgcntrece,artistId):
         else:
 			rating = 0.0
         mysong.set_rating(rating)
-        genres_levels = {}
+        genres_levels = {0:[],1:[]}
         genre = vid['genres']
         #print genre
         if(genre != None):
@@ -366,7 +368,10 @@ def genXML(vid,avgcnt,avgcntrece,artistId):
             #genre = genre.split(',')
             for g in genre:
                 g = g.replace("\"","")
-                g = g.replace(" ","_")
+                if(g != "Folk, World, & Country"):
+                    g = g.replace(" ","_")
+                else:
+                    g = "Folk_World_Country"
                 g = g.lower()
                 g = g[0].upper()+g[1:]
                 if(g == 'Rock_&_roll'):
@@ -392,9 +397,14 @@ def genXML(vid,avgcnt,avgcntrece,artistId):
                         #print ex
                         logger_genre.error(xmlpath)
                         logging.exception("Error in path for "+xmlpath)
-                if(len(genre_paths) == 0):
-                    logger_genre.error(g)
-                for gp in genre_paths:
+                    if(len(genre_paths) == 0):
+                        logger_genre.error(g)
+                    else:
+                        genres_levels[0].append(g+"_music")
+                else:
+                    genres_levels[0].append(g)
+                    
+                '''for gp in genre_paths:
                     sAbsolutePath = doc.getpath(gp)
                     pathList = sAbsolutePath.split('/')
                     #print pathList
@@ -404,7 +414,7 @@ def genXML(vid,avgcnt,avgcntrece,artistId):
                             if l not in genres_levels[k]:
                                 genres_levels[k].append(l)
                         else:
-                            genres_levels[k] = [l]
+                            genres_levels[k] = [l]'''
         style = []
         style = vid['styles']
         if(style != None):
@@ -437,9 +447,13 @@ def genXML(vid,avgcnt,avgcntrece,artistId):
                     except Exception as ex:
                         logger_genre.error(xmlpath)
                         logging.exception("Error in path for "+xmlpath)
-                if(len(genre_paths) == 0):
-                    logger_genre.error(g)
-                for gp in genre_paths:
+                    if(len(genre_paths) == 0):
+                        logger_genre.error(g)
+                    else:
+                        genres_levels[1].append(g+"_music")
+                else:
+                    genres_levels[1].append(g)
+                '''for gp in genre_paths:
                     sAbsolutePath = doc.getpath(gp)
                     pathList = sAbsolutePath.split('/')
                     #print pathList
@@ -449,7 +463,7 @@ def genXML(vid,avgcnt,avgcntrece,artistId):
                             if l not in genres_levels[k]:
                                 genres_levels[k].append(l)
                         else:
-                            genres_levels[k] = [l]
+                            genres_levels[k] = [l]'''
                 
         for i in genres_levels:
 			if(i == 0):
@@ -536,36 +550,49 @@ def genXML(vid,avgcnt,avgcntrece,artistId):
         if not os.path.exists(path):
 			os.mkdir(path)
         fname = path + "/0000" +url[-11:] + ".xml"
+        
         if os.path.exists(fname):
-			fr = codecs.open(fname,'r','utf-8')
-			oldsong = api.parse(fname)
-			if(round(oldsong.totalMatch) < round(mysong.totalMatch)): 
+            fr = codecs.open(fname,'r','utf-8')
+            oldsong = api.parse(fname)
+            if(url[-11:] == "kiTL5A4_zWM"):
+                print 'hit'
+                print mysong.overLap
+                print mysong.releaseDate
+                print mysong.songName
+                print oldsong.overLap
+                print oldsong.releaseDate
+                print oldsong.songName
+                print 'done'
+            if(round(oldsong.totalMatch) < round(mysong.totalMatch)): 
 				#print "overwriting :"
-				print oldsong.overLap
+				#print oldsong.overLap
 				#print oldsong.totalMatch
 				print "With this :"
-				print mysong.overLap
-			elif ((round(oldsong.totalMatch) == round(mysong.totalMatch)) and (round(oldsong.songMatch) < round(mysong.songMatch))):
+				#print mysong.overLap
+            elif ((round(oldsong.totalMatch) == round(mysong.totalMatch)) and (round(oldsong.songMatch) < round(mysong.songMatch))):
 				#print "overwriting :"
-				print oldsong.totalMatch
-				print oldsong.songMatch
+				#print oldsong.totalMatch
+				#print oldsong.songMatch
 				print "With this :"
-				print mysong.match
-			elif ((round(oldsong.songMatch) == round(mysong.songMatch)) and (round(oldsong.artistMatch) < round(mysong.artistMatch))):
+				#print mysong.match
+            elif ((round(oldsong.songMatch) == round(mysong.songMatch)) and (round(oldsong.artistMatch) < round(mysong.artistMatch))):
 				#print "overwriting :"
-				print oldsong.totalMatch
+				#print oldsong.totalMatch
 				print "With this :"
-				print mysong.totalMatch
-			elif(round(oldsong.totalMatch) == round(mysong.totalMatch) and round(oldsong.songMatch) == round(mysong.songMatch) and round(oldsong.artistMatch) == round(mysong.artistMatch)):
-				if(oldsong.artistPopularityAll > mysong.artistPopularityAll):
-					mysong = oldsong
-				if(oldsong.releaseDate < mysong.releaseDate):
-					mysong.releaseDate = oldsong.releaseDate
-				#print "overwriting :"
-				print oldsong.totalMatch
-				print "With this :"
-				print mysong.totalMatch
-			else:
+				#print mysong.totalMatch
+            elif(round(oldsong.totalMatch) == round(mysong.totalMatch) and round(oldsong.songMatch) == round(mysong.songMatch) and round(oldsong.artistMatch) == round(mysong.artistMatch)):
+                #if(artistPopularityAll in oldsong):
+                if(oldsong.artist.artistPopularityAll > mysong.artist.artistPopularityAll):
+                        mysong = oldsong
+                if(mysong.releaseDate != 1001 and oldsong.releaseDate < mysong.releaseDate):
+                    print "With this :"
+                    print mysong.releaseDate
+                else:
+                    mysong = oldsong
+                #print oldsong.totalMatch
+                #print "With this :"
+                #print mysong.totalMatch
+            else:
 				mysong = oldsong
         fx = codecs.open(fname,"w","utf-8")
         fx.write('<?xml version="1.0" ?>\n')
@@ -724,6 +751,7 @@ def generatexmls(dirlist):
         directory = d.strip()
         dindex = directory.rfind("/")
         avgcnt,avgcntrece =  CalculateAverages(directory)
+        print avgcnt,avgcntrece
         vids = []
         try:
 			vids = load(directory+'/dump')
