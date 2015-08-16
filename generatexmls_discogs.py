@@ -189,6 +189,8 @@ def genXML(vid,avgcnt,avgcntrece,artistId):
         mysong.set_songName(songName)	
         mysong.set_youtubeName(vid['title'])
         vid['title'] = vid['title'].replace(',','')
+        if('anv' in vid):
+            print vid['anv']
         songName = songName.replace(',','')
         if(vid['title'].lower().find(songName.lower())!= -1):
 			substring_song = "true"

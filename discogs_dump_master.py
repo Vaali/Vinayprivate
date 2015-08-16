@@ -1314,6 +1314,8 @@ def getVideo(curr_elem,flag):
             video1.year = curr_elem['year']
             video1.language = 'English'
             video1.songcountry = curr_elem['songcountry']
+            if('anv' in curr_elem):
+                video1.anv = curr_elem['anv']
             if('artistalias' in curr_elem):
                 video1.artistalias = curr_elem['artistalias']
             video1.genres = curr_elem['genres']
@@ -1731,10 +1733,7 @@ def crawlArtist(directory):
         artist_alias_list = getArtistAliasList(sorted_list)
         for song in sorted_list:
             Item_id = song['name'].lower()
-            if('love story' in Item_id):
-                print Item_id
-                print song['year']
-                print "--------xxxxxxxxxxx---------"
+            
             #Item_id = Item_id + ","
             Item_id = Item_id + "," + song['artistName']
             if(len(song['featArtists'])!= 0):
@@ -1859,7 +1858,6 @@ def crawlArtist(directory):
                             stemp['genres']= genre
                             stemp['styles']= style
                             stemp['country'] = song['country']
-                            
                             if('release_album' in song):
                                     stemp['release_album'] = song['release_album']
                             if('anv' in song):
@@ -1885,7 +1883,13 @@ def crawlArtist(directory):
                                     stemp['release_album'] = song['release_album']
                                 if('anv' in song):
                                     stemp['anv'] = song['anv']
-                final_song_list[Item_id] = stemp                     
+                final_song_list[Item_id] = stemp
+            if('night rocker' in Item_id):
+                print Item_id
+                print song['year']
+                print song['country']
+                print final_song_list[Item_id]['songcountry'] 
+                print "--------xxxxxxxxxxx---------"
         total_count = 0
         for i in full_lang_list:
             total_count = total_count + full_lang_list[i]
@@ -1899,6 +1903,7 @@ def crawlArtist(directory):
             logger_decisions.error(final_song_list[s]['year'])
             logger_decisions.error(final_song_list[s]['genres'])
             logger_decisions.error(final_song_list[s]['styles'])
+            logger_decisions.error(final_song_list[s]['country'])
             '''for g in final_song_list[s]['genres']:
                 logger_decisions.error(g)
                 #percent = final_song_list[s]['genres_count'][g]*100/final_song_list[s]['gcount']
