@@ -130,7 +130,10 @@ def remove_stemwords(songName):
         if(stem.lower() in songName):
             songName = songName.replace(stem.lower(),"")
     return songName.strip()
-    
+
+def get_released_date(releaseDate):
+    ''' 20041109 '''
+    return
 
 def check(date1,date2):
     date1 = str(date1)
@@ -310,6 +313,8 @@ def get_song_list_master(directory,songs_list,full_country_list,aliases,ear_coun
                         continue
                     
                     song = {}
+                    #if(curr_album['released_date'] != null):
+                        
                     song['styles'] = curr_album['styles']
                     song['genres'] = curr_album['genres']
                     song['year'] = curr_album['released_date']
@@ -1344,15 +1349,15 @@ def getYoutubeUrl(video,flag,mostpopular):
         ftartists = flist
         allArtists = video.artist.strip("-")+" "+ftartists
         if(flag == 0):
-            if('cover' not in video.name.lower()):
+            '''if('cover' not in video.name.lower()):
                 searchUrl = "https://www.googleapis.com/youtube/v3/search?part=snippet&q=allintitle%3A"+urllib.quote_plus(str(allArtists))+"+"+urllib.quote_plus(str(video.name))+"+-cover"+"&alt=json&type=video&max-results=5&key=AIzaSyBE5nUPdQ7J_hlc3345_Z-I4IG-Po1ItPU&videoCategoryId=10"
-            else:
-                searchUrl = "https://www.googleapis.com/youtube/v3/search?part=snippet&q=allintitle%3A"+urllib.quote_plus(str(allArtists))+"+"+urllib.quote_plus(str(video.name))+"&alt=json&type=video&max-results=5&key=AIzaSyBE5nUPdQ7J_hlc3345_Z-I4IG-Po1ItPU&videoCategoryId=10"
+            else:'''
+            searchUrl = "https://www.googleapis.com/youtube/v3/search?part=snippet&q=allintitle%3A"+urllib.quote_plus(str(allArtists))+"+"+urllib.quote_plus(str(video.name))+"&alt=json&type=video&max-results=5&key=AIzaSyBE5nUPdQ7J_hlc3345_Z-I4IG-Po1ItPU&videoCategoryId=10"
         else:
-            if('cover' not in video.name.lower()):
+            '''if('cover' not in video.name.lower()):
                 searchUrl = "https://www.googleapis.com/youtube/v3/search?part=snippet&q="+urllib.quote_plus(str(allArtists))+"+"+urllib.quote_plus(str(video.name))+"+-cover"+"&alt=json&type=video&max-results=5&key=AIzaSyBE5nUPdQ7J_hlc3345_Z-I4IG-Po1ItPU&videoCategoryId=10"
-            else:
-                searchUrl = "https://www.googleapis.com/youtube/v3/search?part=snippet&q="+urllib.quote_plus(str(allArtists))+"+"+urllib.quote_plus(str(video.name))+"&alt=json&type=video&max-results=5&key=AIzaSyBE5nUPdQ7J_hlc3345_Z-I4IG-Po1ItPU&videoCategoryId=10"
+            else:'''
+            searchUrl = "https://www.googleapis.com/youtube/v3/search?part=snippet&q="+urllib.quote_plus(str(allArtists))+"+"+urllib.quote_plus(str(video.name))+"&alt=json&type=video&max-results=5&key=AIzaSyBE5nUPdQ7J_hlc3345_Z-I4IG-Po1ItPU&videoCategoryId=10"
         print searchUrl
         try:
             searchResult = simplejson.load(urllib2.urlopen(searchUrl),"utf-8")
