@@ -122,7 +122,14 @@ def getMatch(strg,matchstring):
 	m = strg.find(",",n)
 	st = strg[n+len(ms):m]
 	return float(st)
-
+def changeName(artName):
+    artNamewords = artName.split()
+    retNamewords = []
+    for artword in artNamewords:
+         retNamewords.append(artword[0].upper()+ artword[1:])
+    return " ".join(retNamewords)
+     
+    
 def genXML(vid,avgcnt,avgcntrece,artistId):
     xmlpath = ""
     try:
@@ -138,7 +145,7 @@ def genXML(vid,avgcnt,avgcntrece,artistId):
         conlist = ""
         mysong = api.songs()
         artistName = vid['artist']
-        artistName = artistName[0].upper()+ artistName[1:]
+        
         artistName.strip("-")
         ftArtistName = vid['ftArtist']
         try:
@@ -271,6 +278,7 @@ def genXML(vid,avgcnt,avgcntrece,artistId):
         aliases = GetAlias(directory)
         ar.set_artistPopularityAll(avgcnt)
         ar.set_artistPopularityRecent(avgcntrece)
+        artistName = changeName(artistName)
         ar.add_artistName(artistName)
         #print artistName
         #if(artistName not in aliases):
@@ -297,7 +305,7 @@ def genXML(vid,avgcnt,avgcntrece,artistId):
         fIAr = api.indexedftArtistList()
 		#print ftArtistName
         for f in ftArtistName:
-            f = f[0].upper()+f[1:]
+            f = changeName(f)
             fAr.add_ftArtistName(f)
             fIAr.add_indexedftArtistName(f)
             #mysong.add_ftArtistName
