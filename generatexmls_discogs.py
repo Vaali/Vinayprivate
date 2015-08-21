@@ -564,14 +564,16 @@ def genXML(vid,avgcnt,avgcntrece,artistId):
         if os.path.exists(fname):
             fr = codecs.open(fname,'r','utf-8')
             oldsong = api.parse(fname)
-            if(url[-11:] == "kiTL5A4_zWM"):
+            if(url[-11:] == "JSUIQgEVDM4"):
                 print 'hit'
                 print mysong.overLap
                 print mysong.releaseDate
                 print mysong.songName
+                print mysong.artist.artistPopularityAll
                 print oldsong.overLap
                 print oldsong.releaseDate
                 print oldsong.songName
+                print oldsong.artist.artistPopularityAll
                 print 'done'
             if(round(oldsong.totalMatch) < round(mysong.totalMatch)): 
 				#print "overwriting :"
@@ -594,9 +596,12 @@ def genXML(vid,avgcnt,avgcntrece,artistId):
                 #if(artistPopularityAll in oldsong):
                 if(oldsong.artist.artistPopularityAll > mysong.artist.artistPopularityAll):
                         mysong = oldsong
-                if(mysong.releaseDate != 1001 and oldsong.releaseDate < mysong.releaseDate):
+                #print fname
+                #print mysong.releaseDate
+                #print oldsong.releaseDate
+                if(mysong.releaseDate != 1001 and int(oldsong.releaseDate) > int(mysong.releaseDate)):
                     print "With this :"
-                    print mysong.releaseDate
+                    
                 else:
                     mysong = oldsong
                 #print oldsong.totalMatch
