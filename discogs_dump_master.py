@@ -760,7 +760,9 @@ hq','band','audio','album','world','instrumental','intro','house','acoustic','so
         for word in stemwords:
             if(word not in songnameset):
                 diffset.append(word)
-                youtubematch = re.sub(r'\b'+word+'\b', '', youtubematch)
+                pattern = '\\b'+word+'\\b'
+                youtubematch = re.sub(pattern,'', youtubematch)
+        
         for c in connectorList:
             if(c != None):
                 conlist = conlist+" "+c	
@@ -796,7 +798,7 @@ hq','band','audio','album','world','instrumental','intro','house','acoustic','so
                 artist_order[artpos] = f
             else:
                 ftartistmatch.append(False)
-              
+             
         ftartists = ""
         if(len(fList)!=0):
             ftartists = fList[0:]
@@ -840,6 +842,7 @@ hq','band','audio','album','world','instrumental','intro','house','acoustic','so
         y1 = yname.find("-")
         y2 = yname.find(":")
         bhiphen = False
+        
         if((y1 != -1) or (y2 != -1)):
             bhiphen = True
             if(y1 != -1):
@@ -854,8 +857,12 @@ hq','band','audio','album','world','instrumental','intro','house','acoustic','so
             snameset = set(snameset1)
             sreadset = re.findall("\w+",songName.lower(),re.U)
             common1 = (set(snameset).intersection(set(sreadset)))
-            if float(len(snameset)) !=0:
-                songMatch = len(common1)*100/float(len(snameset))
+            if(len(snameset) > len(sreadset)):
+                if float(len(snameset)) !=0:
+                    songMatch = len(common1)*100/float(len(snameset))
+            else:
+                if float(len(sreadset)) !=0:
+                    songMatch = len(common1)*100/float(len(sreadset))
             anameset = re.findall("\w+",aname.lower(),re.U)
             anameset = set(anameset) - set(diffset) - set(ftArtistSet)
             areadset = re.findall("\w+",artistName.lower(),re.U)
@@ -879,6 +886,14 @@ hq','band','audio','album','world','instrumental','intro','house','acoustic','so
             am = artistMatch
             lam = leftMatch
             ram = rightMatch
+            if('the police' in vid_title.lower()):
+                print youtubematch
+                print vid_title.lower()
+                print songset
+                print common1
+                print snameset
+                print songMatch
+                print 'xxx--xxx-xxxxx-xxx--xxx'
         if(((y1 != -1) or (y2 != -1)) and (leftMatch != 100.0 and am != 100.0 and sm!= 100.0)): # right match if left match is zero.
             bhiphen = True
             #print "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
@@ -894,8 +909,12 @@ hq','band','audio','album','world','instrumental','intro','house','acoustic','so
             snameset = set(snameset1)-set(ftArtistSet)
             sreadset = re.findall("\w+",songName.lower(),re.U)	
             common1 = (set(snameset).intersection(set(sreadset)))
-            if float(len(snameset)) !=0:
-                songMatch = len(common1)*100/float(len(snameset))
+            if(len(snameset) > len(sreadset)):
+                if float(len(snameset)) !=0:
+                    songMatch = len(common1)*100/float(len(snameset))
+            else:
+                if float(len(sreadset)) !=0:
+                    songMatch = len(common1)*100/float(len(sreadset))
             anameset = re.findall("\w+",aname.lower(),re.U)
             areadset = re.findall("\w+",artistName.lower(),re.U)
             common2 = (set(anameset).intersection(set(areadset)))
@@ -918,7 +937,16 @@ hq','band','audio','album','world','instrumental','intro','house','acoustic','so
             sm = songMatch
             am = artistMatch
             lam = leftMatch
-            ram = rightMatch 
+            ram = rightMatch
+            if('the police' in vid_title.lower()):
+                print youtubematch
+                print vid_title.lower()
+                print songset
+                print common1
+                print snameset
+                print songMatch
+                print songName
+                print 'xxx--xxx-xxxxx-xxx--xxx'
         if((y1 == -1) and (y2 == -1)):	
             #print("YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY")
             arnameset = set(re.findall("\w+",artistName.lower(),re.U)) - set(diffset) - set(ftArtistSet)
@@ -1764,9 +1792,7 @@ def crawlArtist(directory):
         artist_alias_list = []
         artist_alias_list = getArtistAliasList(sorted_list)
         for song in sorted_list:
-            Item_id = song['name'].lower()
-            
-            #Item_id = Item_id + ","
+            Item_id = song['name'].lower()            
             Item_id = Item_id + "," + song['artistName']
             if(len(song['featArtists'])!= 0):
                 temp_str = ','.join(song['featArtists'])
@@ -1783,7 +1809,6 @@ def crawlArtist(directory):
                 if("fwc" in genre):
                     genre.remove("fwc")
                     genre.append("Folk, World, & Country")
-                        
             else:
                 genre = []
             style = song['styles']
