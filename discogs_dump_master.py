@@ -187,6 +187,9 @@ def get_song_list(directory,songs_list,full_country_list,aliases,ear_count,ear_y
             for track in curr_album['tracks']:
                 if(track == None):
                     continue
+                if(track['position'] == "" and track['duration'] == ""):
+                    #print track['title']
+                    continue
                 if(track['title'] == ""):
                     continue
                 bskip = False
@@ -323,6 +326,9 @@ def get_song_list_master(directory,songs_list,full_country_list,aliases,ear_coun
                 
                 for track in curr_album['tracks']:
                     if(track == None):
+                        continue
+                    if(track['position'] == "" and track['duration'] == ""):
+                        #print track['title']
                         continue
                     if(track['title'] == ""):
                         continue
