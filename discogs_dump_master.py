@@ -2017,6 +2017,9 @@ def crawlArtist(directory):
             
         t1=time.time()
         print len(parallel_songs_list)
+        with open(directory + '/songslist.txt', 'wb') as f:
+			pickle.dump(parallel_songs_list, f)
+        '''
         songs_pool = Pool()
         songs_pool =Pool(processes=20)
         return_pool = songs_pool.map(getVideoFromYoutube,parallel_songs_list)
@@ -2029,11 +2032,12 @@ def crawlArtist(directory):
                     if('url' not in rv.__dict__):
                         misses = misses + 1
                     else:
-                        vid.append(rv.__dict__)
+                        
                         hits = hits + 1
+                    vid.append(rv.__dict__)
         print "Hits:"+str(hits)+" Misses:"+str(misses)
         print time.time() - t1
-        write(vid,directory+"/dump")
+        write(vid,directory+"/dump")'''
 
     except Exception, e:
         logger_error.exception(e)
