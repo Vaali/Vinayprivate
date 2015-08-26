@@ -16,8 +16,8 @@ from multiprocessing import Pool
 import time
 import copy
 import operator
-#from fuzzywuzzy import fuzz
-#import fuzzy
+from fuzzywuzzy import fuzz
+import fuzzy
 #from apiclient.errors import HttpError
 
 reload(sys)
@@ -39,7 +39,7 @@ logger_error = logging.getLogger('simple_logger2')
 
 solrConnection = SolrConnection('http://aurora.cs.rutgers.edu:8181/solr/discogs_artists')
 #change here to add stem words
-stemwords_uniquelist = ["(Edited Short Version)","(Alternate Early Version)","(Alternate Version)","(Mono)","(Radio Edit)","(Original Album Version)","(Different Mix)","(Music Film)","(Stereo)","(Single Version)","Stereo","Mono"]
+stemwords_uniquelist = ["(Edited Short Version)","(Alternate Early Version)","(Alternate Version)","(Mono)","(Radio Edit)","(Original Album Version)","(Different Mix)","(Music Film)","(Stereo)","(Single Version)","Stereo","Mono","(Album Version)","Demo","(Demo Version)"]
 class Video():
 	pass
 
@@ -55,6 +55,7 @@ def removeStemCharacters(currString):
     currString = currString.replace("‘",'').strip()
     currString = currString.replace("?",'').strip()
     currString = currString.replace(',','').strip()
+    currString = currString.replace('#','').strip()
     return currString
     
 def ParseTime(time):
@@ -175,6 +176,29 @@ def check(date1,date2):
     if(list1[2]< list2[2]):
         return 1
 
+def GetArtist(artistObj):
+    if(artistObj == None):
+        return None,None,None
+    artistName = ""
+    ftArtistList = []
+    connList = []
+    for artist in artistObj:
+        if(artist == None or artist['artist_name'] == None):
+            continue
+        artName = re.sub(r'\(.*?\)', '', artist['artist_name']).strip().lower()
+        if(', the' in artName):
+            artName = artName.replace(', the','')
+            artName = 'the '+ artName
+        if(artist['position'] == 1):
+            artistName = artName
+        else:
+            ftArtistList.append(artName)
+        if(artist['join_relation'] != None):
+            connList.append(artist['join_relation'])
+    return artistName,ftArtistList,connList
+        
+    
+    
 def get_song_list(directory,songs_list,full_country_list,aliases,ear_count,ear_year,ear_rel):
     releases_list = glob.glob(directory+"/release*.json")
     for release in releases_list:
@@ -223,14 +247,20 @@ def get_song_list(directory,songs_list,full_country_list,aliases,ear_count,ear_y
                         song['featArtists'].append(artist['artist_name'].lower())
                         if(artist['join_relation'] != None):
                             song['connectors'].append(artist['join_relation'])
-                if('artists' in track):
+                if('artists' in track and len(track['artists']) > 1):
                     for artist in track['artists']:
                         if(artist == None):
                             continue
                         if(artist['artist_id'] == 355):
                                 earlier_year_skip = True
                                 bskip = True
-                        artist['artist_name'] = re.sub(r'\(.*?\)', '', artist['artist_name']).strip().lower()
+                    retlist = GetArtist(track['artists'])
+                    if(retlist[0] != None):
+                        song['featArtists'] = retlist[1]
+                        song['connectors'] = retlist[2]
+                        song['artistName'] = retlist[0]
+                        
+                        '''artist['artist_name'] = re.sub(r'\(.*?\)', '', artist['artist_name']).strip().lower()
                         if(', the' in artist['artist_name'].lower()):
                                 artist['artist_name'] = artist['artist_name'].lower().replace(', the','')
                                 artist['artist_name'] = 'the '+ artist['artist_name']
@@ -241,7 +271,7 @@ def get_song_list(directory,songs_list,full_country_list,aliases,ear_count,ear_y
                                     song['connectors'].append(artist['join_relation'])
                         if('artist_name' in artist and artist['artist_name'].lower() == song['artistName'].lower()):
                                 if(artist['join_relation'] not in song['featArtists']):
-                                    song['connectors'].append(artist['join_relation'])
+                                    song['connectors'].append(artist['join_relation'])'''
                 if(bskip == True):
                     continue
                 if('extraartists' in track and track['extraartists'] != None):
@@ -370,13 +400,18 @@ def get_song_list_master(directory,songs_list,full_country_list,aliases,ear_coun
                             song['featArtists'].append(artist['artist_name'].lower())
                             if(artist['join_relation'] != None):
                                 song['connectors'].append(artist['join_relation'])
-                    if('artists' in track):
+                    if('artists' in track and len(track['artists']) > 1):
                         for artist in track['artists']:
                             if(artist == None):
                                 continue
                             if(artist['artist_id'] == 355):
                                 bskip = True
-                            artist['artist_name'] = re.sub(r'\(.*?\)', '', artist['artist_name']).strip().lower()
+                        retlist = GetArtist(track['artists'])
+                        if(retlist[0] != None):
+                            song['featArtists'] = retlist[1]
+                            song['connectors'] = retlist[2]
+                            song['artistName'] = retlist[0]
+                            '''artist['artist_name'] = re.sub(r'\(.*?\)', '', artist['artist_name']).strip().lower()
                             if(', the' in artist['artist_name'].lower()):
                                         artist['artist_name'] = artist['artist_name'].lower().replace(', the','')
                                         artist['artist_name'] = 'the '+ artist['artist_name']
@@ -387,7 +422,7 @@ def get_song_list_master(directory,songs_list,full_country_list,aliases,ear_coun
                                     song['connectors'].append(artist['join_relation'])
                             if('artist_name' in artist and artist['artist_name'].lower() == song['artistName'].lower()):
                                 if(artist['join_relation'] not in song['featArtists']):
-                                    song['connectors'].append(artist['join_relation'])
+                                    song['connectors'].append(artist['join_relation'])'''
                     
                     if(bskip == True):
                         earlier_year_skip = True
@@ -1747,6 +1782,64 @@ def getVideo_1(curr_elem,flag):
             logger_error.exception(e)
     except Exception as e:
             logger_error.exception(e)
+def checkFtArtist(ftartist1,ftartist2):
+    if(len(ftartist1) != len(ftartist2)):
+        return False
+    ft1 = set(ftartist1)
+    ft2 = set(ftartist2)
+    intersect = ft1.union(ft2) - ft1.intersection(ft2)
+    if(len(intersect) == 0):
+        return True
+    return False
+            
+def checkIfSongExists(curr_song,songs_list):
+    retVal = False
+    matched_song = ""
+    song_name = curr_song['name']
+    for s in songs_list:
+        #print song
+        song = songs_list[s]['name']
+        if(len(song) > len(song_name)):
+            soundex = fuzzy.Soundex(len(song))
+        else:
+            soundex = fuzzy.Soundex(len(song_name))
+        phonectic_distance = fuzz.ratio(soundex(song),soundex(song_name))
+        if('(' in song.lower()):
+            parmatch,tryagain = getparanthesismatch(song.lower(),song_name.lower())
+            if(parmatch == True):
+                if(curr_song['artistName'].lower() == songs_list[s]['artistName'].lower() and checkFtArtist(curr_song['featArtists'],songs_list[s]['featArtists']) == True):
+                    retVal = True
+                    #print song_name + ' -------------- ' + song
+                    #print "paranthesis match"
+                    matched_song = s
+                    break
+        normal_distance = fuzz.ratio(song.lower(),song_name.lower())
+        if(phonectic_distance >= 90 and normal_distance >= 85):
+            if(curr_song['artistName'].lower() != songs_list[s]['artistName'].lower()):
+                continue
+            if(checkFtArtist(curr_song['featArtists'],songs_list[s]['featArtists']) == False):
+                continue
+            retVal = True
+            #print song_name + ' -------------- ' + song
+            #print str(phonectic_distance) + " ######### " + str(normal_distance)
+            matched_song = s
+            break
+    return retVal,matched_song
+
+
+def getparanthesismatch(source,destination):
+    sourcelist = re.findall('(.*?)\(([^(].*?)\)(.*)',source)
+    destinationlist = re.findall('(.*?)\(([^(].*?)\)(.*)',destination)
+    if(len(sourcelist) ==0 or len(destinationlist) == 0):
+        return False,1
+    slist = [s for s in sourcelist[0] if s != "" ]
+    dlist = [s for s in destinationlist[0] if s != "" ]
+    part1_dist = fuzz.ratio(slist[0].lower(),dlist[0].lower())
+    part2_dist = fuzz.ratio(slist[1].lower(),dlist[1].lower())
+    if(part1_dist >= 85 and part2_dist >=85):
+        return True,0
+    else:
+        return False,0
 
 def crawlArtist(directory):
     songs_list = list()
@@ -1798,7 +1891,8 @@ def crawlArtist(directory):
         artist_alias_list = []
         artist_alias_list = getArtistAliasList(sorted_list)
         for song in sorted_list:
-            Item_id = song['name'].lower()            
+            Item_id = song['name'].lower()
+            Item_id = removeStemCharacters(Item_id)
             Item_id = Item_id + "," + song['artistName']
             if(len(song['featArtists'])!= 0):
                 temp_str = ','.join(song['featArtists'])
@@ -1824,45 +1918,51 @@ def crawlArtist(directory):
                 style = style.split(',')
             else:
                 style = []
+            #isPresentSong,matched_song = checkIfSongExists(Item_id,final_song_list.keys())
+            isPresent = False
             if(Item_id not in final_song_list):
-                song['genres_count'] = {}
-                song['styles_count'] = {}
-                song['gcount'] = 0
-                song['scount'] = 0
-                song['genres'] = genre
-                song['styles'] = style
-                song['yearList'] = []
-                '''for g in genre:
-                    if(g not in song['genres_count']):
-                        song['genres_count'][g] = 1
-                        song['genres'].append(g)
-                    else:
-                        song['genres_count'][g] = song['genres_count'][g] + 1
-                    song['gcount'] = song['gcount'] + 1
-                    
-                
-                for s in style:
-                    if(s not in song['styles_count']):
-                        song['styles_count'][s] = 1
-                        song['styles'].append(s)
-                    else:
-                        song['styles_count'][s] = song['styles_count'][s] + 1
-                    song['scount'] = song['scount'] + 1'''
-                
-                final_song_list[Item_id] = song
-                song['yearList'].append(song['year'])
-                final_song_list[Item_id]['year'] = song['year']
-                if(final_song_list[Item_id]['year'] == None):
-                    final_song_list[Item_id]['year'] = 1001
-                final_song_list[Item_id]['songcountry'] = ear_count
-                if(ear_count == None):
-                    final_song_list[Item_id]['songcountry'] = artist_country
-                elif(artist_country == None):
+                isPresentSong,matched_song = checkIfSongExists(song,final_song_list)
+                if(isPresentSong == False):
+                    song['genres_count'] = {}
+                    song['styles_count'] = {}
+                    song['gcount'] = 0
+                    song['scount'] = 0
+                    song['genres'] = genre
+                    song['styles'] = style
+                    song['yearList'] = []
+                    '''for g in genre:
+                        if(g not in song['genres_count']):
+                            song['genres_count'][g] = 1
+                            song['genres'].append(g)
+                        else:
+                            song['genres_count'][g] = song['genres_count'][g] + 1
+                        song['gcount'] = song['gcount'] + 1
+
+
+                    for s in style:
+                        if(s not in song['styles_count']):
+                            song['styles_count'][s] = 1
+                            song['styles'].append(s)
+                        else:
+                            song['styles_count'][s] = song['styles_count'][s] + 1
+                        song['scount'] = song['scount'] + 1'''
+
+                    final_song_list[Item_id] = song
+                    song['yearList'].append(song['year'])
+                    final_song_list[Item_id]['year'] = song['year']
+                    if(final_song_list[Item_id]['year'] == None):
+                        final_song_list[Item_id]['year'] = 1001
                     final_song_list[Item_id]['songcountry'] = ear_count
-                elif(ear_count.lower() != artist_country.lower()):
-                    final_song_list[Item_id]['songcountry'] = ear_count.lower()
-                
-            else:
+                    if(ear_count == None):
+                        final_song_list[Item_id]['songcountry'] = artist_country
+                    elif(artist_country == None):
+                        final_song_list[Item_id]['songcountry'] = ear_count
+                    elif(ear_count.lower() != artist_country.lower()):
+                        final_song_list[Item_id]['songcountry'] = ear_count.lower()
+                    isPresent = True
+            if(isPresentSong == True):
+                Item_id = matched_song
+            if(isPresent == False):
                 stemp = final_song_list[Item_id]
                 '''for g in genre:
                     if(g not in stemp['genres_count']):
@@ -1921,6 +2021,8 @@ def crawlArtist(directory):
                             stemp['genres']= genre
                             stemp['styles']= style
                             stemp['country'] = song['country']
+                            if(isPresentSong == True):
+                                stemp['name'] = song['name']
                             if('release_album' in song):
                                     stemp['release_album'] = song['release_album']
                             if('anv' in song):
@@ -1932,6 +2034,8 @@ def crawlArtist(directory):
                                 stemp['genres']= genre
                                 stemp['styles']= style
                                 stemp['country'] = song['country']
+                                if(isPresentSong == True):
+                                    stemp['name'] = song['name']
                                 if('release_album' in song):
                                     stemp['release_album'] = song['release_album']
                                 if('anv' in song):
