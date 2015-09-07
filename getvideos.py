@@ -19,6 +19,7 @@ import ConfigParser
 import random
 import time
 import pickle
+import collections
 
 
 reload(sys)
@@ -129,7 +130,8 @@ def getVideo(curr_elem,flag):
         #combine all the album information for the songs into a list.
         for l in songs_list:
             album_details = Album_Data()
-            album_details.albumname = removeStemCharacters(l['albumName'])
+            #album_details.albumname = removeStemCharacters(l['albumName'])
+            album_details.albumname = l['albumName']
             album_details.year = l['year']
             if('country' in l and l['country'] != None and len(l['country'])> 0):
                 album_details.country = l['country']
@@ -142,7 +144,8 @@ def getVideo(curr_elem,flag):
             '''
             if(l['albumName'].lower().strip() not in unique_albums):
                 unique_albums.append(l['albumName'].lower().strip())
-                album_details.albumname = removeStemCharacters(l['albumName'])
+                #album_details.albumname = removeStemCharacters(l['albumName'])
+                album_details.albumname = l['albumName']
                 if(l['year'] != None):
                     album_details.albumname = album_details.albumname + " " + l['year']
                 alist.append(album_details.__dict__)
@@ -221,7 +224,7 @@ def CalculateMatch(video,vid_title):
         albumname = ""
         decision = "Incorrect"
         stemwords = [ 'screen','m/v','artist','ft','featuring','live','hd','1080P','video','mix','feat','official','lyrics','music','cover','version','original','\
-hq','band','audio','album','world','instrumental','intro','house','acoustic','sound','orchestra','vs','track','project','records','extended','01','02','03','04','05','06','07','08','09','2008','prod','piano','town','disco','solo','festival','vivo','vocal','featuring','name','london','1995','soundtrack','tv','em','ti','quartet','system','single','official','top','low','special','trance','circle','stereo','videoclip','lp','quality','underground','espanol','vinyl','tribute','master','step','uk','eu','voice','promo','choir','outro','au','anthem','songs','song','digital','hour','nature','motion','sounds','sound','ballad','unplugged','singers','singer','legend','legends', 'french','strings','string','classic','cast','act','full','screen','radio','remix','song','edit','tracks','remaster','reissue','review','re-issue','trailer','studio','improvization','solo','download','tour','dvd','festival']
+hq','band','audio','album','world','instrumental','intro','house','acoustic','sound','orchestra','vs','track','project','records','extended','01','02','03','04','05','06','07','08','09','2008','prod','piano','town','disco','solo','festival','vivo','vocal','featuring','name','london','1995','soundtrack','tv','em','ti','quartet','system','single','official','top','low','special','trance','circle','stereo','videoclip','lp','quality','underground','espanol','vinyl','tribute','master','step','uk','eu','voice','promo','choir','outro','au','anthem','songs','song','digital','hour','nature','motion','sounds','sound','ballad','unplugged','singers','singer','legend','legends', 'french','strings','string','classic','cast','act','full','screen','radio','remix','song','edit','tracks','remaster','reissue','review','re-issue','trailer','studio','improvization','solo','download','tour','dvd','festival','remastered']
         '''stemwords = ['video','mix','feat','official','lyrics','music','cover','version','original','hq','band','audio','album','world','instrumental', 'intro','house','acoustic','sound','orchestra','vs','track','project','records','extended','01','02','03','04','05','06','07','08','09','2008','prod', 'piano','town','disco','solo','festival','vivo','vocal','featuring','name','london','1995','soundtrack','tv','em','ti','quartet','system','single', 'official','top','low','special','trance','circle','stereo','videoclip','lp','quality','underground','espanol','vinyl','tribute','master','step','uk','eu','voice','promo','choir','outro','au','anthem','songs','digital','hour','nature','motion','sounds','ballad','unplugged','singers','legend', 'french','strings','classic','cast','act','full','screen','radio','remix','song','edit','tracks']'''
         stemcharacters = ['[',']','(',')','\'','"','.','’']
         youtubematch = vid_title.lower()
@@ -363,14 +366,14 @@ hq','band','audio','album','world','instrumental','intro','house','acoustic','so
             am = artistMatch
             lam = leftMatch
             ram = rightMatch
-            if('the police' in vid_title.lower()):
+            """if('light my fire' in vid_title.lower()):
                 print youtubematch
                 print vid_title.lower()
                 print songset
                 print common1
                 print snameset
                 print songMatch
-                print 'xxx--xxx-xxxxx-xxx--xxx'
+                print 'xxx--xxx-xxxxx-xxx--xxx' """
         if(((y1 != -1) or (y2 != -1)) and (leftMatch != 100.0 and am != 100.0 and sm!= 100.0)): # right match if left match is zero.
             bhiphen = True
             #print "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
@@ -415,7 +418,7 @@ hq','band','audio','album','world','instrumental','intro','house','acoustic','so
             am = artistMatch
             lam = leftMatch
             ram = rightMatch
-            if('the police' in vid_title.lower()):
+            """if('light my fire' in vid_title.lower()):
                 print youtubematch
                 print vid_title.lower()
                 print songset
@@ -423,7 +426,7 @@ hq','band','audio','album','world','instrumental','intro','house','acoustic','so
                 print snameset
                 print songMatch
                 print songName
-                print 'xxx--xxx-xxxxx-xxx--xxx'
+                print 'xxx--xxx-xxxxx-xxx--xxx' """
         if((y1 == -1) and (y2 == -1)):	
             #print("YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY")
             arnameset = set(re.findall("\w+",artistName.lower(),re.U)) - set(diffset) - set(ftArtistSet)
@@ -541,6 +544,7 @@ def getYoutubeUrl(video,flag,mostpopular):
                 searchUrl = "https://www.googleapis.com/youtube/v3/search?part=snippet&q="+urllib.quote_plus(str(allArtists))+"+"+urllib.quote_plus(str(video.name))+"+-cover"+"&alt=json&type=video&max-results=5&key=AIzaSyBE5nUPdQ7J_hlc3345_Z-I4IG-Po1ItPU&videoCategoryId=10"
             else:'''
             searchUrl = "https://www.googleapis.com/youtube/v3/search?part=snippet&q="+urllib.quote_plus(str(allArtists))+"+"+urllib.quote_plus(str(video.name))+"&alt=json&type=video&max-results=5&key=AIzaSyBE5nUPdQ7J_hlc3345_Z-I4IG-Po1ItPU&videoCategoryId=10"
+            mostpopular = 1
         print searchUrl
         try:
             searchResult = simplejson.load(urllib2.urlopen(searchUrl),"utf-8")
@@ -717,6 +721,8 @@ for fl in foldlist:
                         misses = misses + 1
                     else:
                         hits = hits + 1
+                        #print rv.__dict__
+                        #tv = collections.OrderedDict(rv.__dict__)
                         vid.append(rv.__dict__)
         print "Hits:"+str(hits)+" Misses:"+str(misses)
         write(vid,fl+"/dump")
