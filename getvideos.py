@@ -201,7 +201,7 @@ class Album_Data():
 class Audio(object):
 	pass
 
-def removeStemCharacters(currString):
+def RemoveStemCharacters(currString):
     currString = currString.replace('"','').strip()
     currString = currString.replace('’','').strip()
     currString = currString.replace("'",'').strip()
@@ -210,6 +210,13 @@ def removeStemCharacters(currString):
     currString = currString.replace(',','').strip()
     return currString
 
+def GetYearFromTitle(vid_title):
+    returnYear = 0
+    yearList = re.findall(r'\d\d\d\d+',vid_title)
+    print yearList
+    if(len(yearList) != 0):
+        returnYear = int(yearList[0])
+    return returnYear
 
 def CalculateMatch(video,vid_title):
     try:
@@ -572,10 +579,12 @@ def getYoutubeUrl(video,flag,mostpopular):
                 selectedVideolikes = 0
                 selectedVideodislikes = 0
                 selectedVideoPublishedDate = ""
+                selectedVideoYear = 0
                 for videoresult in searchResult['items']:
                     searchEntry = searchResult['items'][i]
                     [currentVideoDecision,currentVideoMatch,currentVideoTotalMatch,currentVideoSongMatch,currentVideoArtistMatch] = CalculateMatch(video,searchEntry['snippet']['title'])
                     if(currentVideoDecision == "correct"):# || currentVideoDecision == "Incorrect"):
+                        currentVideoYear = GetYearFromTitle(searchEntry['snippet']['title'])
                         youtubeVideoId = searchEntry['id']['videoId']
                         videoUrl = "https://www.googleapis.com/youtube/v3/videos?id="+str(youtubeVideoId)+"&key=AIzaSyBE5nUPdQ7J_hlc3345_Z-I4IG-Po1ItPU&part=statistics,contentDetails,status"
                         try:
@@ -601,6 +610,7 @@ def getYoutubeUrl(video,flag,mostpopular):
                                 selectedVideoSongMatch = currentVideoSongMatch
                                 selectedVideoArtistMatch = currentVideoArtistMatch
                                 selectedVideoTitle = searchEntry['snippet']['title']
+                                selectedVideoYear = currentVideoYear
                                 selectedVideoUrl = "https://www.youtube.com/watch?v="+str(youtubeVideoId)
                                 selectedVideoPublishedDate = searchEntry['snippet']['publishedAt']
                                 selectedVideoDuration = ParseTime(videoEntry['contentDetails']['duration'])
@@ -610,6 +620,7 @@ def getYoutubeUrl(video,flag,mostpopular):
                             if ((selectedVideoTotalMatch) < int(currentVideoTotalMatch) and (mostpopular == 1)):
                                 selectedVideoViewCount = currentVideoViewCount
                                 selectedVideoMatch = currentVideoMatch
+                                selectedVideoYear = currentVideoYear
                                 selectedVideoTotalMatch = currentVideoTotalMatch
                                 selectedVideoSongMatch = currentVideoSongMatch
                                 selectedVideoArtistMatch = currentVideoArtistMatch
@@ -626,6 +637,7 @@ def getYoutubeUrl(video,flag,mostpopular):
                                 selectedVideoTotalMatch = currentVideoTotalMatch
                                 selectedVideoSongMatch = currentVideoSongMatch
                                 selectedVideoArtistMatch = currentVideoArtistMatch
+                                selectedVideoYear = currentVideoYear
                                 selectedVideoTitle = searchEntry['snippet']['title']
                                 selectedVideoUrl = "https://www.youtube.com/watch?v="+str(youtubeVideoId)
                                 selectedVideoPublishedDate = searchEntry['snippet']['publishedAt']
@@ -646,6 +658,11 @@ def getYoutubeUrl(video,flag,mostpopular):
                         video.sm = selectedVideoSongMatch
                         video.am = selectedVideoArtistMatch
                         video.title = selectedVideoTitle
+                        if(selectedVideoYear != 0):
+                            video.videoYear = selectedVideoYear
+                            curr_year = int(str(video.year).split('-')[0])
+                            if(curr_year == 1001 or (curr_year > int(video.videoYear))):
+                                video.year = video.videoYear
                         video.published = selectedVideoPublishedDate
                         m = re.search(re.compile("[0-9]{4}[-][0-9]{2}[-][0-9]{2}"),video.published)
                         n = re.search(re.compile("[0-9]{2}[:][0-9]{2}[:][0-9]{2}"),video.published)
