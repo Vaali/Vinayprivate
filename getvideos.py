@@ -20,6 +20,8 @@ import random
 import time
 import pickle
 import collections
+from fuzzywuzzy import fuzz
+import fuzzy
 
 
 reload(sys)
@@ -106,6 +108,10 @@ def getVideoFromYoutube(curr_elem):
                 retvid,bret = getVideo(curr_elem,1)
     except Exception as e:
         logger_error.exception('getVideoFromYoutube')
+    if(retvid != None):
+        tempDictionary = retvid[0].__dict__
+        if('errorstr' in tempDictionary):
+            logger_decisions.error(tempDictionary['errorstr'])
     return retvid,bret
 
 
@@ -158,7 +164,6 @@ def getVideo(curr_elem,flag):
         flist = ""
         #Apostolos
         try:
-
             video1 = Video()
             video2 = Video()
             video1.artist = curr_elem['artistName']
@@ -220,7 +225,7 @@ def GetYearFromTitle(vid_title):
 
 def CalculateMatch(video,vid_title):
     try:
-        #soundex = fuzzy.Soundex(len(vid_title))
+        soundex = fuzzy.Soundex(len(vid_title))
         list = ""
         conlist = ""
         artistName = video.artist
@@ -229,6 +234,7 @@ def CalculateMatch(video,vid_title):
         songName = video.name
         fList = ""
         albumname = ""
+        error_str = ""
         decision = "Incorrect"
         stemwords = [ 'screen','m/v','artist','ft','featuring','live','hd','1080P','video','mix','feat','official','lyrics','music','cover','version','original','\
 hq','band','audio','album','world','instrumental','intro','house','acoustic','sound','orchestra','vs','track','project','records','extended','01','02','03','04','05','06','07','08','09','2008','prod','piano','town','disco','solo','festival','vivo','vocal','featuring','name','london','1995','soundtrack','tv','em','ti','quartet','system','single','official','top','low','special','trance','circle','stereo','videoclip','lp','quality','underground','espanol','vinyl','tribute','master','step','uk','eu','voice','promo','choir','outro','au','anthem','songs','song','digital','hour','nature','motion','sounds','sound','ballad','unplugged','singers','singer','legend','legends', 'french','strings','string','classic','cast','act','full','screen','radio','remix','song','edit','tracks','remaster','reissue','review','re-issue','trailer','studio','improvization','solo','download','tour','dvd','festival','remastered']
@@ -238,9 +244,9 @@ hq','band','audio','album','world','instrumental','intro','house','acoustic','so
         diffset = []
         substring_album = "false"
         #remove the characters form songname and youtubename
-        for c in stemcharacters:
-            youtubematch = youtubematch.replace(c,'')
-            songName = songName.replace(c,'')
+        #for c in stemcharacters:
+        #    youtubematch = youtubematch.replace(c,' ').strip()
+        #    songName = songName.replace(c,' ').strip()
         artist_order = {}
         #remvoe the stemwords form youtube name
         songnameset = re.findall("\w+",songName.lower(),re.U)
@@ -494,7 +500,7 @@ hq','band','audio','album','world','instrumental','intro','house','acoustic','so
             decision = "correct"
             condition = 3
         #if only one words for both song and artist ,check total match and leftmatch for - case.
-        elif(substring_artist == "true" and substring_song == "true"  and (percentMatch > 80.0 or (leftMatch == 100.0 and bhiphen and len(artistName.strip().split()) > 1))):
+        elif(substring_artist == "true" and substring_song == "true"  and (percentMatch > 80.0 or (leftMatch == 100.0 and bhiphen and len(artistName.strip().split()) > 1) and percentMatch > 30.0)):
             decision = "correct"
             condition = 4
         #no hiphen , song match shd be 100 and left or right should be 100 
@@ -503,7 +509,41 @@ hq','band','audio','album','world','instrumental','intro','house','acoustic','so
             condition = 5
         if(bhiphen == "true" and (songMatch == 0  or (leftMatch == 0.0 and rightMatch == 0.0))):
             decision = "Incorrect"
-        logger_decisions.error(decision)
+        error_str += "##decision:"
+        error_str += str(decision)
+        error_str += "##condition:"
+        error_str += str(condition)
+        error_str += "##match:"
+        error_str += str(match)
+        error_str += "##artistName:"
+        error_str += str(artistName)
+        error_str += "##songName:"
+        error_str += str(songName)
+        error_str += "##ftArtistName:"
+        error_str += str(ftArtistName)
+        error_str += "##substring_album:"
+        error_str += str(substring_album)
+        error_str += "##vid_title:"
+        error_str += str(vid_title)
+        error_str += "##comparestring:"
+        error_str += str(comparestring)
+        error_str += "##substring_song:"
+        error_str += str(substring_song)
+        error_str += "##substring_artist:"
+        error_str += str(substring_artist)
+        error_str += "##ftartistmatch:"
+        error_str += str(ftartistmatch)
+        error_str += "##percentMatch:"
+        error_str += str(percentMatch)
+        error_str += "##youtubematch:"
+        error_str += str(youtubematch)
+        error_str += "##phonetic ratio:"
+        error_str += str(fuzz.ratio(soundex(youtubematch.lower()),soundex(comparestring.lower())))
+        error_str += "##normal ratio:"
+        error_str += str(fuzz.ratio(youtubematch.lower(),comparestring.lower()))
+        
+        #logger_decisions.error(error_str)
+        '''logger_decisions.error(decision)
         logger_decisions.error(condition)
         logger_decisions.error(match)
         logger_decisions.error(artistName)
@@ -523,13 +563,13 @@ hq','band','audio','album','world','instrumental','intro','house','acoustic','so
         logger_decisions.error(percentMatch)
         logger_decisions.error(youtubematch)
         #logger_decisions.error(fuzz.ratio(youtubematch.lower(),comparestring.lower()))
-        logger_decisions.error("phonetic distance : ")
+        logger_decisions.error("phonetic distance : ")'''
         #logger_decisions.error(fuzz.ratio(soundex(youtubematch.lower()),soundex(comparestring.lower())))
-        logger_decisions.error('-----------------')
+        #logger_decisions.error('-----------------')
     except Exception, e:
             logger_error.exception(e)
-    return decision,match,tm,sm,am
-
+    #print error_str
+    return decision,match,tm,sm,am,error_str
 
 def getYoutubeUrl(video,flag,mostpopular):
     global request_count
@@ -582,7 +622,8 @@ def getYoutubeUrl(video,flag,mostpopular):
                 selectedVideoYear = 0
                 for videoresult in searchResult['items']:
                     searchEntry = searchResult['items'][i]
-                    [currentVideoDecision,currentVideoMatch,currentVideoTotalMatch,currentVideoSongMatch,currentVideoArtistMatch] = CalculateMatch(video,searchEntry['snippet']['title'])
+                    [currentVideoDecision,currentVideoMatch,currentVideoTotalMatch,currentVideoSongMatch,currentVideoArtistMatch,error_str] = CalculateMatch(video,searchEntry['snippet']['title'])
+                    video.errorstr = error_str
                     if(currentVideoDecision == "correct"):# || currentVideoDecision == "Incorrect"):
                         currentVideoYear = GetYearFromTitle(searchEntry['snippet']['title'])
                         youtubeVideoId = searchEntry['id']['videoId']
