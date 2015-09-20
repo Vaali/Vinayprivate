@@ -112,6 +112,7 @@ def getVideoFromYoutube(curr_elem):
         tempDictionary = retvid[0].__dict__
         if('errorstr' in tempDictionary):
             logger_decisions.error(tempDictionary['errorstr'])
+            logger_decisions.error('-----------------')
     return retvid,bret
 
 
@@ -215,6 +216,22 @@ def RemoveStemCharacters(currString):
     currString = currString.replace(',','').strip()
     return currString
 
+def RemoveStemCharactersforComparison(currString):
+    currString = currString.replace('"','').strip()
+    currString = currString.replace('’','').strip()
+    currString = currString.replace("'",'').strip()
+    currString = currString.replace("‘",'').strip()
+    currString = currString.replace("?",'').strip()
+    currString = currString.replace(',','').strip()
+    currString = currString.replace('(','').strip()
+    currString = currString.replace(')','').strip()
+    currString = currString.replace('[','').strip()
+    currString = currString.replace(']','').strip()
+    currString = currString.replace('&','').strip()
+    currString = currString.replace('-',' ').strip()
+    currString = currString.replace('´','').strip()
+    return currString
+
 def GetYearFromTitle(vid_title):
     returnYear = 0
     yearList = re.findall(r'\d\d\d\d+',vid_title)
@@ -223,9 +240,8 @@ def GetYearFromTitle(vid_title):
         returnYear = int(yearList[0])
     return returnYear
 
-def CalculateMatch(video,vid_title):
+def CalculateMatch(video,vid_title,vid_description):
     try:
-        soundex = fuzzy.Soundex(len(vid_title))
         list = ""
         conlist = ""
         artistName = video.artist
@@ -241,6 +257,7 @@ hq','band','audio','album','world','instrumental','intro','house','acoustic','so
         '''stemwords = ['video','mix','feat','official','lyrics','music','cover','version','original','hq','band','audio','album','world','instrumental', 'intro','house','acoustic','sound','orchestra','vs','track','project','records','extended','01','02','03','04','05','06','07','08','09','2008','prod', 'piano','town','disco','solo','festival','vivo','vocal','featuring','name','london','1995','soundtrack','tv','em','ti','quartet','system','single', 'official','top','low','special','trance','circle','stereo','videoclip','lp','quality','underground','espanol','vinyl','tribute','master','step','uk','eu','voice','promo','choir','outro','au','anthem','songs','digital','hour','nature','motion','sounds','ballad','unplugged','singers','legend', 'french','strings','classic','cast','act','full','screen','radio','remix','song','edit','tracks']'''
         stemcharacters = ['[',']','(',')','\'','"','.','’']
         youtubematch = vid_title.lower()
+        descriptionmatch = vid_description.lower()
         diffset = []
         substring_album = "false"
         #remove the characters form songname and youtubename
@@ -255,13 +272,16 @@ hq','band','audio','album','world','instrumental','intro','house','acoustic','so
                 diffset.append(word)
                 pattern = '\\b'+word+'\\b'
                 youtubematch = re.sub(pattern,'', youtubematch)
+                descriptionmatch = re.sub(pattern,'',descriptionmatch)
         
         for c in connectorList:
             if(c != None):
                 conlist = conlist+" "+c	
         #Find positions of artist ,song and feat artists
         songpos = youtubematch.lower().find(songName.lower())
+        songpos_desc = descriptionmatch.lower().find(songName.lower())
         artpos = youtubematch.lower().find(artistName.lower())
+        artpos_desc = descriptionmatch.lower().find(artistName.lower())
         for l in video.album:
             albumpos = youtubematch.lower().find(l['albumname'].lower())
             if(albumpos != -1):
@@ -271,12 +291,22 @@ hq','band','audio','album','world','instrumental','intro','house','acoustic','so
                 break
         ftart_substring = []
         ftartpos = []
+        ftartistmatchdesc = []
         ftartistmatch = []
+        comparestringartist = artistName;
         if(songpos != -1):
             substring_song = "true"
             artist_order[songpos] = songName
         else:
             substring_song = "false"
+        if(songpos_desc != -1):
+            substring_song_desc = "true"
+        else:
+            substring_song_desc = "false"
+        if(artpos_desc != -1):
+            substring_artist_desc = "true"
+        else:
+            substring_artist_desc = "false"
         if(artpos != -1):
             substring_artist = "true"
             artist_order[artpos] = artistName
@@ -284,13 +314,20 @@ hq','band','audio','album','world','instrumental','intro','house','acoustic','so
             substring_artist = "false"
         for f in ftArtistName:
             fList = fList+" "+f
+            comparestringartist = comparestringartist + " " + f
             currpos = youtubematch.lower().find(f.lower())
+            currpos_desc = descriptionmatch.lower().find(f.lower())
+            
             ftartpos.append(currpos)
             if(currpos != -1):
                 ftartistmatch.append(True)
                 artist_order[artpos] = f
             else:
                 ftartistmatch.append(False)
+            if(currpos_desc != -1):
+                ftartistmatchdesc.append(True)
+            else:
+                ftartistmatchdesc.append(False)
              
         ftartists = ""
         if(len(fList)!=0):
@@ -325,9 +362,8 @@ hq','band','audio','album','world','instrumental','intro','house','acoustic','so
         if(len(songset) != 0):
             songMatch = len(common1)*100/float(len(songset))
         #check if - is present
-        comparestring = "";
-        for key in sorted(artist_order):
-            comparestring = comparestring + " " + artist_order[key]
+        
+        
         yname = youtubematch
         yname = yname.lower().replace("feat.","")
         yname = yname.lower().replace("ft.","")
@@ -509,6 +545,12 @@ hq','band','audio','album','world','instrumental','intro','house','acoustic','so
             condition = 5
         if(bhiphen == "true" and (songMatch == 0  or (leftMatch == 0.0 and rightMatch == 0.0))):
             decision = "Incorrect"
+        '''if(len(vid_title) > len(video.name)):
+            soundexmax = fuzzy.Soundex(len(vid_title))
+            soundexmin = fuzzy.Soundex(len(video.name))
+        else:
+            soundexmax = fuzzy.Soundex(len(video.name))
+            soundexmin = fuzzy.Soundex(len(vid_title))'''
         error_str += "##decision:"
         error_str += str(decision)
         error_str += "##condition:"
@@ -525,23 +567,46 @@ hq','band','audio','album','world','instrumental','intro','house','acoustic','so
         error_str += str(substring_album)
         error_str += "##vid_title:"
         error_str += str(vid_title)
-        error_str += "##comparestring:"
-        error_str += str(comparestring)
+        error_str += "##vid_description:"
+        error_str += str(vid_description)
+        error_str += "##comparestringleft:"
+        error_str += str(RemoveStemCharactersforComparison(songName.lower()+ " " +comparestringartist.lower()))
         error_str += "##substring_song:"
         error_str += str(substring_song)
         error_str += "##substring_artist:"
         error_str += str(substring_artist)
         error_str += "##ftartistmatch:"
         error_str += str(ftartistmatch)
+        error_str += "##substring_song_desc:"
+        error_str += str(substring_song_desc)
+        error_str += "##substring_artist_desc:"
+        error_str += str(substring_artist_desc)
+        error_str += "##ftartistmatch_desc:"
+        error_str += str(ftartistmatchdesc)
         error_str += "##percentMatch:"
         error_str += str(percentMatch)
         error_str += "##youtubematch:"
         error_str += str(youtubematch)
-        error_str += "##phonetic ratio:"
-        error_str += str(fuzz.ratio(soundex(youtubematch.lower()),soundex(comparestring.lower())))
-        error_str += "##normal ratio:"
-        error_str += str(fuzz.ratio(youtubematch.lower(),comparestring.lower()))
-        
+        error_str += "##partial songmatch:"
+        error_str +=str(fuzz.partial_ratio(RemoveStemCharactersforComparison(youtubematch.lower()),RemoveStemCharactersforComparison(songName.lower())))
+        error_str += "##partial artist:"
+        error_str += str(fuzz.partial_ratio(RemoveStemCharactersforComparison(youtubematch.lower()),RemoveStemCharactersforComparison(artistName.lower())))
+        error_str += "##partial ft artist:"
+        for f in ftArtistName:
+            error_str += ','
+            error_str += str(fuzz.partial_ratio(RemoveStemCharactersforComparison(youtubematch.lower()),RemoveStemCharactersforComparison(f.lower())))
+        error_str += "##partial total match"
+        error_str += str(fuzz.token_sort_ratio(RemoveStemCharactersforComparison(youtubematch.lower()),RemoveStemCharactersforComparison(songName.lower()+ " " +comparestringartist.lower())))
+        error_str += "##setratio songmatch:"
+        error_str += str(fuzz.token_set_ratio(RemoveStemCharactersforComparison(youtubematch.lower()),RemoveStemCharactersforComparison(songName.lower())))
+        error_str += "##setratio artist:"
+        error_str += str(fuzz.token_set_ratio(RemoveStemCharactersforComparison(youtubematch.lower()),RemoveStemCharactersforComparison(artistName.lower())))
+        error_str += "##setratio ft artist:"
+        for f in ftArtistName:
+            error_str += ','
+            error_str += str(fuzz.token_set_ratio(RemoveStemCharactersforComparison(youtubematch.lower()),RemoveStemCharactersforComparison(f.lower())))
+        error_str += "##setratio total match:"
+        error_str += str(fuzz.token_set_ratio(RemoveStemCharactersforComparison(youtubematch.lower()),RemoveStemCharactersforComparison(songName.lower()+ " " +comparestringartist.lower())))
         #logger_decisions.error(error_str)
         '''logger_decisions.error(decision)
         logger_decisions.error(condition)
@@ -622,7 +687,7 @@ def getYoutubeUrl(video,flag,mostpopular):
                 selectedVideoYear = 0
                 for videoresult in searchResult['items']:
                     searchEntry = searchResult['items'][i]
-                    [currentVideoDecision,currentVideoMatch,currentVideoTotalMatch,currentVideoSongMatch,currentVideoArtistMatch,error_str] = CalculateMatch(video,searchEntry['snippet']['title'])
+                    [currentVideoDecision,currentVideoMatch,currentVideoTotalMatch,currentVideoSongMatch,currentVideoArtistMatch,error_str] = CalculateMatch(video,searchEntry['snippet']['title'],searchEntry['snippet']['description'])
                     video.errorstr = error_str
                     if(currentVideoDecision == "correct"):# || currentVideoDecision == "Incorrect"):
                         currentVideoYear = GetYearFromTitle(searchEntry['snippet']['title'])
