@@ -511,7 +511,26 @@ hq','band','audio','album','world','instrumental','intro','house','acoustic','so
                 sm = songMatch
                 am = leftMatch
                 lam = leftMatch
-                ram = rightMatch 
+                ram = rightMatch
+                
+        ########
+        # partial set and fuzzy ratios
+        #######
+        partial_songmatch = fuzz.partial_ratio(RemoveStemCharactersforComparison(youtubematch.lower()),RemoveStemCharactersforComparison(songName.lower()))
+        partial_artist = fuzz.partial_ratio(RemoveStemCharactersforComparison(youtubematch.lower()),RemoveStemCharactersforComparison(artistName.lower()))
+        partial_totalmatch = fuzz.token_sort_ratio(RemoveStemCharactersforComparison(youtubematch.lower()),RemoveStemCharactersforComparison(songName.lower()+ " " +comparestringartist.lower()))
+        setratio_songmatch = fuzz.token_set_ratio(RemoveStemCharactersforComparison(youtubematch.lower()),RemoveStemCharactersforComparison(songName.lower()))
+        setratio_artistmatch = fuzz.token_set_ratio(RemoveStemCharactersforComparison(youtubematch.lower()),RemoveStemCharactersforComparison(artistName.lower()))
+        setratio_totalmatch = fuzz.token_set_ratio(RemoveStemCharactersforComparison(youtubematch.lower()),RemoveStemCharactersforComparison(songName.lower()+ " " +comparestringartist.lower()))
+        ftartist_partial = []
+        ftartist_setratio = []
+        for f in ftArtistName:
+            ftartist_partial.append(fuzz.partial_ratio(RemoveStemCharactersforComparison(youtubematch.lower()),RemoveStemCharactersforComparison(f.lower())))
+            ftartist_setratio.append(fuzz.token_set_ratio(RemoveStemCharactersforComparison(youtubematch.lower()),RemoveStemCharactersforComparison(f.lower())))
+            
+        
+        
+        
         decision = "Incorrect"
         condition = 0
         # if all substraing match is true for all and the number of words is greater than 1 for atleast one.
@@ -588,25 +607,25 @@ hq','band','audio','album','world','instrumental','intro','house','acoustic','so
         error_str += "##youtubematch:"
         error_str += str(youtubematch)
         error_str += "##partial songmatch:"
-        error_str +=str(fuzz.partial_ratio(RemoveStemCharactersforComparison(youtubematch.lower()),RemoveStemCharactersforComparison(songName.lower())))
+        error_str +=str(partial_songmatch)
         error_str += "##partial artist:"
-        error_str += str(fuzz.partial_ratio(RemoveStemCharactersforComparison(youtubematch.lower()),RemoveStemCharactersforComparison(artistName.lower())))
+        error_str += str(partial_artist)
         error_str += "##partial ft artist:"
-        for f in ftArtistName:
+        for f in ftartist_partial:
             error_str += ','
-            error_str += str(fuzz.partial_ratio(RemoveStemCharactersforComparison(youtubematch.lower()),RemoveStemCharactersforComparison(f.lower())))
+            error_str += str(f)
         error_str += "##partial total match"
-        error_str += str(fuzz.token_sort_ratio(RemoveStemCharactersforComparison(youtubematch.lower()),RemoveStemCharactersforComparison(songName.lower()+ " " +comparestringartist.lower())))
+        error_str += str(partial_totalmatch)
         error_str += "##setratio songmatch:"
-        error_str += str(fuzz.token_set_ratio(RemoveStemCharactersforComparison(youtubematch.lower()),RemoveStemCharactersforComparison(songName.lower())))
+        error_str += str(setratio_songmatch)
         error_str += "##setratio artist:"
-        error_str += str(fuzz.token_set_ratio(RemoveStemCharactersforComparison(youtubematch.lower()),RemoveStemCharactersforComparison(artistName.lower())))
+        error_str += str(setratio_artistmatch)
         error_str += "##setratio ft artist:"
-        for f in ftArtistName:
+        for f in ftartist_setratio:
             error_str += ','
-            error_str += str(fuzz.token_set_ratio(RemoveStemCharactersforComparison(youtubematch.lower()),RemoveStemCharactersforComparison(f.lower())))
+            error_str += str(f)
         error_str += "##setratio total match:"
-        error_str += str(fuzz.token_set_ratio(RemoveStemCharactersforComparison(youtubematch.lower()),RemoveStemCharactersforComparison(songName.lower()+ " " +comparestringartist.lower())))
+        error_str += str(setratio_totalmatch)
         #logger_decisions.error(error_str)
         '''logger_decisions.error(decision)
         logger_decisions.error(condition)
