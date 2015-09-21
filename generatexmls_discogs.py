@@ -345,6 +345,14 @@ def genXML(vid,avgcnt,avgcntrece,artistId):
 		#print vid['language']
         releaseyear = str(vid['year']).split('-')[0]
         mysong.set_releaseDate(int(releaseyear))
+        if('videoYear' in vid):
+            if(int(releaseyear) != int(vid['videoYear'])):
+                print 'mis-match of years'
+                print releaseyear
+                print vid['name']
+                print vid['videoYear']
+                print vid['title']
+                print '----------------------------------'
         mysong.set_decade(int(releaseyear)/10)
         mysong.set_earliestDate(vid['year'])
         if('songcountry' in vid):
@@ -377,7 +385,7 @@ def genXML(vid,avgcnt,avgcntrece,artistId):
             #genre = genre.replace("}","")
             #genre = genre.split(',')
             for g in genre:
-                g = g.replace("\"","")
+                '''g = g.replace("\"","")
                 if(g != "Folk, World, & Country"):
                     g = g.replace(" ","_")
                 else:
@@ -388,7 +396,11 @@ def genXML(vid,avgcnt,avgcntrece,artistId):
                     g = 'Rock_and_roll'
                 else:
                     g = g.replace('&','and')
-                    g.strip()
+                    g.strip() '''
+                g = g.replace("\"","")
+                g = g.lower()
+                g = g[0].upper()+g[1:]
+                g = encodexml(g)
                 xmlpath = "//"+str(g)
                 #print "xmla oath :" +xmlpath
                 genre_paths = []
@@ -433,7 +445,7 @@ def genXML(vid,avgcnt,avgcntrece,artistId):
             #style = style.split(',')
             
             for g in style:
-                g = g.replace("\"","")
+                '''g = g.replace("\"","")
                 g = g.replace(" ","_")
                 g = g.lower()
                 g = g[0].upper()+g[1:]
@@ -441,7 +453,11 @@ def genXML(vid,avgcnt,avgcntrece,artistId):
                     g = 'Rock_and_roll'
                 else:
                     g = g.replace('&','and')
-                    g.strip()
+                    g.strip()'''
+                g = g.replace("\"","")
+                g = g.lower()
+                g = g[0].upper()+g[1:]
+                g = encodexml(g)
                 xmlpath = "//"+str(g)
                 #print "xmla styles :" +g
                 genre_paths = []
