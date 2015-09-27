@@ -90,6 +90,13 @@ def getArtistAliasList(sorted_list):
 			final_artist_alias_list = getAliasFromArtistsSolr(final_artist_alias_list,artist[0])
     return final_artist_alias_list
 
+def GetYearFromTitle(vid_title):
+    returnYear = 0
+    yearList = re.findall(r'\d\d\d\d+',vid_title)
+    if(len(yearList) != 0):
+        returnYear = int(yearList[0])
+    return returnYear
+
 def getAliasFromArtistsSolr(final_artist_alias_list,artist_id):
     global solrConnection
     artistId = 'artistId:"'+str(artist_id)+ '"'
@@ -290,8 +297,8 @@ def get_song_list(directory,songs_list,full_country_list,aliases,ear_count,ear_y
         try:
             songs_list = []
             filename = release
-            with codecs.open(filename,"r","utf-8") as input:
-                curr_album = json.load(input)
+            with codecs.open(filename,"r","utf-8") as input1:
+                curr_album = json.load(input1)
             earlier_year_skip = False #skip for the albums which have no artist attched to them
             
             for track in curr_album['tracks']:
@@ -306,6 +313,16 @@ def get_song_list(directory,songs_list,full_country_list,aliases,ear_count,ear_y
                 song = {}
                 if(curr_album['released_date'] != None):
                         curr_album['released_date'] = get_released_date(curr_album['released_date'])
+                temp_year_album = 0
+                temp_year_album = GetYearFromTitle(curr_album['title'])
+                print temp_year_album
+                if(curr_album['released_date'] != None and temp_year_album != 0):
+                    curr_year = int(str(curr_album['released_date']).split('-')[0])
+                    if(curr_year == 1001 or (curr_year > int(temp_year_album))):
+                        curr_album['released_date'] = str(temp_year_album)
+                elif(temp_year_album != 0):
+                    curr_album['released_date'] = str(temp_year_album)
+                print curr_album['released_date']
                 song['styles'] = curr_album['styles']
                 song['genres'] = curr_album['genres']
                 song['year'] = curr_album['released_date']
@@ -414,8 +431,8 @@ def get_song_list_master(directory,songs_list,full_country_list,aliases,ear_coun
     for release in releases_list:
         try:
             filename = release
-            with codecs.open(filename,"r","utf-8") as input:
-                curr_master = json.load(input)
+            with codecs.open(filename,"r","utf-8") as input1:
+                curr_master = json.load(input1)
             release_song_list = []
             curr_song_list =[]
             release_album = str(curr_master['main_release'])
@@ -437,7 +454,14 @@ def get_song_list_master(directory,songs_list,full_country_list,aliases,ear_coun
                             full_country_list[curr_album['country']] = full_country_list[curr_album['country']] + 1
                 else:
                     earlier_year_skip = True
-                
+                temp_year_album = 0
+                temp_year_album = GetYearFromTitle(curr_album['title'])
+                if(curr_album['released_date'] != None and temp_year_album != 0):
+                    curr_year = int(str(curr_album['released_date']).split('-')[0])
+                    if(curr_year == 1001 or (curr_year > int(temp_year_album))):
+                        curr_album['released_date'] = str(temp_year_album)
+                elif(temp_year_album != 0):
+                    curr_album['released_date'] = str(temp_year_album)
                 for track in curr_album['tracks']:
                     if(track == None):
                         continue
@@ -554,7 +578,7 @@ def get_song_list_master(directory,songs_list,full_country_list,aliases,ear_coun
                             ear_rel = curr_rel
                             ear_conflict = False
         except Exception as e:
-            traceback.print_exc()
+            logger_error.exception(e)
         final_song_list = GetUniquesongs(release_song_list,final_song_list,True,False,ear_count)
         final_song_list = GetUniquesongs(curr_song_list,final_song_list,False,True,ear_count)
         
@@ -683,13 +707,6 @@ def get_song_list_master_old(directory,songs_list,full_country_list,aliases,ear_
                     song['name'] = track['title']
                     song['name'] = remove_stemwords(song['name'])
                     #song['name'] = song['name'].replace("?",'').strip()
-                    '''if('lazy' in song['name'].lower()):
-                        print '------------------------------------'
-                        print song['genres']
-                        print song['year']
-                        print song['styles']
-                        print curr_album['release_id']
-                        print curr_master['id']'''
                     if('duration' in curr_album):
                         song['duration'] = track['duration']
                     albumInfo = {}
