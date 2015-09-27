@@ -660,6 +660,8 @@ def getYoutubeUrl(video,flag,mostpopular):
     bret = False
     try:
         flist = ""
+        yearfromName = 0
+        yearfromName = GetYearFromTitle(video.name)
         for f in video.ftArtist:
             ttt=f.strip("-")
             flist = flist+" "+ttt
@@ -783,11 +785,18 @@ def getYoutubeUrl(video,flag,mostpopular):
                         video.sm = selectedVideoSongMatch
                         video.am = selectedVideoArtistMatch
                         video.title = selectedVideoTitle
+                        #check if the earliest year present in the name of the song from youtube
                         if(selectedVideoYear != 0):
                             video.videoYear = selectedVideoYear
                             curr_year = int(str(video.year).split('-')[0])
                             if(curr_year == 1001 or (curr_year > int(video.videoYear))):
                                 video.year = video.videoYear
+                        #check if the earliest year present in the title of the song from discogs
+                        if(yearfromName != 0):
+                            video.videoYearName = yearfromName
+                            curr_year = int(str(video.year).split('-')[0])
+                            if(curr_year == 1001 or (curr_year > int(video.videoYearName))):
+                                video.year = video.videoYearName    
                         video.published = selectedVideoPublishedDate
                         m = re.search(re.compile("[0-9]{4}[-][0-9]{2}[-][0-9]{2}"),video.published)
                         n = re.search(re.compile("[0-9]{2}[:][0-9]{2}[:][0-9]{2}"),video.published)
