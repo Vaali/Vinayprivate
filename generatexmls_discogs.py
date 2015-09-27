@@ -71,17 +71,18 @@ def CalculateScale(viewcount):
 
 
 def encodexml(s):
- 	s = s.replace("&", "0000")
-	s = s.replace(" ", "_")	   
-	s = s.replace("/", "1111")
-	s = s.replace("-", "2222")
-	s = s.replace("\\", "3333")	   
-	s = s.replace(".", "4444")
-	s = s.replace("'", "5555")
-	s = s.replace("(", "6666")	   
-	s = s.replace(")", "7777")
-	s = s.replace("!", "8888")
-   	return s
+    s = s.replace("&", "0000")
+    s = s.replace(" ", "_")
+    s = s.replace("/", "1111")
+    s = s.replace("-", "2222")
+    s = s.replace("\\", "3333")
+    s = s.replace(".", "4444")
+    s = s.replace("'", "5555")
+    s = s.replace("(", "6666")
+    s = s.replace(")", "7777")
+    s = s.replace("!", "8888")
+    s = s.replace(",","")
+    return s
 
 	
 def decodexml(s):
