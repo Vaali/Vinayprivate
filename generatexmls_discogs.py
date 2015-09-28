@@ -381,6 +381,7 @@ def genXML(vid,avgcnt,avgcntrece,artistId):
         genres_levels = {0:[],1:[]}
         genre = vid['genres']
         #print genre
+        curr_genres_list = []
         if(genre != None):
             #genre = genre.replace("{","")
             #genre = genre.replace("}","")
@@ -423,21 +424,25 @@ def genXML(vid,avgcnt,avgcntrece,artistId):
                     if(len(genre_paths) == 0):
                         logger_genre.error(g)
                     else:
-                        genres_levels[0].append(g+"_music")
+                        #genres_levels[0].append(g+"_music")
+                        curr_genres_list.append(g+"_music")
                 else:
-                    genres_levels[0].append(g)
-                    
-                '''for gp in genre_paths:
+                    #genres_levels[0].append(g)
+                    curr_genres_list.append(g)
+                #print genre_paths    
+                for gp in genre_paths:
                     sAbsolutePath = doc.getpath(gp)
                     pathList = sAbsolutePath.split('/')
-                    #print pathList
+                    print pathList
+                    print len(pathList)
                     pathlength = len(pathList)
                     for k,l in enumerate(pathList[2:]):
                         if k in genres_levels:
                             if l not in genres_levels[k]:
                                 genres_levels[k].append(l)
                         else:
-                            genres_levels[k] = [l]'''
+                            genres_levels[k] = [l]
+                
         style = []
         style = vid['styles']
         if(style != None):
@@ -446,7 +451,7 @@ def genXML(vid,avgcnt,avgcntrece,artistId):
             #style = style.split(',')
             
             for g in style:
-                '''g = g.replace("\"","")
+                g = g.replace("\"","")
                 g = g.replace(" ","_")
                 g = g.lower()
                 g = g[0].upper()+g[1:]
@@ -454,10 +459,10 @@ def genXML(vid,avgcnt,avgcntrece,artistId):
                     g = 'Rock_and_roll'
                 else:
                     g = g.replace('&','and')
-                    g.strip()'''
-                g = g.replace("\"","")
+                    g.strip()
+                '''g = g.replace("\"","")
                 g = g.lower()
-                g = g[0].upper()+g[1:]
+                g = g[0].upper()+g[1:]'''
                 g = encodexml(g)
                 xmlpath = "//"+str(g)
                 #print "xmla styles :" +g
@@ -474,24 +479,37 @@ def genXML(vid,avgcnt,avgcntrece,artistId):
                     except Exception as ex:
                         logger_genre.error(xmlpath)
                         logging.exception("Error in path for "+xmlpath)
-                    if(len(genre_paths) == 0):
+                    '''if(len(genre_paths) == 0):
                         logger_genre.error(g)
                     else:
-                        genres_levels[1].append(g+"_music")
+                        genres_levels[1].append(g+"_music")'''
                 else:
-                    genres_levels[1].append(g)
-                '''for gp in genre_paths:
+                    print g
+                    #genres_levels[1].append(g)
+                for gp in genre_paths:
                     sAbsolutePath = doc.getpath(gp)
                     pathList = sAbsolutePath.split('/')
                     #print pathList
+                    #print len(pathList)
                     pathlength = len(pathList)
+                    found = 0
                     for k,l in enumerate(pathList[2:]):
                         if k in genres_levels:
                             if l not in genres_levels[k]:
                                 genres_levels[k].append(l)
                         else:
+                            genres_levels[k] = [l]
+                    '''if(found == 1):
+                        k = len(pathList) - 3
+                        print k
+                        l = pathList[len(pathList)-1]
+                        print l
+                        if k in genres_levels:
+                            if l not in genres_levels[k]:
+                                genres_levels[k].append(l)
+                        else:
                             genres_levels[k] = [l]'''
-                
+        print genres_levels        
         for i in genres_levels:
 			if(i == 0):
 				level1Genres = api.level1Genres()
@@ -720,7 +738,7 @@ t1=datetime.now()
 #myfile = codecs.open('levels.xml','r','utf8');
 #doc_str = myfile.read()
 #doc_str = doc_str.encode("UTF-8")
-doc = etree.parse(open('discogs_genres.xml'))
+doc = etree.parse(open('new_genres_list.xml'))
 #doc = libxml2.parseFile('genres_manual.xml')
 #doc = libxml2.xmlReadFile("levels.xml","utf8")
 #doc = libxml2.parseDoc(doc_str)
