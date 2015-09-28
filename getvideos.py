@@ -744,7 +744,7 @@ def getYoutubeUrl(video,flag,mostpopular):
                                 selectedVideolikes = currentVideolikes
                                 selectedVideodislikes = currentVideodislikes
                                 iindex=i
-                            if ((selectedVideoTotalMatch) < int(currentVideoTotalMatch) and (mostpopular == 1)):
+                            if (mostpopular == 1):
                                 selectedVideoViewCount = currentVideoViewCount
                                 selectedVideoMatch = currentVideoMatch
                                 selectedVideoYear = currentVideoYear
@@ -758,6 +758,7 @@ def getYoutubeUrl(video,flag,mostpopular):
                                 selectedVideolikes = currentVideolikes
                                 selectedVideodislikes = currentVideodislikes
                                 iindex=i
+                                break
                             if (selectedVideoTotalMatch == currentVideoTotalMatch and (mostpopular == 1) and int(selectedVideoViewCount) < int(currentVideoViewCount)):
                                 selectedVideoViewCount = currentVideoViewCount
                                 selectedVideoMatch = currentVideoMatch
@@ -831,16 +832,9 @@ def getYoutubeUrl(video,flag,mostpopular):
     return video,bret
 
 request_count = 0
-t2=datetime.now()
-directory = raw_input("Enter directory: ")
-m = raw_input("Enter m: ")
-m=int(m)
 foldlist = list()
-jobs=[]
 t1=datetime.now()
-foldercompletelist = {}
-folderstartedlist = {}
-for dirs in os.listdir(directory):
+'''for dirs in os.listdir(directory):
   	found = re.search(r'[0-9]+',str(dirs),0)
   	print dirs
   	if found:
@@ -850,14 +844,20 @@ for dirs in os.listdir(directory):
 				if not f:
 					continue
 				strg = os.path.join(curr_dir,sd)
-				foldlist.append(strg)
+				foldlist.append(strg)'''
+if(len(sys.argv) > 0):
+    foldlist = sys.argv[1:]
+    print foldlist
 for fl in foldlist:
     try:
         vid = list()
         misses = 0
         hits = 0
         infile = fl + '/songslist.txt'
-        fread = open(infile,'r')
+        try:
+            fread = open(infile,'r')
+        except IOError as e:
+            continue
         parallel_songs_list = pickle.load(fread)
         songs_pool = Pool()
         songs_pool =Pool(processes=20)
