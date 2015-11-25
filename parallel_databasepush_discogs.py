@@ -19,21 +19,21 @@ try:
     folders = int(folders)
     m1=int(m1)
     directorylist = list()
-    if(os.path.exists(directory+'/lastdirecotry.txt')):
-        fread = codecs.open(directory+'/lastdirecotry.txt','r','utf-8')
+    if(os.path.exists(directory+'/lastdirectory.txt')):
+        fread = codecs.open(directory+'/lastdirectory.txt','r','utf-8')
         lines = fread.readlines()
         if(len(lines) > 0):
             if(lines[-1].strip() != ""):
                 lastdirectory = int(lines[-1])
         fread.close()
-        fwrite = codecs.open(directory+'/lastdirecotry.txt','a','utf-8')
+        fwrite = codecs.open(directory+'/lastdirectory.txt','a','utf-8')
     else:
-        fwrite = codecs.open(directory+'/lastdirecotry.txt','w','utf-8')
+        fwrite = codecs.open(directory+'/lastdirectory.txt','w','utf-8')
     
     ''' Folders list count to control the numebr of folders done'''
     for dirs in os.listdir(directory):
         found = re.search(r'[0-9]+',str(dirs),0)
-        if (found and (lastdirectory < int(dirs))):
+        if (found and (lastdirectory <= int(dirs))):
             directorylist.append(int(dirs))
     directorylist = sorted(directorylist)
     splitlist = list(itertools.izip_longest(*(iter(directorylist),) * folders))
@@ -83,7 +83,7 @@ try:
 
         filepartition = []
         for i in range(0,blockcount):
-            filepartition.append("python discogs_dump.py ")
+            filepartition.append("python discogs_dump_master.py ")
         index = 0
         count = 0
         for j in range(0,blockcount):
