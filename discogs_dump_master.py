@@ -315,14 +315,14 @@ def get_song_list(directory,songs_list,full_country_list,aliases,ear_count,ear_y
                         curr_album['released_date'] = get_released_date(curr_album['released_date'])
                 temp_year_album = 0
                 temp_year_album = GetYearFromTitle(curr_album['title'])
-                print temp_year_album
+                #print temp_year_album
                 if(curr_album['released_date'] != None and temp_year_album != 0):
                     curr_year = int(str(curr_album['released_date']).split('-')[0])
                     if(curr_year == 1001 or (curr_year > int(temp_year_album))):
                         curr_album['released_date'] = str(temp_year_album)
                 elif(temp_year_album != 0):
                     curr_album['released_date'] = str(temp_year_album)
-                print curr_album['released_date']
+                #print curr_album['released_date']
                 song['styles'] = curr_album['styles']
                 song['genres'] = curr_album['genres']
                 song['year'] = curr_album['released_date']
@@ -787,19 +787,29 @@ def checkIfSongExists(curr_song,songs_list):
 
 
 def getparanthesismatch(source,destination):
-    sourcelist = re.findall('(.*?)\(([^(].*?)\)(.*)',source)
-    destinationlist = re.findall('(.*?)\(([^(].*?)\)(.*)',destination)
-    if(len(sourcelist) ==0 or len(destinationlist) == 0):
-        return False,1
-    slist = [s for s in sourcelist[0] if s != "" ]
-    dlist = [s for s in destinationlist[0] if s != "" ]
-    part1_dist = fuzz.ratio(slist[0].lower(),dlist[0].lower())
-    part2_dist = fuzz.ratio(slist[1].lower(),dlist[1].lower())
-    if(part1_dist >= 85 and part2_dist >=85):
-        return True,0
-    else:
+    try:
+        sourcelist = re.findall('(.*?)\(([^(].*?)\)(.*)',source)
+        destinationlist = re.findall('(.*?)\(([^(].*?)\)(.*)',destination)
+        if(len(sourcelist) ==0 or len(destinationlist) == 0):
+            return False,1
+        slist = [s for s in sourcelist[0] if s != "" ]
+        dlist = [s for s in destinationlist[0] if s != "" ]
+        
+        part1_dist = fuzz.ratio(slist[0].lower(),dlist[0].lower())
+        part2_dist = 0
+        if(len(slist) >1 and len(dlist) > 1):
+            fuzz.ratio(slist[1].lower(),dlist[1].lower())
+        
+        if(part1_dist >= 85 and part2_dist >=85):
+            return True,0
+        else:
+            return False,0
+    except Exception, e:
+        logger_error.exception(source)
+        logger_error.exception(destination)
+        logger_error.exception(e)
         return False,0
-    
+        
 def getGenresAndStyles(genres,styles):
     genre = []
     style = []
@@ -822,46 +832,50 @@ def getGenresAndStyles(genres,styles):
     return genre,style
 
 def crawlArtist(directory):
-    songs_list = list()
-    global misses
-    global hits
-    full_lang_list = {}
-    full_country_list ={}
-    aliases = []
-    ear_count = ""
-    ear_year = 1001
-    ear_rel = False
-    master_ear_count = ""
-    master_ear_rel = ""
-    bskipflag = 0
-    final_song_list = {}
-    ear_conflict = False
-    songs_list,full_country_list,aliases,ear_count,ear_year,ear_rel,ear_conflict,final_song_list = get_song_list_master(directory,songs_list,full_country_list,aliases,ear_count,ear_year,ear_rel)
-    print ear_count
-    print ear_year
-    if(len(songs_list) != 0):
-        master_ear_count = ear_count
-        master_ear_year = ear_year
-        bskipflag = 1
-    songs_list,final_song_list,full_country_list,aliases,ear_count,ear_year,ear_rel = get_song_list(directory,songs_list,full_country_list,aliases,ear_count,ear_year,ear_rel,final_song_list)
-    print ear_count
-    print ear_year
-    if(bskipflag == 1):
-        ear_count = master_ear_count
-        ear_year = master_ear_year
-    sorted_list_country = sorted(full_country_list.items(), key=operator.itemgetter(1),reverse = True)
-    #sorted(full_country_list,key = lambda x:x['name'].lower())
-    artist_country = ear_count
-    if(len(sorted_list_country) > 0):
-        artist_country = sorted_list_country[0][0]
-    if(ear_conflict == True):
-        ear_count = artist_country
-    sorted_list = sorted(songs_list,key = lambda x:x['name'].lower()) 
-    hits = 0
-    misses = 0
-    global request_count
-    request_count = 0
-    if(len(sorted_list) == 0):
+    try:
+        songs_list = list()
+        global misses
+        global hits
+        full_lang_list = {}
+        full_country_list ={}
+        aliases = []
+        ear_count = ""
+        ear_year = 1001
+        ear_rel = False
+        master_ear_count = ""
+        master_ear_rel = ""
+        bskipflag = 0
+        final_song_list = {}
+        ear_conflict = False
+        songs_list,full_country_list,aliases,ear_count,ear_year,ear_rel,ear_conflict,final_song_list = get_song_list_master(directory,songs_list,full_country_list,aliases,ear_count,ear_year,ear_rel)
+        print ear_count
+        print ear_year
+        if(len(songs_list) != 0):
+            master_ear_count = ear_count
+            master_ear_year = ear_year
+            bskipflag = 1
+        songs_list,final_song_list,full_country_list,aliases,ear_count,ear_year,ear_rel = get_song_list(directory,songs_list,full_country_list,aliases,ear_count,ear_year,ear_rel,final_song_list)
+        print ear_count
+        print ear_year
+        if(bskipflag == 1):
+            ear_count = master_ear_count
+            ear_year = master_ear_year
+        sorted_list_country = sorted(full_country_list.items(), key=operator.itemgetter(1),reverse = True)
+        #sorted(full_country_list,key = lambda x:x['name'].lower())
+        artist_country = ear_count
+        if(len(sorted_list_country) > 0):
+            artist_country = sorted_list_country[0][0]
+        if(ear_conflict == True):
+            ear_count = artist_country
+        sorted_list = sorted(songs_list,key = lambda x:x['name'].lower()) 
+        hits = 0
+        misses = 0
+        global request_count
+        request_count = 0
+        if(len(sorted_list) == 0):
+            return
+    except Exception, e:
+        logger_error.exception(e)
         return
     try:
         curr_time = "2020-14-33"
@@ -1078,11 +1092,17 @@ def crawlArtist(directory):
 reload(sys)
 sys.setdefaultencoding('utf8')
 filenameList = []
+t1 = time.time()
 if(len(sys.argv) > 0):
     filenameList = sys.argv[1:]
-for filename in filenameList:
+
+songs_pool = Pool()
+songs_pool =Pool(processes=20)
+songs_pool.map(crawlArtist,filenameList)
+'''for filename in filenameList:
 	try:
 		crawlArtist(str(filename))
 		#logger.info("completed for artist :"+filename)
 	except Exception as e:
-		logger_error.exception(e)
+		logger_error.exception(e)'''
+print time.time()-t1
