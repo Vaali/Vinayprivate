@@ -109,5 +109,3 @@ for j in range(1,blocknumber+1):
 
 	proc.join()
 print time.time()-t1
-
-		
