@@ -922,4 +922,4 @@ for filename in filenameList:
 		crawlArtist(str(filename))
 		logger.exception("completed")
 	except Exception as e:
-		print e,filename
+		print e
