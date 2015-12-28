@@ -238,6 +238,8 @@ def GetYearFromTitle(vid_title):
     print yearList
     if(len(yearList) != 0):
         returnYear = int(yearList[0])
+        if(returnYear < 1940):
+            returnYear = 0
     return returnYear
 
 def CalculateMatch(video,vid_title,vid_description):
@@ -685,7 +687,8 @@ def getYoutubeUrl(video,flag,mostpopular):
             #print searchResult
         except Exception as e:
             request_count = request_count + 2
-            logger_error.exception("Error")
+            logger_error.exception("Error %d --- %s"% (e.resp.status, e.content))
+            #print "An HTTP error %d occurred:\n%s" % (e.resp.status, e.content)
             return video,bret
         now = datetime.now()
         try:
@@ -719,13 +722,17 @@ def getYoutubeUrl(video,flag,mostpopular):
                             request_count = request_count + 7
                         except Exception as e:
                             request_count = request_count + 7
-                            logger_error.exception(e)
+                            logger_error.exception("Error %d --- %s"% (e.resp.status, e.content))
                             continue
                         if videoResult.has_key('items'):
                             videoEntry = videoResult['items'][0]
                             currentVideoViewCount = videoEntry['statistics']['viewCount']
-                            currentVideolikes = videoEntry['statistics']['likeCount']
-                            currentVideodislikes = videoEntry['statistics']['dislikeCount']
+                            if('likeCount' in videoEntry['statistics']):
+                                currentVideolikes = videoEntry['statistics']['likeCount']
+                                currentVideodislikes = videoEntry['statistics']['dislikeCount']
+                            else:
+                                currentVideolikes = 0
+                                currentVideodislikes = 0
                             currentVideoEmbedded = videoEntry['status']['embeddable']
                             currentVideoStatus = videoEntry['status']['privacyStatus']
                             if(currentVideoEmbedded == False or currentVideoStatus != 'public'):
