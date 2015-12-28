@@ -95,6 +95,8 @@ def GetYearFromTitle(vid_title):
     yearList = re.findall(r'\d\d\d\d+',vid_title)
     if(len(yearList) != 0):
         returnYear = int(yearList[0])
+        if(returnYear < 1940):
+            returnYear = 0
     return returnYear
 
 def getAliasFromArtistsSolr(final_artist_alias_list,artist_id):
