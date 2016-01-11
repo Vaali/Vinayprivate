@@ -122,7 +122,7 @@
         <New_wave_music_in_yugoslavia />
         <Coldwave />
         <Synthesizer />
-        <Boogie_6666genre7777 />
+        <Boogie />
         <Minimal_wave />
         <New_music_6666music_industry7777 />
       </New_wave>
@@ -324,10 +324,11 @@
       </Christian_rock>
       <Mainstream_rock />
     </Rock_radio_formats>
-  </Rock>
-  <Pop_music>
-      <Instrumental />
       <Acoustic/>
+  </Rock>
+  <Pop>
+      <Instrumental />
+        <Acoustic/>
       <Shibuya2222kei />
       <Beat_music />
       <Smooth_jazz />
@@ -366,7 +367,6 @@
       <Operatic_pop />
       <C2222pop />
       <Pop_rap />
-      <Psychedelic />
       <Electropop />
       <Pop_punk>
         <Emo_pop />
@@ -404,7 +404,7 @@
         <Mod_revival />
         <Coldwave />
         <Synthesizer />
-        <Boogie_6666genre7777 />
+        <Boogie />
         <Minimal_wave />
         <New_music_6666music_industry7777 />
       </New_wave_music>
@@ -413,7 +413,7 @@
       <Progressive_pop />
       <Popcorn_6666music_style7777 />
     <Mexican_pop_music />
-  </Pop_music>
+  </Pop>
   <Electronic>
       <Leftfield />
       <Jungle />
@@ -607,7 +607,7 @@
       <Minimal_wave />
       <Electronic_rock />
       <Post2222disco>
-        <Boogie_6666genre7777 />
+        <Boogie />
         <Dance2222rock />
       </Post2222disco>
       <Funk_carioca>
@@ -692,6 +692,8 @@
             <Memphis_soul />
             <Boogaloo />
             <Funk>
+                <Gogo />
+                <Bayou_funk />
                 <P4444funk />
                 <Afrobeat />
                 <Jazz2222funk />
@@ -703,7 +705,7 @@
                 <Free_funk />
                 <Funktronica />
                 <Go2222go />
-                <Boogie_6666genre7777 />
+                <Boogie />
               <Funk_dance>
                 <Robot_6666dance7777 />
                 <Locking_6666dance7777 />
@@ -712,7 +714,8 @@
                 </Popping_6666dance7777>
               </Funk_dance>
             </Funk>
-            <Psychedelic_soul />
+              <Psychedelic_soul></Psychedelic_soul>
+            <Psychedelic />
             <Southern_soul />
             <Modern_soul />
             <Chicago_soul />
@@ -724,8 +727,9 @@
             <Latin_soul />
             <Afro2222soul />
             <Soca_music />
+            <Neo_soul />
           </Soul>
-          <Neo_soul />
+
           <Doo_wop />
           <Deep_funk />
           <Contemporary_r0000b />
@@ -737,6 +741,7 @@
         <R0000b_and_soul_music_portal>
           <R0000b_and_soul_music_portal_selected_biographies />
         </R0000b_and_soul_music_portal>
+          <Funk_1111_soul />
       </Rhythm_0000_blues>
       <New_blues />
       <Boogie_rock />
@@ -764,6 +769,7 @@
     <Mississippi_blues_trail />
   </Blues>
   <Hip_hop>
+      <New_jack_swing />
       <Funk_carioca />
       <Jazzy_hip2222hop></Jazzy_hip2222hop>
       <Beatbox />
@@ -994,6 +1000,7 @@
     </European_hip_hop>
   </Hip_hop>
   <Jazz>
+      <Swing />
       <Skiffle/>
       <Big_band />
       <Ragtime/>
@@ -1368,7 +1375,7 @@
         <Space_disco />
         <Nu2222disco />
           <Post2222disco>
-            <Boogie_6666genre7777 />
+            <Boogie />
           </Post2222disco>
       </Disco>
       <Industrial_dance />
@@ -1597,6 +1604,7 @@
     <Swedish_country_music />
   </Country_music>
   <Classical>
+      <Modern />
       <Twelve2222tone />
       <Neo2222romantic />
     <Neo2222classical />
@@ -2126,27 +2134,7 @@
       <Forró />
       <Flamenco />
     </Latin>
-    <Folk_world_0000_country />
-
   <Uknown_genre/>
-    <Funk_1111_soul>
-    <Funk />
-    <Swingbeat />
-    <Psychedelic />
-    <P4444funk />
-    <Neo_soul />
-    <New_jack_swing />
-    <Contemporary_r0000b />
-    <Soul />
-    <Afrobeat />
-    <Rhythm_0000_blues />
-    <Boogie />
-    <Bayou_funk />
-    <Gospel />
-    <Gogo />
-    <Disco />
-    <Free_funk />
-  </Funk_1111_soul>
     <Stage_0000_screen>
     <Theme />
     <Musical />
