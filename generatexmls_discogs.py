@@ -387,6 +387,7 @@ def genXML(vid,avgcnt,avgcntrece,artistId):
             #genre = genre.replace("}","")
             #genre = genre.split(',')
             for g in genre:
+
                 '''g = g.replace("\"","")
                 if(g != "Folk, World, & Country"):
                     g = g.replace(" ","_")
@@ -402,6 +403,8 @@ def genXML(vid,avgcnt,avgcntrece,artistId):
                 g = g.replace("\"","")
                 g = g.lower()
                 g = g[0].upper()+g[1:]
+                if(g.strip() == ""):
+                    continue
                 g = encodexml(g)
                 xmlpath = "//"+str(g)
                 #print "xmla oath :" +xmlpath
@@ -460,6 +463,8 @@ def genXML(vid,avgcnt,avgcntrece,artistId):
                 else:
                     g = g.replace('&','and')
                     g.strip()
+                if(g.strip() == ""):
+                    continue
                 '''g = g.replace("\"","")
                 g = g.lower()
                 g = g[0].upper()+g[1:]'''
@@ -535,7 +540,7 @@ def genXML(vid,avgcnt,avgcntrece,artistId):
 					level3Genres.add_genreName(level3)
 				mysong.set_level3Genres(level3Genres)
 				continue
-			if(i == 3):
+			if(i >= 3):
 				level4Genres = api.level4Genres()
 
 				for level4 in genres_levels[i]:
@@ -543,7 +548,7 @@ def genXML(vid,avgcnt,avgcntrece,artistId):
 					level4Genres.add_genreName(level4)
 				mysong.set_level4Genres(level4Genres)
 				continue
-			if(i == 4):
+			'''if(i == 4):
 				level5Genres = api.level5Genres()
 
 				for level5 in genres_levels[i]:
@@ -581,7 +586,7 @@ def genXML(vid,avgcnt,avgcntrece,artistId):
 				for level9 in genres_levels[i]:
 					level9 = decodexml(level9)
 					level9Genres.add_genreName(level9)
-				mysong.set_level9Genres(level9Genres)
+				mysong.set_level9Genres(level9Genres)'''
         #mysong.set_artist(artistName)
         mysong.set_duration(timedelta(seconds=int(vid['length'])))
         if vid.has_key('viewcountRate'):
@@ -738,7 +743,7 @@ t1=datetime.now()
 #myfile = codecs.open('levels.xml','r','utf8');
 #doc_str = myfile.read()
 #doc_str = doc_str.encode("UTF-8")
-doc = etree.parse(open('new_genres_list.xml'))
+doc = etree.parse(open('discogs_genres.xml'))
 #doc = libxml2.parseFile('genres_manual.xml')
 #doc = libxml2.xmlReadFile("levels.xml","utf8")
 #doc = libxml2.parseDoc(doc_str)
@@ -794,6 +799,7 @@ fx.write("")
 fx.close()
 #print "testing"
 def generatexmls(dirlist):
+    global IsIncremental
     try:
         d = dirlist
         #for d in dirlist:
@@ -806,7 +812,10 @@ def generatexmls(dirlist):
         print avgcnt,avgcntrece
         vids = []
         try:
-			vids = load(directory+'/dump')
+            if(IsIncremental == 0):
+			    vids = load(directory+'/dump')
+            else:
+                vids = load(directory+'/dump_incr')
         except Exception as e:
 			#continue
 			return
@@ -824,6 +833,8 @@ t2=datetime.now()
 directory = raw_input("Enter directory: ")
 m = raw_input("Enter m: ")
 m=int(m)
+IsIncremental = raw_input("Isincremental : ")
+IsIncremental = int(IsIncremental)
 foldlist = list()
 jobs=[]
 t1=datetime.now()

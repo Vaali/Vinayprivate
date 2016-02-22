@@ -23,7 +23,6 @@ import collections
 from fuzzywuzzy import fuzz
 import fuzzy
 
-
 reload(sys)
 sys.setdefaultencoding('utf8')
 
@@ -838,6 +837,7 @@ def getYoutubeUrl(video,flag,mostpopular):
         logger_error.exception(e)
     return video,bret
 
+IsIncremental = 0
 request_count = 0
 foldlist = list()
 t1=datetime.now()
@@ -852,15 +852,21 @@ t1=datetime.now()
 					continue
 				strg = os.path.join(curr_dir,sd)
 				foldlist.append(strg)'''
+IsIncremental = int(sys.argv[-1])
 if(len(sys.argv) > 0):
-    foldlist = sys.argv[1:]
+    foldlist = sys.argv[1:len(sys.argv)-2]
     print foldlist
+print IsIncremental
+
 for fl in foldlist:
     try:
         vid = list()
         misses = 0
         hits = 0
-        infile = fl + '/songslist.txt'
+        if(IsIncremental == 0):
+            infile = fl + '/songslist.txt'
+        else:
+            infile = fl + '/songslist_incr.txt'
         try:
             fread = open(infile,'r')
         except IOError as e:
@@ -883,7 +889,11 @@ for fl in foldlist:
                         #tv = collections.OrderedDict(rv.__dict__)
                         vid.append(rv.__dict__)
         print "Hits:"+str(hits)+" Misses:"+str(misses)
-        write(vid,fl+"/dump")
+        if(IsIncremental == 0):
+            write(vid,fl+"/dump")
+        else:
+            write(vid,fl+"/dump_incr")
+
     except Exception as e:
             logger_error.exception(e)
 t2=datetime.now()
