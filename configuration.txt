@@ -1,0 +1,6 @@
+1) Solr
+    Start tomcat server from /usr/vinaypamarthi/tomcat
+   solr engine runs on it
+2) apache web server
+    located in /Library/Webserver/Documents
+    httpd.conf present in /etc/apache2/httpd.conf
