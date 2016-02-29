@@ -18,6 +18,7 @@ import copy
 import operator
 from fuzzywuzzy import fuzz
 import fuzzy
+import os
 #from apiclient.errors import HttpError
 
 reload(sys)
@@ -259,9 +260,10 @@ def GetUniquesongs(songs_list,final_song_list,isMaster,same_album,ear_count):
                 if(same_album == False):
                     if(song['year'] != None and song['year'] != 1001):
                         if(stemp['year'] == None or stemp['year'] == 1001):
-                                stemp['year'] = song['year']
-                                stemp['genres'],stemp['styles']= song['genres'],song['styles']
-                                stemp['country'] = song['country']
+                                if(song['isCompilation'] == False):
+                                    stemp['year'] = song['year']
+                                    stemp['genres'],stemp['styles']= song['genres'],song['styles']
+                                    stemp['country'] = song['country']
                                 if(isPresentSong == True):
                                     stemp['name'] = song['name']
                                 if('release_album' in song and song['release_album'] == True):
@@ -269,7 +271,9 @@ def GetUniquesongs(songs_list,final_song_list,isMaster,same_album,ear_count):
                                 if('anv' in song):
                                     stemp['anv'] = song['anv']
                         else:
-                            k = check(song['year'],stemp['year'])
+                            k = 0
+                            if(song['isCompilation'] == False):
+                                k = check(song['year'],stemp['year'])
                             if(k == 1):
                                 if('release_album' in song):
                                         if(isPresentSong == True):
@@ -292,17 +296,36 @@ def GetUniquesongs(songs_list,final_song_list,isMaster,same_album,ear_count):
                     final_song_list[keySong] = stemp
     return final_song_list
 
+def IsReleaseCollection(formats):
+    bRet = False
+    for format in formats:
+        if(format == None):
+            continue
+        descriptions = format['descriptions']
+        #descriptions = descriptions.split(",")
+        for desc in descriptions:
+            desc = desc.lower()
+            if(desc == "collections" or desc == "mixed" or desc == "compilation"):
+                bRet = True
+    return bRet
+
+
+
     
 def get_song_list(directory,songs_list,full_country_list,aliases,ear_count,ear_year,ear_rel,final_song_list):
     releases_list = glob.glob(directory+"/release*.json")
     for release in releases_list:
         try:
+            Iscompilation = False
             songs_list = []
             filename = release
             with codecs.open(filename,"r","utf-8") as input1:
                 curr_album = json.load(input1)
             earlier_year_skip = False #skip for the albums which have no artist attched to them
-            
+            if('formats' in curr_album and IsReleaseCollection(curr_album['formats']) == True):
+                print curr_album['formats']
+                Iscompilation  = True
+            #print curr_album['formats']
             for track in curr_album['tracks']:
                 if(track == None):
                     continue
@@ -333,6 +356,7 @@ def get_song_list(directory,songs_list,full_country_list,aliases,ear_count,ear_y
                 song['connectors'] = []
                 song['extraArtists'] = []
                 song['extraArtistsconnectors'] = []
+                song['isCompilation'] = Iscompilation
                 for artist in curr_album['releaseartists']:
                     if(artist == None):
                         continue
@@ -387,6 +411,7 @@ def get_song_list(directory,songs_list,full_country_list,aliases,ear_count,ear_y
                 
                 song['name'] = track['title']
                 song['name'] = remove_stemwords(song['name'])
+
                 if('duration' in curr_album):
                     song['duration'] = track['duration']
                 albumInfo = {}
@@ -400,6 +425,8 @@ def get_song_list(directory,songs_list,full_country_list,aliases,ear_count,ear_y
                 albumInfo['language'] = "English"
                 song['albumInfo'] = [albumInfo]
                 songs_list.append(song)
+            if(song['isCompilation'] == True):
+                earlier_year_skip = True
             if(earlier_year_skip == False):
                 option = check(curr_album['released_date'],ear_year)
                 if(option == 3 and ear_rel== False):
@@ -432,6 +459,7 @@ def get_song_list_master(directory,songs_list,full_country_list,aliases,ear_coun
     releases_list = sorted(releases_list)
     for release in releases_list:
         try:
+            Iscompilation  = False
             filename = release
             with codecs.open(filename,"r","utf-8") as input1:
                 curr_master = json.load(input1)
@@ -446,6 +474,12 @@ def get_song_list_master(directory,songs_list,full_country_list,aliases,ear_coun
             for curr_album in sorted_releases_list:
                 earlier_year_skip = False
                 curr_rel = False
+                #print curr_album['formats']
+                if('formats' in curr_album and IsReleaseCollection(curr_album['formats']) == True):
+                    print curr_album['formats']
+                    Iscompilation  = True
+                    #continue
+                #print curr_album['formats']
                 if(curr_album == None):
                     continue    
                 if(curr_album['release_id'] == release_album):
@@ -484,7 +518,7 @@ def get_song_list_master(directory,songs_list,full_country_list,aliases,ear_coun
                     song['connectors'] = []
                     song['extraArtists'] = []
                     song['extraArtistsconnectors'] = []
-                    
+                    song['isCompilation'] = Iscompilation
                     #if unknown artist present in the list of artist,skip the album
                     bskip = False
                     
@@ -565,6 +599,8 @@ def get_song_list_master(directory,songs_list,full_country_list,aliases,ear_coun
                     else:
                         curr_song_list.append(song)
                     combined_songs_list.append(song)
+                    if(song['isCompilation'] == True):
+                        earlier_year_skip = True
                     if(earlier_year_skip == False):
                         option = check(curr_album['released_date'],ear_year)
                         if(option == 3 and ear_rel== False and curr_rel == True):
@@ -586,7 +622,7 @@ def get_song_list_master(directory,songs_list,full_country_list,aliases,ear_coun
         
     return combined_songs_list,full_country_list,aliases,ear_count,ear_year,ear_rel,ear_conflict,final_song_list
 
-
+"""
 def get_song_list_master_old(directory,songs_list,full_country_list,aliases,ear_count,ear_year,ear_rel):
     releases_list = glob.glob(directory+"/master*.json")
     ear_conflict = False
@@ -740,7 +776,7 @@ def get_song_list_master_old(directory,songs_list,full_country_list,aliases,ear_
         except Exception, e:
             logger_error.exception(e)
     return songs_list,full_country_list,aliases,ear_count,ear_year,ear_rel,ear_conflict
-
+"""
 def checkFtArtist(ftartist1,ftartist2):
     if(len(ftartist1) != len(ftartist2)):
         return False
@@ -832,6 +868,7 @@ def getGenresAndStyles(genres,styles):
     else:
         style = []
     return genre,style
+
 
 def crawlArtist(directory):
     try:
@@ -1057,10 +1094,11 @@ def crawlArtist(directory):
             logger_decisions.error(final_song_list[s]['genres'])
             logger_decisions.error(final_song_list[s]['styles'])
             logger_decisions.error(final_song_list[s]['country'])
+            logger_decisions.error(final_song_list[s]['albumInfo'])
             logger_decisions.error('----------------------------------------')
         vid = list()
         with open(directory + '/uniquelist.txt', 'wb') as f:
-			pickle.dump(final_song_list.keys(), f)
+			pickle.dump(final_song_list, f)
         parallel_songs_list = []
         finalsongs = final_song_list.values()
         for s in finalsongs:
@@ -1090,7 +1128,23 @@ def crawlArtist(directory):
     except Exception, e:
         logger_error.exception(e)
 
-        
+
+
+''' Incremental Functions '''
+
+def GetChangedFiles(directory,times):
+    changed_files = []
+    master_list = glob.glob(directory+"/master*.json")
+    for fileName in master_list:
+        if( os.path.getmtime(fileName) > times):
+            changed_files.append(fileName)
+    releases_list = glob.glob(directory+"/master*.json")
+    for fileName in releases_list:
+        if( os.path.getmtime(fileName) > times):
+            changed_files.append(fileName)
+    print changed_files
+
+
 reload(sys)
 sys.setdefaultencoding('utf8')
 filenameList = []
