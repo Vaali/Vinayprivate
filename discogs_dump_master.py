@@ -1149,8 +1149,10 @@ reload(sys)
 sys.setdefaultencoding('utf8')
 filenameList = []
 t1 = time.time()
+print sys.argv
 if(len(sys.argv) > 0):
-    filenameList = sys.argv[1:]
+    # second and third arguments are for the incremental option and the previous time.
+    filenameList = sys.argv[3:]
 
 songs_pool = Pool()
 songs_pool =Pool(processes=20)

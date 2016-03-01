@@ -6,8 +6,8 @@ import logging
 import codecs
 from datetime import datetime, date, timedelta
 import itertools
-def func(strg):
-	os.system(strg)
+#def func(strg):
+#	os.system(strg)
 logging.basicConfig(filename='parallel_discogs_part1.log',level=logging.DEBUG,format='%(asctime)s %(process)s %(thread)s: %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
 
 try:
@@ -16,6 +16,17 @@ try:
     directory = raw_input("Enter directory: ")
     m1 = raw_input("Enter m: ")
     folders = raw_input("Enter number of folders: ")
+    incr = raw_input("Isincremental : ")
+    incr = int(incr)
+    prev_time = 0
+    timeFile = directory + "/timelog.txt"
+    if(incr == 1):
+        try:
+            with open(timeFile,"r") as f:
+                prev_time = int(f.read())
+        except IOError as e:
+            print e
+
     folders = int(folders)
     m1=int(m1)
     directorylist = list()
@@ -83,7 +94,10 @@ try:
 
         filepartition = []
         for i in range(0,blockcount):
-            filepartition.append("python discogs_dump_master.py ")
+            processStr = "python discogs_dump_master.py "
+            processStr = processStr + str(incr) + " " + str(prev_time)
+            filepartition.append(processStr)
+
         index = 0
         count = 0
         for j in range(0,blockcount):
@@ -99,7 +113,8 @@ try:
             if(count + m > len(filepartition)):
                 m = len(filepartition) - count
             for i in range(0,m):
-                proc = Process(target=func,args=(filepartition[count],))
+                #proc = Process(target=func,args=(filepartition[count],prev_time,incr))
+                proc = Process(os.system(filepartition[count]))
                 jobs.append(proc)
                 proc.start()
                 count = count + 1
