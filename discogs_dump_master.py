@@ -209,7 +209,7 @@ def GetArtist(artistObj):
     return artistName,ftArtistList,connList
 
 
-def GetUniquesongs(songs_list,final_song_list,isMaster,same_album,ear_count):
+def GetUniquesongs(songs_list,final_song_list,isMaster,same_album,ear_count,full_songs_list = []):
     #artist_country = None
     for song in songs_list:
         keySong = song['name'].lower()
@@ -223,6 +223,10 @@ def GetUniquesongs(songs_list,final_song_list,isMaster,same_album,ear_count):
         isPresentSong = False
         song['genres'],song['styles'] = getGenresAndStyles(song['genres'],song['styles'])
         if(keySong not in final_song_list):
+            ''' First check in the full songlist. '''
+            isPresentSong,matchedsong = checkIfSongExists(song,full_songs_list)
+            if(isPresentSong == True):
+                continue
             isPresentSong,matchedsong = checkIfSongExists(song,final_song_list)
             if(isPresentSong == False):
                 song['genres_count'] = {}
@@ -312,8 +316,17 @@ def IsReleaseCollection(formats):
 
 
     
-def get_song_list(directory,songs_list,full_country_list,aliases,ear_count,ear_year,ear_rel,final_song_list):
-    releases_list = glob.glob(directory+"/release*.json")
+def get_song_list(directory,songs_list,full_country_list,aliases,ear_count,ear_year,ear_rel,final_song_list,full_songs_list):
+    releases_list = []
+    if(IsIncremental == 1):
+        master_list = glob.glob(directory+"/release*.json")
+        for fileName in master_list:
+            if( os.path.getmtime(fileName) > prev_time):
+                releases_list.append(fileName)
+        print prev_time
+        print releases_list
+    else:
+        releases_list = glob.glob(directory+"/release*.json")
     for release in releases_list:
         try:
             Iscompilation = False
@@ -439,7 +452,7 @@ def get_song_list(directory,songs_list,full_country_list,aliases,ear_count,ear_y
             #final_song_list = GetUniquesongs(release_song_list,final_song_list,True,False,ear_count)
         except Exception, e:
             logger_error.exception(e)
-        final_song_list = GetUniquesongs(songs_list,final_song_list,False,False,ear_count)
+        final_song_list = GetUniquesongs(songs_list,final_song_list,False,False,ear_count,full_songs_list)
         print len(songs_list)
         print len(final_song_list)
         print "------------"
@@ -450,8 +463,19 @@ def get_song_list(directory,songs_list,full_country_list,aliases,ear_count,ear_y
 Get the songslist from the master files.
 '''
 
-def get_song_list_master(directory,songs_list,full_country_list,aliases,ear_count,ear_year,ear_rel):
-    releases_list = glob.glob(directory+"/master*.json")
+def get_song_list_master(directory,songs_list,full_country_list,aliases,ear_count,ear_year,ear_rel,full_song_list):
+    releases_list = []
+    global prev_time
+    global IsIncremental
+    if(IsIncremental == 1):
+        master_list = glob.glob(directory+"/master*.json")
+        for fileName in master_list:
+            if( os.path.getmtime(fileName) > prev_time):
+                releases_list.append(fileName)
+        print prev_time
+        print releases_list
+    else:
+        releases_list = glob.glob(directory+"/master*.json")
     ear_conflict = False
     release_song_list = []
     combined_songs_list = []
@@ -617,8 +641,8 @@ def get_song_list_master(directory,songs_list,full_country_list,aliases,ear_coun
                             ear_conflict = False
         except Exception as e:
             logger_error.exception(e)
-        final_song_list = GetUniquesongs(release_song_list,final_song_list,True,False,ear_count)
-        final_song_list = GetUniquesongs(curr_song_list,final_song_list,False,True,ear_count)
+        final_song_list = GetUniquesongs(release_song_list,final_song_list,True,False,ear_count,full_song_list)
+        final_song_list = GetUniquesongs(curr_song_list,final_song_list,False,True,ear_count,full_song_list)
         
     return combined_songs_list,full_country_list,aliases,ear_count,ear_year,ear_rel,ear_conflict,final_song_list
 
@@ -875,6 +899,7 @@ def crawlArtist(directory):
         songs_list = list()
         global misses
         global hits
+        global IsIncremental
         full_lang_list = {}
         full_country_list ={}
         aliases = []
@@ -886,14 +911,24 @@ def crawlArtist(directory):
         bskipflag = 0
         final_song_list = {}
         ear_conflict = False
-        songs_list,full_country_list,aliases,ear_count,ear_year,ear_rel,ear_conflict,final_song_list = get_song_list_master(directory,songs_list,full_country_list,aliases,ear_count,ear_year,ear_rel)
+        full_song_list = []
+        ##Get the songs from the full trial
+        if(IsIncremental == 1):
+            infile = directory + '/songslist.txt'
+            try:
+                fread = open(infile,'r')
+            except IOError as e:
+                logger_error.exception(e)
+            parallel_songs_list = pickle.load(fread)
+            full_song_list = GetSongsFromFullList(parallel_songs_list)
+        songs_list,full_country_list,aliases,ear_count,ear_year,ear_rel,ear_conflict,final_song_list = get_song_list_master(directory,songs_list,full_country_list,aliases,ear_count,ear_year,ear_rel,full_song_list)
         print ear_count
         print ear_year
         if(len(songs_list) != 0):
             master_ear_count = ear_count
             master_ear_year = ear_year
             bskipflag = 1
-        songs_list,final_song_list,full_country_list,aliases,ear_count,ear_year,ear_rel = get_song_list(directory,songs_list,full_country_list,aliases,ear_count,ear_year,ear_rel,final_song_list)
+        songs_list,final_song_list,full_country_list,aliases,ear_count,ear_year,ear_rel = get_song_list(directory,songs_list,full_country_list,aliases,ear_count,ear_year,ear_rel,final_song_list,full_song_list)
         print ear_count
         print ear_year
         if(bskipflag == 1):
@@ -1097,8 +1132,12 @@ def crawlArtist(directory):
             logger_decisions.error(final_song_list[s]['albumInfo'])
             logger_decisions.error('----------------------------------------')
         vid = list()
-        with open(directory + '/uniquelist.txt', 'wb') as f:
-			pickle.dump(final_song_list, f)
+        if(IsIncremental == 0):
+            with open(directory + '/uniquelist.txt', 'wb') as f:
+			    pickle.dump(final_song_list, f)
+        else:
+            with open(directory + '/uniquelist_incr.txt', 'wb') as f:
+			    pickle.dump(final_song_list, f)
         parallel_songs_list = []
         finalsongs = final_song_list.values()
         for s in finalsongs:
@@ -1123,14 +1162,31 @@ def crawlArtist(directory):
             
         t1=time.time()
         print len(parallel_songs_list)
-        with open(directory + '/songslist.txt', 'wb') as f:
-			pickle.dump(parallel_songs_list, f)
+        if(IsIncremental == 0):
+            with open(directory + '/songslist.txt', 'wb') as f:
+			    pickle.dump(parallel_songs_list, f)
+        else:
+            with open(directory + '/songslist_incr.txt', 'wb') as f:
+			    pickle.dump(parallel_songs_list, f)
     except Exception, e:
         logger_error.exception(e)
 
-
+def GetKeyFromSong(song):
+    keySong = song['name'].lower()
+    keySong = keySong + "," + song['artistName']
+    if(len(song['featArtists'])!= 0):
+        temp_str = ','.join(song['featArtists'])
+        keySong = keySong + "," +temp_str.lower()
+    KeySong = keySong.strip()
+    return KeySong
 
 ''' Incremental Functions '''
+def GetSongsFromFullList(songs_details):
+    full_songs_list = {}
+    for song in songs_details:
+        keySong = GetKeyFromSong(song)
+        full_songs_list[keySong] = song
+    return full_songs_list
 
 def GetChangedFiles(directory,times):
     changed_files = []
@@ -1144,12 +1200,12 @@ def GetChangedFiles(directory,times):
             changed_files.append(fileName)
     print changed_files
 
-
 reload(sys)
 sys.setdefaultencoding('utf8')
 filenameList = []
 t1 = time.time()
-print sys.argv
+IsIncremental = int(sys.argv[1])
+prev_time = int(sys.argv[2])
 if(len(sys.argv) > 0):
     # second and third arguments are for the incremental option and the previous time.
     filenameList = sys.argv[3:]
