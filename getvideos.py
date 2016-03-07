@@ -854,8 +854,9 @@ t1=datetime.now()
 				foldlist.append(strg)'''
 IsIncremental = int(sys.argv[-1])
 if(len(sys.argv) > 0):
-    foldlist = sys.argv[1:len(sys.argv)-2]
+    foldlist = sys.argv[1:len(sys.argv)-1]
     print foldlist
+print 'IsIncremental'
 print IsIncremental
 
 for fl in foldlist:
@@ -891,8 +892,14 @@ for fl in foldlist:
         print "Hits:"+str(hits)+" Misses:"+str(misses)
         if(IsIncremental == 0):
             write(vid,fl+"/dump")
+            with open(fl + '/last_full_part2.txt', 'wb') as f1:
+                f1.write(str(int(t1)))
+                f1.close()
         else:
             write(vid,fl+"/dump_incr")
+            with open(fl + '/last_incr_part2.txt', 'wb') as f1:
+                f1.write(str(int(t1)))
+                f1.close()
 
     except Exception as e:
             logger_error.exception(e)

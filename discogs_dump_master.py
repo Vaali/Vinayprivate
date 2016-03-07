@@ -1163,11 +1163,20 @@ def crawlArtist(directory):
         t1=time.time()
         print len(parallel_songs_list)
         if(IsIncremental == 0):
+            with open(directory + '/last_full_part1.txt', 'wb') as f1:
+                f1.write(str(int(t1)))
+                f1.close()
             with open(directory + '/songslist.txt', 'wb') as f:
-			    pickle.dump(parallel_songs_list, f)
+                pickle.dump(parallel_songs_list, f)
+                f.close()
         else:
+            print "incremental"
             with open(directory + '/songslist_incr.txt', 'wb') as f:
-			    pickle.dump(parallel_songs_list, f)
+                pickle.dump(parallel_songs_list, f)
+                f.close()
+            with open(directory + '/last_incr_part1.txt', 'wb') as f1:
+                f1.write(str(int(t1)))
+                f1.close()
     except Exception, e:
         logger_error.exception(e)
 

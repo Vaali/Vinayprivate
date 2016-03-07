@@ -18,17 +18,20 @@ try:
     folders = raw_input("Enter number of folders: ")
     folders = int(folders)
     m1=int(m1)
+    incr = raw_input("Isincremental : ")
+    incr = int(incr)
+    IsIncremental = incr
     directorylist = list()
-    if(os.path.exists(directory+'/lastdirecotryyoutube.txt')):
-        fread = codecs.open(directory+'/lastdirecotryyoutube.txt','r','utf-8')
+    if(os.path.exists(directory+'/lastdirectoryyoutube.txt')):
+        fread = codecs.open(directory+'/lastdirectoryyoutube.txt','r','utf-8')
         lines = fread.readlines()
         if(len(lines) > 0):
             if(lines[-1].strip() != ""):
                 lastdirectory = int(lines[-1])
         fread.close()
-        fwrite = codecs.open(directory+'/lastdirecotryyoutube.txt','a','utf-8')
+        fwrite = codecs.open(directory+'/lastdirectoryyoutube.txt','a','utf-8')
     else:
-        fwrite = codecs.open(directory+'/lastdirecotryyoutube.txt','w','utf-8')
+        fwrite = codecs.open(directory+'/lastdirectoryyoutube.txt','w','utf-8')
     
     ''' Folders list count to control the numebr of folders done'''
     for dirs in os.listdir(directory):
@@ -92,7 +95,9 @@ try:
                 last = n
             for i in foldlist[index:last]:
                 filepartition[j] = filepartition[j] + " " +i
+            filepartition[j] = filepartition[j] + " " + str(incr)
             index = last
+
         print filepartition
         logging.debug("Starting Processes:")
         while (count < len(filepartition)):
@@ -118,4 +123,3 @@ try:
 except Exception as e:
 		logging.exception(e)
 
-		
