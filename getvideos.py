@@ -893,12 +893,12 @@ for fl in foldlist:
         if(IsIncremental == 0):
             write(vid,fl+"/dump")
             with open(fl + '/last_full_part2.txt', 'wb') as f1:
-                f1.write(str(int(t1)))
+                f1.write(str(int(datetime.now())))
                 f1.close()
         else:
             write(vid,fl+"/dump_incr")
             with open(fl + '/last_incr_part2.txt', 'wb') as f1:
-                f1.write(str(int(t1)))
+                f1.write(str(int(datetime.now())))
                 f1.close()
 
     except Exception as e:

@@ -1,303 +1,1418 @@
-2015-05-30 01:11:29,923 - simple_logger - ERROR - Stage__screen
-2015-05-30 01:11:29,925 - simple_logger - ERROR - Soundtrack
-2015-05-30 01:11:29,932 - simple_logger - ERROR - Modern_classical
-2015-05-30 01:11:29,936 - simple_logger - ERROR - Modern_classical
-2015-05-30 01:11:29,940 - simple_logger - ERROR - Stage__screen
-2015-05-30 01:11:29,940 - simple_logger - ERROR - Modern_classical
-2015-05-30 01:11:29,941 - simple_logger - ERROR - Ethereal
-2015-05-30 01:11:29,941 - simple_logger - ERROR - Soundtrack
-2015-05-30 01:11:29,946 - simple_logger - ERROR - Stage__screen
-2015-05-30 01:11:29,946 - simple_logger - ERROR - Soundtrack
-2015-05-30 01:11:29,947 - simple_logger - ERROR - Contemporary_jazz
-2015-05-30 01:11:29,951 - simple_logger - ERROR - Stage__screen
-2015-05-30 01:11:29,951 - simple_logger - ERROR - Soundtrack
-2015-05-30 01:11:29,956 - simple_logger - ERROR - Stage__screen
-2015-05-30 01:11:29,956 - simple_logger - ERROR - Soundtrack
-2015-05-30 01:11:29,956 - simple_logger - ERROR - Neo-classical
-2015-05-30 01:11:29,957 - simple_logger - ERROR - Contemporary
-2015-05-30 01:11:29,961 - simple_logger - ERROR - Stage__screen
-2015-05-30 01:11:29,961 - simple_logger - ERROR - Modern_classical
-2015-05-30 01:11:29,962 - simple_logger - ERROR - Ethereal
-2015-05-30 01:11:29,962 - simple_logger - ERROR - Soundtrack
-2015-05-30 01:11:29,967 - simple_logger - ERROR - Stage__screen
-2015-05-30 01:11:29,968 - simple_logger - ERROR - Soundtrack
-2015-05-30 01:11:29,969 - simple_logger - ERROR - Jazz-funk
-2015-05-30 01:11:29,974 - simple_logger - ERROR - Stage__screen
-2015-05-30 01:11:29,975 - simple_logger - ERROR - Soundtrack
-2015-05-30 01:11:29,976 - simple_logger - ERROR - Modern_classical
-2015-05-30 01:11:29,976 - simple_logger - ERROR - Contemporary
-2015-05-30 01:11:29,981 - simple_logger - ERROR - Latin
-2015-05-30 01:11:29,981 - simple_logger - ERROR - Funk_/_soul
-2015-05-30 01:11:29,982 - simple_logger - ERROR - Stage__screen
-2015-05-30 01:11:29,983 - simple_logger - ERROR - Soundtrack
-2015-05-30 01:11:29,983 - simple_logger - ERROR - Theme
-2015-05-30 01:11:29,987 - simple_logger - ERROR - Stage__screen
-2015-05-30 01:11:29,988 - simple_logger - ERROR - Soundtrack
-2015-05-30 01:11:29,988 - simple_logger - ERROR - Jazz-funk
-2015-05-30 01:11:29,992 - simple_logger - ERROR - Latin
-2015-05-30 01:11:29,993 - simple_logger - ERROR - Funk_/_soul
-2015-05-30 01:11:29,993 - simple_logger - ERROR - Stage__screen
-2015-05-30 01:11:29,994 - simple_logger - ERROR - Soundtrack
-2015-05-30 01:11:29,995 - simple_logger - ERROR - Theme
-2015-05-30 01:11:29,999 - simple_logger - ERROR - Contemporary
-2015-05-30 01:11:30,000 - simple_logger - ERROR - Avantgarde
-2015-05-30 01:11:30,004 - simple_logger - ERROR - Contemporary
-2015-05-30 01:11:30,004 - simple_logger - ERROR - Avantgarde
-2015-05-30 01:11:30,008 - simple_logger - ERROR - Stage__screen
-2015-05-30 01:11:30,008 - simple_logger - ERROR - Soundtrack
-2015-05-30 01:11:30,009 - simple_logger - ERROR - Soul-jazz
-2015-05-30 01:11:30,009 - simple_logger - ERROR - Modern_classical
-2015-05-30 01:11:30,013 - simple_logger - ERROR - Contemporary
-2015-05-30 01:11:30,014 - simple_logger - ERROR - Avantgarde
-2015-05-30 01:11:30,019 - simple_logger - ERROR - Contemporary
-2015-05-30 01:11:30,019 - simple_logger - ERROR - Avantgarde
-2015-05-30 01:11:30,023 - simple_logger - ERROR - Stage__screen
-2015-05-30 01:11:30,024 - simple_logger - ERROR - Modern_classical
-2015-05-30 01:11:30,024 - simple_logger - ERROR - Ethereal
-2015-05-30 01:11:30,025 - simple_logger - ERROR - Soundtrack
-2015-05-30 01:11:30,031 - simple_logger - ERROR - Modern_classical
-2015-05-30 01:11:30,035 - simple_logger - ERROR - Stage__screen
-2015-05-30 01:11:30,036 - simple_logger - ERROR - Soundtrack
-2015-05-30 01:11:30,036 - simple_logger - ERROR - Jazz-funk
-2015-05-30 01:11:30,040 - simple_logger - ERROR - Stage__screen
-2015-05-30 01:11:30,040 - simple_logger - ERROR - Modern_classical
-2015-05-30 01:11:30,041 - simple_logger - ERROR - Ethereal
-2015-05-30 01:11:30,041 - simple_logger - ERROR - Soundtrack
-2015-05-30 01:11:30,047 - simple_logger - ERROR - Modern_classical
-2015-05-30 01:11:30,051 - simple_logger - ERROR - Modern_classical
-2015-05-30 01:11:30,055 - simple_logger - ERROR - Stage__screen
-2015-05-30 01:11:30,056 - simple_logger - ERROR - Soundtrack
-2015-05-30 01:11:30,056 - simple_logger - ERROR - Jazz-funk
-2015-05-30 01:11:30,061 - simple_logger - ERROR - Modern_classical
-2015-05-30 01:11:30,066 - simple_logger - ERROR - Modern_classical
-2015-05-30 01:11:30,070 - simple_logger - ERROR - Contemporary
-2015-05-30 01:11:30,071 - simple_logger - ERROR - Avantgarde
-2015-05-30 01:11:30,075 - simple_logger - ERROR - Contemporary
-2015-05-30 01:11:30,076 - simple_logger - ERROR - Avantgarde
-2015-05-30 01:11:30,079 - simple_logger - ERROR - Stage__screen
-2015-05-30 01:11:30,080 - simple_logger - ERROR - Soundtrack
-2015-05-30 01:11:30,080 - simple_logger - ERROR - Jazz-funk
-2015-05-30 01:11:30,084 - simple_logger - ERROR - Latin
-2015-05-30 01:11:30,085 - simple_logger - ERROR - Funk_/_soul
-2015-05-30 01:11:30,085 - simple_logger - ERROR - Stage__screen
-2015-05-30 01:11:30,086 - simple_logger - ERROR - Soundtrack
-2015-05-30 01:11:30,086 - simple_logger - ERROR - Theme
-2015-05-30 01:11:30,090 - simple_logger - ERROR - Stage__screen
-2015-05-30 01:11:30,091 - simple_logger - ERROR - Modern_classical
-2015-05-30 01:11:30,091 - simple_logger - ERROR - Ethereal
-2015-05-30 01:11:30,092 - simple_logger - ERROR - Soundtrack
-2015-05-30 01:11:30,097 - simple_logger - ERROR - Stage__screen
-2015-05-30 01:11:30,098 - simple_logger - ERROR - Modern_classical
-2015-05-30 01:11:30,098 - simple_logger - ERROR - Ethereal
-2015-05-30 01:11:30,099 - simple_logger - ERROR - Soundtrack
-2015-05-30 01:11:30,104 - simple_logger - ERROR - Stage__screen
-2015-05-30 01:11:30,104 - simple_logger - ERROR - Soundtrack
-2015-05-30 01:11:30,105 - simple_logger - ERROR - Soul-jazz
-2015-05-30 01:11:30,105 - simple_logger - ERROR - Modern_classical
-2015-05-30 01:11:30,108 - simple_logger - ERROR - Stage__screen
-2015-05-30 01:11:30,109 - simple_logger - ERROR - Modern_classical
-2015-05-30 01:11:30,109 - simple_logger - ERROR - Ethereal
-2015-05-30 01:11:30,110 - simple_logger - ERROR - Soundtrack
-2015-05-30 01:11:30,115 - simple_logger - ERROR - Stage__screen
-2015-05-30 01:11:30,115 - simple_logger - ERROR - Modern_classical
-2015-05-30 01:11:30,116 - simple_logger - ERROR - Ethereal
-2015-05-30 01:11:30,116 - simple_logger - ERROR - Soundtrack
-2015-05-30 01:11:30,121 - simple_logger - ERROR - Stage__screen
-2015-05-30 01:11:30,122 - simple_logger - ERROR - Modern_classical
-2015-05-30 01:11:30,122 - simple_logger - ERROR - Ethereal
-2015-05-30 01:11:30,123 - simple_logger - ERROR - Soundtrack
-2015-05-30 01:11:30,127 - simple_logger - ERROR - Contemporary
-2015-05-30 01:11:30,128 - simple_logger - ERROR - Avantgarde
-2015-05-30 01:11:30,132 - simple_logger - ERROR - Contemporary
-2015-05-30 01:11:30,133 - simple_logger - ERROR - Avantgarde
-2015-05-30 01:11:30,137 - simple_logger - ERROR - Stage__screen
-2015-05-30 01:11:30,137 - simple_logger - ERROR - Modern_classical
-2015-05-30 01:11:30,138 - simple_logger - ERROR - Ethereal
-2015-05-30 01:11:30,138 - simple_logger - ERROR - Soundtrack
-2015-05-30 01:11:30,143 - simple_logger - ERROR - Stage__screen
-2015-05-30 01:11:30,144 - simple_logger - ERROR - Modern_classical
-2015-05-30 01:11:30,144 - simple_logger - ERROR - Ethereal
-2015-05-30 01:11:30,145 - simple_logger - ERROR - Soundtrack
-2015-05-30 01:11:30,150 - simple_logger - ERROR - Stage__screen
-2015-05-30 01:11:30,150 - simple_logger - ERROR - Soundtrack
-2015-05-30 01:11:30,153 - simple_logger - ERROR - Stage__screen
-2015-05-30 01:11:30,154 - simple_logger - ERROR - Modern_classical
-2015-05-30 01:11:30,154 - simple_logger - ERROR - Ethereal
-2015-05-30 01:11:30,155 - simple_logger - ERROR - Soundtrack
-2015-05-30 01:11:30,161 - simple_logger - ERROR - Stage__screen
-2015-05-30 01:11:30,162 - simple_logger - ERROR - Soundtrack
-2015-05-30 01:11:30,163 - simple_logger - ERROR - Contemporary_jazz
-2015-05-30 01:11:30,167 - simple_logger - ERROR - Stage__screen
-2015-05-30 01:11:30,167 - simple_logger - ERROR - Modern_classical
-2015-05-30 01:11:30,168 - simple_logger - ERROR - Ethereal
-2015-05-30 01:11:30,168 - simple_logger - ERROR - Soundtrack
-2015-05-30 01:11:30,173 - simple_logger - ERROR - Stage__screen
-2015-05-30 01:11:30,174 - simple_logger - ERROR - Modern_classical
-2015-05-30 01:11:30,174 - simple_logger - ERROR - Ethereal
-2015-05-30 01:11:30,175 - simple_logger - ERROR - Soundtrack
-2015-05-30 01:11:30,182 - simple_logger - ERROR - Contemporary
-2015-05-30 01:11:30,182 - simple_logger - ERROR - Avantgarde
-2015-05-30 01:11:30,189 - simple_logger - ERROR - Stage__screen
-2015-05-30 01:11:30,190 - simple_logger - ERROR - Modern_classical
-2015-05-30 01:11:30,190 - simple_logger - ERROR - Ethereal
-2015-05-30 01:11:30,191 - simple_logger - ERROR - Soundtrack
-2015-05-30 01:11:30,196 - simple_logger - ERROR - Latin
-2015-05-30 01:11:30,196 - simple_logger - ERROR - Funk_/_soul
-2015-05-30 01:11:30,197 - simple_logger - ERROR - Stage__screen
-2015-05-30 01:11:30,197 - simple_logger - ERROR - Soundtrack
-2015-05-30 01:11:30,198 - simple_logger - ERROR - Theme
-2015-05-30 01:11:30,203 - simple_logger - ERROR - Stage__screen
-2015-05-30 01:11:30,203 - simple_logger - ERROR - Soundtrack
-2015-05-30 01:11:30,204 - simple_logger - ERROR - Soul-jazz
-2015-05-30 01:11:30,205 - simple_logger - ERROR - Score
-2015-05-30 01:11:30,209 - simple_logger - ERROR - Latin
-2015-05-30 01:11:30,209 - simple_logger - ERROR - Funk_/_soul
-2015-05-30 01:11:30,209 - simple_logger - ERROR - Stage__screen
-2015-05-30 01:11:30,210 - simple_logger - ERROR - Soundtrack
-2015-05-30 01:11:30,210 - simple_logger - ERROR - Theme
-2015-05-30 01:11:30,214 - simple_logger - ERROR - Modern_classical
-2015-05-30 01:11:30,219 - simple_logger - ERROR - Modern_classical
-2015-05-30 01:11:30,222 - simple_logger - ERROR - Stage__screen
-2015-05-30 01:11:30,223 - simple_logger - ERROR - Soundtrack
-2015-05-30 01:11:30,227 - simple_logger - ERROR - Modern_classical
-2015-05-30 01:11:30,231 - simple_logger - ERROR - Modern_classical
-2015-05-30 01:11:30,237 - simple_logger - ERROR - Stage__screen
-2015-05-30 01:11:30,237 - simple_logger - ERROR - Soundtrack
-2015-05-30 01:11:30,238 - simple_logger - ERROR - Contemporary_jazz
-2015-05-30 01:11:30,243 - simple_logger - ERROR - Stage__screen
-2015-05-30 01:11:30,243 - simple_logger - ERROR - Soundtrack
-2015-05-30 01:11:30,244 - simple_logger - ERROR - Contemporary_jazz
-2015-05-30 01:11:30,248 - simple_logger - ERROR - Stage__screen
-2015-05-30 01:11:30,249 - simple_logger - ERROR - Soundtrack
-2015-05-30 01:11:30,249 - simple_logger - ERROR - Soul-jazz
-2015-05-30 01:11:30,250 - simple_logger - ERROR - Score
-2015-05-30 01:11:30,254 - simple_logger - ERROR - Stage__screen
-2015-05-30 01:11:30,254 - simple_logger - ERROR - Modern_classical
-2015-05-30 01:11:30,254 - simple_logger - ERROR - Ethereal
-2015-05-30 01:11:30,255 - simple_logger - ERROR - Soundtrack
-2015-05-30 01:11:30,261 - simple_logger - ERROR - Modern_classical
-2015-05-30 01:11:30,265 - simple_logger - ERROR - Stage__screen
-2015-05-30 01:11:30,265 - simple_logger - ERROR - Soundtrack
-2015-05-30 01:11:30,266 - simple_logger - ERROR - Soul-jazz
-2015-05-30 01:11:30,266 - simple_logger - ERROR - Score
-2015-05-30 01:11:30,270 - simple_logger - ERROR - Stage__screen
-2015-05-30 01:11:30,270 - simple_logger - ERROR - Soundtrack
-2015-05-30 01:11:30,271 - simple_logger - ERROR - Contemporary_jazz
-2015-05-30 01:11:30,274 - simple_logger - ERROR - Stage__screen
-2015-05-30 01:11:30,274 - simple_logger - ERROR - Soundtrack
-2015-05-30 01:11:30,275 - simple_logger - ERROR - Contemporary_jazz
-2015-05-30 01:11:30,280 - simple_logger - ERROR - Contemporary
-2015-05-30 01:11:30,280 - simple_logger - ERROR - Avantgarde
-2015-05-30 01:11:30,286 - simple_logger - ERROR - Contemporary
-2015-05-30 01:11:30,286 - simple_logger - ERROR - Avantgarde
-2015-05-30 01:11:30,290 - simple_logger - ERROR - Stage__screen
-2015-05-30 01:11:30,291 - simple_logger - ERROR - Soundtrack
-2015-05-30 01:11:30,295 - simple_logger - ERROR - Stage__screen
-2015-05-30 01:11:30,296 - simple_logger - ERROR - Modern_classical
-2015-05-30 01:11:30,296 - simple_logger - ERROR - Ethereal
-2015-05-30 01:11:30,297 - simple_logger - ERROR - Soundtrack
-2015-05-30 01:11:30,302 - simple_logger - ERROR - Stage__screen
-2015-05-30 01:11:30,302 - simple_logger - ERROR - Soundtrack
-2015-05-30 01:11:30,303 - simple_logger - ERROR - Score
-2015-05-30 01:11:30,303 - simple_logger - ERROR - Contemporary
-2015-05-30 01:11:30,307 - simple_logger - ERROR - Stage__screen
-2015-05-30 01:11:30,307 - simple_logger - ERROR - Soundtrack
-2015-05-30 01:11:30,310 - simple_logger - ERROR - Latin
-2015-05-30 01:11:30,311 - simple_logger - ERROR - Funk_/_soul
-2015-05-30 01:11:30,311 - simple_logger - ERROR - Stage__screen
-2015-05-30 01:11:30,312 - simple_logger - ERROR - Soundtrack
-2015-05-30 01:11:30,312 - simple_logger - ERROR - Theme
-2015-05-30 01:11:30,316 - simple_logger - ERROR - Contemporary
-2015-05-30 01:11:30,317 - simple_logger - ERROR - Avantgarde
-2015-05-30 01:11:30,321 - simple_logger - ERROR - Contemporary
-2015-05-30 01:11:30,322 - simple_logger - ERROR - Avantgarde
-2015-05-30 01:11:30,327 - simple_logger - ERROR - Contemporary
-2015-05-30 01:11:30,327 - simple_logger - ERROR - Avantgarde
-2015-05-30 01:11:30,332 - simple_logger - ERROR - Contemporary
-2015-05-30 01:11:30,332 - simple_logger - ERROR - Avantgarde
-2015-05-30 01:11:30,336 - simple_logger - ERROR - Stage__screen
-2015-05-30 01:11:30,337 - simple_logger - ERROR - Soundtrack
-2015-05-30 01:11:30,339 - simple_logger - ERROR - Stage__screen
-2015-05-30 01:11:30,340 - simple_logger - ERROR - Modern_classical
-2015-05-30 01:11:30,340 - simple_logger - ERROR - Ethereal
-2015-05-30 01:11:30,341 - simple_logger - ERROR - Soundtrack
-2015-05-30 01:11:30,345 - simple_logger - ERROR - Modern_classical
-2015-05-30 01:11:30,350 - simple_logger - ERROR - Modern_classical
-2015-05-30 01:11:30,356 - simple_logger - ERROR - Contemporary
-2015-05-30 01:11:30,356 - simple_logger - ERROR - Avantgarde
-2015-05-30 01:11:30,362 - simple_logger - ERROR - Contemporary
-2015-05-30 01:11:30,363 - simple_logger - ERROR - Avantgarde
-2015-05-30 01:11:30,368 - simple_logger - ERROR - Stage__screen
-2015-05-30 01:11:30,370 - simple_logger - ERROR - Modern_classical
-2015-05-30 01:11:30,370 - simple_logger - ERROR - Ethereal
-2015-05-30 01:11:30,371 - simple_logger - ERROR - Soundtrack
-2015-05-30 01:11:30,378 - simple_logger - ERROR - Stage__screen
-2015-05-30 01:11:30,379 - simple_logger - ERROR - Soundtrack
-2015-05-30 01:11:30,379 - simple_logger - ERROR - Neo-classical
-2015-05-30 01:11:30,380 - simple_logger - ERROR - Contemporary
-2015-05-30 01:11:30,384 - simple_logger - ERROR - Latin
-2015-05-30 01:11:30,384 - simple_logger - ERROR - Funk_/_soul
-2015-05-30 01:11:30,385 - simple_logger - ERROR - Stage__screen
-2015-05-30 01:11:30,385 - simple_logger - ERROR - Soundtrack
-2015-05-30 01:11:30,386 - simple_logger - ERROR - Theme
-2015-05-30 01:11:30,390 - simple_logger - ERROR - Latin
-2015-05-30 01:11:30,391 - simple_logger - ERROR - Funk_/_soul
-2015-05-30 01:11:30,391 - simple_logger - ERROR - Stage__screen
-2015-05-30 01:11:30,392 - simple_logger - ERROR - Soundtrack
-2015-05-30 01:11:30,392 - simple_logger - ERROR - Theme
-2015-05-30 01:11:30,396 - simple_logger - ERROR - Latin
-2015-05-30 01:11:30,397 - simple_logger - ERROR - Funk_/_soul
-2015-05-30 01:11:30,397 - simple_logger - ERROR - Stage__screen
-2015-05-30 01:11:30,398 - simple_logger - ERROR - Soundtrack
-2015-05-30 01:11:30,398 - simple_logger - ERROR - Theme
-2015-05-30 01:11:30,402 - simple_logger - ERROR - Stage__screen
-2015-05-30 01:11:30,403 - simple_logger - ERROR - Soundtrack
-2015-05-30 01:11:30,406 - simple_logger - ERROR - Stage__screen
-2015-05-30 01:11:30,407 - simple_logger - ERROR - Soundtrack
-2015-05-30 01:11:30,407 - simple_logger - ERROR - Contemporary_jazz
-2015-05-30 01:11:30,413 - simple_logger - ERROR - Modern_classical
-2015-05-30 01:11:30,418 - simple_logger - ERROR - Modern_classical
-2015-05-30 01:11:30,423 - simple_logger - ERROR - Contemporary
-2015-05-30 01:11:30,424 - simple_logger - ERROR - Avantgarde
-2015-05-30 01:11:30,428 - simple_logger - ERROR - Contemporary
-2015-05-30 01:11:30,429 - simple_logger - ERROR - Avantgarde
-2015-05-30 01:11:30,432 - simple_logger - ERROR - Stage__screen
-2015-05-30 01:11:30,433 - simple_logger - ERROR - Soundtrack
-2015-05-30 01:11:30,433 - simple_logger - ERROR - Contemporary_jazz
-2015-05-30 01:11:30,437 - simple_logger - ERROR - Stage__screen
-2015-05-30 01:11:30,437 - simple_logger - ERROR - Soundtrack
-2015-05-30 01:11:30,438 - simple_logger - ERROR - Contemporary_jazz
-2015-05-30 01:11:30,442 - simple_logger - ERROR - Contemporary
-2015-05-30 01:11:30,442 - simple_logger - ERROR - Avantgarde
-2015-05-30 01:11:30,446 - simple_logger - ERROR - Contemporary
-2015-05-30 01:11:30,447 - simple_logger - ERROR - Avantgarde
-2015-05-30 01:11:30,451 - simple_logger - ERROR - Modern_classical
-2015-05-30 01:11:30,455 - simple_logger - ERROR - Modern_classical
-2015-05-30 01:11:30,460 - simple_logger - ERROR - Contemporary
-2015-05-30 01:11:30,461 - simple_logger - ERROR - Avantgarde
-2015-05-30 01:11:30,465 - simple_logger - ERROR - Contemporary
-2015-05-30 01:11:30,465 - simple_logger - ERROR - Avantgarde
-2015-05-30 01:11:30,470 - simple_logger - ERROR - Contemporary
-2015-05-30 01:11:30,470 - simple_logger - ERROR - Avantgarde
-2015-05-30 01:11:30,475 - simple_logger - ERROR - Contemporary
-2015-05-30 01:11:30,476 - simple_logger - ERROR - Avantgarde
-2015-05-30 01:11:30,480 - simple_logger - ERROR - Modern_classical
-2015-05-30 01:11:30,484 - simple_logger - ERROR - Modern_classical
-2015-05-30 01:11:30,488 - simple_logger - ERROR - Stage__screen
-2015-05-30 01:11:30,489 - simple_logger - ERROR - Modern_classical
-2015-05-30 01:11:30,489 - simple_logger - ERROR - Ethereal
-2015-05-30 01:11:30,490 - simple_logger - ERROR - Soundtrack
-2015-05-30 01:11:30,495 - simple_logger - ERROR - Stage__screen
-2015-05-30 01:11:30,496 - simple_logger - ERROR - Soundtrack
-2015-05-30 01:11:30,500 - simple_logger - ERROR - Contemporary
-2015-05-30 01:11:30,501 - simple_logger - ERROR - Avantgarde
-2015-05-30 01:11:30,506 - simple_logger - ERROR - Contemporary
-2015-05-30 01:11:30,507 - simple_logger - ERROR - Avantgarde
-2015-05-30 01:11:30,510 - simple_logger - ERROR - Stage__screen
-2015-05-30 01:11:30,510 - simple_logger - ERROR - Soundtrack
-2015-05-30 01:11:30,511 - simple_logger - ERROR - Neo-classical
-2015-05-30 01:11:30,511 - simple_logger - ERROR - Contemporary
-2015-05-30 01:11:30,516 - simple_logger - ERROR - Stage__screen
-2015-05-30 01:11:30,517 - simple_logger - ERROR - Soundtrack
-2015-05-30 01:11:30,518 - simple_logger - ERROR - Modern_classical
-2015-05-30 01:11:30,518 - simple_logger - ERROR - Contemporary
+2016-03-09 01:11:22,778 - root - ERROR - 'style'
+Traceback (most recent call last):
+  File "generatexmls_discogs.py", line 839, in generatexmls
+    style = v['style']
+KeyError: 'style'
+2016-03-09 01:13:44,781 - simple_logger - ERROR - Pop
+2016-03-09 01:13:44,789 - simple_logger - ERROR - Pop
+2016-03-09 01:13:44,793 - simple_logger - ERROR - Pop
+2016-03-09 01:13:44,796 - simple_logger - ERROR - Pop
+2016-03-09 01:13:44,803 - simple_logger - ERROR - Pop
+2016-03-09 01:13:44,809 - simple_logger - ERROR - Pop
+2016-03-09 01:13:44,812 - simple_logger - ERROR - Pop
+2016-03-09 01:13:44,832 - simple_logger - ERROR - Pop
+2016-03-09 01:13:44,847 - simple_logger - ERROR - Pop
+2016-03-09 01:13:44,861 - simple_logger - ERROR - Pop
+2016-03-09 01:13:44,865 - simple_logger - ERROR - Pop
+2016-03-09 01:13:44,876 - simple_logger - ERROR - Pop
+2016-03-09 01:13:44,884 - simple_logger - ERROR - Pop
+2016-03-09 01:13:44,896 - simple_logger - ERROR - Pop
+2016-03-09 01:13:44,900 - simple_logger - ERROR - Pop
+2016-03-09 01:13:44,910 - simple_logger - ERROR - Pop
+2016-03-09 01:13:44,917 - simple_logger - ERROR - Pop
+2016-03-09 01:13:44,940 - simple_logger - ERROR - Pop
+2016-03-09 01:13:44,962 - simple_logger - ERROR - Pop
+2016-03-09 01:13:44,969 - simple_logger - ERROR - Pop
+2016-03-09 01:13:44,978 - simple_logger - ERROR - Pop
+2016-03-09 01:13:44,983 - simple_logger - ERROR - Pop
+2016-03-09 01:13:44,987 - simple_logger - ERROR - Pop
+2016-03-09 01:13:44,991 - simple_logger - ERROR - Pop
+2016-03-09 01:13:44,998 - simple_logger - ERROR - Pop
+2016-03-09 01:13:45,004 - simple_logger - ERROR - Pop
+2016-03-09 01:13:45,007 - simple_logger - ERROR - Pop
+2016-03-09 01:13:45,011 - simple_logger - ERROR - Pop
+2016-03-09 01:13:45,017 - simple_logger - ERROR - Pop
+2016-03-09 01:13:45,021 - simple_logger - ERROR - Pop
+2016-03-09 01:13:45,048 - simple_logger - ERROR - Pop
+2016-03-09 01:13:45,056 - simple_logger - ERROR - Pop
+2016-03-09 01:13:45,076 - simple_logger - ERROR - Pop
+2016-03-09 01:13:45,082 - simple_logger - ERROR - Pop
+2016-03-09 01:13:45,085 - simple_logger - ERROR - Pop
+2016-03-09 01:13:45,091 - simple_logger - ERROR - Pop
+2016-03-09 01:13:45,098 - simple_logger - ERROR - Pop
+2016-03-09 01:13:45,105 - simple_logger - ERROR - Pop
+2016-03-09 01:13:45,114 - simple_logger - ERROR - Pop
+2016-03-09 01:13:45,117 - simple_logger - ERROR - Pop
+2016-03-09 01:13:45,130 - simple_logger - ERROR - Pop
+2016-03-09 01:13:45,136 - simple_logger - ERROR - Pop
+2016-03-09 01:13:45,142 - simple_logger - ERROR - Pop
+2016-03-09 01:13:45,145 - simple_logger - ERROR - Pop
+2016-03-09 01:13:45,151 - simple_logger - ERROR - Pop
+2016-03-09 01:13:45,157 - simple_logger - ERROR - Pop
+2016-03-09 01:13:45,164 - simple_logger - ERROR - Pop
+2016-03-09 01:13:45,176 - simple_logger - ERROR - Pop
+2016-03-09 01:13:45,182 - simple_logger - ERROR - Pop
+2016-03-09 01:13:45,189 - simple_logger - ERROR - Pop
+2016-03-09 01:13:45,192 - simple_logger - ERROR - Pop
+2016-03-09 01:13:45,196 - simple_logger - ERROR - Pop
+2016-03-09 01:13:45,200 - simple_logger - ERROR - Pop
+2016-03-09 01:13:45,207 - simple_logger - ERROR - Pop
+2016-03-09 01:13:45,219 - simple_logger - ERROR - Pop
+2016-03-09 01:13:45,233 - simple_logger - ERROR - Pop
+2016-03-09 01:13:45,240 - simple_logger - ERROR - Pop
+2016-03-09 01:13:45,252 - simple_logger - ERROR - Pop
+2016-03-09 01:13:45,261 - simple_logger - ERROR - Pop
+2016-03-09 01:13:45,268 - simple_logger - ERROR - Pop
+2016-03-09 01:13:45,274 - simple_logger - ERROR - Pop
+2016-03-09 01:13:45,281 - simple_logger - ERROR - Pop
+2016-03-09 01:13:45,285 - simple_logger - ERROR - Pop
+2016-03-09 01:13:45,295 - simple_logger - ERROR - Pop
+2016-03-09 01:13:45,301 - simple_logger - ERROR - Pop
+2016-03-09 01:13:45,308 - simple_logger - ERROR - Pop
+2016-03-09 01:13:45,321 - simple_logger - ERROR - Pop
+2016-03-09 01:13:45,325 - simple_logger - ERROR - Pop
+2016-03-09 01:13:45,331 - simple_logger - ERROR - Pop
+2016-03-09 01:13:45,348 - simple_logger - ERROR - Pop
+2016-03-09 01:13:45,352 - simple_logger - ERROR - Pop
+2016-03-09 01:13:45,361 - simple_logger - ERROR - Pop
+2016-03-09 01:13:45,365 - simple_logger - ERROR - Pop
+2016-03-09 01:13:45,381 - simple_logger - ERROR - Pop
+2016-03-09 01:13:45,390 - simple_logger - ERROR - Pop
+2016-03-09 01:13:45,397 - simple_logger - ERROR - Pop
+2016-03-09 01:13:45,403 - simple_logger - ERROR - Pop
+2016-03-09 01:13:45,409 - simple_logger - ERROR - Pop
+2016-03-09 01:13:45,412 - simple_logger - ERROR - Pop
+2016-03-09 01:13:45,422 - simple_logger - ERROR - Pop
+2016-03-09 01:13:45,425 - simple_logger - ERROR - Pop
+2016-03-09 01:13:45,435 - simple_logger - ERROR - Pop
+2016-03-09 01:13:45,438 - simple_logger - ERROR - Pop
+2016-03-09 01:13:45,453 - simple_logger - ERROR - Pop
+2016-03-09 01:13:45,468 - simple_logger - ERROR - Pop
+2016-03-09 01:13:45,486 - simple_logger - ERROR - Pop
+2016-03-09 01:13:45,494 - simple_logger - ERROR - Pop
+2016-03-09 01:13:45,504 - simple_logger - ERROR - Pop
+2016-03-09 01:13:45,507 - simple_logger - ERROR - Pop
+2016-03-09 01:13:45,517 - simple_logger - ERROR - Pop
+2016-03-09 01:13:45,521 - simple_logger - ERROR - Pop
+2016-03-09 01:13:45,546 - simple_logger - ERROR - Pop
+2016-03-09 01:13:45,553 - simple_logger - ERROR - Pop
+2016-03-09 01:13:45,559 - simple_logger - ERROR - Pop
+2016-03-09 01:13:45,563 - simple_logger - ERROR - Pop
+2016-03-09 01:13:45,565 - simple_logger - ERROR - Pop
+2016-03-09 01:13:45,569 - simple_logger - ERROR - Pop
+2016-03-09 01:13:45,581 - simple_logger - ERROR - Pop
+2016-03-09 01:13:45,593 - simple_logger - ERROR - Pop
+2016-03-09 01:13:45,596 - simple_logger - ERROR - Pop
+2016-03-09 01:13:45,600 - simple_logger - ERROR - Pop
+2016-03-09 01:13:45,608 - simple_logger - ERROR - Pop
+2016-03-09 01:13:45,611 - simple_logger - ERROR - Pop
+2016-03-09 23:54:05,440 - simple_logger - ERROR - Pop
+2016-03-09 23:54:05,444 - root - ERROR - 'ascii' codec can't encode character u'\xe9' in position 1: ordinal not in range(128)
+Traceback (most recent call last):
+  File "generatexmls_discogs.py", line 606, in genXML
+    oldsong = api.parse(fname)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3879, in parse
+    pretty_print=True)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 729, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 752, in exportChildren
+    outfile.write('<%ssongName>%s</%ssongName>%s' % (namespace_, self.gds_format_string(quote_xml(self.songName).encode(ExternalEncoding), input_name='songName'), namespace_, eol_))
+UnicodeEncodeError: 'ascii' codec can't encode character u'\xe9' in position 1: ordinal not in range(128)
+2016-03-09 23:54:05,451 - simple_logger - ERROR - Pop
+2016-03-09 23:54:05,456 - simple_logger - ERROR - Pop
+2016-03-09 23:54:05,460 - simple_logger - ERROR - Pop
+2016-03-09 23:54:05,469 - simple_logger - ERROR - Pop
+2016-03-09 23:54:05,478 - simple_logger - ERROR - Pop
+2016-03-09 23:54:05,482 - simple_logger - ERROR - Pop
+2016-03-09 23:54:05,506 - simple_logger - ERROR - Pop
+2016-03-09 23:54:05,527 - simple_logger - ERROR - Pop
+2016-03-09 23:54:05,546 - simple_logger - ERROR - Pop
+2016-03-09 23:54:05,552 - simple_logger - ERROR - Pop
+2016-03-09 23:54:05,568 - simple_logger - ERROR - Pop
+2016-03-09 23:54:05,571 - root - ERROR - 'ascii' codec can't encode characters in position 29-47: ordinal not in range(128)
+Traceback (most recent call last):
+  File "generatexmls_discogs.py", line 606, in genXML
+    oldsong = api.parse(fname)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3879, in parse
+    pretty_print=True)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 729, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 752, in exportChildren
+    outfile.write('<%ssongName>%s</%ssongName>%s' % (namespace_, self.gds_format_string(quote_xml(self.songName).encode(ExternalEncoding), input_name='songName'), namespace_, eol_))
+UnicodeEncodeError: 'ascii' codec can't encode characters in position 29-47: ordinal not in range(128)
+2016-03-09 23:54:05,577 - simple_logger - ERROR - Pop
+2016-03-09 23:54:05,593 - simple_logger - ERROR - Pop
+2016-03-09 23:54:05,599 - simple_logger - ERROR - Pop
+2016-03-09 23:54:05,612 - simple_logger - ERROR - Pop
+2016-03-09 23:54:05,621 - simple_logger - ERROR - Pop
+2016-03-09 23:54:05,641 - root - ERROR - 'ascii' codec can't encode characters in position 23-24: ordinal not in range(128)
+Traceback (most recent call last):
+  File "generatexmls_discogs.py", line 606, in genXML
+    oldsong = api.parse(fname)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3879, in parse
+    pretty_print=True)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 729, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 755, in exportChildren
+    outfile.write('<%syoutubeName>%s</%syoutubeName>%s' % (namespace_, self.gds_format_string(quote_xml(self.youtubeName).encode(ExternalEncoding), input_name='youtubeName'), namespace_, eol_))
+UnicodeEncodeError: 'ascii' codec can't encode characters in position 23-24: ordinal not in range(128)
+2016-03-09 23:54:05,650 - simple_logger - ERROR - Pop
+2016-03-09 23:54:05,680 - simple_logger - ERROR - Pop
+2016-03-09 23:54:05,688 - simple_logger - ERROR - Pop
+2016-03-09 23:54:05,701 - simple_logger - ERROR - Pop
+2016-03-09 23:54:05,708 - simple_logger - ERROR - Pop
+2016-03-09 23:54:05,713 - simple_logger - ERROR - Pop
+2016-03-09 23:54:05,718 - simple_logger - ERROR - Pop
+2016-03-09 23:54:05,720 - root - ERROR - 'ascii' codec can't encode character u'\xe9' in position 1: ordinal not in range(128)
+Traceback (most recent call last):
+  File "generatexmls_discogs.py", line 606, in genXML
+    oldsong = api.parse(fname)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3879, in parse
+    pretty_print=True)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 729, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 752, in exportChildren
+    outfile.write('<%ssongName>%s</%ssongName>%s' % (namespace_, self.gds_format_string(quote_xml(self.songName).encode(ExternalEncoding), input_name='songName'), namespace_, eol_))
+UnicodeEncodeError: 'ascii' codec can't encode character u'\xe9' in position 1: ordinal not in range(128)
+2016-03-09 23:54:05,725 - simple_logger - ERROR - Pop
+2016-03-09 23:54:05,733 - simple_logger - ERROR - Pop
+2016-03-09 23:54:05,738 - simple_logger - ERROR - Pop
+2016-03-09 23:54:05,743 - simple_logger - ERROR - Pop
+2016-03-09 23:54:05,751 - simple_logger - ERROR - Pop
+2016-03-09 23:54:05,755 - simple_logger - ERROR - Pop
+2016-03-09 23:54:05,783 - simple_logger - ERROR - Pop
+2016-03-09 23:54:05,792 - simple_logger - ERROR - Pop
+2016-03-09 23:54:05,817 - simple_logger - ERROR - Pop
+2016-03-09 23:54:05,825 - simple_logger - ERROR - Pop
+2016-03-09 23:54:05,829 - simple_logger - ERROR - Pop
+2016-03-09 23:54:05,836 - simple_logger - ERROR - Pop
+2016-03-09 23:54:05,844 - simple_logger - ERROR - Pop
+2016-03-09 23:54:05,855 - simple_logger - ERROR - Pop
+2016-03-09 23:54:05,867 - simple_logger - ERROR - Pop
+2016-03-09 23:54:05,871 - simple_logger - ERROR - Pop
+2016-03-09 23:54:05,887 - simple_logger - ERROR - Pop
+2016-03-09 23:54:05,896 - simple_logger - ERROR - Pop
+2016-03-09 23:54:05,904 - simple_logger - ERROR - Pop
+2016-03-09 23:54:05,908 - simple_logger - ERROR - Pop
+2016-03-09 23:54:05,917 - simple_logger - ERROR - Pop
+2016-03-09 23:54:05,925 - simple_logger - ERROR - Pop
+2016-03-09 23:54:05,934 - simple_logger - ERROR - Pop
+2016-03-09 23:54:05,960 - simple_logger - ERROR - Pop
+2016-03-09 23:54:05,969 - simple_logger - ERROR - Pop
+2016-03-09 23:54:05,977 - simple_logger - ERROR - Pop
+2016-03-09 23:54:05,982 - simple_logger - ERROR - Pop
+2016-03-09 23:54:05,987 - simple_logger - ERROR - Pop
+2016-03-09 23:54:05,989 - root - ERROR - 'ascii' codec can't encode characters in position 16-26: ordinal not in range(128)
+Traceback (most recent call last):
+  File "generatexmls_discogs.py", line 606, in genXML
+    oldsong = api.parse(fname)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3879, in parse
+    pretty_print=True)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 729, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 752, in exportChildren
+    outfile.write('<%ssongName>%s</%ssongName>%s' % (namespace_, self.gds_format_string(quote_xml(self.songName).encode(ExternalEncoding), input_name='songName'), namespace_, eol_))
+UnicodeEncodeError: 'ascii' codec can't encode characters in position 16-26: ordinal not in range(128)
+2016-03-09 23:54:05,990 - simple_logger - ERROR - Pop
+2016-03-09 23:54:05,998 - simple_logger - ERROR - Pop
+2016-03-09 23:54:06,014 - simple_logger - ERROR - Pop
+2016-03-09 23:54:06,033 - simple_logger - ERROR - Pop
+2016-03-09 23:54:06,040 - simple_logger - ERROR - Pop
+2016-03-09 23:54:06,053 - simple_logger - ERROR - Pop
+2016-03-09 23:54:06,065 - simple_logger - ERROR - Pop
+2016-03-09 23:54:06,073 - simple_logger - ERROR - Pop
+2016-03-09 23:54:06,082 - simple_logger - ERROR - Pop
+2016-03-09 23:54:06,083 - root - ERROR - 'ascii' codec can't encode characters in position 16-27: ordinal not in range(128)
+Traceback (most recent call last):
+  File "generatexmls_discogs.py", line 606, in genXML
+    oldsong = api.parse(fname)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3879, in parse
+    pretty_print=True)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 729, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 752, in exportChildren
+    outfile.write('<%ssongName>%s</%ssongName>%s' % (namespace_, self.gds_format_string(quote_xml(self.songName).encode(ExternalEncoding), input_name='songName'), namespace_, eol_))
+UnicodeEncodeError: 'ascii' codec can't encode characters in position 16-27: ordinal not in range(128)
+2016-03-09 23:54:06,088 - simple_logger - ERROR - Pop
+2016-03-09 23:54:06,093 - simple_logger - ERROR - Pop
+2016-03-09 23:54:06,105 - simple_logger - ERROR - Pop
+2016-03-09 23:54:06,114 - simple_logger - ERROR - Pop
+2016-03-09 23:54:06,116 - root - ERROR - 'ascii' codec can't encode character u'\xe9' in position 1: ordinal not in range(128)
+Traceback (most recent call last):
+  File "generatexmls_discogs.py", line 606, in genXML
+    oldsong = api.parse(fname)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3879, in parse
+    pretty_print=True)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 729, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 752, in exportChildren
+    outfile.write('<%ssongName>%s</%ssongName>%s' % (namespace_, self.gds_format_string(quote_xml(self.songName).encode(ExternalEncoding), input_name='songName'), namespace_, eol_))
+UnicodeEncodeError: 'ascii' codec can't encode character u'\xe9' in position 1: ordinal not in range(128)
+2016-03-09 23:54:06,120 - simple_logger - ERROR - Pop
+2016-03-09 23:54:06,138 - simple_logger - ERROR - Pop
+2016-03-09 23:54:06,143 - simple_logger - ERROR - Pop
+2016-03-09 23:54:06,144 - root - ERROR - 'ascii' codec can't encode character u'\xe9' in position 1: ordinal not in range(128)
+Traceback (most recent call last):
+  File "generatexmls_discogs.py", line 606, in genXML
+    oldsong = api.parse(fname)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3879, in parse
+    pretty_print=True)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 729, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 752, in exportChildren
+    outfile.write('<%ssongName>%s</%ssongName>%s' % (namespace_, self.gds_format_string(quote_xml(self.songName).encode(ExternalEncoding), input_name='songName'), namespace_, eol_))
+UnicodeEncodeError: 'ascii' codec can't encode character u'\xe9' in position 1: ordinal not in range(128)
+2016-03-09 23:54:06,149 - simple_logger - ERROR - Pop
+2016-03-09 23:54:06,171 - simple_logger - ERROR - Pop
+2016-03-09 23:54:06,176 - simple_logger - ERROR - Pop
+2016-03-09 23:54:06,189 - simple_logger - ERROR - Pop
+2016-03-09 23:54:06,193 - simple_logger - ERROR - Pop
+2016-03-09 23:54:06,215 - simple_logger - ERROR - Pop
+2016-03-09 23:54:06,228 - simple_logger - ERROR - Pop
+2016-03-09 23:54:06,237 - simple_logger - ERROR - Pop
+2016-03-09 23:54:06,245 - simple_logger - ERROR - Pop
+2016-03-09 23:54:06,253 - simple_logger - ERROR - Pop
+2016-03-09 23:54:06,258 - simple_logger - ERROR - Pop
+2016-03-09 23:54:06,270 - simple_logger - ERROR - Pop
+2016-03-09 23:54:06,275 - simple_logger - ERROR - Pop
+2016-03-09 23:54:06,287 - simple_logger - ERROR - Pop
+2016-03-09 23:54:06,292 - simple_logger - ERROR - Pop
+2016-03-09 23:54:06,311 - simple_logger - ERROR - Pop
+2016-03-09 23:54:06,312 - root - ERROR - 'ascii' codec can't encode character u'\u2013' in position 22: ordinal not in range(128)
+Traceback (most recent call last):
+  File "generatexmls_discogs.py", line 606, in genXML
+    oldsong = api.parse(fname)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3879, in parse
+    pretty_print=True)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 729, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 755, in exportChildren
+    outfile.write('<%syoutubeName>%s</%syoutubeName>%s' % (namespace_, self.gds_format_string(quote_xml(self.youtubeName).encode(ExternalEncoding), input_name='youtubeName'), namespace_, eol_))
+UnicodeEncodeError: 'ascii' codec can't encode character u'\u2013' in position 22: ordinal not in range(128)
+2016-03-09 23:54:06,329 - simple_logger - ERROR - Pop
+2016-03-09 23:54:06,353 - simple_logger - ERROR - Pop
+2016-03-09 23:54:06,364 - simple_logger - ERROR - Pop
+2016-03-09 23:54:06,376 - simple_logger - ERROR - Pop
+2016-03-09 23:54:06,380 - simple_logger - ERROR - Pop
+2016-03-09 23:54:06,394 - simple_logger - ERROR - Pop
+2016-03-09 23:54:06,398 - simple_logger - ERROR - Pop
+2016-03-09 23:54:06,430 - simple_logger - ERROR - Pop
+2016-03-09 23:54:06,438 - simple_logger - ERROR - Pop
+2016-03-09 23:54:06,448 - simple_logger - ERROR - Pop
+2016-03-09 23:54:06,452 - simple_logger - ERROR - Pop
+2016-03-09 23:54:06,456 - simple_logger - ERROR - Pop
+2016-03-09 23:54:06,460 - simple_logger - ERROR - Pop
+2016-03-09 23:54:06,476 - simple_logger - ERROR - Pop
+2016-03-09 23:54:06,492 - simple_logger - ERROR - Pop
+2016-03-09 23:54:06,497 - simple_logger - ERROR - Pop
+2016-03-09 23:54:06,501 - simple_logger - ERROR - Pop
+2016-03-09 23:54:06,511 - simple_logger - ERROR - Pop
+2016-03-09 23:54:06,514 - simple_logger - ERROR - Pop
+2016-03-09 23:54:06,516 - root - ERROR - 'ascii' codec can't encode character u'\xe9' in position 1: ordinal not in range(128)
+Traceback (most recent call last):
+  File "generatexmls_discogs.py", line 606, in genXML
+    oldsong = api.parse(fname)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3879, in parse
+    pretty_print=True)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 729, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 752, in exportChildren
+    outfile.write('<%ssongName>%s</%ssongName>%s' % (namespace_, self.gds_format_string(quote_xml(self.songName).encode(ExternalEncoding), input_name='songName'), namespace_, eol_))
+UnicodeEncodeError: 'ascii' codec can't encode character u'\xe9' in position 1: ordinal not in range(128)
+2016-03-09 23:54:06,579 - root - ERROR - 'ascii' codec can't encode characters in position 0-4: ordinal not in range(128)
+Traceback (most recent call last):
+  File "generatexmls_discogs.py", line 606, in genXML
+    oldsong = api.parse(fname)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3879, in parse
+    pretty_print=True)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 729, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 815, in exportChildren
+    self.albumList.export(outfile, level, namespace_, name_='albumList', pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3064, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3077, in exportChildren
+    album_.export(outfile, level, namespace_, name_='album', pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3170, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3184, in exportChildren
+    outfile.write('<%salbumName>%s</%salbumName>%s' % (namespace_, self.gds_format_string(quote_xml(self.albumName).encode(ExternalEncoding), input_name='albumName'), namespace_, eol_))
+UnicodeEncodeError: 'ascii' codec can't encode characters in position 0-4: ordinal not in range(128)
+2016-03-09 23:54:06,582 - root - ERROR - 'ascii' codec can't encode characters in position 0-4: ordinal not in range(128)
+Traceback (most recent call last):
+  File "generatexmls_discogs.py", line 606, in genXML
+    oldsong = api.parse(fname)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3879, in parse
+    pretty_print=True)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 729, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 815, in exportChildren
+    self.albumList.export(outfile, level, namespace_, name_='albumList', pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3064, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3077, in exportChildren
+    album_.export(outfile, level, namespace_, name_='album', pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3170, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3184, in exportChildren
+    outfile.write('<%salbumName>%s</%salbumName>%s' % (namespace_, self.gds_format_string(quote_xml(self.albumName).encode(ExternalEncoding), input_name='albumName'), namespace_, eol_))
+UnicodeEncodeError: 'ascii' codec can't encode characters in position 0-4: ordinal not in range(128)
+2016-03-09 23:54:06,584 - root - ERROR - 'ascii' codec can't encode characters in position 0-4: ordinal not in range(128)
+Traceback (most recent call last):
+  File "generatexmls_discogs.py", line 606, in genXML
+    oldsong = api.parse(fname)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3879, in parse
+    pretty_print=True)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 729, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 815, in exportChildren
+    self.albumList.export(outfile, level, namespace_, name_='albumList', pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3064, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3077, in exportChildren
+    album_.export(outfile, level, namespace_, name_='album', pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3170, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3184, in exportChildren
+    outfile.write('<%salbumName>%s</%salbumName>%s' % (namespace_, self.gds_format_string(quote_xml(self.albumName).encode(ExternalEncoding), input_name='albumName'), namespace_, eol_))
+UnicodeEncodeError: 'ascii' codec can't encode characters in position 0-4: ordinal not in range(128)
+2016-03-09 23:54:06,591 - root - ERROR - 'ascii' codec can't encode characters in position 0-4: ordinal not in range(128)
+Traceback (most recent call last):
+  File "generatexmls_discogs.py", line 606, in genXML
+    oldsong = api.parse(fname)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3879, in parse
+    pretty_print=True)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 729, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 815, in exportChildren
+    self.albumList.export(outfile, level, namespace_, name_='albumList', pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3064, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3077, in exportChildren
+    album_.export(outfile, level, namespace_, name_='album', pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3170, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3184, in exportChildren
+    outfile.write('<%salbumName>%s</%salbumName>%s' % (namespace_, self.gds_format_string(quote_xml(self.albumName).encode(ExternalEncoding), input_name='albumName'), namespace_, eol_))
+UnicodeEncodeError: 'ascii' codec can't encode characters in position 0-4: ordinal not in range(128)
+2016-03-09 23:54:06,593 - root - ERROR - 'ascii' codec can't encode character u'\xe1' in position 30: ordinal not in range(128)
+Traceback (most recent call last):
+  File "generatexmls_discogs.py", line 606, in genXML
+    oldsong = api.parse(fname)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3879, in parse
+    pretty_print=True)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 729, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 755, in exportChildren
+    outfile.write('<%syoutubeName>%s</%syoutubeName>%s' % (namespace_, self.gds_format_string(quote_xml(self.youtubeName).encode(ExternalEncoding), input_name='youtubeName'), namespace_, eol_))
+UnicodeEncodeError: 'ascii' codec can't encode character u'\xe1' in position 30: ordinal not in range(128)
+2016-03-09 23:54:06,595 - root - ERROR - 'ascii' codec can't encode characters in position 0-4: ordinal not in range(128)
+Traceback (most recent call last):
+  File "generatexmls_discogs.py", line 606, in genXML
+    oldsong = api.parse(fname)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3879, in parse
+    pretty_print=True)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 729, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 815, in exportChildren
+    self.albumList.export(outfile, level, namespace_, name_='albumList', pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3064, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3077, in exportChildren
+    album_.export(outfile, level, namespace_, name_='album', pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3170, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3184, in exportChildren
+    outfile.write('<%salbumName>%s</%salbumName>%s' % (namespace_, self.gds_format_string(quote_xml(self.albumName).encode(ExternalEncoding), input_name='albumName'), namespace_, eol_))
+UnicodeEncodeError: 'ascii' codec can't encode characters in position 0-4: ordinal not in range(128)
+2016-03-09 23:54:06,598 - root - ERROR - 'ascii' codec can't encode characters in position 0-4: ordinal not in range(128)
+Traceback (most recent call last):
+  File "generatexmls_discogs.py", line 606, in genXML
+    oldsong = api.parse(fname)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3879, in parse
+    pretty_print=True)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 729, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 815, in exportChildren
+    self.albumList.export(outfile, level, namespace_, name_='albumList', pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3064, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3077, in exportChildren
+    album_.export(outfile, level, namespace_, name_='album', pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3170, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3184, in exportChildren
+    outfile.write('<%salbumName>%s</%salbumName>%s' % (namespace_, self.gds_format_string(quote_xml(self.albumName).encode(ExternalEncoding), input_name='albumName'), namespace_, eol_))
+UnicodeEncodeError: 'ascii' codec can't encode characters in position 0-4: ordinal not in range(128)
+2016-03-09 23:54:06,601 - root - ERROR - 'ascii' codec can't encode characters in position 0-4: ordinal not in range(128)
+Traceback (most recent call last):
+  File "generatexmls_discogs.py", line 606, in genXML
+    oldsong = api.parse(fname)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3879, in parse
+    pretty_print=True)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 729, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 815, in exportChildren
+    self.albumList.export(outfile, level, namespace_, name_='albumList', pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3064, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3077, in exportChildren
+    album_.export(outfile, level, namespace_, name_='album', pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3170, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3184, in exportChildren
+    outfile.write('<%salbumName>%s</%salbumName>%s' % (namespace_, self.gds_format_string(quote_xml(self.albumName).encode(ExternalEncoding), input_name='albumName'), namespace_, eol_))
+UnicodeEncodeError: 'ascii' codec can't encode characters in position 0-4: ordinal not in range(128)
+2016-03-09 23:54:06,603 - root - ERROR - 'ascii' codec can't encode characters in position 0-4: ordinal not in range(128)
+Traceback (most recent call last):
+  File "generatexmls_discogs.py", line 606, in genXML
+    oldsong = api.parse(fname)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3879, in parse
+    pretty_print=True)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 729, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 815, in exportChildren
+    self.albumList.export(outfile, level, namespace_, name_='albumList', pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3064, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3077, in exportChildren
+    album_.export(outfile, level, namespace_, name_='album', pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3170, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3184, in exportChildren
+    outfile.write('<%salbumName>%s</%salbumName>%s' % (namespace_, self.gds_format_string(quote_xml(self.albumName).encode(ExternalEncoding), input_name='albumName'), namespace_, eol_))
+UnicodeEncodeError: 'ascii' codec can't encode characters in position 0-4: ordinal not in range(128)
+2016-03-09 23:54:06,605 - root - ERROR - 'ascii' codec can't encode characters in position 0-4: ordinal not in range(128)
+Traceback (most recent call last):
+  File "generatexmls_discogs.py", line 606, in genXML
+    oldsong = api.parse(fname)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3879, in parse
+    pretty_print=True)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 729, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 815, in exportChildren
+    self.albumList.export(outfile, level, namespace_, name_='albumList', pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3064, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3077, in exportChildren
+    album_.export(outfile, level, namespace_, name_='album', pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3170, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3184, in exportChildren
+    outfile.write('<%salbumName>%s</%salbumName>%s' % (namespace_, self.gds_format_string(quote_xml(self.albumName).encode(ExternalEncoding), input_name='albumName'), namespace_, eol_))
+UnicodeEncodeError: 'ascii' codec can't encode characters in position 0-4: ordinal not in range(128)
+2016-03-09 23:54:06,608 - root - ERROR - 'ascii' codec can't encode characters in position 0-4: ordinal not in range(128)
+Traceback (most recent call last):
+  File "generatexmls_discogs.py", line 606, in genXML
+    oldsong = api.parse(fname)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3879, in parse
+    pretty_print=True)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 729, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 815, in exportChildren
+    self.albumList.export(outfile, level, namespace_, name_='albumList', pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3064, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3077, in exportChildren
+    album_.export(outfile, level, namespace_, name_='album', pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3170, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3184, in exportChildren
+    outfile.write('<%salbumName>%s</%salbumName>%s' % (namespace_, self.gds_format_string(quote_xml(self.albumName).encode(ExternalEncoding), input_name='albumName'), namespace_, eol_))
+UnicodeEncodeError: 'ascii' codec can't encode characters in position 0-4: ordinal not in range(128)
+2016-03-09 23:54:06,619 - root - ERROR - 'ascii' codec can't encode characters in position 0-4: ordinal not in range(128)
+Traceback (most recent call last):
+  File "generatexmls_discogs.py", line 606, in genXML
+    oldsong = api.parse(fname)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3879, in parse
+    pretty_print=True)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 729, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 815, in exportChildren
+    self.albumList.export(outfile, level, namespace_, name_='albumList', pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3064, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3077, in exportChildren
+    album_.export(outfile, level, namespace_, name_='album', pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3170, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3184, in exportChildren
+    outfile.write('<%salbumName>%s</%salbumName>%s' % (namespace_, self.gds_format_string(quote_xml(self.albumName).encode(ExternalEncoding), input_name='albumName'), namespace_, eol_))
+UnicodeEncodeError: 'ascii' codec can't encode characters in position 0-4: ordinal not in range(128)
+2016-03-09 23:54:06,625 - root - ERROR - 'ascii' codec can't encode characters in position 0-4: ordinal not in range(128)
+Traceback (most recent call last):
+  File "generatexmls_discogs.py", line 606, in genXML
+    oldsong = api.parse(fname)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3879, in parse
+    pretty_print=True)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 729, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 815, in exportChildren
+    self.albumList.export(outfile, level, namespace_, name_='albumList', pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3064, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3077, in exportChildren
+    album_.export(outfile, level, namespace_, name_='album', pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3170, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3184, in exportChildren
+    outfile.write('<%salbumName>%s</%salbumName>%s' % (namespace_, self.gds_format_string(quote_xml(self.albumName).encode(ExternalEncoding), input_name='albumName'), namespace_, eol_))
+UnicodeEncodeError: 'ascii' codec can't encode characters in position 0-4: ordinal not in range(128)
+2016-03-09 23:54:06,628 - root - ERROR - 'ascii' codec can't encode characters in position 0-4: ordinal not in range(128)
+Traceback (most recent call last):
+  File "generatexmls_discogs.py", line 606, in genXML
+    oldsong = api.parse(fname)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3879, in parse
+    pretty_print=True)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 729, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 815, in exportChildren
+    self.albumList.export(outfile, level, namespace_, name_='albumList', pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3064, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3077, in exportChildren
+    album_.export(outfile, level, namespace_, name_='album', pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3170, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3184, in exportChildren
+    outfile.write('<%salbumName>%s</%salbumName>%s' % (namespace_, self.gds_format_string(quote_xml(self.albumName).encode(ExternalEncoding), input_name='albumName'), namespace_, eol_))
+UnicodeEncodeError: 'ascii' codec can't encode characters in position 0-4: ordinal not in range(128)
+2016-03-09 23:54:06,631 - root - ERROR - 'ascii' codec can't encode characters in position 0-4: ordinal not in range(128)
+Traceback (most recent call last):
+  File "generatexmls_discogs.py", line 606, in genXML
+    oldsong = api.parse(fname)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3879, in parse
+    pretty_print=True)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 729, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 815, in exportChildren
+    self.albumList.export(outfile, level, namespace_, name_='albumList', pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3064, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3077, in exportChildren
+    album_.export(outfile, level, namespace_, name_='album', pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3170, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3184, in exportChildren
+    outfile.write('<%salbumName>%s</%salbumName>%s' % (namespace_, self.gds_format_string(quote_xml(self.albumName).encode(ExternalEncoding), input_name='albumName'), namespace_, eol_))
+UnicodeEncodeError: 'ascii' codec can't encode characters in position 0-4: ordinal not in range(128)
+2016-03-09 23:54:06,633 - root - ERROR - 'ascii' codec can't encode characters in position 0-4: ordinal not in range(128)
+Traceback (most recent call last):
+  File "generatexmls_discogs.py", line 606, in genXML
+    oldsong = api.parse(fname)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3879, in parse
+    pretty_print=True)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 729, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 815, in exportChildren
+    self.albumList.export(outfile, level, namespace_, name_='albumList', pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3064, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3077, in exportChildren
+    album_.export(outfile, level, namespace_, name_='album', pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3170, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3184, in exportChildren
+    outfile.write('<%salbumName>%s</%salbumName>%s' % (namespace_, self.gds_format_string(quote_xml(self.albumName).encode(ExternalEncoding), input_name='albumName'), namespace_, eol_))
+UnicodeEncodeError: 'ascii' codec can't encode characters in position 0-4: ordinal not in range(128)
+2016-03-09 23:54:06,636 - root - ERROR - 'ascii' codec can't encode characters in position 0-4: ordinal not in range(128)
+Traceback (most recent call last):
+  File "generatexmls_discogs.py", line 606, in genXML
+    oldsong = api.parse(fname)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3879, in parse
+    pretty_print=True)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 729, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 815, in exportChildren
+    self.albumList.export(outfile, level, namespace_, name_='albumList', pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3064, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3077, in exportChildren
+    album_.export(outfile, level, namespace_, name_='album', pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3170, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3184, in exportChildren
+    outfile.write('<%salbumName>%s</%salbumName>%s' % (namespace_, self.gds_format_string(quote_xml(self.albumName).encode(ExternalEncoding), input_name='albumName'), namespace_, eol_))
+UnicodeEncodeError: 'ascii' codec can't encode characters in position 0-4: ordinal not in range(128)
+2016-03-09 23:54:06,638 - root - ERROR - 'ascii' codec can't encode characters in position 0-4: ordinal not in range(128)
+Traceback (most recent call last):
+  File "generatexmls_discogs.py", line 606, in genXML
+    oldsong = api.parse(fname)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3879, in parse
+    pretty_print=True)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 729, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 815, in exportChildren
+    self.albumList.export(outfile, level, namespace_, name_='albumList', pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3064, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3077, in exportChildren
+    album_.export(outfile, level, namespace_, name_='album', pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3170, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3184, in exportChildren
+    outfile.write('<%salbumName>%s</%salbumName>%s' % (namespace_, self.gds_format_string(quote_xml(self.albumName).encode(ExternalEncoding), input_name='albumName'), namespace_, eol_))
+UnicodeEncodeError: 'ascii' codec can't encode characters in position 0-4: ordinal not in range(128)
+2016-03-09 23:54:06,641 - root - ERROR - 'ascii' codec can't encode characters in position 0-4: ordinal not in range(128)
+Traceback (most recent call last):
+  File "generatexmls_discogs.py", line 606, in genXML
+    oldsong = api.parse(fname)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3879, in parse
+    pretty_print=True)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 729, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 815, in exportChildren
+    self.albumList.export(outfile, level, namespace_, name_='albumList', pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3064, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3077, in exportChildren
+    album_.export(outfile, level, namespace_, name_='album', pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3170, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3184, in exportChildren
+    outfile.write('<%salbumName>%s</%salbumName>%s' % (namespace_, self.gds_format_string(quote_xml(self.albumName).encode(ExternalEncoding), input_name='albumName'), namespace_, eol_))
+UnicodeEncodeError: 'ascii' codec can't encode characters in position 0-4: ordinal not in range(128)
+2016-03-09 23:54:06,644 - root - ERROR - 'ascii' codec can't encode characters in position 0-4: ordinal not in range(128)
+Traceback (most recent call last):
+  File "generatexmls_discogs.py", line 606, in genXML
+    oldsong = api.parse(fname)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3879, in parse
+    pretty_print=True)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 729, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 815, in exportChildren
+    self.albumList.export(outfile, level, namespace_, name_='albumList', pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3064, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3077, in exportChildren
+    album_.export(outfile, level, namespace_, name_='album', pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3170, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3184, in exportChildren
+    outfile.write('<%salbumName>%s</%salbumName>%s' % (namespace_, self.gds_format_string(quote_xml(self.albumName).encode(ExternalEncoding), input_name='albumName'), namespace_, eol_))
+UnicodeEncodeError: 'ascii' codec can't encode characters in position 0-4: ordinal not in range(128)
+2016-03-09 23:54:06,647 - root - ERROR - 'ascii' codec can't encode characters in position 0-4: ordinal not in range(128)
+Traceback (most recent call last):
+  File "generatexmls_discogs.py", line 606, in genXML
+    oldsong = api.parse(fname)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3879, in parse
+    pretty_print=True)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 729, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 815, in exportChildren
+    self.albumList.export(outfile, level, namespace_, name_='albumList', pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3064, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3077, in exportChildren
+    album_.export(outfile, level, namespace_, name_='album', pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3170, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3184, in exportChildren
+    outfile.write('<%salbumName>%s</%salbumName>%s' % (namespace_, self.gds_format_string(quote_xml(self.albumName).encode(ExternalEncoding), input_name='albumName'), namespace_, eol_))
+UnicodeEncodeError: 'ascii' codec can't encode characters in position 0-4: ordinal not in range(128)
+2016-03-09 23:54:06,650 - root - ERROR - 'ascii' codec can't encode characters in position 0-4: ordinal not in range(128)
+Traceback (most recent call last):
+  File "generatexmls_discogs.py", line 606, in genXML
+    oldsong = api.parse(fname)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3879, in parse
+    pretty_print=True)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 729, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 815, in exportChildren
+    self.albumList.export(outfile, level, namespace_, name_='albumList', pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3064, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3077, in exportChildren
+    album_.export(outfile, level, namespace_, name_='album', pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3170, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3184, in exportChildren
+    outfile.write('<%salbumName>%s</%salbumName>%s' % (namespace_, self.gds_format_string(quote_xml(self.albumName).encode(ExternalEncoding), input_name='albumName'), namespace_, eol_))
+UnicodeEncodeError: 'ascii' codec can't encode characters in position 0-4: ordinal not in range(128)
+2016-03-09 23:54:06,653 - root - ERROR - 'ascii' codec can't encode characters in position 0-4: ordinal not in range(128)
+Traceback (most recent call last):
+  File "generatexmls_discogs.py", line 606, in genXML
+    oldsong = api.parse(fname)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3879, in parse
+    pretty_print=True)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 729, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 815, in exportChildren
+    self.albumList.export(outfile, level, namespace_, name_='albumList', pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3064, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3077, in exportChildren
+    album_.export(outfile, level, namespace_, name_='album', pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3170, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3184, in exportChildren
+    outfile.write('<%salbumName>%s</%salbumName>%s' % (namespace_, self.gds_format_string(quote_xml(self.albumName).encode(ExternalEncoding), input_name='albumName'), namespace_, eol_))
+UnicodeEncodeError: 'ascii' codec can't encode characters in position 0-4: ordinal not in range(128)
+2016-03-09 23:54:06,655 - root - ERROR - 'ascii' codec can't encode characters in position 0-4: ordinal not in range(128)
+Traceback (most recent call last):
+  File "generatexmls_discogs.py", line 606, in genXML
+    oldsong = api.parse(fname)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3879, in parse
+    pretty_print=True)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 729, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 815, in exportChildren
+    self.albumList.export(outfile, level, namespace_, name_='albumList', pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3064, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3077, in exportChildren
+    album_.export(outfile, level, namespace_, name_='album', pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3170, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3184, in exportChildren
+    outfile.write('<%salbumName>%s</%salbumName>%s' % (namespace_, self.gds_format_string(quote_xml(self.albumName).encode(ExternalEncoding), input_name='albumName'), namespace_, eol_))
+UnicodeEncodeError: 'ascii' codec can't encode characters in position 0-4: ordinal not in range(128)
+2016-03-09 23:54:06,657 - root - ERROR - 'ascii' codec can't encode characters in position 0-4: ordinal not in range(128)
+Traceback (most recent call last):
+  File "generatexmls_discogs.py", line 606, in genXML
+    oldsong = api.parse(fname)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3879, in parse
+    pretty_print=True)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 729, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 815, in exportChildren
+    self.albumList.export(outfile, level, namespace_, name_='albumList', pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3064, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3077, in exportChildren
+    album_.export(outfile, level, namespace_, name_='album', pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3170, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3184, in exportChildren
+    outfile.write('<%salbumName>%s</%salbumName>%s' % (namespace_, self.gds_format_string(quote_xml(self.albumName).encode(ExternalEncoding), input_name='albumName'), namespace_, eol_))
+UnicodeEncodeError: 'ascii' codec can't encode characters in position 0-4: ordinal not in range(128)
+2016-03-09 23:54:06,660 - root - ERROR - 'ascii' codec can't encode characters in position 0-4: ordinal not in range(128)
+Traceback (most recent call last):
+  File "generatexmls_discogs.py", line 606, in genXML
+    oldsong = api.parse(fname)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3879, in parse
+    pretty_print=True)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 729, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 815, in exportChildren
+    self.albumList.export(outfile, level, namespace_, name_='albumList', pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3064, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3077, in exportChildren
+    album_.export(outfile, level, namespace_, name_='album', pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3170, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3184, in exportChildren
+    outfile.write('<%salbumName>%s</%salbumName>%s' % (namespace_, self.gds_format_string(quote_xml(self.albumName).encode(ExternalEncoding), input_name='albumName'), namespace_, eol_))
+UnicodeEncodeError: 'ascii' codec can't encode characters in position 0-4: ordinal not in range(128)
+2016-03-09 23:54:06,663 - root - ERROR - 'ascii' codec can't encode characters in position 0-4: ordinal not in range(128)
+Traceback (most recent call last):
+  File "generatexmls_discogs.py", line 606, in genXML
+    oldsong = api.parse(fname)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3879, in parse
+    pretty_print=True)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 729, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 815, in exportChildren
+    self.albumList.export(outfile, level, namespace_, name_='albumList', pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3064, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3077, in exportChildren
+    album_.export(outfile, level, namespace_, name_='album', pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3170, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3184, in exportChildren
+    outfile.write('<%salbumName>%s</%salbumName>%s' % (namespace_, self.gds_format_string(quote_xml(self.albumName).encode(ExternalEncoding), input_name='albumName'), namespace_, eol_))
+UnicodeEncodeError: 'ascii' codec can't encode characters in position 0-4: ordinal not in range(128)
+2016-03-09 23:54:06,665 - root - ERROR - 'ascii' codec can't encode characters in position 0-4: ordinal not in range(128)
+Traceback (most recent call last):
+  File "generatexmls_discogs.py", line 606, in genXML
+    oldsong = api.parse(fname)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3879, in parse
+    pretty_print=True)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 729, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 815, in exportChildren
+    self.albumList.export(outfile, level, namespace_, name_='albumList', pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3064, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3077, in exportChildren
+    album_.export(outfile, level, namespace_, name_='album', pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3170, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3184, in exportChildren
+    outfile.write('<%salbumName>%s</%salbumName>%s' % (namespace_, self.gds_format_string(quote_xml(self.albumName).encode(ExternalEncoding), input_name='albumName'), namespace_, eol_))
+UnicodeEncodeError: 'ascii' codec can't encode characters in position 0-4: ordinal not in range(128)
+2016-03-09 23:54:06,668 - root - ERROR - 'ascii' codec can't encode characters in position 0-4: ordinal not in range(128)
+Traceback (most recent call last):
+  File "generatexmls_discogs.py", line 606, in genXML
+    oldsong = api.parse(fname)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3879, in parse
+    pretty_print=True)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 729, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 815, in exportChildren
+    self.albumList.export(outfile, level, namespace_, name_='albumList', pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3064, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3077, in exportChildren
+    album_.export(outfile, level, namespace_, name_='album', pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3170, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3184, in exportChildren
+    outfile.write('<%salbumName>%s</%salbumName>%s' % (namespace_, self.gds_format_string(quote_xml(self.albumName).encode(ExternalEncoding), input_name='albumName'), namespace_, eol_))
+UnicodeEncodeError: 'ascii' codec can't encode characters in position 0-4: ordinal not in range(128)
+2016-03-09 23:54:06,674 - root - ERROR - 'ascii' codec can't encode characters in position 0-4: ordinal not in range(128)
+Traceback (most recent call last):
+  File "generatexmls_discogs.py", line 606, in genXML
+    oldsong = api.parse(fname)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3879, in parse
+    pretty_print=True)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 729, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 815, in exportChildren
+    self.albumList.export(outfile, level, namespace_, name_='albumList', pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3064, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3077, in exportChildren
+    album_.export(outfile, level, namespace_, name_='album', pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3170, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3184, in exportChildren
+    outfile.write('<%salbumName>%s</%salbumName>%s' % (namespace_, self.gds_format_string(quote_xml(self.albumName).encode(ExternalEncoding), input_name='albumName'), namespace_, eol_))
+UnicodeEncodeError: 'ascii' codec can't encode characters in position 0-4: ordinal not in range(128)
+2016-03-09 23:54:06,676 - root - ERROR - 'ascii' codec can't encode characters in position 0-4: ordinal not in range(128)
+Traceback (most recent call last):
+  File "generatexmls_discogs.py", line 606, in genXML
+    oldsong = api.parse(fname)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3879, in parse
+    pretty_print=True)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 729, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 815, in exportChildren
+    self.albumList.export(outfile, level, namespace_, name_='albumList', pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3064, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3077, in exportChildren
+    album_.export(outfile, level, namespace_, name_='album', pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3170, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3184, in exportChildren
+    outfile.write('<%salbumName>%s</%salbumName>%s' % (namespace_, self.gds_format_string(quote_xml(self.albumName).encode(ExternalEncoding), input_name='albumName'), namespace_, eol_))
+UnicodeEncodeError: 'ascii' codec can't encode characters in position 0-4: ordinal not in range(128)
+2016-03-09 23:54:06,681 - root - ERROR - 'ascii' codec can't encode character u'\u266b' in position 0: ordinal not in range(128)
+Traceback (most recent call last):
+  File "generatexmls_discogs.py", line 606, in genXML
+    oldsong = api.parse(fname)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3879, in parse
+    pretty_print=True)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 729, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 755, in exportChildren
+    outfile.write('<%syoutubeName>%s</%syoutubeName>%s' % (namespace_, self.gds_format_string(quote_xml(self.youtubeName).encode(ExternalEncoding), input_name='youtubeName'), namespace_, eol_))
+UnicodeEncodeError: 'ascii' codec can't encode character u'\u266b' in position 0: ordinal not in range(128)
+2016-03-09 23:54:06,683 - root - ERROR - 'ascii' codec can't encode characters in position 0-4: ordinal not in range(128)
+Traceback (most recent call last):
+  File "generatexmls_discogs.py", line 606, in genXML
+    oldsong = api.parse(fname)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3879, in parse
+    pretty_print=True)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 729, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 815, in exportChildren
+    self.albumList.export(outfile, level, namespace_, name_='albumList', pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3064, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3077, in exportChildren
+    album_.export(outfile, level, namespace_, name_='album', pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3170, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3184, in exportChildren
+    outfile.write('<%salbumName>%s</%salbumName>%s' % (namespace_, self.gds_format_string(quote_xml(self.albumName).encode(ExternalEncoding), input_name='albumName'), namespace_, eol_))
+UnicodeEncodeError: 'ascii' codec can't encode characters in position 0-4: ordinal not in range(128)
+2016-03-09 23:54:06,686 - root - ERROR - 'ascii' codec can't encode characters in position 0-4: ordinal not in range(128)
+Traceback (most recent call last):
+  File "generatexmls_discogs.py", line 606, in genXML
+    oldsong = api.parse(fname)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3879, in parse
+    pretty_print=True)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 729, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 815, in exportChildren
+    self.albumList.export(outfile, level, namespace_, name_='albumList', pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3064, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3077, in exportChildren
+    album_.export(outfile, level, namespace_, name_='album', pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3170, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3184, in exportChildren
+    outfile.write('<%salbumName>%s</%salbumName>%s' % (namespace_, self.gds_format_string(quote_xml(self.albumName).encode(ExternalEncoding), input_name='albumName'), namespace_, eol_))
+UnicodeEncodeError: 'ascii' codec can't encode characters in position 0-4: ordinal not in range(128)
+2016-03-09 23:54:06,688 - root - ERROR - 'ascii' codec can't encode characters in position 0-4: ordinal not in range(128)
+Traceback (most recent call last):
+  File "generatexmls_discogs.py", line 606, in genXML
+    oldsong = api.parse(fname)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3879, in parse
+    pretty_print=True)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 729, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 815, in exportChildren
+    self.albumList.export(outfile, level, namespace_, name_='albumList', pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3064, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3077, in exportChildren
+    album_.export(outfile, level, namespace_, name_='album', pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3170, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3184, in exportChildren
+    outfile.write('<%salbumName>%s</%salbumName>%s' % (namespace_, self.gds_format_string(quote_xml(self.albumName).encode(ExternalEncoding), input_name='albumName'), namespace_, eol_))
+UnicodeEncodeError: 'ascii' codec can't encode characters in position 0-4: ordinal not in range(128)
+2016-03-09 23:54:06,690 - root - ERROR - 'ascii' codec can't encode character u'\xbb' in position 12: ordinal not in range(128)
+Traceback (most recent call last):
+  File "generatexmls_discogs.py", line 606, in genXML
+    oldsong = api.parse(fname)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3879, in parse
+    pretty_print=True)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 729, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 755, in exportChildren
+    outfile.write('<%syoutubeName>%s</%syoutubeName>%s' % (namespace_, self.gds_format_string(quote_xml(self.youtubeName).encode(ExternalEncoding), input_name='youtubeName'), namespace_, eol_))
+UnicodeEncodeError: 'ascii' codec can't encode character u'\xbb' in position 12: ordinal not in range(128)
+2016-03-09 23:54:06,692 - root - ERROR - 'ascii' codec can't encode characters in position 0-4: ordinal not in range(128)
+Traceback (most recent call last):
+  File "generatexmls_discogs.py", line 606, in genXML
+    oldsong = api.parse(fname)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3879, in parse
+    pretty_print=True)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 729, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 815, in exportChildren
+    self.albumList.export(outfile, level, namespace_, name_='albumList', pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3064, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3077, in exportChildren
+    album_.export(outfile, level, namespace_, name_='album', pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3170, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3184, in exportChildren
+    outfile.write('<%salbumName>%s</%salbumName>%s' % (namespace_, self.gds_format_string(quote_xml(self.albumName).encode(ExternalEncoding), input_name='albumName'), namespace_, eol_))
+UnicodeEncodeError: 'ascii' codec can't encode characters in position 0-4: ordinal not in range(128)
+2016-03-09 23:54:06,694 - root - ERROR - 'ascii' codec can't encode characters in position 0-4: ordinal not in range(128)
+Traceback (most recent call last):
+  File "generatexmls_discogs.py", line 606, in genXML
+    oldsong = api.parse(fname)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3879, in parse
+    pretty_print=True)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 729, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 815, in exportChildren
+    self.albumList.export(outfile, level, namespace_, name_='albumList', pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3064, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3077, in exportChildren
+    album_.export(outfile, level, namespace_, name_='album', pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3170, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3184, in exportChildren
+    outfile.write('<%salbumName>%s</%salbumName>%s' % (namespace_, self.gds_format_string(quote_xml(self.albumName).encode(ExternalEncoding), input_name='albumName'), namespace_, eol_))
+UnicodeEncodeError: 'ascii' codec can't encode characters in position 0-4: ordinal not in range(128)
+2016-03-09 23:54:06,696 - root - ERROR - 'ascii' codec can't encode characters in position 0-4: ordinal not in range(128)
+Traceback (most recent call last):
+  File "generatexmls_discogs.py", line 606, in genXML
+    oldsong = api.parse(fname)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3879, in parse
+    pretty_print=True)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 729, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 815, in exportChildren
+    self.albumList.export(outfile, level, namespace_, name_='albumList', pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3064, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3077, in exportChildren
+    album_.export(outfile, level, namespace_, name_='album', pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3170, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3184, in exportChildren
+    outfile.write('<%salbumName>%s</%salbumName>%s' % (namespace_, self.gds_format_string(quote_xml(self.albumName).encode(ExternalEncoding), input_name='albumName'), namespace_, eol_))
+UnicodeEncodeError: 'ascii' codec can't encode characters in position 0-4: ordinal not in range(128)
+2016-03-09 23:54:06,698 - root - ERROR - 'ascii' codec can't encode characters in position 0-4: ordinal not in range(128)
+Traceback (most recent call last):
+  File "generatexmls_discogs.py", line 606, in genXML
+    oldsong = api.parse(fname)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3879, in parse
+    pretty_print=True)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 729, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 815, in exportChildren
+    self.albumList.export(outfile, level, namespace_, name_='albumList', pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3064, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3077, in exportChildren
+    album_.export(outfile, level, namespace_, name_='album', pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3170, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3184, in exportChildren
+    outfile.write('<%salbumName>%s</%salbumName>%s' % (namespace_, self.gds_format_string(quote_xml(self.albumName).encode(ExternalEncoding), input_name='albumName'), namespace_, eol_))
+UnicodeEncodeError: 'ascii' codec can't encode characters in position 0-4: ordinal not in range(128)
+2016-03-09 23:54:06,701 - root - ERROR - 'ascii' codec can't encode characters in position 0-4: ordinal not in range(128)
+Traceback (most recent call last):
+  File "generatexmls_discogs.py", line 606, in genXML
+    oldsong = api.parse(fname)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3879, in parse
+    pretty_print=True)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 729, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 815, in exportChildren
+    self.albumList.export(outfile, level, namespace_, name_='albumList', pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3064, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3077, in exportChildren
+    album_.export(outfile, level, namespace_, name_='album', pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3170, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3184, in exportChildren
+    outfile.write('<%salbumName>%s</%salbumName>%s' % (namespace_, self.gds_format_string(quote_xml(self.albumName).encode(ExternalEncoding), input_name='albumName'), namespace_, eol_))
+UnicodeEncodeError: 'ascii' codec can't encode characters in position 0-4: ordinal not in range(128)
+2016-03-09 23:54:06,703 - root - ERROR - 'ascii' codec can't encode characters in position 0-4: ordinal not in range(128)
+Traceback (most recent call last):
+  File "generatexmls_discogs.py", line 606, in genXML
+    oldsong = api.parse(fname)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3879, in parse
+    pretty_print=True)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 729, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 815, in exportChildren
+    self.albumList.export(outfile, level, namespace_, name_='albumList', pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3064, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3077, in exportChildren
+    album_.export(outfile, level, namespace_, name_='album', pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3170, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3184, in exportChildren
+    outfile.write('<%salbumName>%s</%salbumName>%s' % (namespace_, self.gds_format_string(quote_xml(self.albumName).encode(ExternalEncoding), input_name='albumName'), namespace_, eol_))
+UnicodeEncodeError: 'ascii' codec can't encode characters in position 0-4: ordinal not in range(128)
+2016-03-09 23:54:06,710 - root - ERROR - 'ascii' codec can't encode characters in position 0-4: ordinal not in range(128)
+Traceback (most recent call last):
+  File "generatexmls_discogs.py", line 606, in genXML
+    oldsong = api.parse(fname)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3879, in parse
+    pretty_print=True)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 729, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 815, in exportChildren
+    self.albumList.export(outfile, level, namespace_, name_='albumList', pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3064, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3077, in exportChildren
+    album_.export(outfile, level, namespace_, name_='album', pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3170, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3184, in exportChildren
+    outfile.write('<%salbumName>%s</%salbumName>%s' % (namespace_, self.gds_format_string(quote_xml(self.albumName).encode(ExternalEncoding), input_name='albumName'), namespace_, eol_))
+UnicodeEncodeError: 'ascii' codec can't encode characters in position 0-4: ordinal not in range(128)
+2016-03-09 23:54:06,713 - root - ERROR - 'ascii' codec can't encode characters in position 0-4: ordinal not in range(128)
+Traceback (most recent call last):
+  File "generatexmls_discogs.py", line 606, in genXML
+    oldsong = api.parse(fname)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3879, in parse
+    pretty_print=True)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 729, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 815, in exportChildren
+    self.albumList.export(outfile, level, namespace_, name_='albumList', pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3064, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3077, in exportChildren
+    album_.export(outfile, level, namespace_, name_='album', pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3170, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3184, in exportChildren
+    outfile.write('<%salbumName>%s</%salbumName>%s' % (namespace_, self.gds_format_string(quote_xml(self.albumName).encode(ExternalEncoding), input_name='albumName'), namespace_, eol_))
+UnicodeEncodeError: 'ascii' codec can't encode characters in position 0-4: ordinal not in range(128)
+2016-03-09 23:54:06,714 - root - ERROR - 'ascii' codec can't encode character u'\xbb' in position 12: ordinal not in range(128)
+Traceback (most recent call last):
+  File "generatexmls_discogs.py", line 606, in genXML
+    oldsong = api.parse(fname)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3879, in parse
+    pretty_print=True)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 729, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 755, in exportChildren
+    outfile.write('<%syoutubeName>%s</%syoutubeName>%s' % (namespace_, self.gds_format_string(quote_xml(self.youtubeName).encode(ExternalEncoding), input_name='youtubeName'), namespace_, eol_))
+UnicodeEncodeError: 'ascii' codec can't encode character u'\xbb' in position 12: ordinal not in range(128)
+2016-03-09 23:54:06,724 - root - ERROR - 'ascii' codec can't encode characters in position 0-4: ordinal not in range(128)
+Traceback (most recent call last):
+  File "generatexmls_discogs.py", line 606, in genXML
+    oldsong = api.parse(fname)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3879, in parse
+    pretty_print=True)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 729, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 815, in exportChildren
+    self.albumList.export(outfile, level, namespace_, name_='albumList', pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3064, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3077, in exportChildren
+    album_.export(outfile, level, namespace_, name_='album', pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3170, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3184, in exportChildren
+    outfile.write('<%salbumName>%s</%salbumName>%s' % (namespace_, self.gds_format_string(quote_xml(self.albumName).encode(ExternalEncoding), input_name='albumName'), namespace_, eol_))
+UnicodeEncodeError: 'ascii' codec can't encode characters in position 0-4: ordinal not in range(128)
+2016-03-09 23:54:06,727 - root - ERROR - 'ascii' codec can't encode characters in position 0-4: ordinal not in range(128)
+Traceback (most recent call last):
+  File "generatexmls_discogs.py", line 606, in genXML
+    oldsong = api.parse(fname)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3879, in parse
+    pretty_print=True)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 729, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 815, in exportChildren
+    self.albumList.export(outfile, level, namespace_, name_='albumList', pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3064, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3077, in exportChildren
+    album_.export(outfile, level, namespace_, name_='album', pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3170, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3184, in exportChildren
+    outfile.write('<%salbumName>%s</%salbumName>%s' % (namespace_, self.gds_format_string(quote_xml(self.albumName).encode(ExternalEncoding), input_name='albumName'), namespace_, eol_))
+UnicodeEncodeError: 'ascii' codec can't encode characters in position 0-4: ordinal not in range(128)
+2016-03-09 23:54:06,730 - root - ERROR - 'ascii' codec can't encode characters in position 0-4: ordinal not in range(128)
+Traceback (most recent call last):
+  File "generatexmls_discogs.py", line 606, in genXML
+    oldsong = api.parse(fname)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3879, in parse
+    pretty_print=True)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 729, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 815, in exportChildren
+    self.albumList.export(outfile, level, namespace_, name_='albumList', pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3064, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3077, in exportChildren
+    album_.export(outfile, level, namespace_, name_='album', pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3170, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3184, in exportChildren
+    outfile.write('<%salbumName>%s</%salbumName>%s' % (namespace_, self.gds_format_string(quote_xml(self.albumName).encode(ExternalEncoding), input_name='albumName'), namespace_, eol_))
+UnicodeEncodeError: 'ascii' codec can't encode characters in position 0-4: ordinal not in range(128)
+2016-03-09 23:54:06,733 - root - ERROR - 'ascii' codec can't encode characters in position 0-4: ordinal not in range(128)
+Traceback (most recent call last):
+  File "generatexmls_discogs.py", line 606, in genXML
+    oldsong = api.parse(fname)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3879, in parse
+    pretty_print=True)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 729, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 815, in exportChildren
+    self.albumList.export(outfile, level, namespace_, name_='albumList', pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3064, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3077, in exportChildren
+    album_.export(outfile, level, namespace_, name_='album', pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3170, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3184, in exportChildren
+    outfile.write('<%salbumName>%s</%salbumName>%s' % (namespace_, self.gds_format_string(quote_xml(self.albumName).encode(ExternalEncoding), input_name='albumName'), namespace_, eol_))
+UnicodeEncodeError: 'ascii' codec can't encode characters in position 0-4: ordinal not in range(128)
+2016-03-09 23:54:06,735 - root - ERROR - 'ascii' codec can't encode characters in position 0-4: ordinal not in range(128)
+Traceback (most recent call last):
+  File "generatexmls_discogs.py", line 606, in genXML
+    oldsong = api.parse(fname)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3879, in parse
+    pretty_print=True)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 729, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 815, in exportChildren
+    self.albumList.export(outfile, level, namespace_, name_='albumList', pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3064, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3077, in exportChildren
+    album_.export(outfile, level, namespace_, name_='album', pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3170, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3184, in exportChildren
+    outfile.write('<%salbumName>%s</%salbumName>%s' % (namespace_, self.gds_format_string(quote_xml(self.albumName).encode(ExternalEncoding), input_name='albumName'), namespace_, eol_))
+UnicodeEncodeError: 'ascii' codec can't encode characters in position 0-4: ordinal not in range(128)
+2016-03-09 23:54:06,737 - root - ERROR - 'ascii' codec can't encode characters in position 0-4: ordinal not in range(128)
+Traceback (most recent call last):
+  File "generatexmls_discogs.py", line 606, in genXML
+    oldsong = api.parse(fname)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3879, in parse
+    pretty_print=True)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 729, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 815, in exportChildren
+    self.albumList.export(outfile, level, namespace_, name_='albumList', pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3064, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3077, in exportChildren
+    album_.export(outfile, level, namespace_, name_='album', pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3170, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3184, in exportChildren
+    outfile.write('<%salbumName>%s</%salbumName>%s' % (namespace_, self.gds_format_string(quote_xml(self.albumName).encode(ExternalEncoding), input_name='albumName'), namespace_, eol_))
+UnicodeEncodeError: 'ascii' codec can't encode characters in position 0-4: ordinal not in range(128)
+2016-03-09 23:54:06,739 - root - ERROR - 'ascii' codec can't encode characters in position 0-4: ordinal not in range(128)
+Traceback (most recent call last):
+  File "generatexmls_discogs.py", line 606, in genXML
+    oldsong = api.parse(fname)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3879, in parse
+    pretty_print=True)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 729, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 815, in exportChildren
+    self.albumList.export(outfile, level, namespace_, name_='albumList', pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3064, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3077, in exportChildren
+    album_.export(outfile, level, namespace_, name_='album', pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3170, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3184, in exportChildren
+    outfile.write('<%salbumName>%s</%salbumName>%s' % (namespace_, self.gds_format_string(quote_xml(self.albumName).encode(ExternalEncoding), input_name='albumName'), namespace_, eol_))
+UnicodeEncodeError: 'ascii' codec can't encode characters in position 0-4: ordinal not in range(128)
+2016-03-09 23:54:06,742 - root - ERROR - 'ascii' codec can't encode characters in position 0-4: ordinal not in range(128)
+Traceback (most recent call last):
+  File "generatexmls_discogs.py", line 606, in genXML
+    oldsong = api.parse(fname)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3879, in parse
+    pretty_print=True)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 729, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 815, in exportChildren
+    self.albumList.export(outfile, level, namespace_, name_='albumList', pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3064, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3077, in exportChildren
+    album_.export(outfile, level, namespace_, name_='album', pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3170, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3184, in exportChildren
+    outfile.write('<%salbumName>%s</%salbumName>%s' % (namespace_, self.gds_format_string(quote_xml(self.albumName).encode(ExternalEncoding), input_name='albumName'), namespace_, eol_))
+UnicodeEncodeError: 'ascii' codec can't encode characters in position 0-4: ordinal not in range(128)
+2016-03-09 23:54:06,751 - root - ERROR - 'ascii' codec can't encode characters in position 0-4: ordinal not in range(128)
+Traceback (most recent call last):
+  File "generatexmls_discogs.py", line 606, in genXML
+    oldsong = api.parse(fname)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3879, in parse
+    pretty_print=True)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 729, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 815, in exportChildren
+    self.albumList.export(outfile, level, namespace_, name_='albumList', pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3064, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3077, in exportChildren
+    album_.export(outfile, level, namespace_, name_='album', pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3170, in export
+    self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+  File "/Volumes/Secondone/sourcefiles/songs_api.py", line 3184, in exportChildren
+    outfile.write('<%salbumName>%s</%salbumName>%s' % (namespace_, self.gds_format_string(quote_xml(self.albumName).encode(ExternalEncoding), input_name='albumName'), namespace_, eol_))
+UnicodeEncodeError: 'ascii' codec can't encode characters in position 0-4: ordinal not in range(128)
+2016-03-09 23:59:36,083 - simple_logger - ERROR - Pop
+2016-03-09 23:59:36,103 - simple_logger - ERROR - Pop
+2016-03-09 23:59:36,113 - simple_logger - ERROR - Pop
+2016-03-09 23:59:36,122 - simple_logger - ERROR - Pop
+2016-03-09 23:59:36,140 - simple_logger - ERROR - Pop
+2016-03-09 23:59:36,159 - simple_logger - ERROR - Pop
+2016-03-09 23:59:36,167 - simple_logger - ERROR - Pop
+2016-03-09 23:59:36,221 - simple_logger - ERROR - Pop
+2016-03-09 23:59:36,265 - simple_logger - ERROR - Pop
+2016-03-09 23:59:36,300 - simple_logger - ERROR - Pop
+2016-03-09 23:59:36,310 - simple_logger - ERROR - Pop
+2016-03-09 23:59:36,339 - simple_logger - ERROR - Pop
+2016-03-09 23:59:36,359 - simple_logger - ERROR - Pop
+2016-03-09 23:59:36,394 - simple_logger - ERROR - Pop
+2016-03-09 23:59:36,404 - simple_logger - ERROR - Pop
+2016-03-09 23:59:36,431 - simple_logger - ERROR - Pop
+2016-03-09 23:59:36,449 - simple_logger - ERROR - Pop
+2016-03-09 23:59:36,511 - simple_logger - ERROR - Pop
+2016-03-09 23:59:36,573 - simple_logger - ERROR - Pop
+2016-03-09 23:59:36,590 - simple_logger - ERROR - Pop
+2016-03-09 23:59:36,617 - simple_logger - ERROR - Pop
+2016-03-09 23:59:36,634 - simple_logger - ERROR - Pop
+2016-03-09 23:59:36,644 - simple_logger - ERROR - Pop
+2016-03-09 23:59:36,654 - simple_logger - ERROR - Pop
+2016-03-09 23:59:36,672 - simple_logger - ERROR - Pop
+2016-03-09 23:59:36,690 - simple_logger - ERROR - Pop
+2016-03-09 23:59:36,698 - simple_logger - ERROR - Pop
+2016-03-09 23:59:36,707 - simple_logger - ERROR - Pop
+2016-03-09 23:59:36,725 - simple_logger - ERROR - Pop
+2016-03-09 23:59:36,735 - simple_logger - ERROR - Pop
+2016-03-09 23:59:36,797 - simple_logger - ERROR - Pop
+2016-03-09 23:59:36,814 - simple_logger - ERROR - Pop
+2016-03-09 23:59:36,866 - simple_logger - ERROR - Pop
+2016-03-09 23:59:36,884 - simple_logger - ERROR - Pop
+2016-03-09 23:59:36,893 - simple_logger - ERROR - Pop
+2016-03-09 23:59:36,910 - simple_logger - ERROR - Pop
+2016-03-09 23:59:36,930 - simple_logger - ERROR - Pop
+2016-03-09 23:59:36,948 - simple_logger - ERROR - Pop
+2016-03-09 23:59:36,975 - simple_logger - ERROR - Pop
+2016-03-09 23:59:36,984 - simple_logger - ERROR - Pop
+2016-03-09 23:59:37,019 - simple_logger - ERROR - Pop
+2016-03-09 23:59:37,038 - simple_logger - ERROR - Pop
+2016-03-09 23:59:37,057 - simple_logger - ERROR - Pop
+2016-03-09 23:59:37,066 - simple_logger - ERROR - Pop
+2016-03-09 23:59:37,084 - simple_logger - ERROR - Pop
+2016-03-09 23:59:37,102 - simple_logger - ERROR - Pop
+2016-03-09 23:59:37,122 - simple_logger - ERROR - Pop
+2016-03-09 23:59:37,158 - simple_logger - ERROR - Pop
+2016-03-09 23:59:37,174 - simple_logger - ERROR - Pop
+2016-03-09 23:59:37,193 - simple_logger - ERROR - Pop
+2016-03-09 23:59:37,202 - simple_logger - ERROR - Pop
+2016-03-09 23:59:37,211 - simple_logger - ERROR - Pop
+2016-03-09 23:59:37,220 - simple_logger - ERROR - Pop
+2016-03-09 23:59:37,239 - simple_logger - ERROR - Pop
+2016-03-09 23:59:37,273 - simple_logger - ERROR - Pop
+2016-03-09 23:59:37,317 - simple_logger - ERROR - Pop
+2016-03-09 23:59:37,335 - simple_logger - ERROR - Pop
+2016-03-09 23:59:37,361 - simple_logger - ERROR - Pop
+2016-03-09 23:59:37,387 - simple_logger - ERROR - Pop
+2016-03-09 23:59:37,405 - simple_logger - ERROR - Pop
+2016-03-09 23:59:37,423 - simple_logger - ERROR - Pop
+2016-03-09 23:59:37,444 - simple_logger - ERROR - Pop
+2016-03-09 23:59:37,454 - simple_logger - ERROR - Pop
+2016-03-09 23:59:37,483 - simple_logger - ERROR - Pop
+2016-03-09 23:59:37,502 - simple_logger - ERROR - Pop
+2016-03-09 23:59:37,522 - simple_logger - ERROR - Pop
+2016-03-09 23:59:37,560 - simple_logger - ERROR - Pop
+2016-03-09 23:59:37,569 - simple_logger - ERROR - Pop
+2016-03-09 23:59:37,589 - simple_logger - ERROR - Pop
+2016-03-09 23:59:37,640 - simple_logger - ERROR - Pop
+2016-03-09 23:59:37,650 - simple_logger - ERROR - Pop
+2016-03-09 23:59:37,678 - simple_logger - ERROR - Pop
+2016-03-09 23:59:37,687 - simple_logger - ERROR - Pop
+2016-03-09 23:59:37,740 - simple_logger - ERROR - Pop
+2016-03-09 23:59:37,767 - simple_logger - ERROR - Pop
+2016-03-09 23:59:37,786 - simple_logger - ERROR - Pop
+2016-03-09 23:59:37,804 - simple_logger - ERROR - Pop
+2016-03-09 23:59:37,822 - simple_logger - ERROR - Pop
+2016-03-09 23:59:37,832 - simple_logger - ERROR - Pop
+2016-03-09 23:59:37,859 - simple_logger - ERROR - Pop
+2016-03-09 23:59:37,868 - simple_logger - ERROR - Pop
+2016-03-09 23:59:37,896 - simple_logger - ERROR - Pop
+2016-03-09 23:59:37,904 - simple_logger - ERROR - Pop
+2016-03-09 23:59:37,949 - simple_logger - ERROR - Pop
+2016-03-09 23:59:37,993 - simple_logger - ERROR - Pop
+2016-03-09 23:59:38,046 - simple_logger - ERROR - Pop
+2016-03-09 23:59:38,071 - simple_logger - ERROR - Pop
+2016-03-09 23:59:38,099 - simple_logger - ERROR - Pop
+2016-03-09 23:59:38,108 - simple_logger - ERROR - Pop
+2016-03-09 23:59:38,137 - simple_logger - ERROR - Pop
+2016-03-09 23:59:38,147 - simple_logger - ERROR - Pop
+2016-03-09 23:59:38,221 - simple_logger - ERROR - Pop
+2016-03-09 23:59:38,239 - simple_logger - ERROR - Pop
+2016-03-09 23:59:38,257 - simple_logger - ERROR - Pop
+2016-03-09 23:59:38,267 - simple_logger - ERROR - Pop
+2016-03-09 23:59:38,276 - simple_logger - ERROR - Pop
+2016-03-09 23:59:38,287 - simple_logger - ERROR - Pop
+2016-03-09 23:59:38,331 - simple_logger - ERROR - Pop
+2016-03-09 23:59:38,369 - simple_logger - ERROR - Pop
+2016-03-09 23:59:38,378 - simple_logger - ERROR - Pop
+2016-03-09 23:59:38,388 - simple_logger - ERROR - Pop
+2016-03-09 23:59:38,408 - simple_logger - ERROR - Pop
+2016-03-09 23:59:38,417 - simple_logger - ERROR - Pop
