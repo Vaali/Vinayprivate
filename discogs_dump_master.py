@@ -318,7 +318,8 @@ def IsReleaseCollection(formats):
     
 def get_song_list(directory,songs_list,full_country_list,aliases,ear_count,ear_year,ear_rel,final_song_list,full_songs_list):
     releases_list = []
-    if(IsIncremental == 1):
+    retVal = checkpreviousfull(directory)
+    if(IsIncremental == 1 and retVal == 1):
         master_list = glob.glob(directory+"/release*.json")
         for fileName in master_list:
             if( os.path.getmtime(fileName) > prev_time):
@@ -467,7 +468,8 @@ def get_song_list_master(directory,songs_list,full_country_list,aliases,ear_coun
     releases_list = []
     global prev_time
     global IsIncremental
-    if(IsIncremental == 1):
+    retVal = checkpreviousfull(directory)
+    if(IsIncremental == 1 and retVal == 1):
         master_list = glob.glob(directory+"/master*.json")
         for fileName in master_list:
             if( os.path.getmtime(fileName) > prev_time):
@@ -913,7 +915,8 @@ def crawlArtist(directory):
         ear_conflict = False
         full_song_list = []
         ##Get the songs from the full trial
-        if(IsIncremental == 1):
+        retVal = checkpreviousfull(directory)
+        if(IsIncremental == 1 and retVal == 1):
             infile = directory + '/songslist.txt'
             try:
                 fread = open(infile,'r')
@@ -1179,6 +1182,14 @@ def crawlArtist(directory):
                 f1.close()
     except Exception, e:
         logger_error.exception(e)
+
+def checkpreviousfull(directory):
+    retVal = 0
+    #if(os.path.exists(directory+'/last_full_part1.txt')):
+    #    retVal = 1
+    if(os.path.exists(directory+'/dump')):
+        retVal = 1
+    return retVal
 
 def GetKeyFromSong(song):
     keySong = song['name'].lower()
