@@ -19,6 +19,9 @@ try:
     folders = raw_input("Enter number of folders: ")
     folders = int(folders)
     m1=int(m1)
+    incr = raw_input("Isincremental : ")
+    incr = int(incr)
+    IsIncremental = incr
     directorylist = list()
     if(os.path.exists(directory+'/lastdirectoryyoutube.txt')):
         fread = codecs.open(directory+'/lastdirectoryyoutube.txt','r','utf-8')
@@ -94,6 +97,7 @@ try:
                 last = n
             for i in foldlist[index:last]:
                 filepartition[j] = filepartition[j] + " " +i
+            filepartition[j] = filepartition[j] + " " + str(incr)
             index = last
         print filepartition
         logging.debug("Starting Processes:")

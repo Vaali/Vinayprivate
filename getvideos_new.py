@@ -7,6 +7,7 @@ import codecs
 import urllib
 from urllib2 import Request, urlopen, URLError, HTTPError
 from datetime import datetime, date, timedelta
+import time
 from multiprocessing import Pool
 import logging
 import pickle
@@ -823,16 +824,21 @@ def getYoutubeUrl(video,flag,mostpopular):
     return video,bret
 
 def callmefromanotherfile(foldlist):
-    #print 'here me'
-    #foldlist = foldlist.split()
     foldlist1 = str(foldlist).split()
+    IsIncremental = foldlist1[-1] #get the incremental flag
+    foldlist1 = foldlist1[:len(foldlist1)-1]
+    print foldlist1
+    print IsIncremental
     for fl in foldlist1:
         try:
             #print fl
             vid = list()
             misses = 0
             hits = 0
-            infile = fl + '/songslist.txt'
+            if(IsIncremental == 0):
+                infile = fl + '/songslist.txt'
+            else:
+                infile = fl + '/songslist_incr.txt'
             try:
                 fread = open(infile,'r')
             except IOError as e:
@@ -859,12 +865,22 @@ def callmefromanotherfile(foldlist):
                             #tv = collections.OrderedDict(rv.__dict__)
                             vid.append(rv.__dict__)
             print "Hits:"+str(hits)+" Misses:"+str(misses)
-            write(vid,fl+"/dump")
+            if(IsIncremental == 0):
+                write(vid,fl+"/dump")
+                with open(fl + '/last_full_part2.txt', 'wb') as f1:
+                    f1.write(str(int(time.time())))
+                    f1.close()
+            else:
+                write(vid,fl+"/dump_incr")
+                with open(fl + '/last_incr_part2.txt', 'wb') as f1:
+                    f1.write(str(int(time.time())))
+                    f1.close()
         except Exception as e:
                 print e
                 logger_error.exception(e)
 
 request_count = 0
+IsIncremental = 0
 foldlist = list()
 t1=datetime.now()
 '''for dirs in os.listdir(directory):
@@ -878,8 +894,9 @@ t1=datetime.now()
 					continue
 				strg = os.path.join(curr_dir,sd)
 				foldlist.append(strg)'''
+IsIncremental = 0 #int(sys.argv[-1])
 if(len(sys.argv) > 0):
-    foldlist = sys.argv[1:]
+    foldlist = sys.argv[1:len(sys.argv)-1]
     print foldlist
     callmefromanotherfile(foldlist)
 
