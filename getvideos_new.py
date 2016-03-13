@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import sys
+import os
 import json
 import simplejson
 import re
@@ -823,6 +824,14 @@ def getYoutubeUrl(video,flag,mostpopular):
         logger_error.exception(e)
     return video,bret
 
+def checkpreviousfull(directory):
+    retVal = 0
+    if(os.path.exists(directory+'/last_full_part2.txt')):
+        retVal = 1
+    elif(os.path.exists(directory+'/dump')):
+        retVal = 1
+    return retVal
+
 def callmefromanotherfile(foldlist):
     foldlist1 = str(foldlist).split()
     IsIncremental = foldlist1[-1] #get the incremental flag
@@ -835,7 +844,8 @@ def callmefromanotherfile(foldlist):
             vid = list()
             misses = 0
             hits = 0
-            if(IsIncremental == 0):
+            fullComplete = checkpreviousfull(fl)
+            if(IsIncremental == 0 or fullComplete == 0):
                 infile = fl + '/songslist.txt'
             else:
                 infile = fl + '/songslist_incr.txt'
