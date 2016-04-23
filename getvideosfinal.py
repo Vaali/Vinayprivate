@@ -313,6 +313,12 @@ def GetUniquesongs(songs_list,final_song_list,isMaster,same_album,ear_count,full
                                     stemp['year'] = song['year']
                                     stemp['genres'],stemp['styles']= song['genres'],song['styles']
                                     stemp['country'] = song['country']
+                                    stemp['release_Id'] = song['release_Id']
+                                    stemp['masterRelease'] = song['masterRelease']
+                                    stemp['masterGenres'] = song['masterGenres']
+                                    stemp['masterStyles'] = song['masterStyles']
+                                else:
+                                    continue
                                 if(isPresentSong == True):
                                     stemp['name'] = song['name']
                                 if('release_album' in song and song['release_album'] == True):
@@ -323,6 +329,8 @@ def GetUniquesongs(songs_list,final_song_list,isMaster,same_album,ear_count,full
                             k = 0
                             if(song['isCompilation'] == False):
                                 k = check(song['year'],stemp['year'])
+                            else:
+                                continue
                             if(k == 1):
                                 if('release_album' in song):
                                         if(isPresentSong == True):
@@ -331,6 +339,10 @@ def GetUniquesongs(songs_list,final_song_list,isMaster,same_album,ear_count,full
                                         stemp['release_album'] = song['release_album']
                                         stemp['genres'],stemp['styles']= song['genres'],song['styles']
                                         stemp['country'] = song['country']
+                                        stemp['release_Id'] = song['release_Id']
+                                        stemp['masterRelease'] = song['masterRelease']
+                                        stemp['masterGenres'] = song['masterGenres']
+                                        stemp['masterStyles'] = song['masterStyles']
                                         if('anv' in song):
                                             stemp['anv'] = song['anv']
                             if(k == 3):
@@ -338,6 +350,10 @@ def GetUniquesongs(songs_list,final_song_list,isMaster,same_album,ear_count,full
                                     stemp['year'] = song['year']
                                     stemp['genres'],stemp['styles']= song['genres'],song['styles']
                                     stemp['country'] = song['country']
+                                    stemp['release_Id'] = song['release_Id']
+                                    stemp['masterRelease'] = song['masterRelease']
+                                    stemp['masterGenres'] = song['masterGenres']
+                                    stemp['masterStyles'] = song['masterStyles']
                                     if('release_album' in song):
                                         stemp['release_album'] = song['release_album']
                                     if('anv' in song):
@@ -369,9 +385,9 @@ def get_song_list(directory,songs_list,full_country_list,aliases,ear_count,ear_y
                     releases_list.append(curr_album)'''
             releases_list.append(filename)
     for release in releases_list:
+        songs_list = []
+        Iscompilation = False
         try:
-            Iscompilation = False
-            songs_list = []
             #curr_album = release
             filename = release
             with codecs.open(filename,"r","utf-8") as input1:
@@ -411,6 +427,10 @@ def get_song_list(directory,songs_list,full_country_list,aliases,ear_count,ear_y
                 song['connectors'] = []
                 song['extraArtists'] = []
                 song['extraArtistsconnectors'] = []
+                song['release_Id'] = curr_album['release_id']
+                song['masterRelease'] = curr_album['release_id']
+                song['masterGenres'] = curr_album['genres']
+                song['masterStyles'] = curr_album['styles']
                 song['isCompilation'] = Iscompilation
                 for artist in curr_album['releaseartists']:
                     if(artist == None):
@@ -530,14 +550,14 @@ def get_song_list_master(directory,songs_list,full_country_list,aliases,ear_coun
     final_song_list = {}
     releases_list = sorted(releases_list)
     for release in releases_list:
+        release_song_list = []
+        curr_song_list =[]
+        Iscompilation  = False
         try:
-            Iscompilation  = False
             #curr_master = release
             filename = release
             with codecs.open(filename,"r","utf-8") as input1:
                 curr_master = json.load(input1)
-            release_song_list = []
-            curr_song_list =[]
             release_album = str(curr_master['main_release'])
             earlier_year_skip = False #skip for the albums which have no artist attched to them
             release_album = str(curr_master['main_release'])
@@ -590,6 +610,10 @@ def get_song_list_master(directory,songs_list,full_country_list,aliases,ear_coun
                     song['connectors'] = []
                     song['extraArtists'] = []
                     song['extraArtistsconnectors'] = []
+                    song['release_Id'] = curr_album['release_id']
+                    song['masterRelease'] = curr_master['id']
+                    song['masterGenres'] = curr_master['genres']
+                    song['masterStyles'] = curr_master['styles']
                     song['isCompilation'] = Iscompilation
                     #if unknown artist present in the list of artist,skip the album
                     bskip = False
@@ -689,7 +713,7 @@ def get_song_list_master(directory,songs_list,full_country_list,aliases,ear_coun
                             ear_conflict = False
         except Exception as e:
             logger_error.exception(e)
-        final_song_list = GetUniquesongs(release_song_list,final_song_list,True,False,ear_count,full_song_list)
+        final_song_list = GetUniquesongs(release_song_list,final_song_list,False,False,ear_count,full_song_list)
         final_song_list = GetUniquesongs(curr_song_list,final_song_list,False,True,ear_count,full_song_list)
 
     return combined_songs_list,full_country_list,aliases,ear_count,ear_year,ear_rel,ear_conflict,final_song_list
@@ -1055,6 +1079,11 @@ def getVideo(curr_elem,flag):
             video1.year = curr_elem['year']
             video1.language = 'English'
             video1.songcountry = curr_elem['songcountry']
+            video1.release_Id = curr_elem['release_Id']
+            video1.masterRelease = curr_elem['masterRelease']
+            video1.masterGenres = curr_elem['masterGenres']
+            video1.masterStyles = curr_elem['masterStyles']
+            print curr_elem['release_Id']
             if('anv' in curr_elem):
                 video1.anv = curr_elem['anv']
             if('artistalias' in curr_elem):
