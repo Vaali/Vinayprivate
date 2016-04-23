@@ -131,7 +131,7 @@ def changeName(artName):
     return " ".join(retNamewords)
      
     
-def genXML(vid,avgcnt,avgcntrece,artistId):
+def genXML(vid,avgcnt,avgcntrece,artistId,genreCountList):
     xmlpath = ""
     try:
         global opdir
@@ -253,7 +253,7 @@ def genXML(vid,avgcnt,avgcntrece,artistId):
         mysong.set_artistMatch(vid['am'])
         mysong.set_overLap(vid['match'])
         mysong.set_decision(decision)
-
+        mysong.set_genresCountList(genreCountList)
 		###adding audio details 
         '''audioList = api.soundcloudList()
 		audioDetails = api.audio()
@@ -283,21 +283,15 @@ def genXML(vid,avgcnt,avgcntrece,artistId):
         ar.set_artistPopularityRecent(avgcntrece)
         artistName = changeName(artistName)
         ar.add_artistName(artistName)
-        #print artistName
-        #if(artistName not in aliases):
-        #	aliases.append(artistName)
         iAliaslist = api.indexedArtistAliasList()
         if(len(aliases) != 0):
-			#print aliases
 			ar.set_artistAlias(aliases)
 			for alias in aliases:
 				iAliaslist.add_indexedArtistAliasName(alias)
         if('artistalias' in vid):
             aliases = vid['artistalias']
             if(len(aliases) != 0):
-                #ar.set_artistAlias(aliases)
                 for alias in aliases:
-                    #print alias
                     iAliaslist.add_indexedArtistAliasName(alias)
                     ar.add_artistAlias(alias)
         mysong.set_indexedArtistAliasList(iAliaslist)
@@ -306,12 +300,10 @@ def genXML(vid,avgcnt,avgcntrece,artistId):
         #featuring artist is a list too
         fAr = api.ftArtistList()
         fIAr = api.indexedftArtistList()
-		#print ftArtistName
         for f in ftArtistName:
             f = changeName(f)
             fAr.add_ftArtistName(f)
             fIAr.add_indexedftArtistName(f)
-            #mysong.add_ftArtistName
         mysong.set_ftArtistList(fAr)
         mysong.set_indexedftArtistList(fIAr)
 		#connector of artists is a list
@@ -371,6 +363,11 @@ def genXML(vid,avgcnt,avgcntrece,artistId):
 			vc = int(vid['viewcount'])
         else:
             vc=0
+        #master
+        if(vid.has_key('release_Id')):
+            mysong.set_releaseId(int(vid['release_Id']))
+        if(vid.has_key('masterRelease')):
+            mysong.set_masterRelease(int(vid['masterRelease']))
         mysong.set_viewcount(vc)
         mysong.set_viewCountGroup(CalculateScale(vc))
         if vid.has_key('rating'):
@@ -436,8 +433,8 @@ def genXML(vid,avgcnt,avgcntrece,artistId):
                 for gp in genre_paths:
                     sAbsolutePath = doc.getpath(gp)
                     pathList = sAbsolutePath.split('/')
-                    print pathList
-                    print len(pathList)
+                    #print pathList
+                    #print len(pathList)
                     pathlength = len(pathList)
                     for k,l in enumerate(pathList[2:]):
                         if k in genres_levels:
@@ -514,7 +511,25 @@ def genXML(vid,avgcnt,avgcntrece,artistId):
                                 genres_levels[k].append(l)
                         else:
                             genres_levels[k] = [l]'''
-        print genres_levels        
+        #print genres_levels
+        masterGenres = api.masterGenres()
+        masterStyles = api.masterStyles()
+        if('masterGenres' in vid and vid['masterGenres'] != None):
+            g = vid['masterGenres']
+            g = g.replace("\"","")
+            g = g.lower()
+            #g = g[0].upper()+g[1:]
+            g = encodexml(g)
+            masterGenres.add_genreName(g)
+        if('masterStyles' in vid and vid['masterStyles'] != None):
+            g = vid['masterStyles']
+            g = g.replace("\"","")
+            g = g.lower()
+            #g = g[0].upper()+g[1:]
+            g = encodexml(g)
+            masterStyles.add_genreName(g)
+        mysong.set_masterGenres(masterGenres)
+        mysong.set_masterStyles(masterStyles)
         for i in genres_levels:
 			if(i == 0):
 				level1Genres = api.level1Genres()
@@ -548,55 +563,11 @@ def genXML(vid,avgcnt,avgcntrece,artistId):
 					level4Genres.add_genreName(level4)
 				mysong.set_level4Genres(level4Genres)
 				continue
-			'''if(i == 4):
-				level5Genres = api.level5Genres()
-
-				for level5 in genres_levels[i]:
-					level5 = decodexml(level5)
-					level5Genres.add_genreName(level5)
-				mysong.set_level5Genres(level5Genres)
-				continue
-			if(i == 5):
-				level6Genres = api.level6Genres()
-
-				for level6 in genres_levels[i]:
-					level6 = decodexml(level6)
-					level6Genres.add_genreName(level6)
-				mysong.set_level6Genres(level6Genres)
-				continue
-			if(i == 6):
-				level7Genres = api.level7Genres()
-
-				for level7 in genres_levels[i]:
-					level7 = decodexml(level7)
-					level1Genres.add_genreName(level7)
-				mysong.set_level7Genres(level7Genres)
-				continue
-			if(i == 7):
-				level8Genres = api.level8Genres()
-
-				for level8 in genres_levels[i]:
-					level8 = decodexml(level8)
-					level8Genres.add_genreName(level8)
-				mysong.set_level8Genres(level8Genres)
-				continue
-			if(i == 8):
-				level9Genres = api.level9Genres()
-
-				for level9 in genres_levels[i]:
-					level9 = decodexml(level9)
-					level9Genres.add_genreName(level9)
-				mysong.set_level9Genres(level9Genres)'''
         #mysong.set_artist(artistName)
         mysong.set_duration(timedelta(seconds=int(vid['length'])))
         if vid.has_key('viewcountRate'):
 			mysong.set_viewcountRate(vid['viewcountRate'])
-		#idVal = url[-11:]
-		#dirtec = idVal[:8]
-		#fileN = idVal[8:]
-		#path = opdir+'/'+dirtec
         path = opdir
-        #path = opdir + '/' + str(random.randint(1, 5))
         if not os.path.exists(path):
 			os.mkdir(path)
         fname = path + "/0000" +url[-11:] + ".xml"
@@ -604,7 +575,7 @@ def genXML(vid,avgcnt,avgcntrece,artistId):
         if os.path.exists(fname):
             fr = codecs.open(fname,'r','utf-8')
             oldsong = api.parse(fname)
-            if(url[-11:].lower() == "aVIA1n5ng4Y".lower()):
+            '''if(url[-11:].lower() == "aVIA1n5ng4Y".lower()):
                 print 'hit'
                 print mysong.overLap
                 print mysong.releaseDate
@@ -615,6 +586,7 @@ def genXML(vid,avgcnt,avgcntrece,artistId):
                 print oldsong.songName
                 print oldsong.artist.artistPopularityAll
                 print 'done'
+            '''
             if(round(oldsong.totalMatch) < round(mysong.totalMatch)): 
 				#print "overwriting :"
 				#print oldsong.overLap
@@ -738,6 +710,57 @@ def CalculateAverages(directory):
 		#print averagerating
     return averageCount,averageCountRecent
 
+def GetTotalGenresCountForArtist(vids):
+    genreList = api.genresCountList()
+    genrecount = {}
+    stylecount = {}
+    TotalGenreStyleCount = 0
+    for v in vids:
+        genre = v['genres']
+        if(genre != None):
+            for g in genre:
+                g = g.replace("\"","")
+                g = g.lower()
+                if(g.strip() == ""):
+                    continue
+                TotalGenreStyleCount = TotalGenreStyleCount+1
+                if(g not in genrecount):
+                    genrecount[g] = 1
+                else:
+                    genrecount[g] = genrecount[g] + 1
+        style = v['styles']
+        if(style != None):
+            for g in style:
+                g = g.replace("\"","")
+                g = g.lower()
+                if(g.strip() == ""):
+                    continue
+                TotalGenreStyleCount = TotalGenreStyleCount + 1
+                if(g not in stylecount):
+                    stylecount[g] = 1
+                else:
+                    stylecount[g] = stylecount[g] + 1
+    print stylecount
+    print genrecount
+    print TotalGenreStyleCount
+    for genre in genrecount:
+        g = api.genresCount()
+        g.set_Genre(genre)
+        g.set_Count(genrecount[genre])
+        if(TotalGenreStyleCount != 0):
+            percent = (genrecount[genre]*100.0)/TotalGenreStyleCount
+            g.set_Percentage(percent)
+        genreList.add_genresCount(g)
+    for style in stylecount:
+        g = api.genresCount()
+        g.set_Genre(style)
+        g.set_Count(stylecount[style])
+        if(TotalGenreStyleCount != 0):
+            percent = (stylecount[style]*100.0)/TotalGenreStyleCount
+            g.set_Percentage(percent)
+        genreList.add_genresCount(g)
+    return genreList
+
 #Main starts here
 t1=datetime.now()
 #myfile = codecs.open('levels.xml','r','utf8');
@@ -820,11 +843,12 @@ def generatexmls(dirlist):
 			#continue
 			return
         artistId = directory[dindex+1:]
+        genreCountList = GetTotalGenresCountForArtist(vids)
         for v in vids:
             t3=datetime.now()
             if(int(artistId) == 194):
                 artistId = v['artist_id']
-            genXML(v,avgcnt,avgcntrece,artistId)
+            genXML(v,avgcnt,avgcntrece,artistId,genreCountList)
         #logger_finished.error('Completed for directory '+ str(directory))
     except Exception as e:
         logging.exception(e)
