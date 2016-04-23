@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 #
-# Generated Sun May 18 20:09:03 2014 by generateDS.py version 2.9a.
+# Generated Sat Apr 23 14:43:09 2016 by generateDS.py version 2.9a.
 #
 
 import sys
@@ -285,7 +285,7 @@ except ImportError, exp:
 # Globals
 #
 
-ExternalEncoding = 'utf-8'
+ExternalEncoding = 'utf8'
 Tag_pattern_ = re_.compile(r'({.*})?(.*)')
 String_cleanup_pat_ = re_.compile(r"[\n\r\s]+")
 Namespace_extract_pat_ = re_.compile(r'{(.*)}(.*)')
@@ -514,7 +514,7 @@ def _cast(typ, value):
 class songs(GeneratedsSuper):
     subclass = None
     superclass = None
-    def __init__(self, youtubeId=None, artistId=None, overLap=None, songName=None, youtubeName=None, artist=None, ftArtistList=None, indexedftArtistList=None, indexedArtistAliasList=None, connPhraseList=None, indexedArtist=None, url=None, releaseDate=None, decade=None, youtubeDate=None, crawlDate=None, viewcount=None, rating=None, level1Genres=None, level2Genres=None, level3Genres=None, level4Genres=None, level5Genres=None, level6Genres=None, level7Genres=None, level8Genres=None, level9Genres=None, albumList=None, viewcountRate=None, duration=None, descriptions=None, viewCountGroup=None, decision=None, substring_song=None, substring_artist=None, substring_ftartist=None, songLanguage=None, earliestDate=None, songCountry=None, totalMatch=None, songMatch=None, artistMatch=None, youtubeList=None):
+    def __init__(self, youtubeId=None, artistId=None, overLap=None, songName=None, youtubeName=None, artist=None, ftArtistList=None, indexedftArtistList=None, indexedArtistAliasList=None, connPhraseList=None, indexedArtist=None, url=None, releaseDate=None, decade=None, youtubeDate=None, crawlDate=None, viewcount=None, crawlDelta=None, releaseId=None, masterRelease=None, masterGenres=None, masterStyles=None, crawlHistoryList=None, genresCountList=None, rating=None, level1Genres=None, level2Genres=None, level3Genres=None, level4Genres=None, level5Genres=None, level6Genres=None, level7Genres=None, level8Genres=None, level9Genres=None, albumList=None, viewcountRate=None, duration=None, descriptions=None, viewCountGroup=None, decision=None, substring_song=None, substring_artist=None, substring_ftartist=None, songLanguage=None, earliestDate=None, songCountry=None, totalMatch=None, songMatch=None, artistMatch=None, youtubeList=None, soundcloudList=None):
         self.youtubeId = youtubeId
         self.artistId = artistId
         self.overLap = overLap
@@ -532,6 +532,13 @@ class songs(GeneratedsSuper):
         self.youtubeDate = youtubeDate
         self.crawlDate = crawlDate
         self.viewcount = viewcount
+        self.crawlDelta = crawlDelta
+        self.releaseId = releaseId
+        self.masterRelease = masterRelease
+        self.masterGenres = masterGenres
+        self.masterStyles = masterStyles
+        self.crawlHistoryList = crawlHistoryList
+        self.genresCountList = genresCountList
         self.rating = rating
         self.level1Genres = level1Genres
         self.level2Genres = level2Genres
@@ -558,6 +565,7 @@ class songs(GeneratedsSuper):
         self.songMatch = songMatch
         self.artistMatch = artistMatch
         self.youtubeList = youtubeList
+        self.soundcloudList = soundcloudList
     def factory(*args_, **kwargs_):
         if songs.subclass:
             return songs.subclass(*args_, **kwargs_)
@@ -598,6 +606,20 @@ class songs(GeneratedsSuper):
     def set_crawlDate(self, crawlDate): self.crawlDate = crawlDate
     def get_viewcount(self): return self.viewcount
     def set_viewcount(self, viewcount): self.viewcount = viewcount
+    def get_crawlDelta(self): return self.crawlDelta
+    def set_crawlDelta(self, crawlDelta): self.crawlDelta = crawlDelta
+    def get_releaseId(self): return self.releaseId
+    def set_releaseId(self, releaseId): self.releaseId = releaseId
+    def get_masterRelease(self): return self.masterRelease
+    def set_masterRelease(self, masterRelease): self.masterRelease = masterRelease
+    def get_masterGenres(self): return self.masterGenres
+    def set_masterGenres(self, masterGenres): self.masterGenres = masterGenres
+    def get_masterStyles(self): return self.masterStyles
+    def set_masterStyles(self, masterStyles): self.masterStyles = masterStyles
+    def get_crawlHistoryList(self): return self.crawlHistoryList
+    def set_crawlHistoryList(self, crawlHistoryList): self.crawlHistoryList = crawlHistoryList
+    def get_genresCountList(self): return self.genresCountList
+    def set_genresCountList(self, genresCountList): self.genresCountList = genresCountList
     def get_rating(self): return self.rating
     def set_rating(self, rating): self.rating = rating
     def get_level1Genres(self): return self.level1Genres
@@ -650,6 +672,8 @@ class songs(GeneratedsSuper):
     def set_artistMatch(self, artistMatch): self.artistMatch = artistMatch
     def get_youtubeList(self): return self.youtubeList
     def set_youtubeList(self, youtubeList): self.youtubeList = youtubeList
+    def get_soundcloudList(self): return self.soundcloudList
+    def set_soundcloudList(self, soundcloudList): self.soundcloudList = soundcloudList
     def hasContent_(self):
         if (
             self.youtubeId is not None or
@@ -669,6 +693,13 @@ class songs(GeneratedsSuper):
             self.youtubeDate is not None or
             self.crawlDate is not None or
             self.viewcount is not None or
+            self.crawlDelta is not None or
+            self.releaseId is not None or
+            self.masterRelease is not None or
+            self.masterGenres is not None or
+            self.masterStyles is not None or
+            self.crawlHistoryList is not None or
+            self.genresCountList is not None or
             self.rating is not None or
             self.level1Genres is not None or
             self.level2Genres is not None or
@@ -694,7 +725,8 @@ class songs(GeneratedsSuper):
             self.totalMatch is not None or
             self.songMatch is not None or
             self.artistMatch is not None or
-            self.youtubeList is not None
+            self.youtubeList is not None or
+            self.soundcloudList is not None
             ):
             return True
         else:
@@ -767,6 +799,23 @@ class songs(GeneratedsSuper):
         if self.viewcount is not None:
             showIndent(outfile, level, pretty_print)
             outfile.write('<%sviewcount>%s</%sviewcount>%s' % (namespace_, self.gds_format_integer(self.viewcount, input_name='viewcount'), namespace_, eol_))
+        if self.crawlDelta is not None:
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%scrawlDelta>%s</%scrawlDelta>%s' % (namespace_, self.gds_format_integer(self.crawlDelta, input_name='crawlDelta'), namespace_, eol_))
+        if self.releaseId is not None:
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sreleaseId>%s</%sreleaseId>%s' % (namespace_, self.gds_format_integer(self.releaseId, input_name='releaseId'), namespace_, eol_))
+        if self.masterRelease is not None:
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%smasterRelease>%s</%smasterRelease>%s' % (namespace_, self.gds_format_integer(self.masterRelease, input_name='masterRelease'), namespace_, eol_))
+        if self.masterGenres is not None:
+            self.masterGenres.export(outfile, level, namespace_, name_='masterGenres', pretty_print=pretty_print)
+        if self.masterStyles is not None:
+            self.masterStyles.export(outfile, level, namespace_, name_='masterStyles', pretty_print=pretty_print)
+        if self.crawlHistoryList is not None:
+            self.crawlHistoryList.export(outfile, level, namespace_, name_='crawlHistoryList', pretty_print=pretty_print)
+        if self.genresCountList is not None:
+            self.genresCountList.export(outfile, level, namespace_, name_='genresCountList', pretty_print=pretty_print)
         if self.rating is not None:
             showIndent(outfile, level, pretty_print)
             outfile.write('<%srating>%s</%srating>%s' % (namespace_, self.gds_format_float(self.rating, input_name='rating'), namespace_, eol_))
@@ -834,6 +883,8 @@ class songs(GeneratedsSuper):
             outfile.write('<%sartistMatch>%s</%sartistMatch>%s' % (namespace_, self.gds_format_float(self.artistMatch, input_name='artistMatch'), namespace_, eol_))
         if self.youtubeList is not None:
             self.youtubeList.export(outfile, level, namespace_, name_='youtubeList', pretty_print=pretty_print)
+        if self.soundcloudList is not None:
+            self.soundcloudList.export(outfile, level, namespace_, name_='soundcloudList', pretty_print=pretty_print)
     def exportLiteral(self, outfile, level, name_='songs'):
         level += 1
         already_processed = set()
@@ -912,6 +963,39 @@ class songs(GeneratedsSuper):
         if self.viewcount is not None:
             showIndent(outfile, level)
             outfile.write('viewcount=%d,\n' % self.viewcount)
+        if self.crawlDelta is not None:
+            showIndent(outfile, level)
+            outfile.write('crawlDelta=%d,\n' % self.crawlDelta)
+        if self.releaseId is not None:
+            showIndent(outfile, level)
+            outfile.write('releaseId=%d,\n' % self.releaseId)
+        if self.masterRelease is not None:
+            showIndent(outfile, level)
+            outfile.write('masterRelease=%d,\n' % self.masterRelease)
+        if self.masterGenres is not None:
+            showIndent(outfile, level)
+            outfile.write('masterGenres=model_.masterGenres(\n')
+            self.masterGenres.exportLiteral(outfile, level)
+            showIndent(outfile, level)
+            outfile.write('),\n')
+        if self.masterStyles is not None:
+            showIndent(outfile, level)
+            outfile.write('masterStyles=model_.masterStyles(\n')
+            self.masterStyles.exportLiteral(outfile, level)
+            showIndent(outfile, level)
+            outfile.write('),\n')
+        if self.crawlHistoryList is not None:
+            showIndent(outfile, level)
+            outfile.write('crawlHistoryList=model_.crawlHistoryList(\n')
+            self.crawlHistoryList.exportLiteral(outfile, level)
+            showIndent(outfile, level)
+            outfile.write('),\n')
+        if self.genresCountList is not None:
+            showIndent(outfile, level)
+            outfile.write('genresCountList=model_.genresCountList(\n')
+            self.genresCountList.exportLiteral(outfile, level)
+            showIndent(outfile, level)
+            outfile.write('),\n')
         if self.rating is not None:
             showIndent(outfile, level)
             outfile.write('rating=%f,\n' % self.rating)
@@ -1023,6 +1107,12 @@ class songs(GeneratedsSuper):
             self.youtubeList.exportLiteral(outfile, level)
             showIndent(outfile, level)
             outfile.write('),\n')
+        if self.soundcloudList is not None:
+            showIndent(outfile, level)
+            outfile.write('soundcloudList=model_.soundcloudList(\n')
+            self.soundcloudList.exportLiteral(outfile, level)
+            showIndent(outfile, level)
+            outfile.write('),\n')
     def build(self, node):
         already_processed = set()
         self.buildAttributes(node, node.attrib, already_processed)
@@ -1116,6 +1206,46 @@ class songs(GeneratedsSuper):
                 raise_parse_error(child_, 'requires integer: %s' % exp)
             ival_ = self.gds_validate_integer(ival_, node, 'viewcount')
             self.viewcount = ival_
+        elif nodeName_ == 'crawlDelta':
+            sval_ = child_.text
+            try:
+                ival_ = int(sval_)
+            except (TypeError, ValueError), exp:
+                raise_parse_error(child_, 'requires integer: %s' % exp)
+            ival_ = self.gds_validate_integer(ival_, node, 'crawlDelta')
+            self.crawlDelta = ival_
+        elif nodeName_ == 'releaseId':
+            sval_ = child_.text
+            try:
+                ival_ = int(sval_)
+            except (TypeError, ValueError), exp:
+                raise_parse_error(child_, 'requires integer: %s' % exp)
+            ival_ = self.gds_validate_integer(ival_, node, 'releaseId')
+            self.releaseId = ival_
+        elif nodeName_ == 'masterRelease':
+            sval_ = child_.text
+            try:
+                ival_ = int(sval_)
+            except (TypeError, ValueError), exp:
+                raise_parse_error(child_, 'requires integer: %s' % exp)
+            ival_ = self.gds_validate_integer(ival_, node, 'masterRelease')
+            self.masterRelease = ival_
+        elif nodeName_ == 'masterGenres':
+            obj_ = masterGenres.factory()
+            obj_.build(child_)
+            self.set_masterGenres(obj_)
+        elif nodeName_ == 'masterStyles':
+            obj_ = masterStyles.factory()
+            obj_.build(child_)
+            self.set_masterStyles(obj_)
+        elif nodeName_ == 'crawlHistoryList':
+            obj_ = crawlHistoryList.factory()
+            obj_.build(child_)
+            self.set_crawlHistoryList(obj_)
+        elif nodeName_ == 'genresCountList':
+            obj_ = genresCountList.factory()
+            obj_.build(child_)
+            self.set_genresCountList(obj_)
         elif nodeName_ == 'rating':
             sval_ = child_.text
             try:
@@ -1244,6 +1374,10 @@ class songs(GeneratedsSuper):
             obj_ = youtubeList.factory()
             obj_.build(child_)
             self.set_youtubeList(obj_)
+        elif nodeName_ == 'soundcloudList':
+            obj_ = soundcloudList.factory()
+            obj_.build(child_)
+            self.set_soundcloudList(obj_)
 # end class songs
 
 
@@ -1816,6 +1950,570 @@ class indexedArtist(GeneratedsSuper):
             indexedArtistName_ = self.gds_validate_string(indexedArtistName_, node, 'indexedArtistName')
             self.indexedArtistName.append(indexedArtistName_)
 # end class indexedArtist
+
+
+class masterGenres(GeneratedsSuper):
+    subclass = None
+    superclass = None
+    def __init__(self, genreName=None):
+        if genreName is None:
+            self.genreName = []
+        else:
+            self.genreName = genreName
+    def factory(*args_, **kwargs_):
+        if masterGenres.subclass:
+            return masterGenres.subclass(*args_, **kwargs_)
+        else:
+            return masterGenres(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_genreName(self): return self.genreName
+    def set_genreName(self, genreName): self.genreName = genreName
+    def add_genreName(self, value): self.genreName.append(value)
+    def insert_genreName(self, index, value): self.genreName[index] = value
+    def hasContent_(self):
+        if (
+            self.genreName
+            ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespace_='', name_='masterGenres', namespacedef_='', pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespace_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self.exportAttributes(outfile, level, already_processed, namespace_, name_='masterGenres')
+        if self.hasContent_():
+            outfile.write('>%s' % (eol_, ))
+            self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespace_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def exportAttributes(self, outfile, level, already_processed, namespace_='', name_='masterGenres'):
+        pass
+    def exportChildren(self, outfile, level, namespace_='', name_='masterGenres', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        for genreName_ in self.genreName:
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sgenreName>%s</%sgenreName>%s' % (namespace_, self.gds_format_string(quote_xml(genreName_).encode(ExternalEncoding), input_name='genreName'), namespace_, eol_))
+    def exportLiteral(self, outfile, level, name_='masterGenres'):
+        level += 1
+        already_processed = set()
+        self.exportLiteralAttributes(outfile, level, already_processed, name_)
+        if self.hasContent_():
+            self.exportLiteralChildren(outfile, level, name_)
+    def exportLiteralAttributes(self, outfile, level, already_processed, name_):
+        pass
+    def exportLiteralChildren(self, outfile, level, name_):
+        showIndent(outfile, level)
+        outfile.write('genreName=[\n')
+        level += 1
+        for genreName_ in self.genreName:
+            showIndent(outfile, level)
+            outfile.write('%s,\n' % quote_python(genreName_).encode(ExternalEncoding))
+        level -= 1
+        showIndent(outfile, level)
+        outfile.write('],\n')
+    def build(self, node):
+        already_processed = set()
+        self.buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self.buildChildren(child, node, nodeName_)
+    def buildAttributes(self, node, attrs, already_processed):
+        pass
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False):
+        if nodeName_ == 'genreName':
+            genreName_ = child_.text
+            genreName_ = self.gds_validate_string(genreName_, node, 'genreName')
+            self.genreName.append(genreName_)
+# end class masterGenres
+
+
+class masterStyles(GeneratedsSuper):
+    subclass = None
+    superclass = None
+    def __init__(self, genreName=None):
+        if genreName is None:
+            self.genreName = []
+        else:
+            self.genreName = genreName
+    def factory(*args_, **kwargs_):
+        if masterStyles.subclass:
+            return masterStyles.subclass(*args_, **kwargs_)
+        else:
+            return masterStyles(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_genreName(self): return self.genreName
+    def set_genreName(self, genreName): self.genreName = genreName
+    def add_genreName(self, value): self.genreName.append(value)
+    def insert_genreName(self, index, value): self.genreName[index] = value
+    def hasContent_(self):
+        if (
+            self.genreName
+            ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespace_='', name_='masterStyles', namespacedef_='', pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespace_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self.exportAttributes(outfile, level, already_processed, namespace_, name_='masterStyles')
+        if self.hasContent_():
+            outfile.write('>%s' % (eol_, ))
+            self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespace_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def exportAttributes(self, outfile, level, already_processed, namespace_='', name_='masterStyles'):
+        pass
+    def exportChildren(self, outfile, level, namespace_='', name_='masterStyles', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        for genreName_ in self.genreName:
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sgenreName>%s</%sgenreName>%s' % (namespace_, self.gds_format_string(quote_xml(genreName_).encode(ExternalEncoding), input_name='genreName'), namespace_, eol_))
+    def exportLiteral(self, outfile, level, name_='masterStyles'):
+        level += 1
+        already_processed = set()
+        self.exportLiteralAttributes(outfile, level, already_processed, name_)
+        if self.hasContent_():
+            self.exportLiteralChildren(outfile, level, name_)
+    def exportLiteralAttributes(self, outfile, level, already_processed, name_):
+        pass
+    def exportLiteralChildren(self, outfile, level, name_):
+        showIndent(outfile, level)
+        outfile.write('genreName=[\n')
+        level += 1
+        for genreName_ in self.genreName:
+            showIndent(outfile, level)
+            outfile.write('%s,\n' % quote_python(genreName_).encode(ExternalEncoding))
+        level -= 1
+        showIndent(outfile, level)
+        outfile.write('],\n')
+    def build(self, node):
+        already_processed = set()
+        self.buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self.buildChildren(child, node, nodeName_)
+    def buildAttributes(self, node, attrs, already_processed):
+        pass
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False):
+        if nodeName_ == 'genreName':
+            genreName_ = child_.text
+            genreName_ = self.gds_validate_string(genreName_, node, 'genreName')
+            self.genreName.append(genreName_)
+# end class masterStyles
+
+
+class crawlHistoryList(GeneratedsSuper):
+    subclass = None
+    superclass = None
+    def __init__(self, crawlHistory=None):
+        if crawlHistory is None:
+            self.crawlHistory = []
+        else:
+            self.crawlHistory = crawlHistory
+    def factory(*args_, **kwargs_):
+        if crawlHistoryList.subclass:
+            return crawlHistoryList.subclass(*args_, **kwargs_)
+        else:
+            return crawlHistoryList(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_crawlHistory(self): return self.crawlHistory
+    def set_crawlHistory(self, crawlHistory): self.crawlHistory = crawlHistory
+    def add_crawlHistory(self, value): self.crawlHistory.append(value)
+    def insert_crawlHistory(self, index, value): self.crawlHistory[index] = value
+    def hasContent_(self):
+        if (
+            self.crawlHistory
+            ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespace_='', name_='crawlHistoryList', namespacedef_='', pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespace_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self.exportAttributes(outfile, level, already_processed, namespace_, name_='crawlHistoryList')
+        if self.hasContent_():
+            outfile.write('>%s' % (eol_, ))
+            self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespace_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def exportAttributes(self, outfile, level, already_processed, namespace_='', name_='crawlHistoryList'):
+        pass
+    def exportChildren(self, outfile, level, namespace_='', name_='crawlHistoryList', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        for crawlHistory_ in self.crawlHistory:
+            crawlHistory_.export(outfile, level, namespace_, name_='crawlHistory', pretty_print=pretty_print)
+    def exportLiteral(self, outfile, level, name_='crawlHistoryList'):
+        level += 1
+        already_processed = set()
+        self.exportLiteralAttributes(outfile, level, already_processed, name_)
+        if self.hasContent_():
+            self.exportLiteralChildren(outfile, level, name_)
+    def exportLiteralAttributes(self, outfile, level, already_processed, name_):
+        pass
+    def exportLiteralChildren(self, outfile, level, name_):
+        showIndent(outfile, level)
+        outfile.write('crawlHistory=[\n')
+        level += 1
+        for crawlHistory_ in self.crawlHistory:
+            showIndent(outfile, level)
+            outfile.write('model_.crawlHistory(\n')
+            crawlHistory_.exportLiteral(outfile, level)
+            showIndent(outfile, level)
+            outfile.write('),\n')
+        level -= 1
+        showIndent(outfile, level)
+        outfile.write('],\n')
+    def build(self, node):
+        already_processed = set()
+        self.buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self.buildChildren(child, node, nodeName_)
+    def buildAttributes(self, node, attrs, already_processed):
+        pass
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False):
+        if nodeName_ == 'crawlHistory':
+            obj_ = crawlHistory.factory()
+            obj_.build(child_)
+            self.crawlHistory.append(obj_)
+# end class crawlHistoryList
+
+
+class crawlHistory(GeneratedsSuper):
+    subclass = None
+    superclass = None
+    def __init__(self, Views=None, Date=None, Delta=None):
+        self.Views = Views
+        self.Date = Date
+        self.Delta = Delta
+    def factory(*args_, **kwargs_):
+        if crawlHistory.subclass:
+            return crawlHistory.subclass(*args_, **kwargs_)
+        else:
+            return crawlHistory(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_Views(self): return self.Views
+    def set_Views(self, Views): self.Views = Views
+    def get_Date(self): return self.Date
+    def set_Date(self, Date): self.Date = Date
+    def get_Delta(self): return self.Delta
+    def set_Delta(self, Delta): self.Delta = Delta
+    def hasContent_(self):
+        if (
+            self.Views is not None or
+            self.Date is not None or
+            self.Delta is not None
+            ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespace_='', name_='crawlHistory', namespacedef_='', pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespace_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self.exportAttributes(outfile, level, already_processed, namespace_, name_='crawlHistory')
+        if self.hasContent_():
+            outfile.write('>%s' % (eol_, ))
+            self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespace_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def exportAttributes(self, outfile, level, already_processed, namespace_='', name_='crawlHistory'):
+        pass
+    def exportChildren(self, outfile, level, namespace_='', name_='crawlHistory', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.Views is not None:
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sViews>%s</%sViews>%s' % (namespace_, self.gds_format_integer(self.Views, input_name='Views'), namespace_, eol_))
+        if self.Date is not None:
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sDate>%s</%sDate>%s' % (namespace_, self.gds_format_string(quote_xml(self.Date).encode(ExternalEncoding), input_name='Date'), namespace_, eol_))
+        if self.Delta is not None:
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sDelta>%s</%sDelta>%s' % (namespace_, self.gds_format_integer(self.Delta, input_name='Delta'), namespace_, eol_))
+    def exportLiteral(self, outfile, level, name_='crawlHistory'):
+        level += 1
+        already_processed = set()
+        self.exportLiteralAttributes(outfile, level, already_processed, name_)
+        if self.hasContent_():
+            self.exportLiteralChildren(outfile, level, name_)
+    def exportLiteralAttributes(self, outfile, level, already_processed, name_):
+        pass
+    def exportLiteralChildren(self, outfile, level, name_):
+        if self.Views is not None:
+            showIndent(outfile, level)
+            outfile.write('Views=%d,\n' % self.Views)
+        if self.Date is not None:
+            showIndent(outfile, level)
+            outfile.write('Date=%s,\n' % quote_python(self.Date).encode(ExternalEncoding))
+        if self.Delta is not None:
+            showIndent(outfile, level)
+            outfile.write('Delta=%d,\n' % self.Delta)
+    def build(self, node):
+        already_processed = set()
+        self.buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self.buildChildren(child, node, nodeName_)
+    def buildAttributes(self, node, attrs, already_processed):
+        pass
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False):
+        if nodeName_ == 'Views':
+            sval_ = child_.text
+            try:
+                ival_ = int(sval_)
+            except (TypeError, ValueError), exp:
+                raise_parse_error(child_, 'requires integer: %s' % exp)
+            ival_ = self.gds_validate_integer(ival_, node, 'Views')
+            self.Views = ival_
+        elif nodeName_ == 'Date':
+            Date_ = child_.text
+            Date_ = self.gds_validate_string(Date_, node, 'Date')
+            self.Date = Date_
+        elif nodeName_ == 'Delta':
+            sval_ = child_.text
+            try:
+                ival_ = int(sval_)
+            except (TypeError, ValueError), exp:
+                raise_parse_error(child_, 'requires integer: %s' % exp)
+            ival_ = self.gds_validate_integer(ival_, node, 'Delta')
+            self.Delta = ival_
+# end class crawlHistory
+
+
+class genresCountList(GeneratedsSuper):
+    subclass = None
+    superclass = None
+    def __init__(self, genresCount=None):
+        if genresCount is None:
+            self.genresCount = []
+        else:
+            self.genresCount = genresCount
+    def factory(*args_, **kwargs_):
+        if genresCountList.subclass:
+            return genresCountList.subclass(*args_, **kwargs_)
+        else:
+            return genresCountList(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_genresCount(self): return self.genresCount
+    def set_genresCount(self, genresCount): self.genresCount = genresCount
+    def add_genresCount(self, value): self.genresCount.append(value)
+    def insert_genresCount(self, index, value): self.genresCount[index] = value
+    def hasContent_(self):
+        if (
+            self.genresCount
+            ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespace_='', name_='genresCountList', namespacedef_='', pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespace_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self.exportAttributes(outfile, level, already_processed, namespace_, name_='genresCountList')
+        if self.hasContent_():
+            outfile.write('>%s' % (eol_, ))
+            self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespace_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def exportAttributes(self, outfile, level, already_processed, namespace_='', name_='genresCountList'):
+        pass
+    def exportChildren(self, outfile, level, namespace_='', name_='genresCountList', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        for genresCount_ in self.genresCount:
+            genresCount_.export(outfile, level, namespace_, name_='genresCount', pretty_print=pretty_print)
+    def exportLiteral(self, outfile, level, name_='genresCountList'):
+        level += 1
+        already_processed = set()
+        self.exportLiteralAttributes(outfile, level, already_processed, name_)
+        if self.hasContent_():
+            self.exportLiteralChildren(outfile, level, name_)
+    def exportLiteralAttributes(self, outfile, level, already_processed, name_):
+        pass
+    def exportLiteralChildren(self, outfile, level, name_):
+        showIndent(outfile, level)
+        outfile.write('genresCount=[\n')
+        level += 1
+        for genresCount_ in self.genresCount:
+            showIndent(outfile, level)
+            outfile.write('model_.genresCount(\n')
+            genresCount_.exportLiteral(outfile, level)
+            showIndent(outfile, level)
+            outfile.write('),\n')
+        level -= 1
+        showIndent(outfile, level)
+        outfile.write('],\n')
+    def build(self, node):
+        already_processed = set()
+        self.buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self.buildChildren(child, node, nodeName_)
+    def buildAttributes(self, node, attrs, already_processed):
+        pass
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False):
+        if nodeName_ == 'genresCount':
+            obj_ = genresCount.factory()
+            obj_.build(child_)
+            self.genresCount.append(obj_)
+# end class genresCountList
+
+
+class genresCount(GeneratedsSuper):
+    subclass = None
+    superclass = None
+    def __init__(self, Percentage=None, Count=None, Genre=None):
+        self.Percentage = Percentage
+        self.Count = Count
+        self.Genre = Genre
+    def factory(*args_, **kwargs_):
+        if genresCount.subclass:
+            return genresCount.subclass(*args_, **kwargs_)
+        else:
+            return genresCount(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_Percentage(self): return self.Percentage
+    def set_Percentage(self, Percentage): self.Percentage = Percentage
+    def get_Count(self): return self.Count
+    def set_Count(self, Count): self.Count = Count
+    def get_Genre(self): return self.Genre
+    def set_Genre(self, Genre): self.Genre = Genre
+    def hasContent_(self):
+        if (
+            self.Percentage is not None or
+            self.Count is not None or
+            self.Genre is not None
+            ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespace_='', name_='genresCount', namespacedef_='', pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespace_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self.exportAttributes(outfile, level, already_processed, namespace_, name_='genresCount')
+        if self.hasContent_():
+            outfile.write('>%s' % (eol_, ))
+            self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespace_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def exportAttributes(self, outfile, level, already_processed, namespace_='', name_='genresCount'):
+        pass
+    def exportChildren(self, outfile, level, namespace_='', name_='genresCount', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.Percentage is not None:
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sPercentage>%s</%sPercentage>%s' % (namespace_, self.gds_format_float(self.Percentage, input_name='Percentage'), namespace_, eol_))
+        if self.Count is not None:
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sCount>%s</%sCount>%s' % (namespace_, self.gds_format_integer(self.Count, input_name='Count'), namespace_, eol_))
+        if self.Genre is not None:
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sGenre>%s</%sGenre>%s' % (namespace_, self.gds_format_string(quote_xml(self.Genre).encode(ExternalEncoding), input_name='Genre'), namespace_, eol_))
+    def exportLiteral(self, outfile, level, name_='genresCount'):
+        level += 1
+        already_processed = set()
+        self.exportLiteralAttributes(outfile, level, already_processed, name_)
+        if self.hasContent_():
+            self.exportLiteralChildren(outfile, level, name_)
+    def exportLiteralAttributes(self, outfile, level, already_processed, name_):
+        pass
+    def exportLiteralChildren(self, outfile, level, name_):
+        if self.Percentage is not None:
+            showIndent(outfile, level)
+            outfile.write('Percentage=%f,\n' % self.Percentage)
+        if self.Count is not None:
+            showIndent(outfile, level)
+            outfile.write('Count=%d,\n' % self.Count)
+        if self.Genre is not None:
+            showIndent(outfile, level)
+            outfile.write('Genre=%s,\n' % quote_python(self.Genre).encode(ExternalEncoding))
+    def build(self, node):
+        already_processed = set()
+        self.buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self.buildChildren(child, node, nodeName_)
+    def buildAttributes(self, node, attrs, already_processed):
+        pass
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False):
+        if nodeName_ == 'Percentage':
+            sval_ = child_.text
+            try:
+                fval_ = float(sval_)
+            except (TypeError, ValueError), exp:
+                raise_parse_error(child_, 'requires float or double: %s' % exp)
+            fval_ = self.gds_validate_float(fval_, node, 'Percentage')
+            self.Percentage = fval_
+        elif nodeName_ == 'Count':
+            sval_ = child_.text
+            try:
+                ival_ = int(sval_)
+            except (TypeError, ValueError), exp:
+                raise_parse_error(child_, 'requires integer: %s' % exp)
+            ival_ = self.gds_validate_integer(ival_, node, 'Count')
+            self.Count = ival_
+        elif nodeName_ == 'Genre':
+            Genre_ = child_.text
+            Genre_ = self.gds_validate_string(Genre_, node, 'Genre')
+            self.Genre = Genre_
+# end class genresCount
 
 
 class level1Genres(GeneratedsSuper):
@@ -3101,6 +3799,304 @@ class video(GeneratedsSuper):
 # end class video
 
 
+class soundcloudList(GeneratedsSuper):
+    subclass = None
+    superclass = None
+    def __init__(self, audio=None):
+        if audio is None:
+            self.audio = []
+        else:
+            self.audio = audio
+    def factory(*args_, **kwargs_):
+        if soundcloudList.subclass:
+            return soundcloudList.subclass(*args_, **kwargs_)
+        else:
+            return soundcloudList(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_audio(self): return self.audio
+    def set_audio(self, audio): self.audio = audio
+    def add_audio(self, value): self.audio.append(value)
+    def insert_audio(self, index, value): self.audio[index] = value
+    def hasContent_(self):
+        if (
+            self.audio
+            ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespace_='', name_='soundcloudList', namespacedef_='', pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespace_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self.exportAttributes(outfile, level, already_processed, namespace_, name_='soundcloudList')
+        if self.hasContent_():
+            outfile.write('>%s' % (eol_, ))
+            self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespace_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def exportAttributes(self, outfile, level, already_processed, namespace_='', name_='soundcloudList'):
+        pass
+    def exportChildren(self, outfile, level, namespace_='', name_='soundcloudList', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        for audio_ in self.audio:
+            audio_.export(outfile, level, namespace_, name_='audio', pretty_print=pretty_print)
+    def exportLiteral(self, outfile, level, name_='soundcloudList'):
+        level += 1
+        already_processed = set()
+        self.exportLiteralAttributes(outfile, level, already_processed, name_)
+        if self.hasContent_():
+            self.exportLiteralChildren(outfile, level, name_)
+    def exportLiteralAttributes(self, outfile, level, already_processed, name_):
+        pass
+    def exportLiteralChildren(self, outfile, level, name_):
+        showIndent(outfile, level)
+        outfile.write('audio=[\n')
+        level += 1
+        for audio_ in self.audio:
+            showIndent(outfile, level)
+            outfile.write('model_.audio(\n')
+            audio_.exportLiteral(outfile, level)
+            showIndent(outfile, level)
+            outfile.write('),\n')
+        level -= 1
+        showIndent(outfile, level)
+        outfile.write('],\n')
+    def build(self, node):
+        already_processed = set()
+        self.buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self.buildChildren(child, node, nodeName_)
+    def buildAttributes(self, node, attrs, already_processed):
+        pass
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False):
+        if nodeName_ == 'audio':
+            obj_ = audio.factory()
+            obj_.build(child_)
+            self.audio.append(obj_)
+# end class soundcloudList
+
+
+class audio(GeneratedsSuper):
+    subclass = None
+    superclass = None
+    def __init__(self, soundcloudUrl=None, soundcloudViewcount=None, soundcloudLikes=None, soundcloudGenres=None):
+        self.soundcloudUrl = soundcloudUrl
+        self.soundcloudViewcount = soundcloudViewcount
+        self.soundcloudLikes = soundcloudLikes
+        self.soundcloudGenres = soundcloudGenres
+    def factory(*args_, **kwargs_):
+        if audio.subclass:
+            return audio.subclass(*args_, **kwargs_)
+        else:
+            return audio(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_soundcloudUrl(self): return self.soundcloudUrl
+    def set_soundcloudUrl(self, soundcloudUrl): self.soundcloudUrl = soundcloudUrl
+    def get_soundcloudViewcount(self): return self.soundcloudViewcount
+    def set_soundcloudViewcount(self, soundcloudViewcount): self.soundcloudViewcount = soundcloudViewcount
+    def get_soundcloudLikes(self): return self.soundcloudLikes
+    def set_soundcloudLikes(self, soundcloudLikes): self.soundcloudLikes = soundcloudLikes
+    def get_soundcloudGenres(self): return self.soundcloudGenres
+    def set_soundcloudGenres(self, soundcloudGenres): self.soundcloudGenres = soundcloudGenres
+    def hasContent_(self):
+        if (
+            self.soundcloudUrl is not None or
+            self.soundcloudViewcount is not None or
+            self.soundcloudLikes is not None or
+            self.soundcloudGenres is not None
+            ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespace_='', name_='audio', namespacedef_='', pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespace_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self.exportAttributes(outfile, level, already_processed, namespace_, name_='audio')
+        if self.hasContent_():
+            outfile.write('>%s' % (eol_, ))
+            self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespace_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def exportAttributes(self, outfile, level, already_processed, namespace_='', name_='audio'):
+        pass
+    def exportChildren(self, outfile, level, namespace_='', name_='audio', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.soundcloudUrl is not None:
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%ssoundcloudUrl>%s</%ssoundcloudUrl>%s' % (namespace_, self.gds_format_string(quote_xml(self.soundcloudUrl).encode(ExternalEncoding), input_name='soundcloudUrl'), namespace_, eol_))
+        if self.soundcloudViewcount is not None:
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%ssoundcloudViewcount>%s</%ssoundcloudViewcount>%s' % (namespace_, self.gds_format_integer(self.soundcloudViewcount, input_name='soundcloudViewcount'), namespace_, eol_))
+        if self.soundcloudLikes is not None:
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%ssoundcloudLikes>%s</%ssoundcloudLikes>%s' % (namespace_, self.gds_format_integer(self.soundcloudLikes, input_name='soundcloudLikes'), namespace_, eol_))
+        if self.soundcloudGenres is not None:
+            self.soundcloudGenres.export(outfile, level, namespace_, name_='soundcloudGenres', pretty_print=pretty_print)
+    def exportLiteral(self, outfile, level, name_='audio'):
+        level += 1
+        already_processed = set()
+        self.exportLiteralAttributes(outfile, level, already_processed, name_)
+        if self.hasContent_():
+            self.exportLiteralChildren(outfile, level, name_)
+    def exportLiteralAttributes(self, outfile, level, already_processed, name_):
+        pass
+    def exportLiteralChildren(self, outfile, level, name_):
+        if self.soundcloudUrl is not None:
+            showIndent(outfile, level)
+            outfile.write('soundcloudUrl=%s,\n' % quote_python(self.soundcloudUrl).encode(ExternalEncoding))
+        if self.soundcloudViewcount is not None:
+            showIndent(outfile, level)
+            outfile.write('soundcloudViewcount=%d,\n' % self.soundcloudViewcount)
+        if self.soundcloudLikes is not None:
+            showIndent(outfile, level)
+            outfile.write('soundcloudLikes=%d,\n' % self.soundcloudLikes)
+        if self.soundcloudGenres is not None:
+            showIndent(outfile, level)
+            outfile.write('soundcloudGenres=model_.soundcloudGenres(\n')
+            self.soundcloudGenres.exportLiteral(outfile, level)
+            showIndent(outfile, level)
+            outfile.write('),\n')
+    def build(self, node):
+        already_processed = set()
+        self.buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self.buildChildren(child, node, nodeName_)
+    def buildAttributes(self, node, attrs, already_processed):
+        pass
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False):
+        if nodeName_ == 'soundcloudUrl':
+            soundcloudUrl_ = child_.text
+            soundcloudUrl_ = self.gds_validate_string(soundcloudUrl_, node, 'soundcloudUrl')
+            self.soundcloudUrl = soundcloudUrl_
+        elif nodeName_ == 'soundcloudViewcount':
+            sval_ = child_.text
+            try:
+                ival_ = int(sval_)
+            except (TypeError, ValueError), exp:
+                raise_parse_error(child_, 'requires integer: %s' % exp)
+            ival_ = self.gds_validate_integer(ival_, node, 'soundcloudViewcount')
+            self.soundcloudViewcount = ival_
+        elif nodeName_ == 'soundcloudLikes':
+            sval_ = child_.text
+            try:
+                ival_ = int(sval_)
+            except (TypeError, ValueError), exp:
+                raise_parse_error(child_, 'requires integer: %s' % exp)
+            ival_ = self.gds_validate_integer(ival_, node, 'soundcloudLikes')
+            self.soundcloudLikes = ival_
+        elif nodeName_ == 'soundcloudGenres':
+            obj_ = soundcloudGenres.factory()
+            obj_.build(child_)
+            self.set_soundcloudGenres(obj_)
+# end class audio
+
+
+class soundcloudGenres(GeneratedsSuper):
+    subclass = None
+    superclass = None
+    def __init__(self, genreName=None):
+        if genreName is None:
+            self.genreName = []
+        else:
+            self.genreName = genreName
+    def factory(*args_, **kwargs_):
+        if soundcloudGenres.subclass:
+            return soundcloudGenres.subclass(*args_, **kwargs_)
+        else:
+            return soundcloudGenres(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_genreName(self): return self.genreName
+    def set_genreName(self, genreName): self.genreName = genreName
+    def add_genreName(self, value): self.genreName.append(value)
+    def insert_genreName(self, index, value): self.genreName[index] = value
+    def hasContent_(self):
+        if (
+            self.genreName
+            ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespace_='', name_='soundcloudGenres', namespacedef_='', pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespace_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self.exportAttributes(outfile, level, already_processed, namespace_, name_='soundcloudGenres')
+        if self.hasContent_():
+            outfile.write('>%s' % (eol_, ))
+            self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespace_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def exportAttributes(self, outfile, level, already_processed, namespace_='', name_='soundcloudGenres'):
+        pass
+    def exportChildren(self, outfile, level, namespace_='', name_='soundcloudGenres', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        for genreName_ in self.genreName:
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sgenreName>%s</%sgenreName>%s' % (namespace_, self.gds_format_string(quote_xml(genreName_).encode(ExternalEncoding), input_name='genreName'), namespace_, eol_))
+    def exportLiteral(self, outfile, level, name_='soundcloudGenres'):
+        level += 1
+        already_processed = set()
+        self.exportLiteralAttributes(outfile, level, already_processed, name_)
+        if self.hasContent_():
+            self.exportLiteralChildren(outfile, level, name_)
+    def exportLiteralAttributes(self, outfile, level, already_processed, name_):
+        pass
+    def exportLiteralChildren(self, outfile, level, name_):
+        showIndent(outfile, level)
+        outfile.write('genreName=[\n')
+        level += 1
+        for genreName_ in self.genreName:
+            showIndent(outfile, level)
+            outfile.write('%s,\n' % quote_python(genreName_).encode(ExternalEncoding))
+        level -= 1
+        showIndent(outfile, level)
+        outfile.write('],\n')
+    def build(self, node):
+        already_processed = set()
+        self.buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self.buildChildren(child, node, nodeName_)
+    def buildAttributes(self, node, attrs, already_processed):
+        pass
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False):
+        if nodeName_ == 'genreName':
+            genreName_ = child_.text
+            genreName_ = self.gds_validate_string(genreName_, node, 'genreName')
+            self.genreName.append(genreName_)
+# end class soundcloudGenres
+
+
 GDSClassesMapping = {
 }
 
@@ -3133,8 +4129,8 @@ def parse(inFileName):
     rootObj.build(rootNode)
     # Enable Python to collect the space used by the DOM.
     doc = None
-    '''sys.stdout.write('<?xml version="1.0" ?>\n')
-    rootObj.export(sys.stdout, 0, name_=rootTag,
+    #sys.stdout.write('<?xml version="1.0" ?>\n')
+    '''rootObj.export(sys.stdout, 0, name_=rootTag,
         namespacedef_='',
         pretty_print=True)'''
     return rootObj
@@ -3214,8 +4210,13 @@ __all__ = [
     "album",
     "albumList",
     "artist",
+    "audio",
     "connPhraseList",
+    "crawlHistory",
+    "crawlHistoryList",
     "ftArtistList",
+    "genresCount",
+    "genresCountList",
     "indexedArtist",
     "indexedArtistAliasList",
     "indexedftArtistList",
@@ -3228,7 +4229,11 @@ __all__ = [
     "level7Genres",
     "level8Genres",
     "level9Genres",
+    "masterGenres",
+    "masterStyles",
     "songs",
+    "soundcloudGenres",
+    "soundcloudList",
     "video",
     "youtubeList"
     ]
