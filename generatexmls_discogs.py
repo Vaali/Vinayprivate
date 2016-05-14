@@ -368,6 +368,10 @@ def genXML(vid,avgcnt,avgcntrece,artistId,genreCountList):
             mysong.set_releaseId(int(vid['release_Id']))
         if(vid.has_key('masterRelease')):
             mysong.set_masterRelease(int(vid['masterRelease']))
+        if(vid.has_key('isCompilation')):
+            print vid['isCompilation']
+            print vid['url']
+            mysong.set_isCompilation(vid['isCompilation'])
         mysong.set_viewcount(vc)
         mysong.set_viewCountGroup(CalculateScale(vc))
         if vid.has_key('rating'):
@@ -384,7 +388,6 @@ def genXML(vid,avgcnt,avgcntrece,artistId,genreCountList):
             #genre = genre.replace("}","")
             #genre = genre.split(',')
             for g in genre:
-
                 '''g = g.replace("\"","")
                 if(g != "Folk, World, & Country"):
                     g = g.replace(" ","_")
@@ -404,37 +407,29 @@ def genXML(vid,avgcnt,avgcntrece,artistId,genreCountList):
                     continue
                 g = encodexml(g)
                 xmlpath = "//"+str(g)
-                #print "xmla oath :" +xmlpath
                 genre_paths = []
                 try:
                     genre_paths = doc.xpath(xmlpath)
                 except Exception as ex:
-                    #print ex
                     logger_genre.error(xmlpath)
                     logging.exception("Error in path for "+xmlpath)
-                #print genre_paths
                 if(len(genre_paths) == 0):
                     xmlpath = "//"+str(g+"_music")
                     try:
                         genre_paths = doc.xpath(xmlpath)
                     except Exception as ex:
-                        #print ex
                         logger_genre.error(xmlpath)
                         logging.exception("Error in path for "+xmlpath)
                     if(len(genre_paths) == 0):
                         logger_genre.error(g)
                     else:
-                        #genres_levels[0].append(g+"_music")
                         curr_genres_list.append(g+"_music")
                 else:
-                    #genres_levels[0].append(g)
                     curr_genres_list.append(g)
                 #print genre_paths    
                 for gp in genre_paths:
                     sAbsolutePath = doc.getpath(gp)
                     pathList = sAbsolutePath.split('/')
-                    #print pathList
-                    #print len(pathList)
                     pathlength = len(pathList)
                     for k,l in enumerate(pathList[2:]):
                         if k in genres_levels:
@@ -443,13 +438,12 @@ def genXML(vid,avgcnt,avgcntrece,artistId,genreCountList):
                         else:
                             genres_levels[k] = [l]
                 
-        style = []
         style = vid['styles']
+        Curr_Genres_List =[]
         if(style != None):
             #style = style.replace("{","")
             #style = style.replace("}","")
             #style = style.split(',')
-            
             for g in style:
                 g = g.replace("\"","")
                 g = g.replace(" ","_")
@@ -487,20 +481,18 @@ def genXML(vid,avgcnt,avgcntrece,artistId,genreCountList):
                         genres_levels[1].append(g+"_music")'''
                 else:
                     print g
-                    #genres_levels[1].append(g)
                 for gp in genre_paths:
                     sAbsolutePath = doc.getpath(gp)
                     pathList = sAbsolutePath.split('/')
-                    #print pathList
-                    #print len(pathList)
                     pathlength = len(pathList)
                     found = 0
-                    for k,l in enumerate(pathList[2:]):
-                        if k in genres_levels:
-                            if l not in genres_levels[k]:
-                                genres_levels[k].append(l)
+                    #added change for discogs genres. only adding the genres from second level.
+                    for k,l in enumerate(pathList[3:]):
+                        if k+1 in genres_levels:
+                            if l not in genres_levels[k+1]:
+                                genres_levels[k+1].append(l)
                         else:
-                            genres_levels[k] = [l]
+                            genres_levels[k+1] = [l]
                     '''if(found == 1):
                         k = len(pathList) - 3
                         print k
@@ -515,18 +507,12 @@ def genXML(vid,avgcnt,avgcntrece,artistId,genreCountList):
         masterGenres = api.masterGenres()
         masterStyles = api.masterStyles()
         if('masterGenres' in vid and vid['masterGenres'] != None):
-            g = vid['masterGenres']
-            g = g.replace("\"","")
+            g = ','.join(vid['masterGenres'])
             g = g.lower()
-            #g = g[0].upper()+g[1:]
-            g = encodexml(g)
             masterGenres.add_genreName(g)
         if('masterStyles' in vid and vid['masterStyles'] != None):
-            g = vid['masterStyles']
-            g = g.replace("\"","")
+            g = ','.join(vid['masterStyles'])
             g = g.lower()
-            #g = g[0].upper()+g[1:]
-            g = encodexml(g)
             masterStyles.add_genreName(g)
         mysong.set_masterGenres(masterGenres)
         mysong.set_masterStyles(masterStyles)
@@ -587,7 +573,9 @@ def genXML(vid,avgcnt,avgcntrece,artistId,genreCountList):
                 print oldsong.artist.artistPopularityAll
                 print 'done'
             '''
-            if(round(oldsong.totalMatch) < round(mysong.totalMatch)): 
+            if(oldsong.isCompilation == True and mysong.isCompilation != True):
+                print "With this :"
+            elif(round(oldsong.totalMatch) < round(mysong.totalMatch)):
 				#print "overwriting :"
 				#print oldsong.overLap
 				#print oldsong.totalMatch
@@ -766,7 +754,8 @@ t1=datetime.now()
 #myfile = codecs.open('levels.xml','r','utf8');
 #doc_str = myfile.read()
 #doc_str = doc_str.encode("UTF-8")
-doc = etree.parse(open('discogs_genres.xml'))
+#doc = etree.parse(open('discogs_genres.xml'))
+doc = etree.parse(open('Rock.xml'))
 #doc = libxml2.parseFile('genres_manual.xml')
 #doc = libxml2.xmlReadFile("levels.xml","utf8")
 #doc = libxml2.parseDoc(doc_str)
