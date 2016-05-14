@@ -6,7 +6,7 @@ import simplejson
 import re
 import codecs
 import urllib
-from urllib2 import Request, urlopen, URLError, HTTPError
+from urllib2 import Request,urlopen, URLError, HTTPError
 from datetime import datetime, date, timedelta
 import time
 from multiprocessing import Pool
@@ -267,6 +267,7 @@ def GetUniquesongs(songs_list,final_song_list,isMaster,same_album,ear_count,full
         AddedSong = False
         isPresentSong = False
         song['genres'],song['styles'] = getGenresAndStyles(song['genres'],song['styles'])
+        song['masterGenres'],song['masterStyles'] = getGenresAndStyles(song['masterGenres'],song['masterStyles'])
         if(keySong not in final_song_list):
             ''' First check in the full songlist. '''
             isPresentSong,matchedsong = checkIfSongExists(song,full_songs_list)
@@ -317,6 +318,7 @@ def GetUniquesongs(songs_list,final_song_list,isMaster,same_album,ear_count,full
                                     stemp['masterRelease'] = song['masterRelease']
                                     stemp['masterGenres'] = song['masterGenres']
                                     stemp['masterStyles'] = song['masterStyles']
+                                    stemp['isCompilation'] = song['isCompilation']
                                 else:
                                     continue
                                 if(isPresentSong == True):
@@ -343,6 +345,7 @@ def GetUniquesongs(songs_list,final_song_list,isMaster,same_album,ear_count,full
                                         stemp['masterRelease'] = song['masterRelease']
                                         stemp['masterGenres'] = song['masterGenres']
                                         stemp['masterStyles'] = song['masterStyles']
+                                        stemp['isCompilation'] = song['isCompilation']
                                         if('anv' in song):
                                             stemp['anv'] = song['anv']
                             if(k == 3):
@@ -354,6 +357,7 @@ def GetUniquesongs(songs_list,final_song_list,isMaster,same_album,ear_count,full
                                     stemp['masterRelease'] = song['masterRelease']
                                     stemp['masterGenres'] = song['masterGenres']
                                     stemp['masterStyles'] = song['masterStyles']
+                                    stemp['isCompilation'] = song['isCompilation']
                                     if('release_album' in song):
                                         stemp['release_album'] = song['release_album']
                                     if('anv' in song):
@@ -853,7 +857,7 @@ def crawlArtist(directory):
         logger_error.exception(e)
     logger_decisions.error(directory + "Completed ")
     logger_decisions.error('-----------------------')
-
+    #print parallel_songs_list
     try:
         #print fl
         vid = list()
@@ -1083,6 +1087,7 @@ def getVideo(curr_elem,flag):
             video1.masterRelease = curr_elem['masterRelease']
             video1.masterGenres = curr_elem['masterGenres']
             video1.masterStyles = curr_elem['masterStyles']
+            video1.isCompilation = curr_elem['isCompilation']
             print curr_elem['release_Id']
             if('anv' in curr_elem):
                 video1.anv = curr_elem['anv']
@@ -1124,6 +1129,8 @@ def GetYearFromTitle(vid_title):
     #print yearList
     if(len(yearList) != 0):
         returnYear = int(yearList[0])
+        if(vid_title == yearList[0]):
+            returnYear = 0
     return returnYear
 
 def CalculateMatch(video,vid_title,vid_description):
@@ -1512,7 +1519,7 @@ hq','band','audio','album','world','instrumental','intro','house','acoustic','so
             error_str += str(f)
         error_str += "##setratio total match:"
         error_str += str(setratio_totalmatch)
-        #logger_decisions.error(error_str)
+        logger_decisions.error(error_str)
         '''logger_decisions.error(decision)
         logger_decisions.error(condition)
         logger_decisions.error(match)
