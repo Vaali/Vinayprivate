@@ -3,30 +3,39 @@ import re
 import os
 import codecs
 import urllib
-import urlparse
-import urllib2
-import difflib
-#import libxml2
 from lxml import etree
 from datetime import datetime, date, timedelta
 import songs_api as api
 from multiprocessing import Pool
 import logging
 import ConfigParser
-import random
 import time
-import operator
+import logging.handlers
 config = ConfigParser.ConfigParser()
 reload(sys)
+if(not os.path.exists('logdir')):
+	os.mkdir('logdir')
+else:
+    try:
+        os.remove('logdir/combined.txt')
+    except OSError:
+        pass
 sys.setdefaultencoding('utf8')
 formatter = logging.Formatter('%(message)s')
 logger_genre = logging.getLogger('simple_logger')
-hdlr_1 = logging.FileHandler('combined.txt')
+hdlr_1 = logging.handlers.RotatingFileHandler(
+              'logdir/combined.txt', maxBytes=100*1024*1024, backupCount=500)
 hdlr_1.setFormatter(formatter)
 logger_genre.addHandler(hdlr_1)
 logger_genre = logging.getLogger('simple_logger')
-formatter = logging.Formatter('%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
-logging.basicConfig(format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s',level=logging.DEBUG, filename='errors_combined.log')
+
+formatter1 = logging.Formatter('%(message)s')
+logger_errors = logging.getLogger('simple_logger1')
+hdlr_2 = logging.handlers.RotatingFileHandler(
+              'combined_artists.log', maxBytes=1024*1024*1024, backupCount=10)
+hdlr_2.setFormatter(formatter1)
+logger_errors.addHandler(hdlr_2)
+logger_errors = logging.getLogger('simple_logger1')
 
 def combinefiles(directory):
     try:
@@ -35,12 +44,16 @@ def combinefiles(directory):
 			return
         directory = d.strip()
         path = directory +'/matrix.txt'
+        print path
         if os.path.exists(path):
             fopen = codecs.open(path,'r','utf-8')
             for line in fopen: 
-                    logger_genre.debug(line)
+                    logger_genre.error(line)
+                    #print line
+        else:
+			print 'nofile'
     except Exception as e:
-        logging.exception(e)
+        logger_decisions.exception(e)
 
 
 directory = raw_input("Enter directory: ")
@@ -65,7 +78,7 @@ try:
 	p.close()
 	p.join()
 except Exception as e:
-	logging.exception(e)
+	logger_decisions.exception(e)
 t2=datetime.now()
 
 print "time=" +str(t2-t1)
