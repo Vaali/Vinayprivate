@@ -17,6 +17,7 @@ import logging
 import ConfigParser
 import random
 import time
+import operator
 config = ConfigParser.ConfigParser()
 reload(sys)
 sys.setdefaultencoding('utf8')
@@ -227,7 +228,7 @@ def genXML(vid,avgcnt,avgcntrece,artistId,genreCountList):
         remove = "lyrics official video hd hq edit music lyric audio acoustic videoclip featuring ft feat"
         diffset = re.findall("\w+",remove.lower(),re.U)
         yfullset = re.findall("\w+",yname.lower(),re.U)
-        ydiffset = set(yfullset) - set(diffset) 
+        ydiffset = set(yfullset) - set(diffset)
         yresultset = [o for o in yfullset if o in ydiffset]
         
         if "feat" in yresultset:
@@ -338,14 +339,14 @@ def genXML(vid,avgcnt,avgcntrece,artistId,genreCountList):
 		#print vid['language']
         releaseyear = str(vid['year']).split('-')[0]
         mysong.set_releaseDate(int(releaseyear))
-        if('videoYear' in vid):
+        '''if('videoYear' in vid):
             if(int(releaseyear) != int(vid['videoYear'])):
                 print 'mis-match of years'
                 print releaseyear
                 print vid['name']
                 print vid['videoYear']
                 print vid['title']
-                print '----------------------------------'
+                print '----------------------------------' '''
         mysong.set_decade(int(releaseyear)/10)
         mysong.set_earliestDate(vid['year'])
         if('songcountry' in vid):
@@ -369,8 +370,8 @@ def genXML(vid,avgcnt,avgcntrece,artistId,genreCountList):
         if(vid.has_key('masterRelease')):
             mysong.set_masterRelease(int(vid['masterRelease']))
         if(vid.has_key('isCompilation')):
-            print vid['isCompilation']
-            print vid['url']
+            #print vid['isCompilation']
+            #print vid['url']
             mysong.set_isCompilation(vid['isCompilation'])
         mysong.set_viewcount(vc)
         mysong.set_viewCountGroup(CalculateScale(vc))
@@ -479,8 +480,8 @@ def genXML(vid,avgcnt,avgcntrece,artistId,genreCountList):
                         logger_genre.error(g)
                     else:
                         genres_levels[1].append(g+"_music")'''
-                else:
-                    print g
+                '''else:
+                    print 'notfound'+g'''
                 for gp in genre_paths:
                     sAbsolutePath = doc.getpath(gp)
                     pathList = sAbsolutePath.split('/')
@@ -573,37 +574,37 @@ def genXML(vid,avgcnt,avgcntrece,artistId,genreCountList):
                 print oldsong.artist.artistPopularityAll
                 print 'done'
             '''
-            if(oldsong.isCompilation == True and mysong.isCompilation != True):
-                print "With this :"
+            if(oldsong.isCompilation == True and mysong.isCompilation == False):
+				print "With this :"
+				mysong = CombineAlbums(oldsong,mysong)
             elif(round(oldsong.totalMatch) < round(mysong.totalMatch)):
 				#print "overwriting :"
 				#print oldsong.overLap
 				#print oldsong.totalMatch
 				print "With this :"
+				mysong = CombineAlbums(oldsong,mysong)
 				#print mysong.overLap
             elif ((round(oldsong.totalMatch) == round(mysong.totalMatch)) and (round(oldsong.songMatch) < round(mysong.songMatch))):
 				#print "overwriting :"
 				#print oldsong.totalMatch
 				#print oldsong.songMatch
 				print "With this :"
+				mysong = CombineAlbums(oldsong,mysong)
 				#print mysong.match
             elif ((round(oldsong.songMatch) == round(mysong.songMatch)) and (round(oldsong.artistMatch) < round(mysong.artistMatch))):
 				#print "overwriting :"
 				#print oldsong.totalMatch
 				print "With this :"
+				mysong = CombineAlbums(oldsong,mysong)
 				#print mysong.totalMatch
             elif(round(oldsong.totalMatch) == round(mysong.totalMatch) and round(oldsong.songMatch) == round(mysong.songMatch) and round(oldsong.artistMatch) == round(mysong.artistMatch)):
                 #if(artistPopularityAll in oldsong):
                 #if(oldsong.artist.artistPopularityAll > mysong.artist.artistPopularityAll):
                 #        mysong = oldsong
                 
-                if(url[-11:].lower() == "aVIA1n5ng4Y".lower()):
-                    print 'this song is here'
-                    print fname
-                    print mysong.releaseDate
-                    print oldsong.releaseDate
                 if(mysong.releaseDate != 1001 and int(oldsong.releaseDate) > int(mysong.releaseDate)):
-                    print "With this :"    
+					print "With this :"
+					mysong = CombineAlbums(oldsong,mysong)  
                 else:
                     mysong = oldsong
                 #print oldsong.totalMatch
@@ -633,7 +634,7 @@ def genXML(vid,avgcnt,avgcntrece,artistId,genreCountList):
 			fx.write(artistId) 
 			fx.close()
     except Exception as ex:
-		logging.exception(ex)
+        logging.exception(ex)
 
 
 
@@ -670,13 +671,39 @@ def GetAlias(directory):
 		aliases.append(l.strip())
 	return aliases
 
+def CombineAlbums(oldsong,mysong):
+	print 'CombineAlbums'
+	print oldsong.artistId
+	destList = mysong.albumList
+	sourceList = oldsong.albumList.album
+	#print sourceList
+	#print len(sourceList)
+	#albList = api.albumList()
+	#album = api.album()
+	try:
+		for album in sourceList:
+			destList.add_album(album)
+			print album.albumName
+			print album.country
+			print album.language
+			print album.barCode
+			print '-----'			
+		mysong.set_albumList(destList)
+	except Exception as e:
+		print e
+	return mysong
+	#print len(mysong.albumList.album)
+		
+
 def CalculateAverages(directory):
     averageCount = 0
     averageCountRecent = 0
+    earlier_year = 10000
     path = directory + "/dump"
     print path
+    viewcountlist = []
     try:
-		json_data = open(path)
+		json_data = codecs.open(path)
     except IOError as e:
 		print "File does not exist"
 		return 0,0
@@ -686,8 +713,14 @@ def CalculateAverages(directory):
     ViewcountSum = 0
     ViewCountRateSum = 0
     for s in songs:
+	releaseyear = 2050
+        if('year' in s):
+            releaseyear = int(str(s['year']).split('-')[0])
+        if(earlier_year > releaseyear and releaseyear > 1900):
+		earlier_year = releaseyear
         if('viewcount' in s):
             ViewcountSum = ViewcountSum + int(s['viewcount'])
+            viewcountlist.append(int(s['viewcount']))
             ViewCountRateSum = ViewCountRateSum + int(s['viewcountRate'])
             count = count + 1
     if(len(songs) != 0):
@@ -696,15 +729,56 @@ def CalculateAverages(directory):
 		#print averageCount
 		averageCountRecent = ViewCountRateSum / len(songs) 
 		#print averagerating
-    return averageCount,averageCountRecent
+    viewcountlist = filter(lambda x:x>averageCount,viewcountlist)
+    if(len(viewcountlist)>0):
+    	averageCount = sum(viewcountlist)/len(viewcountlist)
+    print len(viewcountlist)
+    return averageCount,averageCountRecent,earlier_year
 
-def GetTotalGenresCountForArtist(vids):
+def CalculateIdsforGenres(node,currentGenre):
+    #genreMat[decodexml(node.tag.lower())] = currentGenre
+    current_list = []
+    for child in node.iterchildren("*"):
+        current_list.append(decodexml(child.tag.lower()))
+    current_list.sort()
+    #print current_list
+    if(current_list == None):
+        return
+    for child in current_list:
+        currentGenre = currentGenre+1
+        genreMat[child] = currentGenre
+    #print genreMat
+    for child in node.iterchildren("*"):
+        CalculateIdsforGenres(child,currentGenre)
+
+def CalculateIds():
+	doc1 = etree.parse(codecs.open('Rock.xml'))
+	currentGenre = 0
+	children = doc1.getroot().iterchildren("*")
+	#print children
+	for child in doc1.getroot().iterchildren("*"):
+		genreMat[decodexml(child.tag.lower())] = currentGenre
+		CalculateIdsforGenres(child,currentGenre)
+		currentGenre = currentGenre + 100
+
+def GetTotalGenresCountForArtist(vids,artistId,directory):
     genreList = api.genresCountList()
     genrecount = {}
     stylecount = {}
     TotalGenreStyleCount = 0
+    CalculateIds()
+    parseMat = list()
+    #print genreMat
+    with codecs.open(directory+'/result.json', 'w','utf8') as fp:
+        json.dump(genreMat, fp)
+	artists_count = {}
     for v in vids:
         genre = v['genres']
+        curr_artist = v['artist'].lower()
+        if(curr_artist not in artists_count):
+			artists_count[curr_artist] = 1
+        else:
+			artists_count[curr_artist] = artists_count[curr_artist] + 1
         if(genre != None):
             for g in genre:
                 g = g.replace("\"","")
@@ -728,26 +802,56 @@ def GetTotalGenresCountForArtist(vids):
                     stylecount[g] = 1
                 else:
                     stylecount[g] = stylecount[g] + 1
-    print stylecount
-    print genrecount
-    print TotalGenreStyleCount
+    #print stylecount
+    #print genrecount
+    #print TotalGenreStyleCount
+    #print artists_count
+    sorted_x = sorted(artists_count.items(), key=operator.itemgetter(1),reverse = True)
+    if(len(sorted_x) == 0):
+	    artistName = 'Unknown'
+    else:	
+        artistName = sorted_x[0][0]
     for genre in genrecount:
         g = api.genresCount()
         g.set_Genre(genre)
         g.set_Count(genrecount[genre])
+        curr_parseVal = list()
+        percent = 0
         if(TotalGenreStyleCount != 0):
             percent = (genrecount[genre]*100.0)/TotalGenreStyleCount
             g.set_Percentage(percent)
         genreList.add_genresCount(g)
+        curr_parseVal.append(artistName)
+        curr_parseVal.append(artistId)
+        if(genre in genreMat):
+            curr_parseVal.append(genre)
+            curr_parseVal.append(genreMat[genre])
+        else:
+			logger_genre.error(genre)
+			continue
+        curr_parseVal.append(percent)
+        parseMat.append(curr_parseVal)
     for style in stylecount:
         g = api.genresCount()
         g.set_Genre(style)
         g.set_Count(stylecount[style])
+        percent = 0
+        curr_parseVal = list()
         if(TotalGenreStyleCount != 0):
             percent = (stylecount[style]*100.0)/TotalGenreStyleCount
             g.set_Percentage(percent)
         genreList.add_genresCount(g)
-    return genreList
+        curr_parseVal.append(artistName)
+        curr_parseVal.append(artistId)
+        if(style in genreMat):
+            curr_parseVal.append(style)
+            curr_parseVal.append(genreMat[style])
+        else:
+            logger_genre.error(style)
+            continue
+        curr_parseVal.append(percent)
+        parseMat.append(curr_parseVal)
+    return genreList,parseMat
 
 #Main starts here
 t1=datetime.now()
@@ -761,6 +865,7 @@ doc = etree.parse(open('Rock.xml'))
 #doc = libxml2.parseDoc(doc_str)
 #print "Working on this Artist Now: "
 #print artistId
+genreMat = {}
 genre = list()
 style = list()
 subgenlist = list()
@@ -810,6 +915,7 @@ fx = codecs.open(fname,"w","utf-8")
 fx.write("")
 fx.close()
 #print "testing"
+
 def generatexmls(dirlist):
     global IsIncremental
     try:
@@ -820,19 +926,31 @@ def generatexmls(dirlist):
 			return
         directory = d.strip()
         dindex = directory.rfind("/")
-        avgcnt,avgcntrece =  CalculateAverages(directory)
-        print avgcnt,avgcntrece
+        avgcnt,avgcntrece,earlier_year =  CalculateAverages(directory)
+        print avgcnt,avgcntrece,earlier_year
         vids = []
         try:
             if(IsIncremental == 0):
-			    vids = load(directory+'/dump')
+                vids = load(directory+'/dump')
             else:
                 vids = load(directory+'/dump_incr')
         except Exception as e:
 			#continue
 			return
         artistId = directory[dindex+1:]
-        genreCountList = GetTotalGenresCountForArtist(vids)
+        genreCountList,parseMat = GetTotalGenresCountForArtist(vids,artistId,directory)
+        #print genreCountList
+        #print parseMat
+        if(IsIncremental == 1):
+                f = codecs.open(directory+'/matrix.txt','a','utf8')
+        else:
+                f = codecs.open(directory+'/matrix.txt','w','utf8')
+        for i in parseMat:
+		i.append(avgcnt)
+		i.append(earlier_year)
+		f.write(':;'.join(str(t) for t in i))
+		f.write('\n')
+        f.close()
         for v in vids:
             t3=datetime.now()
             if(int(artistId) == 194):
@@ -842,21 +960,25 @@ def generatexmls(dirlist):
     except Exception as e:
         logging.exception(e)
 
-t2=datetime.now()
-directory = raw_input("Enter directory: ")
-m = raw_input("Enter m: ")
-m=int(m)
-IsIncremental = raw_input("Isincremental : ")
-IsIncremental = int(IsIncremental)
-foldlist = list()
-jobs=[]
-t1=datetime.now()
-foldercompletelist = {}
-folderstartedlist = {}
-for dirs in os.listdir(directory):
-  	found = re.search(r'[0-9]+',str(dirs),0)
-  	print dirs
-  	if found:
+
+#main starts here
+
+if __name__ == '__main__':
+    t2=datetime.now()
+    directory = raw_input("Enter directory: ")
+    m = raw_input("Enter m: ")
+    m=int(m)
+    IsIncremental = raw_input("Isincremental : ")
+    IsIncremental = int(IsIncremental)
+    foldlist = list()
+    jobs=[]
+    t1=datetime.now()
+    foldercompletelist = {}
+    folderstartedlist = {}
+    for dirs in os.listdir(directory):
+        found = re.search(r'[0-9]+',str(dirs),0)
+        print dirs
+        if found:
 		for curr_dir, sub_dir, filenames in os.walk(directory+'/'+dirs):
 			for sd in sub_dir:
 				#print os.path.join(curr_dir,sd)
@@ -865,14 +987,14 @@ for dirs in os.listdir(directory):
 					continue
 				strg = os.path.join(curr_dir,sd)
 				foldlist.append(strg)
-#generatexmls(foldlist)
-try:
-	p =Pool(processes=int(m))
-	p.map(generatexmls,foldlist)
-	p.close()
-	p.join()
-except Exception as e:
-		logging.exception(e)
-t2=datetime.now()
+    #generatexmls(foldlist)
+    try:
+        p =Pool(processes=int(m))
+        p.map(generatexmls,foldlist)
+        p.close()
+        p.join()
+    except Exception as e:
+        logging.exception(e)
+    t2=datetime.now()
 
-print "time=" +str(t2-t1)
+    print "time=" +str(t2-t1)
