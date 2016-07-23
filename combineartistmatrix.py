@@ -24,7 +24,7 @@ sys.setdefaultencoding('utf8')
 formatter = logging.Formatter('%(message)s')
 logger_genre = logging.getLogger('simple_logger')
 hdlr_1 = logging.handlers.RotatingFileHandler(
-              'logdir/combined.txt', maxBytes=100*1024*1024, backupCount=500)
+              'logdir/combined.txt', maxBytes=100*1024*1024*1024, backupCount=500)
 hdlr_1.setFormatter(formatter)
 logger_genre.addHandler(hdlr_1)
 logger_genre = logging.getLogger('simple_logger')

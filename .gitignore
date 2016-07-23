@@ -1,1 +1,16 @@
 .idea
+*.log
+*.pyc
+*.txt
+*.json
+*dump
+
+parallel_discogs_part1.log
+
+*.log
+
+parallel_getSongs.py
+
+*.swp
+
+*.xml
