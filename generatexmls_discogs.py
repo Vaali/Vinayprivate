@@ -829,7 +829,9 @@ def GetTotalGenresCountForArtist(vids,artistId,directory):
         else:
 			logger_genre.error(genre)
 			continue
-        curr_parseVal.append(percent)
+        curr_parseVal.append(genrecount[genre])
+        print genrecount[genre]
+        #curr_parseVal.append(percent)
         parseMat.append(curr_parseVal)
     for style in stylecount:
         g = api.genresCount()
@@ -849,7 +851,8 @@ def GetTotalGenresCountForArtist(vids,artistId,directory):
         else:
             logger_genre.error(style)
             continue
-        curr_parseVal.append(percent)
+        #curr_parseVal.append(percent)
+        curr_parseVal.append(stylecount[style])
         parseMat.append(curr_parseVal)
     return genreList,parseMat
 
