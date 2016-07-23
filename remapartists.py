@@ -37,7 +37,7 @@ def getmatrixdata(filename):
 				if(int(words[1]) not in artist_dict):
 					artist_dict[int(words[1])] = artist_count
 					artist_count = artist_count + 1	
-				line = line.replace(':;'+words[1]+':;',':;'+str(artist_dict[int(words[1])])+':;')
+				line = line.replace(':;'+words[1]+':;',':;'+str(artist_dict[int(words[1])])+':;',1)
 				if(int(words[3]) not in genres_dict):
 					genres_dict[int(words[3])] = genre_count
 					genre_count = genre_count + 1
@@ -47,8 +47,10 @@ def getmatrixdata(filename):
 			except Exception as e:
 				print e
 				print line
-	print len(remapped_lines)
-	print len(lines)
+        print 'artist'
+	print len(artist_dict)
+        print 'genres'
+	print len(genres_dict)
 	fileopen.close()
 	filewrite = codecs.open('remapped_artist_file.txt',"w","utf-8")	
 	for line in remapped_lines:
