@@ -713,6 +713,8 @@ def CalculateAverages(directory):
     ViewcountSum = 0
     ViewCountRateSum = 0
     for s in songs:
+        if('isCompilation' in s and s['isCompilation']== True):
+            continue
 	releaseyear = 2050
         if('year' in s):
             releaseyear = int(str(s['year']).split('-')[0])
