@@ -11,6 +11,9 @@ import logging
 import logging.handlers
 import loggingmodule
 from datetime import datetime, date, timedelta
+from functools import partial
+from itertools import repeat
+import operator
 
 reload(sys)
 sys.setdefaultencoding('utf8')
@@ -27,18 +30,24 @@ def getmatrixdata(filename,col_max,row_max):
 			words = line.split(':;')
 			curr_row = int(words[1])
                         curr_col = int(words[3])
-			rows_list.append(curr_row)
+			
 			if(curr_row not in artists_map):
 				artists_map[curr_row] = [words[0],words[5],words[6],words[7]]
+                                rows_popularity_list.append(0)
+                                cols_popularity_list.append(curr_row)
+                                data_popularity_list.append(int(words[5]))
+
                         if(curr_col not in genres_map):
                             genres_map[curr_col] = words[2]
 			if(row_max < curr_row):
 				row_max = curr_row
 			if(col_max < int(words[3])):
 				col_max = int(words[3])
-                        #print col_max
-			column_list.append(int(words[3]))
-			data_list.append(float(words[4]))
+                        #removes the smaller values from the matrix
+                        if(float(words[4])> 0.1):
+			    column_list.append(int(words[3]))
+			    data_list.append(float(words[4]))
+                            rows_list.append(curr_row)
         return row_max,col_max
 
 def sum1(X,v):
@@ -73,7 +82,6 @@ def cov_csr(x, axis=0):
         return np.array((x.T*x)/x.shape[axis] - meanx.T*meanx)
     else:
         return np.array((x*x.T)/x.shape[axis] - meanx*meanx.T)
-
 
 '''(x,y,z)=sp.find(temp5)
 countings=np.bincount(x)
@@ -120,48 +128,99 @@ print c1[2]
 print v1[2]'''
 
 #print artists_map
+def sort_rows(m):
+    print m
+    m.data *= m.data>=0.89
+    m.eliminate_zeros()
+    print 'xxxxxxxxxxx'
+    print m
+    rows=  m.nonzero()[0]
+    cols = m.nonzero()[1]
+    #for y in cols:
+    #    print m[0,y]
+    t3=datetime.now()
+    temp_ones = m.copy()
+    temp_ones.data /= temp_ones.data
+    sample = popularitymatrix.multiply(temp_ones)
+    popmat = popularitymatrix.tocsr()
+    #print sample.shape
+    #print 'XXXXXXXXXXX'
+    #print sample
+    print '--------------'
+    tuples =  zip(sample.indices,sample.data)
+    #print m.indices
+    #print m.data
+    #currentpopularityrow = popmat[0,:].toarray()[0]
+    #finaltuples = []
+    #for t in tuples:
+    #    s = t + (currentpopularityrow[t[0]],)
+    #    finaltuples.append(s)
+    #print finaltuples
+    t4=datetime.now()
+    print 'zip time' + str(t4-t3)
+    #tuples_filtered = filter(lambda x: x[1]>0.89, finaltuples)
+    t5=datetime.now()
+    #print len(tuples_filtered)
+    sorted_x = sorted(tuples, key=lambda score: score[1], reverse=True)
+    t6=datetime.now()
+    print 'sort time' + str(t6-t5)
+    print sorted_x
+    return sorted_x
 
-def similarartist((artist_index,sim_mat_index)):
+
+def similarartist((split,block_indices,index)):
     try:
-        #print artist_index
-	curr_artistName = artists_map[artist_index][0]
-	curr_artist_id = int(artists_map[artist_index][3])
-	curr_artist_popularity = int(artists_map[artist_index][1])
-	curr_artist_year = int(artists_map[artist_index][2])
-	curr_artist = sa.artist() 
-	curr_artist.set_artistName(curr_artistName)
-	curr_artist.set_artistId(curr_artist_id)
-        curr_artist.set_artistPopularityAll(curr_artist_popularity)
-	curr_artist.set_earliestDate(curr_artist_year)
-	#change this to correct sparse matrix manipulations
-        #print 'here'
-        #print i
-        #print row_indices[i]
-        written = 0
-        currentrow = cosinesimilarityartist[sim_mat_index,:].toarray()
-	for j in row_indices[sim_mat_index]:
-            if(currentrow[0][j] > 0.75):
-                written = 1
-		curr_similar_artist = artists_map[j][0]
-		curr_similar_artist_id = int(artists_map[j][3])
-		curr_similar_artist_popularity = int(artists_map[j][1])
-		curr_similar_artist_year = int(artists_map[j][2])
-		
-		similar_artists = sa.similarArtists()
-		similar_artists.set_artistName(curr_similar_artist)
-		similar_artists.set_artistId(curr_similar_artist_id)
-		similar_artists.set_artistPopularityAll(curr_similar_artist_popularity)
-		similar_artists.set_earliestDate(curr_similar_artist_year)
-		similar_artists.set_cosineDistance(currentrow[0][j])
-		#similar_artists.set_euclideanDistance(euclideandistanceartist[i][j])
-		#similar_artists.set_pearsonDistance(pearsondistanceartist[i,:][j])
-                curr_artist.add_similarArtists(similar_artists)
-        if(written == 1):
-            fname = 'simartistdir/' + str(curr_artist_id)+'.xml'
-	    fx = codecs.open(fname,"w","utf-8")
-	    fx.write('<?xml version="1.0" ?>\n')
-	    curr_artist.export(fx,0)
-	    fx.close()
+        cosinesimilarityartist = split[0]*tempA2
+        row_indices = np.split(cosinesimilarityartist.indices, cosinesimilarityartist.indptr[1:-1])
+        logger_matrix.exception('writing the artists files')
+        indices = zip(range(block_indices[index],block_indices[index+1]),range(block_indices[index+1]-block_indices[index]))
+        #print cosinesimilarityartist
+        #print indices
+        for (artist_index,sim_mat_index) in indices:
+            curr_artistName = artists_map[artist_index][0]
+            curr_artist_id = int(artists_map[artist_index][3])
+            curr_artist_popularity = int(artists_map[artist_index][1])
+            curr_artist_year = int(artists_map[artist_index][2])
+            curr_artist = sa.artist()
+            curr_artist.set_artistName(curr_artistName)
+            curr_artist.set_artistId(curr_artist_id)
+            curr_artist.set_artistPopularityAll(curr_artist_popularity)
+            curr_artist.set_earliestDate(curr_artist_year)
+            written = 0
+            #currentrow = cosinesimilarityartist[sim_mat_index,:].toarray()
+            #currentrow = cosinesimilarityartist.getrow(sim_mat_index)
+            #print currentrow
+            t3=datetime.now()
+            sorted_s = sort_rows(cosinesimilarityartist.getrow(sim_mat_index))
+            t4=datetime.now()
+            print (t4-t3)
+            #change here to increase the number of similar artists
+            sorted_s = sorted_s[0:3]
+	    #for j in row_indices[sim_mat_index]:
+            for pair in sorted_s:
+                j = pair[0]
+                #if(currentrow[0][j] > 0.89):
+                if(pair[1] > 0.89):
+                    written = 1
+                    curr_similar_artist = artists_map[j][0]
+                    curr_similar_artist_id = int(artists_map[j][3])
+                    curr_similar_artist_popularity = int(artists_map[j][1])
+                    curr_similar_artist_year = int(artists_map[j][2])
+                    similar_artists = sa.similarArtists()
+                    similar_artists.set_artistName(curr_similar_artist)
+                    similar_artists.set_artistId(curr_similar_artist_id)
+                    similar_artists.set_artistPopularityAll(curr_similar_artist_popularity)
+                    similar_artists.set_earliestDate(curr_similar_artist_year)
+                    similar_artists.set_cosineDistance(pair[1])
+                    #similar_artists.set_euclideanDistance(euclideandistanceartist[i][j])
+                    #similar_artists.set_pearsonDistance(pearsondistanceartist[i,:][j])
+                    curr_artist.add_similarArtists(similar_artists)
+            if(written == 1):
+                fname = 'simartistdir/' + str(curr_artist_id)+'.xml'
+                fx = codecs.open(fname,"w","utf-8")
+                fx.write('<?xml version="1.0" ?>\n')
+                curr_artist.export(fx,0)
+                fx.close()
     except Exception as e:
 	logger_matrix.exception(e)
 
@@ -181,6 +240,8 @@ def similargenre(i):
         #curr_genre.set_artistPopularityAll(curr_artist_popularity)
 	#curr_genre.set_earliestDate(curr_artist_year)
 	#change this to correct sparse matrix manipulations
+        curr_row = cosinesimilaritygenre[i,:].toarray()
+        #print curr_row
 	for j in genres_map:
             if(cosinesimilaritygenre[i,:].toarray()[0][j] > 0):
 		curr_similar_genre = genres_map[j]
@@ -196,7 +257,7 @@ def similargenre(i):
 		similar_genre.set_cosineDistance(cosinesimilaritygenre[i,:].toarray()[0][j])
 		#similar_genre.set_euclideanDistance(euclideandistancegenre[i][j])
 		#similar_genre.set_pearsonDistance(pearsondistancegenre[i,:][j])		
-		curr_genre.add_similarArtists(similar_genre)	
+		curr_genre.add_similarArtists(similar_genre)
 	curr_genre.export(fx,0)
 	fx.close()
     except Exception as e:
@@ -231,10 +292,14 @@ if __name__ == '__main__':
         column_list = []
         rows_list = []
         data_list = []
+        rows_popularity_list = []
+        cols_popularity_list = []
+        data_popularity_list = []
         col_max = 0
         row_max = 0
         earlier_year = 2050
         artists_map = {}
+        
         genres_map = {}
         if(not os.path.exists('simartistdir')):
 	    os.mkdir('simartistdir')
@@ -249,6 +314,8 @@ if __name__ == '__main__':
         col  = np.array(column_list)
         data = np.array(data_list)
         artistgenrematrix = sp.coo_matrix((data, (row, col)), shape=(row_max+1, col_max+1))
+        popularitymatrix = sp.coo_matrix((data_popularity_list,(rows_popularity_list,cols_popularity_list)),shape=(1,row_max+1))
+        print popularitymatrix
         tempA1 = artistgenrematrix.tocsr()
         #print temp1
         
@@ -267,35 +334,26 @@ if __name__ == '__main__':
         #change this to correct sparse matrix manipulations
 
         #break the matrix into peices
-
+        #if(tempA1.shape[0]<100):
+        #    block_indices = range(1,tempA1.shape[0])
+        #else:
         block_indices = range(100,tempA1.shape[0],100)
         #function returns the blocks of the main matrix        
         split_mat = split_sparse(tempA1,block_indices,[])
 
         index = 0
-        block_indices = [0]+ block_indices + [row_max]
+        block_indices = [0]+ block_indices + [row_max+1]
         #foreach block returned calculate the cosine similarity 
-        
-        for split in split_mat:
-            #split[0] because the columns are not split
-            cosinesimilarityartist = split[0]*tempA2
-            #print cosinesimilarityartist.shape
-            #get the 
-            row_indices = np.split(cosinesimilarityartist.indices, cosinesimilarityartist.indptr[1:-1])
-            logger_matrix.exception('writing the artists files')
-            sim_matrix_arguments = zip(range(block_indices[index],block_indices[index+1]),range(block_indices[index+1]-block_indices[index]))
-            #print sim_matrix_arguments
-            p =Pool(processes=int(100))
-	    p.map(similarartist,sim_matrix_arguments)
-	    p.close()
-	    p.join()
-            index = index+1
-
-
+        print block_indices
+        #similarartist((split_mat[0],block_indices,0))
+        p =Pool(processes=int(100))
+	p.map(similarartist,zip(split_mat,repeat(block_indices),range(0,len(block_indices))))
+        p.close()
+	p.join()
         print 'cosine distance'
         #print temp3.todense()
         #eucliden distance
-        size = cosinesimilarityartist.shape
+        #size = cosinesimilarityartist.shape
         '''print 'euclidean distance'
         tempA4 = 2*(np.ones(size) - cosinesimilarityartist)
 
@@ -314,32 +372,24 @@ if __name__ == '__main__':
         pearsondistanceartist = corrcoef_csr(tempA5,1)
         #print temp7'''
 
-        row_indices = np.split(cosinesimilarityartist.indices, cosinesimilarityartist.indptr[1:-1])
-        #print row_indices[0]
-        '''logger_matrix.exception('writing the artists files')
-        p =Pool(processes=int(100))
-	p.map(similarartist,artists_map.keys())
-	p.close()
-	p.join()'''
-
         #genres
 
-        '''
-        tempG1 = artistgenrematrix.tocsr()
-        tempG1 = tempG1.transpose()
-        print tempG1.todense()
+        
+        tempG1 = artistgenrematrix.transpose().tocsr()
+        #print tempG1.todense()
         row_sums_genres = ((tempG1.multiply(tempG1)).sum(axis=1))
         
         rows_sums_sqrt_genres = np.array(np.sqrt(row_sums_genres))[:,0]
-        print rows_sums_sqrt_genres
+        #print rows_sums_sqrt_genres
         row_indices, col_indices = tempG1.nonzero()
-        print row_indices
-        print tempG1.data[2] 
-        tempG1.data /= rows_sums_sqrt_genres[col_indices]
-        print tempG1.todense()
+        #print col_indices
+        #print tempG1.data[2] 
+        tempG1.data /= rows_sums_sqrt_genres[row_indices]
+        #print tempG1.todense()
         tempG2 = tempG1.transpose()
         cosinesimilaritygenre = tempG1*tempG2
-        print 'cosine distance' '''
+        print cosinesimilaritygenre.shape
+        print 'cosine distance'
         '''size = cosinesimilaritygenre.shape
         tempG4 = 2*(np.ones(size) - cosinesimilaritygenre)
         euclideandistancegenre = np.sqrt(np.absolute(np.around(tempG4,decimals=8)))
@@ -355,17 +405,12 @@ if __name__ == '__main__':
         #print (ymat)
         pearsondistancegenre = corrcoef_csr(tempG5,1)
         print pearsondistancegenre.shape '''
-        '''logger_matrix.exception('writing the genre files')
-        a =Pool(processes=int(100))
-	a.map(similarartist,artists_map.keys())
-	a.close()
-	a.join()
-
-        logger_matrix.exception('writing the  files')
+        logger_matrix.exception('writing the genre files')
+        
         g =Pool(processes=int(100))
 	g.map(similargenre,genres_map.keys())
 	g.close()
-	g.join()'''
+	g.join()
 
         t2=datetime.now()
         print (t2-t1)
