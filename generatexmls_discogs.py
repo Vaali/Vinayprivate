@@ -731,9 +731,9 @@ def CalculateAverages(directory):
 		#print averageCount
 		averageCountRecent = ViewCountRateSum / len(songs) 
 		#print averagerating
-    viewcountlist = filter(lambda x:x>averageCount,viewcountlist)
-    if(len(viewcountlist)>0):
-    	averageCount = sum(viewcountlist)/len(viewcountlist)
+    #viewcountlist = filter(lambda x:x>averageCount,viewcountlist)
+    #if(len(viewcountlist)>0):
+    #	averageCount = sum(viewcountlist)/len(viewcountlist)
     print len(viewcountlist)
     return averageCount,averageCountRecent,earlier_year
 
