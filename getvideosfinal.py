@@ -25,7 +25,6 @@ import operator
 
 
 
-
 reload(sys)
 sys.setdefaultencoding('utf8')
 '''
@@ -446,9 +445,8 @@ def get_song_list(directory,songs_list,full_country_list,aliases,ear_count,ear_y
                                 artist['artist_name'] = 'the '+ artist['artist_name']
                     if(artist['position'] == 1):
                         song['artistName'] = re.sub(r'\(.*?\)', '', artist['artist_name'].lower()).strip()
-                        print song['artistName']
-                        print artist['artist_id']
-
+                        #print song['artistName']
+                        #print artist['artist_id']
                         song['artist_id'] = artist['artist_id']
                         #add anvs for the main artist alone
                         if('anv' in artist and artist['anv'] != None):
@@ -468,9 +466,10 @@ def get_song_list(directory,songs_list,full_country_list,aliases,ear_count,ear_y
                                 bskip = True
                     retlist = GetArtist(track['artists'])
                     if(retlist[0] != None):
-                        song['featArtists'] = retlist[1]
-                        song['connectors'] = retlist[2]
+                        song['featArtists'] = retlist[2]
+                        song['connectors'] = retlist[3]
                         song['artistName'] = retlist[0]
+                        song['artist_id'] = retlist[1]
                 if(bskip == True):
                     continue
                 if('extraartists' in track and track['extraartists'] != None):
@@ -533,8 +532,6 @@ def get_song_list_master(directory,songs_list,full_country_list,aliases,ear_coun
     global prev_time
     global IsIncremental
     retVal = checkpreviousfull(directory)
-    print 'here'
-    print prev_time
     if(IsIncremental == 1 and retVal == 1):
         master_list = glob.glob(directory+"/master*.json")
         for fileName in master_list:
@@ -656,9 +653,10 @@ def get_song_list_master(directory,songs_list,full_country_list,aliases,ear_coun
                                 bskip = True
                         retlist = GetArtist(track['artists'])
                         if(retlist[0] != None):
-                            song['featArtists'] = retlist[1]
-                            song['connectors'] = retlist[2]
+                            song['featArtists'] = retlist[2]
+                            song['connectors'] = retlist[3]
                             song['artistName'] = retlist[0]
+                            song['artist_id'] = retlist[1]
                     if(bskip == True):
                         earlier_year_skip = True
                         continue
@@ -882,7 +880,8 @@ def crawlArtist(directory):
         #songs_pool = Pool()
         #songs_pool =ThreadPool(processes=5)
         print len(parallel_songs_list)
-        with concurrent.futures.ThreadPoolExecutor(max_workers=40) as executor:
+        print parallel_songs_list
+        with concurrent.futures.ThreadPoolExecutor(max_workers=4) as executor:
                 return_pool = executor.map(getVideoFromYoutube,parallel_songs_list)
         #print len(return_pool)
         for ret_val in return_pool:
@@ -998,7 +997,9 @@ def getVideoFromYoutube(curr_elem):
     retvid = None
     bret = False
     artname = curr_elem['artistName']
-    print artname
+    #print '---------------------'
+    #print artname
+    #print '-----------------'
     try:
         retvid,bret = getVideo(curr_elem,0)
         if('anv' in curr_elem):
@@ -1101,6 +1102,8 @@ def getVideo(curr_elem,flag):
             video1.styles = curr_elem['styles']
             video1,bret = getYoutubeUrl(video1,flag,0)
             video1.artist_id = curr_elem['artist_id']
+            #print curr_elem['artist_id']
+            #print curr_elem['artistName']
             #video2,bret = getYoutubeUrl(video1,flag,1)#comment it to get more videos Apostolos
             #else:
             #    return None
@@ -1582,11 +1585,12 @@ def GetArtist(artistObj):
             artName = 'the '+ artName
         if(artist['position'] == 1):
             artistName = artName
+            artist_id = artist['artist_id']
         else:
             ftArtistList.append(artName)
         if(artist['join_relation'] != None):
             connList.append(artist['join_relation'])
-    return artistName,ftArtistList,connList
+    return artistName,artist_id,ftArtistList,connList
 
 
 
@@ -1860,8 +1864,6 @@ try:
                             strg = curr_dir
                             foldlist.append(strg)
         logger_error.debug("Folders List:")
-        print foldlist
-
         n = len(foldlist)
 
         logger_error.debug("Starting Processes:")
