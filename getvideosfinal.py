@@ -428,6 +428,7 @@ def get_song_list(directory,songs_list,full_country_list,aliases,ear_count,ear_y
                 song['year'] = curr_album['released_date']
                 song['country'] = curr_album['country']
                 song['featArtists'] = []
+                song['featArtistsIds'] = []
                 song['connectors'] = []
                 song['extraArtists'] = []
                 song['extraArtistsconnectors'] = []
@@ -445,6 +446,9 @@ def get_song_list(directory,songs_list,full_country_list,aliases,ear_count,ear_y
                                 artist['artist_name'] = 'the '+ artist['artist_name']
                     if(artist['position'] == 1):
                         song['artistName'] = re.sub(r'\(.*?\)', '', artist['artist_name'].lower()).strip()
+                        print song['artistName']
+                        print artist['artist_id']
+
                         song['artist_id'] = artist['artist_id']
                         #add anvs for the main artist alone
                         if('anv' in artist and artist['anv'] != None):
@@ -1096,6 +1100,7 @@ def getVideo(curr_elem,flag):
             video1.genres = curr_elem['genres']
             video1.styles = curr_elem['styles']
             video1,bret = getYoutubeUrl(video1,flag,0)
+            video1.artist_id = curr_elem['artist_id']
             #video2,bret = getYoutubeUrl(video1,flag,1)#comment it to get more videos Apostolos
             #else:
             #    return None
