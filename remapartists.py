@@ -9,15 +9,16 @@ import re
 import codecs
 reload(sys)
 sys.setdefaultencoding('utf8')
-artist_dict = {}
-artist_count = 0
-genres_dict = {}
-genre_count = 0
 
 def getmatrixdata(filename):
-	global artist_count
-	global genre_count
-	fileopen = codecs.open(filename,"r","utf-8")
+        artist_dict = {}
+        artist_count = 0
+        genres_dict = {}
+        genre_count = 0
+        try:
+	    fileopen = codecs.open(filename,"r","utf-8")
+        except Exception as e:
+            return
 	lines = []
 	remapped_lines = []
 	lines = fileopen.readlines()
@@ -57,9 +58,50 @@ def getmatrixdata(filename):
 		filewrite.write(line)
 		filewrite.write('\n')
 				
-
-		
+def getsongsdata(filename):
+    #songname:;youtubeId:;artistid:;artistname:;popularity:;year:;genre:;songid:;genreid
+    songs_dict = {}
+    songs_count = 0
+    genres_dict = {}
+    genre_count = 0
+    fileopen = codecs.open(filename,"r","utf-8")
+    lines = []
+    remapped_lines = []
+    lines = fileopen.readlines()
+    lines = filter(lambda x: x.replace('\n','') != '',lines)
+    lines = map(lambda x:x.replace('\n',''),lines)
+    print len(lines)
+    for line in lines:
+        if(line != ''):
+            try:
+                #remapped_lines.append(line)
+                words = line.split(':;')
+                if(words[1] not in songs_dict):
+                    songs_dict[words[1]] = songs_count
+                    songs_count = songs_count + 1
+                    #line = line.replace(':;'+words[1]+':;',':;'+str(songs_dict[words[1]])+':;',1)
+                line = line +':;'+str(songs_dict[words[1]])
+                if(words[6] not in genres_dict):
+                    genres_dict[words[6]] = genre_count
+                    #line = line +':;'+str(genre_count)
+                    genre_count = genre_count + 1
+                    #line = line.replace(':;'+words[6]+':;',':;'+str(genres_dict[words[6]])+':;')
+                line = line +':;'+str(genres_dict[words[6]])
+                remapped_lines.append(line)
+	    except Exception as e:
+                print e
+                print line
+    print 'songs'
+    print len(songs_dict)
+    print 'genres'
+    print len(genres_dict)
+    fileopen.close()
+    filewrite = codecs.open('remapped_songs_file.txt',"w","utf-8")
+    for line in remapped_lines:
+        filewrite.write(line)
+        filewrite.write('\n')		
 
 getmatrixdata('logdir/combined.txt')
+getsongsdata('songsdir/combinedsongs.txt')
 #print artist_dict
 #print genres_dict
