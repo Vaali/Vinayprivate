@@ -129,11 +129,11 @@ print v1[2]'''
 
 #print artists_map
 def sort_rows(m):
-    print m
+    #print m
     m.data *= m.data>=0.89
     m.eliminate_zeros()
-    print 'xxxxxxxxxxx'
-    print m
+    #print 'xxxxxxxxxxx'
+    #print m
     rows=  m.nonzero()[0]
     cols = m.nonzero()[1]
     #for y in cols:
@@ -164,7 +164,7 @@ def sort_rows(m):
     sorted_x = sorted(tuples, key=lambda score: score[1], reverse=True)
     t6=datetime.now()
     print 'sort time' + str(t6-t5)
-    print sorted_x
+    #print sorted_x
     return sorted_x
 
 
@@ -188,33 +188,33 @@ def similarartist((split,block_indices,index)):
             curr_artist.set_earliestDate(curr_artist_year)
             written = 0
             #currentrow = cosinesimilarityartist[sim_mat_index,:].toarray()
-            #currentrow = cosinesimilarityartist.getrow(sim_mat_index)
+            currentrow = cosinesimilarityartist.getrow(sim_mat_index)
             #print currentrow
             t3=datetime.now()
             sorted_s = sort_rows(cosinesimilarityartist.getrow(sim_mat_index))
             t4=datetime.now()
             print (t4-t3)
             #change here to increase the number of similar artists
-            sorted_s = sorted_s[0:3]
+            sorted_s = sorted_s[0:10]
 	    #for j in row_indices[sim_mat_index]:
             for pair in sorted_s:
                 j = pair[0]
                 #if(currentrow[0][j] > 0.89):
-                if(pair[1] > 0.89):
-                    written = 1
-                    curr_similar_artist = artists_map[j][0]
-                    curr_similar_artist_id = int(artists_map[j][3])
-                    curr_similar_artist_popularity = int(artists_map[j][1])
-                    curr_similar_artist_year = int(artists_map[j][2])
-                    similar_artists = sa.similarArtists()
-                    similar_artists.set_artistName(curr_similar_artist)
-                    similar_artists.set_artistId(curr_similar_artist_id)
-                    similar_artists.set_artistPopularityAll(curr_similar_artist_popularity)
-                    similar_artists.set_earliestDate(curr_similar_artist_year)
-                    similar_artists.set_cosineDistance(pair[1])
-                    #similar_artists.set_euclideanDistance(euclideandistanceartist[i][j])
-                    #similar_artists.set_pearsonDistance(pearsondistanceartist[i,:][j])
-                    curr_artist.add_similarArtists(similar_artists)
+                #if(pair[1] > 0.89):
+                written = 1
+                curr_similar_artist = artists_map[j][0]
+                curr_similar_artist_id = int(artists_map[j][3])
+                curr_similar_artist_popularity = int(artists_map[j][1])
+                curr_similar_artist_year = int(artists_map[j][2])
+                similar_artists = sa.similarArtists()
+                similar_artists.set_artistName(curr_similar_artist)
+                similar_artists.set_artistId(curr_similar_artist_id)
+                similar_artists.set_artistPopularityAll(curr_similar_artist_popularity)
+                similar_artists.set_earliestDate(curr_similar_artist_year)
+                similar_artists.set_cosineDistance(currentrow[0,j])
+                #similar_artists.set_euclideanDistance(euclideandistanceartist[i][j])
+                #similar_artists.set_pearsonDistance(pearsondistanceartist[i,:][j])
+                curr_artist.add_similarArtists(similar_artists)
             if(written == 1):
                 fname = 'simartistdir/' + str(curr_artist_id)+'.xml'
                 fx = codecs.open(fname,"w","utf-8")
@@ -282,6 +282,42 @@ def split_sparse(mat, row_divs = [], col_divs = []):
 
     return mat_of_mats
 
+def cosine_similarity():
+    try:
+        print tempA1.shape
+        #calculating the row sums 
+        row_sums = ((tempA1.multiply(tempA1)).sum(axis=1))
+        #calculating the sqrt of the sums
+        rows_sums_sqrt = np.array(np.sqrt(row_sums))[:,0]
+        #divide and get the norms
+        row_indices, col_indices = tempA1.nonzero()
+        tempA1.data /= rows_sums_sqrt[row_indices]
+        
+        tempA2 = tempA1.transpose()
+        #print (tempA1*tempA2).todense()
+        #change this to correct sparse matrix manipulations
+
+        #break the matrix into peices
+        #if(tempA1.shape[0]<100):
+        #    block_indices = range(1,tempA1.shape[0])
+        #else:
+        block_indices = range(100,tempA1.shape[0],100)
+        #function returns the blocks of the main matrix        
+        split_mat = split_sparse(tempA1,block_indices,[])
+
+        index = 0
+        block_indices = [0]+ block_indices + [row_max+1]
+        #foreach block returned calculate the cosine similarity 
+        print block_indices
+        #similarartist((split_mat[0],block_indices,0))
+        p =Pool(processes=int(100))
+	p.map(similarartist,zip(split_mat,repeat(block_indices),range(0,len(block_indices))))
+        p.close()
+	p.join()
+        print 'cosine distance'
+    except Exception as e:
+	logger_matrix.exception(e)
+
 if __name__ == '__main__':
     logger_matrix = loggingmodule.initialize_logger('matrixoperations.log')
     t1=datetime.now()
@@ -315,7 +351,7 @@ if __name__ == '__main__':
         data = np.array(data_list)
         artistgenrematrix = sp.coo_matrix((data, (row, col)), shape=(row_max+1, col_max+1))
         popularitymatrix = sp.coo_matrix((data_popularity_list,(rows_popularity_list,cols_popularity_list)),shape=(1,row_max+1))
-        print popularitymatrix
+        #print popularitymatrix
         tempA1 = artistgenrematrix.tocsr()
         #print temp1
         
@@ -327,10 +363,10 @@ if __name__ == '__main__':
         rows_sums_sqrt = np.array(np.sqrt(row_sums))[:,0]
         #divide and get the norms
         row_indices, col_indices = tempA1.nonzero()
-        tempA1.data /= rows_sums_sqrt[row_indices]
+        tempA1.data = tempA1.data/rows_sums_sqrt[row_indices]
         
         tempA2 = tempA1.transpose()
-        
+        #print (tempA1*tempA2).todense()
         #change this to correct sparse matrix manipulations
 
         #break the matrix into peices
