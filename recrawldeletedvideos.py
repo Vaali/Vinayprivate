@@ -288,7 +288,7 @@ def getVideo(oldsong):
 		selectedVideoPublishedDate = ""
 		for videoresult in searchResult['items']:
 			searchEntry = searchResult['items'][i]
-			[currentVideoDecision,currentVideoMatch,currentVideoTotalMatch,currentVideoSongMatch,currentVideoArtistMatch] = CalculateMatch(oldsong,searchEntry['snippet']['title'],searchEntry['snippet']['description'])
+			[currentVideoDecision,currentVideoMatch,currentVideoTotalMatch,currentVideoSongMatch,currentVideoArtistMatch,error_str] = CalculateMatch(oldsong,searchEntry['snippet']['title'],searchEntry['snippet']['description'],True)
 			if(currentVideoDecision == "correct"):
 				youtubeVideoId = searchEntry['id']['videoId']
 				videoUrl = "https://www.googleapis.com/youtube/v3/videos?id="+str(youtubeVideoId)+"&key=AIzaSyBE5nUPdQ7J_hlc3345_Z-I4IG-Po1ItPU&part=statistics,contentDetails,status"
@@ -372,18 +372,20 @@ def getNewVideo(filename):
 
 #output_directory = foldername+'/deletedvideos'
 #getNewVideo(str(sys.argv[1]))
-
-directory = raw_input("Enter directory: ")
-outputdirectory = raw_input("Enter output directory: ")
-m = raw_input("Enter m: ")
-m=int(m)
-try:
-	filelist = glob.glob(directory+"/*.xml")
+if __name__ == '__main__':
+    directory = raw_input("Enter directory: ")
+    outputdirectory = raw_input("Enter output directory: ")
+    if(not os.path.exists(outputdirectory)):
+        os.mkdir(outputdirectory)
+    m = raw_input("Enter m: ")
+    m=int(m)
+    try:
+        filelist = glob.glob(directory+"/*.xml")
 	print filelist
 	p =Pool(processes=int(m))
 	p.map(getNewVideo,filelist)
 	p.close()
 	p.join()
-except Exception as e:
-		logging.exception("Error")	
+    except Exception as e:
+	logging.exception("Error")	
 

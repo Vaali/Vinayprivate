@@ -54,6 +54,9 @@ logger_decisions = logging.getLogger('simple_logger1')
 stemwords_uniquelist = ["(Edited Short Version)","(Alternate Early Version)","(Alternate Version)","(Mono)","(Radio Edit)","(Original Album Version)","(Different Mix)","(Music Film)","(Stereo)","(Single Version)","Stereo","Mono","(Album Version)","Demo","(Demo Version)"]
 solrConnection = SolrConnection('http://aurora.cs.rutgers.edu:8181/solr/discogs_artists')
 
+#class 
+
+
 '''
 Utility functions
 '''
@@ -416,7 +419,10 @@ def get_song_list(directory,songs_list,full_country_list,aliases,ear_count,ear_y
                 temp_year_album = GetYearFromTitle(curr_album['title'])
                 #print temp_year_album
                 if(curr_album['released_date'] != None and temp_year_album != 0):
-                    curr_year = int(str(curr_album['released_date']).split('-')[0])
+                    if(str(curr_album['released_date']).split('-')[0] != ''):
+                        curr_year = int(str(curr_album['released_date']).split('-')[0])
+                    else:
+                        curr_year = 1001
                     if(curr_year == 1001 or (curr_year > int(temp_year_album))):
                         curr_album['released_date'] = str(temp_year_album)
                 elif(temp_year_album != 0):
@@ -493,6 +499,8 @@ def get_song_list(directory,songs_list,full_country_list,aliases,ear_count,ear_y
 
                 song['name'] = track['title']
                 song['name'] = remove_stemwords(song['name'])
+                if(song['name'] == ''):
+                        song['name'] = track['title']
 
                 if('duration' in curr_album):
                     song['duration'] = track['duration']
@@ -590,7 +598,10 @@ def get_song_list_master(directory,songs_list,full_country_list,aliases,ear_coun
                 temp_year_album = 0
                 temp_year_album = GetYearFromTitle(curr_album['title'])
                 if(curr_album['released_date'] != None and temp_year_album != 0):
-                    curr_year = int(str(curr_album['released_date']).split('-')[0])
+                    if(str(curr_album['released_date']).split('-')[0] != ''):
+                        curr_year = int(str(curr_album['released_date']).split('-')[0])
+                    else:
+                        curr_year = 1001
                     if(curr_year == 1001 or (curr_year > int(temp_year_album))):
                         curr_album['released_date'] = str(temp_year_album)
                 elif(temp_year_album != 0):
@@ -682,6 +693,8 @@ def get_song_list_master(directory,songs_list,full_country_list,aliases,ear_coun
 
                     song['name'] = track['title']
                     song['name'] = remove_stemwords(song['name'])
+                    if(song['name'] == ''):
+                        song['name'] = track['title']
                     #song['name'] = song['name'].replace("?",'').strip()
                     if('duration' in curr_album):
                         song['duration'] = track['duration']
@@ -880,7 +893,7 @@ def crawlArtist(directory):
         #songs_pool = Pool()
         #songs_pool =ThreadPool(processes=5)
         print len(parallel_songs_list)
-        print parallel_songs_list
+        #print parallel_songs_list
         with concurrent.futures.ThreadPoolExecutor(max_workers=4) as executor:
                 return_pool = executor.map(getVideoFromYoutube,parallel_songs_list)
         #print len(return_pool)
@@ -1141,14 +1154,21 @@ def GetYearFromTitle(vid_title):
             returnYear = 0
     return returnYear
 
-def CalculateMatch(video,vid_title,vid_description):
+def CalculateMatch(video,vid_title,vid_description,oldsong = False):
     try:
         list = ""
         conlist = ""
-        artistName = video.artist
-        ftArtistName = video.ftArtist
-        connectorList = video.connectors
-        songName = video.name
+        if(oldsong == False):
+            artistName = video.artist
+            ftArtistName = video.ftArtist
+            connectorList = video.connectors
+            songName = video.name
+        else:
+            artistName = video.artist.artistName[0]
+            ftArtistName = video.ftArtistList.ftArtistName
+            connectorList = video.connPhraseList.connPhrase
+            songName = video.songName
+
         fList = ""
         albumname = ""
         error_str = ""
@@ -1183,13 +1203,14 @@ hq','band','audio','album','world','instrumental','intro','house','acoustic','so
         songpos_desc = descriptionmatch.lower().find(songName.lower())
         artpos = youtubematch.lower().find(artistName.lower())
         artpos_desc = descriptionmatch.lower().find(artistName.lower())
-        for l in video.album:
-            albumpos = youtubematch.lower().find(l['albumname'].lower())
-            if(albumpos != -1):
-                substring_album = "true"
-                artist_order[albumpos] = l['albumname']
-                albumname = l['albumname']
-                break
+        if(oldsong == False):
+            for l in video.album:
+                albumpos = youtubematch.lower().find(l['albumname'].lower())
+                if(albumpos != -1):
+                    substring_album = "true"
+                    artist_order[albumpos] = l['albumname']
+                    albumname = l['albumname']
+                    break
         ftart_substring = []
         ftartpos = []
         ftartistmatchdesc = []
@@ -1756,13 +1777,19 @@ def getYoutubeUrl(video,flag,mostpopular):
                         #check if the earliest year present in the name of the song from youtube
                         if(selectedVideoYear != 0):
                             video.videoYear = selectedVideoYear
-                            curr_year = int(str(video.year).split('-')[0])
+                            if(str(video.year).split('-')[0] != ''):
+                                curr_year = int(str(video.year).split('-')[0])
+                            else:
+                                curr_year = 1001
                             if(curr_year == 1001 or (curr_year > int(video.videoYear))):
                                 video.year = video.videoYear
                         #check if the earliest year present in the title of the song from discogs
                         if(yearfromName != 0):
                             video.videoYearName = yearfromName
-                            curr_year = int(str(video.year).split('-')[0])
+                            if(str(video.year).split('-')[0] != ''):
+                                curr_year = int(str(video.year).split('-')[0])
+                            else:
+                                curr_year = 1001
                             if(curr_year == 1001 or (curr_year > int(video.videoYearName))):
                                 video.year = video.videoYearName
                         video.published = selectedVideoPublishedDate
@@ -1807,86 +1834,80 @@ def checkpreviousfull(directory):
     return retVal
 
 
+if __name__ == '__main__':
+    reload(sys)
+    sys.setdefaultencoding('utf8')
+    filenameList = []
+    t1 = datetime.now()
+    try:
+        lastdirectory = 0
+        logger_error.debug("Discogs Main Program Starting")
+        directory = raw_input("Enter directory: ")
+        m1 = raw_input("Enter m: ")
+        folders = raw_input("Enter number of folders: ")
+        folders = int(folders)
+        m1=int(m1)
+        incr = raw_input("Isincremental : ")
+        incr = int(incr)
+        IsIncremental = incr
+        prev_time = 0
+        timeFile = directory + "/timelog.txt"
+        if(incr == 1):
+            try:
+                with open(timeFile,"r") as f:
+                    prev_time = int(f.read())
+            except IOError as e:
+                print e
+        directorylist = list()
+        if(os.path.exists(directory+'/lastdirectory.txt')):
+            fread = codecs.open(directory+'/lastdirectory.txt','r','utf-8')
+            lines = fread.readlines()
+            if(len(lines) > 0):
+                if(lines[-1].strip() != ""):
+                    lastdirectory = int(lines[-1])
+            fread.close()
+            fwrite = codecs.open(directory+'/lastdirectory.txt','a','utf-8')
+        else:
+            fwrite = codecs.open(directory+'/lastdirectory.txt','w','utf-8')
 
-reload(sys)
-sys.setdefaultencoding('utf8')
-filenameList = []
-t1 = datetime.now()
-try:
-    lastdirectory = 0
-    logger_error.debug("Discogs Main Program Starting")
-    directory = raw_input("Enter directory: ")
-    m1 = raw_input("Enter m: ")
-    folders = raw_input("Enter number of folders: ")
-    folders = int(folders)
-    m1=int(m1)
-    incr = raw_input("Isincremental : ")
-    incr = int(incr)
-    IsIncremental = incr
-    prev_time = 0
-    timeFile = directory + "/timelog.txt"
-    if(incr == 1):
-        try:
-            with open(timeFile,"r") as f:
-                prev_time = int(f.read())
-        except IOError as e:
-            print e
-    directorylist = list()
-    if(os.path.exists(directory+'/lastdirectory.txt')):
-        fread = codecs.open(directory+'/lastdirectory.txt','r','utf-8')
-        lines = fread.readlines()
-        if(len(lines) > 0):
-            if(lines[-1].strip() != ""):
-                lastdirectory = int(lines[-1])
-        fread.close()
-        fwrite = codecs.open(directory+'/lastdirectory.txt','a','utf-8')
-    else:
-        fwrite = codecs.open(directory+'/lastdirectory.txt','w','utf-8')
-
-    ''' Folders list count to control the numebr of folders done'''
-    for dirs in os.listdir(directory):
-        found = re.search(r'[0-9]+',str(dirs),0)
-        if (found and (lastdirectory <= int(dirs))):
-            directorylist.append(int(dirs))
-    directorylist = sorted(directorylist)
-    splitlist = list(itertools.izip_longest(*(iter(directorylist),) * folders))
-    logger_error.debug(splitlist)
-    for split in splitlist:
-        foldlist = list()
-        #t1=time.time()
-        foldercompletelist = {}
-        folderstartedlist = {}
-        logger_error.debug("Getting the Folders List")
-        for dirs in split:
-            if(dirs == None):
-                continue
-            for curr_dir, sub_dir, filenames in os.walk(directory+'/'+str(dirs)):
+        ''' Folders list count to control the numebr of folders done'''
+        for dirs in os.listdir(directory):
+            found = re.search(r'[0-9]+',str(dirs),0)
+            if (found and (lastdirectory <= int(dirs))):
+                directorylist.append(int(dirs))
+        directorylist = sorted(directorylist)
+        splitlist = list(itertools.izip_longest(*(iter(directorylist),) * folders))
+        logger_error.debug(splitlist)
+        for split in splitlist:
+            foldlist = list()
+            #t1=time.time()
+            foldercompletelist = {}
+            folderstartedlist = {}
+            logger_error.debug("Getting the Folders List")
+            for dirs in split:
+                if(dirs == None):
+                    continue
+                for curr_dir, sub_dir, filenames in os.walk(directory+'/'+str(dirs)):
                             strg = curr_dir
                             foldlist.append(strg)
-        logger_error.debug("Folders List:")
-        n = len(foldlist)
+            logger_error.debug("Folders List:")
+            n = len(foldlist)
 
-        logger_error.debug("Starting Processes:")
-        songs_pool = Pool()
-        songs_pool =Pool(processes=m1)
-        songs_pool.map_async(crawlArtist,foldlist)
-        songs_pool.close()
-        songs_pool.join()
-        print datetime.now()-t1
-        logger_error.debug("completed for split : "+','.join(map(str,split)))
-        fwrite.write(str(split[0]))
-        fwrite.write("\n")
-        if(split[-1]!= None):
-            fwrite.write(str(split[-1]))
+            logger_error.debug("Starting Processes:")
+            songs_pool = Pool()
+            songs_pool =Pool(processes=m1)
+            songs_pool.map_async(crawlArtist,foldlist)
+            songs_pool.close()
+            songs_pool.join()
+            print datetime.now()-t1
+            logger_error.debug("completed for split : "+','.join(map(str,split)))
+            fwrite.write(str(split[0]))
             fwrite.write("\n")
-    fwrite.close()
-except Exception as e:
-		logger_error.exception(e)
-
-
-
-
-t2=datetime.now()
-
-
-print "time=" +str(t2-t1)
+            if(split[-1]!= None):
+                fwrite.write(str(split[-1]))
+                fwrite.write("\n")
+        fwrite.close()
+    except Exception as e:
+        logger_error.exception(e)
+    t2=datetime.now()
+    print "time=" +str(t2-t1)
