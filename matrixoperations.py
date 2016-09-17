@@ -240,24 +240,22 @@ def similargenre(i):
         #curr_genre.set_artistPopularityAll(curr_artist_popularity)
 	#curr_genre.set_earliestDate(curr_artist_year)
 	#change this to correct sparse matrix manipulations
-        curr_row = cosinesimilaritygenre[i,:].toarray()
+        curr_row = cosinesimilaritygenre[i,:]
         #print curr_row
-	for j in genres_map:
-            if(cosinesimilaritygenre[i,:].toarray()[0][j] > 0):
-		curr_similar_genre = genres_map[j]
-		curr_similar_artist_id = j
-		#curr_similar_artist_popularity = int(genres_map[j][1])
-		#curr_similar_artist_year = int(genres_map[j][2])
-		
-		similar_genre = sa.similarArtists()
-		similar_genre.set_artistName(curr_similar_genre)
-		similar_genre.set_artistId(curr_similar_artist_id)
-		#similar_genre.set_artistPopularityAll(curr_similar_artist_popularity)
-		#similar_genre.set_earliestDate(curr_similar_artist_year)
-		similar_genre.set_cosineDistance(cosinesimilaritygenre[i,:].toarray()[0][j])
-		#similar_genre.set_euclideanDistance(euclideandistancegenre[i][j])
-		#similar_genre.set_pearsonDistance(pearsondistancegenre[i,:][j])		
-		curr_genre.add_similarArtists(similar_genre)
+        curr_row.data *= curr_row.data>=0.85
+        curr_row.eliminate_zeros()
+        tuples =  zip(curr_row.indices,curr_row.data)
+        sorted_g = sorted(tuples, key=lambda score: score[1], reverse=True)
+        sorted_g = sorted_g[0:10]      
+	for pair in sorted_g:
+            j = pair[0]
+            curr_similar_genre = genres_map[j]
+	    curr_similar_artist_id = j
+            similar_genre = sa.similarArtists()
+	    similar_genre.set_artistName(curr_similar_genre)
+	    similar_genre.set_artistId(curr_similar_artist_id)
+	    similar_genre.set_cosineDistance(pair[1])
+	    curr_genre.add_similarArtists(similar_genre)
 	curr_genre.export(fx,0)
 	fx.close()
     except Exception as e:
