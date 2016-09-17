@@ -147,6 +147,7 @@ def genXML(vid,avgcnt,avgcntrece,artistId,genreCountList):
         conlist = ""
         mysong = api.songs()
         artistName = vid['artist']
+        curr_artist_id = vid['artist_id']
         
         artistName.strip("-")
         ftArtistName = vid['ftArtist']
@@ -186,8 +187,7 @@ def genXML(vid,avgcnt,avgcntrece,artistId,genreCountList):
         else:
 			ydate = '0001-01-01 00:00:00'
         mysong.set_youtubeId(url[-11:])
-        if (artistName == artistName):
-			mysong.set_artistId(int(artistId))
+        mysong.set_artistId(int(curr_artist_id))
         mysong.set_songName(songName)	
         mysong.set_youtubeName(vid['title'])
         vid['title'] = vid['title'].replace(',','')
@@ -701,6 +701,8 @@ def CalculateAverages(directory):
     earlier_year = 10000
     path = directory + "/dump"
     print path
+    dindex = directory.rfind("/")
+    artistId = directory[dindex+1:]
     viewcountlist = []
     try:
 		json_data = codecs.open(path)
@@ -720,11 +722,12 @@ def CalculateAverages(directory):
             releaseyear = int(str(s['year']).split('-')[0])
         if(earlier_year > releaseyear and releaseyear > 1900):
 		earlier_year = releaseyear
-        if('viewcount' in s):
+        if('viewcount' in s and artistId == s['artist_id']):
             ViewcountSum = ViewcountSum + int(s['viewcount'])
             viewcountlist.append(int(s['viewcount']))
             ViewCountRateSum = ViewCountRateSum + int(s['viewcountRate'])
             count = count + 1
+    #check artist id
     if(len(songs) != 0):
 		averageCount = ViewcountSum / len(songs)
 		#print "Averages: "
@@ -774,13 +777,22 @@ def GetTotalGenresCountForArtist(vids,artistId,directory):
     with codecs.open(directory+'/result.json', 'w','utf8') as fp:
         json.dump(genreMat, fp)
 	artists_count = {}
+        artists_id_mapping = {}
     for v in vids:
         genre = v['genres']
         curr_artist = v['artist'].lower()
+        curr_artist_id = v['artist_id']
+        #possible bug for feature artists. we need to test for featured artists.
+        if(curr_artist_id != artistId):
+            print curr_artist_id
+            print artistId
+            print '----------------'
+            continue
         if(curr_artist not in artists_count):
-			artists_count[curr_artist] = 1
+            artists_count[curr_artist] = 1
+            artists_id_mapping[curr_artist] = curr_artist_id
         else:
-			artists_count[curr_artist] = artists_count[curr_artist] + 1
+            artists_count[curr_artist] = artists_count[curr_artist] + 1
         if(genre != None):
             for g in genre:
                 g = g.replace("\"","")
@@ -809,8 +821,10 @@ def GetTotalGenresCountForArtist(vids,artistId,directory):
     #print TotalGenreStyleCount
     #print artists_count
     sorted_x = sorted(artists_count.items(), key=operator.itemgetter(1),reverse = True)
+    print 'here'
+    print sorted_x
     if(len(sorted_x) == 0):
-	    artistName = 'Unknown'
+	artistName = 'Unknown'
     else:	
         artistName = sorted_x[0][0]
     for genre in genrecount:
@@ -829,8 +843,8 @@ def GetTotalGenresCountForArtist(vids,artistId,directory):
             curr_parseVal.append(genre)
             curr_parseVal.append(genreMat[genre])
         else:
-			logger_genre.error(genre)
-			continue
+            logger_genre.error(genre)
+            continue
         curr_parseVal.append(genrecount[genre])
         print genrecount[genre]
         #curr_parseVal.append(percent)
