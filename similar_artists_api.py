@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 #
-# Generated Thu Aug 25 23:02:14 2016 by generateDS.py version 2.9a.
+# Generated Sat Sep 17 15:24:26 2016 by generateDS.py version 2.9a.
 #
 
 import sys
@@ -843,11 +843,13 @@ class similarArtists(GeneratedsSuper):
 class song(GeneratedsSuper):
     subclass = None
     superclass = None
-    def __init__(self, songName=None, songId=None, songPopularityAll=None, earliestDate=None, similarSongs=None):
+    def __init__(self, songName=None, songId=None, songPopularityAll=None, earliestDate=None, artistName=None, artistId=None, similarSongs=None):
         self.songName = songName
         self.songId = songId
         self.songPopularityAll = songPopularityAll
         self.earliestDate = earliestDate
+        self.artistName = artistName
+        self.artistId = artistId
         if similarSongs is None:
             self.similarSongs = []
         else:
@@ -866,6 +868,10 @@ class song(GeneratedsSuper):
     def set_songPopularityAll(self, songPopularityAll): self.songPopularityAll = songPopularityAll
     def get_earliestDate(self): return self.earliestDate
     def set_earliestDate(self, earliestDate): self.earliestDate = earliestDate
+    def get_artistName(self): return self.artistName
+    def set_artistName(self, artistName): self.artistName = artistName
+    def get_artistId(self): return self.artistId
+    def set_artistId(self, artistId): self.artistId = artistId
     def get_similarSongs(self): return self.similarSongs
     def set_similarSongs(self, similarSongs): self.similarSongs = similarSongs
     def add_similarSongs(self, value): self.similarSongs.append(value)
@@ -876,6 +882,8 @@ class song(GeneratedsSuper):
             self.songId is not None or
             self.songPopularityAll is not None or
             self.earliestDate is not None or
+            self.artistName is not None or
+            self.artistId is not None or
             self.similarSongs
             ):
             return True
@@ -916,6 +924,12 @@ class song(GeneratedsSuper):
         if self.earliestDate is not None:
             showIndent(outfile, level, pretty_print)
             outfile.write('<%searliestDate>%s</%searliestDate>%s' % (namespace_, self.gds_format_string(quote_xml(self.earliestDate).encode(ExternalEncoding), input_name='earliestDate'), namespace_, eol_))
+        if self.artistName is not None:
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sartistName>%s</%sartistName>%s' % (namespace_, self.gds_format_string(quote_xml(self.artistName).encode(ExternalEncoding), input_name='artistName'), namespace_, eol_))
+        if self.artistId is not None:
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sartistId>%s</%sartistId>%s' % (namespace_, self.gds_format_integer(self.artistId, input_name='artistId'), namespace_, eol_))
         for similarSongs_ in self.similarSongs:
             similarSongs_.export(outfile, level, namespace_, name_='similarSongs', pretty_print=pretty_print)
     def exportLiteral(self, outfile, level, name_='song'):
@@ -939,6 +953,12 @@ class song(GeneratedsSuper):
         if self.earliestDate is not None:
             showIndent(outfile, level)
             outfile.write('earliestDate=%s,\n' % quote_python(self.earliestDate).encode(ExternalEncoding))
+        if self.artistName is not None:
+            showIndent(outfile, level)
+            outfile.write('artistName=%s,\n' % quote_python(self.artistName).encode(ExternalEncoding))
+        if self.artistId is not None:
+            showIndent(outfile, level)
+            outfile.write('artistId=%d,\n' % self.artistId)
         showIndent(outfile, level)
         outfile.write('similarSongs=[\n')
         level += 1
@@ -980,6 +1000,18 @@ class song(GeneratedsSuper):
             earliestDate_ = child_.text
             earliestDate_ = self.gds_validate_string(earliestDate_, node, 'earliestDate')
             self.earliestDate = earliestDate_
+        elif nodeName_ == 'artistName':
+            artistName_ = child_.text
+            artistName_ = self.gds_validate_string(artistName_, node, 'artistName')
+            self.artistName = artistName_
+        elif nodeName_ == 'artistId':
+            sval_ = child_.text
+            try:
+                ival_ = int(sval_)
+            except (TypeError, ValueError), exp:
+                raise_parse_error(child_, 'requires integer: %s' % exp)
+            ival_ = self.gds_validate_integer(ival_, node, 'artistId')
+            self.artistId = ival_
         elif nodeName_ == 'similarSongs':
             obj_ = similarSongs.factory()
             obj_.build(child_)
@@ -990,7 +1022,7 @@ class song(GeneratedsSuper):
 class similarSongs(GeneratedsSuper):
     subclass = None
     superclass = None
-    def __init__(self, songName=None, songId=None, songPopularityAll=None, earliestDate=None, cosineDistance=None, euclideanDistance=None, pearsonDistance=None):
+    def __init__(self, songName=None, songId=None, songPopularityAll=None, earliestDate=None, cosineDistance=None, euclideanDistance=None, pearsonDistance=None, artistName=None, artistId=None):
         self.songName = songName
         self.songId = songId
         self.songPopularityAll = songPopularityAll
@@ -998,6 +1030,8 @@ class similarSongs(GeneratedsSuper):
         self.cosineDistance = cosineDistance
         self.euclideanDistance = euclideanDistance
         self.pearsonDistance = pearsonDistance
+        self.artistName = artistName
+        self.artistId = artistId
     def factory(*args_, **kwargs_):
         if similarSongs.subclass:
             return similarSongs.subclass(*args_, **kwargs_)
@@ -1018,6 +1052,10 @@ class similarSongs(GeneratedsSuper):
     def set_euclideanDistance(self, euclideanDistance): self.euclideanDistance = euclideanDistance
     def get_pearsonDistance(self): return self.pearsonDistance
     def set_pearsonDistance(self, pearsonDistance): self.pearsonDistance = pearsonDistance
+    def get_artistName(self): return self.artistName
+    def set_artistName(self, artistName): self.artistName = artistName
+    def get_artistId(self): return self.artistId
+    def set_artistId(self, artistId): self.artistId = artistId
     def hasContent_(self):
         if (
             self.songName is not None or
@@ -1026,7 +1064,9 @@ class similarSongs(GeneratedsSuper):
             self.earliestDate is not None or
             self.cosineDistance is not None or
             self.euclideanDistance is not None or
-            self.pearsonDistance is not None
+            self.pearsonDistance is not None or
+            self.artistName is not None or
+            self.artistId is not None
             ):
             return True
         else:
@@ -1075,6 +1115,12 @@ class similarSongs(GeneratedsSuper):
         if self.pearsonDistance is not None:
             showIndent(outfile, level, pretty_print)
             outfile.write('<%spearsonDistance>%s</%spearsonDistance>%s' % (namespace_, self.gds_format_float(self.pearsonDistance, input_name='pearsonDistance'), namespace_, eol_))
+        if self.artistName is not None:
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sartistName>%s</%sartistName>%s' % (namespace_, self.gds_format_string(quote_xml(self.artistName).encode(ExternalEncoding), input_name='artistName'), namespace_, eol_))
+        if self.artistId is not None:
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sartistId>%s</%sartistId>%s' % (namespace_, self.gds_format_integer(self.artistId, input_name='artistId'), namespace_, eol_))
     def exportLiteral(self, outfile, level, name_='similarSongs'):
         level += 1
         already_processed = set()
@@ -1105,6 +1151,12 @@ class similarSongs(GeneratedsSuper):
         if self.pearsonDistance is not None:
             showIndent(outfile, level)
             outfile.write('pearsonDistance=%f,\n' % self.pearsonDistance)
+        if self.artistName is not None:
+            showIndent(outfile, level)
+            outfile.write('artistName=%s,\n' % quote_python(self.artistName).encode(ExternalEncoding))
+        if self.artistId is not None:
+            showIndent(outfile, level)
+            outfile.write('artistId=%d,\n' % self.artistId)
     def build(self, node):
         already_processed = set()
         self.buildAttributes(node, node.attrib, already_processed)
@@ -1158,6 +1210,18 @@ class similarSongs(GeneratedsSuper):
                 raise_parse_error(child_, 'requires float or double: %s' % exp)
             fval_ = self.gds_validate_float(fval_, node, 'pearsonDistance')
             self.pearsonDistance = fval_
+        elif nodeName_ == 'artistName':
+            artistName_ = child_.text
+            artistName_ = self.gds_validate_string(artistName_, node, 'artistName')
+            self.artistName = artistName_
+        elif nodeName_ == 'artistId':
+            sval_ = child_.text
+            try:
+                ival_ = int(sval_)
+            except (TypeError, ValueError), exp:
+                raise_parse_error(child_, 'requires integer: %s' % exp)
+            ival_ = self.gds_validate_integer(ival_, node, 'artistId')
+            self.artistId = ival_
 # end class similarSongs
 
 
@@ -1193,10 +1257,10 @@ def parse(inFileName):
     rootObj.build(rootNode)
     # Enable Python to collect the space used by the DOM.
     doc = None
-    sys.stdout.write('<?xml version="1.0" ?>\n')
+    '''sys.stdout.write('<?xml version="1.0" ?>\n')
     rootObj.export(sys.stdout, 0, name_=rootTag,
         namespacedef_='',
-        pretty_print=True)
+        pretty_print=True)'''
     return rootObj
 
 
