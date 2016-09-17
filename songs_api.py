@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 #
-# Generated Sat Apr 23 14:43:09 2016 by generateDS.py version 2.9a.
+# Generated Thu May 12 21:41:48 2016 by generateDS.py version 2.9a.
 #
 
 import sys
@@ -514,7 +514,7 @@ def _cast(typ, value):
 class songs(GeneratedsSuper):
     subclass = None
     superclass = None
-    def __init__(self, youtubeId=None, artistId=None, overLap=None, songName=None, youtubeName=None, artist=None, ftArtistList=None, indexedftArtistList=None, indexedArtistAliasList=None, connPhraseList=None, indexedArtist=None, url=None, releaseDate=None, decade=None, youtubeDate=None, crawlDate=None, viewcount=None, crawlDelta=None, releaseId=None, masterRelease=None, masterGenres=None, masterStyles=None, crawlHistoryList=None, genresCountList=None, rating=None, level1Genres=None, level2Genres=None, level3Genres=None, level4Genres=None, level5Genres=None, level6Genres=None, level7Genres=None, level8Genres=None, level9Genres=None, albumList=None, viewcountRate=None, duration=None, descriptions=None, viewCountGroup=None, decision=None, substring_song=None, substring_artist=None, substring_ftartist=None, songLanguage=None, earliestDate=None, songCountry=None, totalMatch=None, songMatch=None, artistMatch=None, youtubeList=None, soundcloudList=None):
+    def __init__(self, youtubeId=None, artistId=None, overLap=None, songName=None, youtubeName=None, artist=None, ftArtistList=None, indexedftArtistList=None, indexedArtistAliasList=None, connPhraseList=None, indexedArtist=None, url=None, releaseDate=None, decade=None, youtubeDate=None, crawlDate=None, viewcount=None, crawlDelta=None, isCompilation=None, releaseId=None, masterRelease=None, masterGenres=None, masterStyles=None, crawlHistoryList=None, genresCountList=None, rating=None, level1Genres=None, level2Genres=None, level3Genres=None, level4Genres=None, level5Genres=None, level6Genres=None, level7Genres=None, level8Genres=None, level9Genres=None, albumList=None, viewcountRate=None, duration=None, descriptions=None, viewCountGroup=None, decision=None, substring_song=None, substring_artist=None, substring_ftartist=None, songLanguage=None, earliestDate=None, songCountry=None, totalMatch=None, songMatch=None, artistMatch=None, youtubeList=None, soundcloudList=None):
         self.youtubeId = youtubeId
         self.artistId = artistId
         self.overLap = overLap
@@ -533,6 +533,7 @@ class songs(GeneratedsSuper):
         self.crawlDate = crawlDate
         self.viewcount = viewcount
         self.crawlDelta = crawlDelta
+        self.isCompilation = isCompilation
         self.releaseId = releaseId
         self.masterRelease = masterRelease
         self.masterGenres = masterGenres
@@ -608,6 +609,8 @@ class songs(GeneratedsSuper):
     def set_viewcount(self, viewcount): self.viewcount = viewcount
     def get_crawlDelta(self): return self.crawlDelta
     def set_crawlDelta(self, crawlDelta): self.crawlDelta = crawlDelta
+    def get_isCompilation(self): return self.isCompilation
+    def set_isCompilation(self, isCompilation): self.isCompilation = isCompilation
     def get_releaseId(self): return self.releaseId
     def set_releaseId(self, releaseId): self.releaseId = releaseId
     def get_masterRelease(self): return self.masterRelease
@@ -694,6 +697,7 @@ class songs(GeneratedsSuper):
             self.crawlDate is not None or
             self.viewcount is not None or
             self.crawlDelta is not None or
+            self.isCompilation is not None or
             self.releaseId is not None or
             self.masterRelease is not None or
             self.masterGenres is not None or
@@ -802,6 +806,9 @@ class songs(GeneratedsSuper):
         if self.crawlDelta is not None:
             showIndent(outfile, level, pretty_print)
             outfile.write('<%scrawlDelta>%s</%scrawlDelta>%s' % (namespace_, self.gds_format_integer(self.crawlDelta, input_name='crawlDelta'), namespace_, eol_))
+        if self.isCompilation is not None:
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sisCompilation>%s</%sisCompilation>%s' % (namespace_, self.gds_format_boolean(self.isCompilation, input_name='isCompilation'), namespace_, eol_))
         if self.releaseId is not None:
             showIndent(outfile, level, pretty_print)
             outfile.write('<%sreleaseId>%s</%sreleaseId>%s' % (namespace_, self.gds_format_integer(self.releaseId, input_name='releaseId'), namespace_, eol_))
@@ -966,6 +973,9 @@ class songs(GeneratedsSuper):
         if self.crawlDelta is not None:
             showIndent(outfile, level)
             outfile.write('crawlDelta=%d,\n' % self.crawlDelta)
+        if self.isCompilation is not None:
+            showIndent(outfile, level)
+            outfile.write('isCompilation=%s,\n' % self.isCompilation)
         if self.releaseId is not None:
             showIndent(outfile, level)
             outfile.write('releaseId=%d,\n' % self.releaseId)
@@ -1214,6 +1224,16 @@ class songs(GeneratedsSuper):
                 raise_parse_error(child_, 'requires integer: %s' % exp)
             ival_ = self.gds_validate_integer(ival_, node, 'crawlDelta')
             self.crawlDelta = ival_
+        elif nodeName_ == 'isCompilation':
+            sval_ = child_.text
+            if sval_ in ('true', '1'):
+                ival_ = True
+            elif sval_ in ('false', '0'):
+                ival_ = False
+            else:
+                raise_parse_error(child_, 'requires boolean')
+            ival_ = self.gds_validate_boolean(ival_, node, 'isCompilation')
+            self.isCompilation = ival_
         elif nodeName_ == 'releaseId':
             sval_ = child_.text
             try:
@@ -4129,8 +4149,8 @@ def parse(inFileName):
     rootObj.build(rootNode)
     # Enable Python to collect the space used by the DOM.
     doc = None
-    #sys.stdout.write('<?xml version="1.0" ?>\n')
-    '''rootObj.export(sys.stdout, 0, name_=rootTag,
+    '''sys.stdout.write('<?xml version="1.0" ?>\n')
+    rootObj.export(sys.stdout, 0, name_=rootTag,
         namespacedef_='',
         pretty_print=True)'''
     return rootObj
