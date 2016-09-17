@@ -223,11 +223,16 @@ def similarsongs((split,block_indices,index,tempA2)):
             curr_song_id = songs_map[song_index][1]
             curr_song_popularity = int(songs_map[song_index][4])
             curr_song_year = int(songs_map[song_index][5])
+            curr_artist_id = int(songs_map[song_index][2])
+            curr_artist_name = songs_map[song_index][3]
             curr_song = sa.song()
             curr_song.set_songName(curr_songName)
             curr_song.set_songId(curr_song_id)
             curr_song.set_songPopularityAll(curr_song_popularity)
             curr_song.set_earliestDate(curr_song_year)
+            curr_song.set_artistName(curr_artist_name)
+            curr_song.set_artistId(curr_artist_id)
+
             written = 0
             #currentrow = cosinesimilarityartist[sim_mat_index,:].toarray()
             currentrow = cosinesimilaritysong.getrow(sim_mat_index)
@@ -250,6 +255,8 @@ def similarsongs((split,block_indices,index,tempA2)):
                 curr_similar_song_year = int(songs_map[j][5])
                 similar_songs = sa.similarSongs()
                 similar_songs.set_songName(curr_similar_song)
+                similar_songs.set_artistName(songs_map[j][3])
+                similar_songs.set_artistId(int(songs_map[j][2]))
                 similar_songs.set_songId(curr_similar_song_id)
                 similar_songs.set_songPopularityAll(curr_similar_song_popularity)
                 similar_songs.set_earliestDate(curr_similar_song_year)
