@@ -17,9 +17,11 @@ sys.setdefaultencoding('utf8')
 def addsongs(fname):
     try:
         currsong = api.parse(fname)
-        curr_string = currsong.songName
-        curr_string = curr_string + ':;' + currsong.youtubeId
-        curr_string = curr_string + ':;' + str(currsong.artistId)
+        curr_string = currsong.songName 
+        curr_string = curr_string + ':;' + currsong.youtubeId 
+        curr_string = curr_string + ':;' + str(currsong.artistId) 
+        if(currsong.artist.artistName[0] == None):
+            return
         curr_string = curr_string + ':;' + currsong.artist.artistName[0]
         curr_string = curr_string + ':;' + str(currsong.viewcount)
         curr_string = curr_string + ':;' + str(currsong.earliestDate)
@@ -32,7 +34,7 @@ def addsongs(fname):
         for style in styleList:
             logger_genre.error(curr_string + ':;' + style)
     except Exception as e:
-        logger_errors.exception(e)
+        print fname
 
 
 if __name__ == '__main__':
@@ -54,7 +56,7 @@ if __name__ == '__main__':
         p.close()
         p.join()
     except Exception as e:
-        logging.exception(e)
+        logger_errors.exception(e)
 
 
 
