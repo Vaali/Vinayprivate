@@ -10,6 +10,7 @@ from itertools import repeat
 from datetime import datetime, date, timedelta
 from multiprocessing import Pool
 import similar_artists_api as sa
+from sys import getsizeof
 
 
 
@@ -148,14 +149,16 @@ def sort_rows_songs(m):
     return sorted_x
 
 
-def similarartist((split,block_indices,index,tempA2)):
+def similarartist((split,block_indices,index)):
     try:
+        #global tempA2
+        
         cosinesimilarityartist = split[0]*tempA2
         row_indices = np.split(cosinesimilarityartist.indices, cosinesimilarityartist.indptr[1:-1])
         logger_matrix.exception('writing the artists files')
         indices = zip(range(block_indices[index],block_indices[index+1]),range(block_indices[index+1]-block_indices[index]))
         #print cosinesimilarityartist
-        print indices
+        #print indices
         #youtubeId,artistId,artistName,popularity,year,genre
         for (artist_index,sim_mat_index) in indices:
             t1 = datetime.now()
@@ -208,8 +211,10 @@ def similarartist((split,block_indices,index,tempA2)):
     except Exception as e:
 	logger_matrix.exception(e)
 
-def similarsongs((split,block_indices,index,tempA2)):
+def similarsongs((split,block_indices,index)):
+    #global tempA2
     try:
+        #multiplying in blocks of matrix
         cosinesimilaritysong = split[0]*tempA2
         row_indices = np.split(cosinesimilaritysong.indices, cosinesimilaritysong.indptr[1:-1])
         logger_matrix.exception('writing the artists files')
@@ -217,6 +222,7 @@ def similarsongs((split,block_indices,index,tempA2)):
         #print cosinesimilarityartist
         #print indices
         #songname,youtubeId,artistId,artistName,popularity,year,genre
+        curr_xmls = {}
         for (song_index,sim_mat_index) in indices:
             t1 = datetime.now()
             curr_songName = songs_map[song_index][0]
@@ -240,7 +246,7 @@ def similarsongs((split,block_indices,index,tempA2)):
             t3=datetime.now()
             sorted_s = sort_rows_songs(cosinesimilaritysong.getrow(sim_mat_index))
             t4=datetime.now()
-            #print (t4-t3)
+            print 'sorttime ' + str(t4-t3)
             #change here to increase the number of similar artists
             sorted_s = sorted_s[0:100]
 	    #for j in row_indices[sim_mat_index]:
@@ -250,7 +256,7 @@ def similarsongs((split,block_indices,index,tempA2)):
                 #if(pair[1] > 0.89):
                 written = 1
                 curr_similar_song = songs_map[j][0]
-                curr_similar_song_id = songs_map[j][1]
+                curr_similar_song_id = songs_map[j][1] + ' ' + str(songs_map[j][5])
                 curr_similar_song_popularity = int(songs_map[j][4])
                 curr_similar_song_year = int(songs_map[j][5])
                 similar_songs = sa.similarSongs()
@@ -265,13 +271,20 @@ def similarsongs((split,block_indices,index,tempA2)):
                 #similar_artists.set_pearsonDistance(pearsondistanceartist[i,:][j])
                 curr_song.add_similarSongs(similar_songs)
             if(written == 1):
-                fname = 'simsongsdir/' + str(curr_song_id)+'.xml'
-                fx = codecs.open(fname,"w","utf-8")
-                fx.write('<?xml version="1.0" ?>\n')
-                curr_song.export(fx,0)
-                fx.close()
-            t2=datetime.now()
-            print (t2-t1)
+                #fname = 'simsongsdir/0000' + str(curr_song_id)+'.xml'
+                #fx = codecs.open(fname,"w","utf-8")
+                #fx.write('<?xml version="1.0" ?>\n')
+                #curr_song.export(fx,0)
+                #fx.close()
+                curr_xmls[curr_song_id] = curr_song
+        for song_xml in curr_xmls:
+            fname = 'simsongsdir/0000' + str(song_xml)+'.xml'
+            fx = codecs.open(fname,"w","utf-8")
+            fx.write('<?xml version="1.0" ?>\n')
+            curr_xmls[song_xml].export(fx,0)
+            fx.close()
+        t2=datetime.now()
+        print 'writing time '+str(t2-t4)
 
     except Exception as e:
 	logger_matrix.exception(e)
@@ -357,7 +370,10 @@ def split_sparse(mat, row_divs = [], col_divs = []):
 
 def cosine_similarity(tempA1,row_max,isSongs):
     try:
+        global tempA2
         print tempA1.shape
+        print 'getsizeof'
+        print tempA1.data.nbytes
         #calculating the row sums 
         row_sums = ((tempA1.multiply(tempA1)).sum(axis=1))
         #calculating the sqrt of the sums
@@ -383,11 +399,11 @@ def cosine_similarity(tempA1,row_max,isSongs):
         print 'there'
         print row_max
         #similarartist((split_mat[0],block_indices,0))
-        p =Pool(processes=int(100))
+        p =Pool(processes=int(25))
         if(isSongs ==0):
-	    p.map(similarartist,zip(split_mat,repeat(block_indices),range(0,len(block_indices)),repeat(tempA2)))
+	    p.map(similarartist,zip(split_mat,repeat(block_indices),range(0,len(block_indices))))
         else:
-            p.map(similarsongs,zip(split_mat,repeat(block_indices),range(0,len(block_indices)),repeat(tempA2)))
+            p.map(similarsongs,zip(split_mat,repeat(block_indices),range(0,len(block_indices))))
 
         p.close()
 	p.join()
@@ -396,10 +412,12 @@ def cosine_similarity(tempA1,row_max,isSongs):
 	logger_matrix.exception(e)
 
 #end here
-
+#since the huge matrix is a readonly shared variable no need of passing it to the new process as the child pocess keeps a memory map of the main process
+tempA2 = []
 if __name__ == '__main__':
     logger_matrix = loggingmodule.initialize_logger('computesimilarities.log')
     t1=datetime.now()
+    #global tempA2
     try:
         if(not os.path.exists('simartistdir')):
 	    os.mkdir('simartistdir')
@@ -473,7 +491,9 @@ if __name__ == '__main__':
         AG = AGP.tocsr()
         #Cosine similarity
         #print tempA1.shape
-        #calculating the row sums 
+        #calculating the row sums
+
+        del artistsongsmatrix
         row_sums = ((AG.multiply(AG)).sum(axis=1))
         #calculating the sqrt of the sums
         rows_sums_sqrt = np.array(np.sqrt(row_sums))[:,0]
