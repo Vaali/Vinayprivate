@@ -507,6 +507,7 @@ def genXML(vid,avgcnt,avgcntrece,artistId,genreCountList):
         #print genres_levels
         masterGenres = api.masterGenres()
         masterStyles = api.masterStyles()
+        genreMatch = []
         if('masterGenres' in vid and vid['masterGenres'] != None):
             g = ','.join(vid['masterGenres'])
             g = g.lower()
@@ -518,39 +519,43 @@ def genXML(vid,avgcnt,avgcntrece,artistId,genreCountList):
         mysong.set_masterGenres(masterGenres)
         mysong.set_masterStyles(masterStyles)
         for i in genres_levels:
-			if(i == 0):
-				level1Genres = api.level1Genres()
-
-				for level1 in genres_levels[i]:
-					level1 = decodexml(level1)
-					level1Genres.add_genreName(level1)
-				mysong.set_level1Genres(level1Genres)
-				continue
-			if(i == 1):
-				level2Genres = api.level2Genres()
-
-				for level2 in genres_levels[i]:
-					level2 = decodexml(level2)
-					level2Genres.add_genreName(level2)
-				mysong.set_level2Genres(level2Genres)
-				continue
-			if(i == 2):
-				level3Genres = api.level3Genres()
-
-				for level3 in genres_levels[i]:
-					level3 = decodexml(level3)
-					level3Genres.add_genreName(level3)
-				mysong.set_level3Genres(level3Genres)
-				continue
-			if(i >= 3):
-				level4Genres = api.level4Genres()
-
-				for level4 in genres_levels[i]:
-					level4 = decodexml(level4)
-					level4Genres.add_genreName(level4)
-				mysong.set_level4Genres(level4Genres)
-				continue
+            if(i == 0):
+		level1Genres = api.level1Genres()
+		for level1 in genres_levels[i]:
+		    level1 = decodexml(level1)
+                    genreMatch.append(level1.lower())
+		    level1Genres.add_genreName(level1)
+		mysong.set_level1Genres(level1Genres)
+		continue
+	    if(i == 1):
+		level2Genres = api.level2Genres()
+                for level2 in genres_levels[i]:
+		    level2 = decodexml(level2)
+                    genreMatch.append(level2.lower())
+		    level2Genres.add_genreName(level2)
+		mysong.set_level2Genres(level2Genres)
+		continue
+	    if(i == 2):
+		level3Genres = api.level3Genres()
+                for level3 in genres_levels[i]:
+		    level3 = decodexml(level3)
+                    genreMatch.append(level3.lower())
+		    level3Genres.add_genreName(level3)
+		mysong.set_level3Genres(level3Genres)
+		continue
+	    if(i >= 3):
+                level4Genres = api.level4Genres()
+                for level4 in genres_levels[i]:
+		    level4 = decodexml(level4)
+                    genreMatch.append(level4.lower())
+		    level4Genres.add_genreName(level4)
+                mysong.set_level4Genres(level4Genres)
+		continue
         #mysong.set_artist(artistName)
+        genreMatch = sorted(genreMatch)
+        combinedgenrestring = ' '.join(genreMatch)
+        combinedgenrestring = combinedgenrestring.replace(' ','')
+        mysong.set_genreMatch(combinedgenrestring)
         mysong.set_duration(timedelta(seconds=int(vid['length'])))
         if vid.has_key('viewcountRate'):
 			mysong.set_viewcountRate(vid['viewcountRate'])
@@ -611,28 +616,28 @@ def genXML(vid,avgcnt,avgcntrece,artistId,genreCountList):
                 #print "With this :"
                 #print mysong.totalMatch
             else:
-				mysong = oldsong
+                mysong = oldsong
         fx = codecs.open(fname,"w","utf-8")
         fx.write('<?xml version="1.0" ?>\n')
-		#mysong.export(fx,0) Apostolos changed 0 to 1
+        #mysong.export(fx,0) Apostolos changed 0 to 1
         mysong.export(fx,0)
         fx.close()
         fh = codecs.open(fname, "rb","utf-8")
         for line in fh:
-	    		pass
+            pass
         last = line
         if(xmlsng != last):
-			if os.path.exists(fname):
-	    			os.remove(fname)
-			if not os.path.exists(failedxmls):
-					os.mkdir(failedxmls)
-			fname = failedxmls + "/0000" +url[-11:] + ".xml"
-			fx = codecs.open(fname,"w","utf-8")
-			fx.write('<?xml version="1.0" ?>\n')
-			#mysong.export(fx,0) Apostolos Changed 0 to 1
-			mysong.export(fx,0)   
-			fx.write(artistId) 
-			fx.close()
+            if os.path.exists(fname):
+	    	os.remove(fname)
+	    if not os.path.exists(failedxmls):
+		os.mkdir(failedxmls)
+	    fname = failedxmls + "/0000" +url[-11:] + ".xml"
+	    fx = codecs.open(fname,"w","utf-8")
+	    fx.write('<?xml version="1.0" ?>\n')
+	    #mysong.export(fx,0) Apostolos Changed 0 to 1
+	    mysong.export(fx,0)   
+	    fx.write(artistId) 
+	    fx.close()
     except Exception as ex:
         logging.exception(ex)
 
