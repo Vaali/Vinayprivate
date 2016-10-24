@@ -15,7 +15,6 @@ from sys import getsizeof
 
 
 
-
 #London:;0JFdt_8QvYA:;1221768:;Lord Sutch And Heavy Friends:;10087:;1970-05-25:;Rock:;0:;0
 #songname:;youtubeId:;artistid:;artistname:;popularity:;year:;genre:;songid:;genreid
 
@@ -126,7 +125,6 @@ def sort_rows_songs(m):
     m.data *= m.data>=1
     m.eliminate_zeros()
     #print 'xxxxxxxxxxx'
-    #print m
     rows=  m.nonzero()[0]
     cols = m.nonzero()[1]
     #for y in cols:
@@ -215,11 +213,14 @@ def similarsongs((split,block_indices,index)):
     #global tempA2
     try:
         #multiplying in blocks of matrix
+        t1=datetime.now()
         cosinesimilaritysong = split[0]*tempA2
         row_indices = np.split(cosinesimilaritysong.indices, cosinesimilaritysong.indptr[1:-1])
         logger_matrix.exception('writing the artists files')
         indices = zip(range(block_indices[index],block_indices[index+1]),range(block_indices[index+1]-block_indices[index]))
         #print cosinesimilarityartist
+        t2=datetime.now()
+        print 'multiplication time ' + str(t2 - t1)
         #print indices
         #songname,youtubeId,artistId,artistName,popularity,year,genre
         curr_xmls = {}
@@ -245,8 +246,8 @@ def similarsongs((split,block_indices,index)):
             #print currentrow
             t3=datetime.now()
             sorted_s = sort_rows_songs(cosinesimilaritysong.getrow(sim_mat_index))
-            t4=datetime.now()
-            print 'sorttime ' + str(t4-t3)
+            #print str(t3-t1)+' block time'
+            #print 'sorttime ' + str(t4-t3)
             #change here to increase the number of similar artists
             sorted_s = sorted_s[0:100]
 	    #for j in row_indices[sim_mat_index]:
@@ -256,7 +257,7 @@ def similarsongs((split,block_indices,index)):
                 #if(pair[1] > 0.89):
                 written = 1
                 curr_similar_song = songs_map[j][0]
-                curr_similar_song_id = songs_map[j][1] + ' ' + str(songs_map[j][5])
+                curr_similar_song_id = songs_map[j][1]  #+ ' ' + str(songs_map[j][5])
                 curr_similar_song_popularity = int(songs_map[j][4])
                 curr_similar_song_year = int(songs_map[j][5])
                 similar_songs = sa.similarSongs()
@@ -276,8 +277,12 @@ def similarsongs((split,block_indices,index)):
                 #fx.write('<?xml version="1.0" ?>\n')
                 #curr_song.export(fx,0)
                 #fx.close()
+                logger_matrix.exception('adding song')
                 curr_xmls[curr_song_id] = curr_song
+        t4=datetime.now()
+        print str(t4-t1)+' block time'
         for song_xml in curr_xmls:
+            logger_matrix.exception('writing song')
             fname = 'simsongsdir/0000' + str(song_xml)+'.xml'
             fx = codecs.open(fname,"w","utf-8")
             fx.write('<?xml version="1.0" ?>\n')
@@ -285,7 +290,7 @@ def similarsongs((split,block_indices,index)):
             fx.close()
         t2=datetime.now()
         print 'writing time '+str(t2-t4)
-
+        print 'process time '+str(t2-t1)
     except Exception as e:
 	logger_matrix.exception(e)
 
@@ -306,7 +311,7 @@ def similargenre((i,cosinesimilaritygenre)):
 	#change this to correct sparse matrix manipulations
         curr_row = cosinesimilaritygenre[i,:]
         #print curr_row
-        curr_row.data *= curr_row.data>=0.85
+        curr_row.data *= curr_row.data>=0
         curr_row.eliminate_zeros()
         tuples =  zip(curr_row.indices,curr_row.data)
         sorted_g = sorted(tuples, key=lambda score: score[1], reverse=True)
@@ -327,9 +332,10 @@ def similargenre((i,cosinesimilaritygenre)):
 
 def cosine_similarity_genres(genresongsmatrix):
     try:
+        
         G1 = genresongsmatrix.transpose().tocsr()
         row_sums_genres = ((G1.multiply(G1)).sum(axis=1))
-        
+        #print G1.todens()
         rows_sums_sqrt_genres = np.array(np.sqrt(row_sums_genres))[:,0]
         row_indices, col_indices = G1.nonzero()
         #print col_indices
@@ -339,7 +345,7 @@ def cosine_similarity_genres(genresongsmatrix):
         G2 = G1.transpose()
         cosinesimilaritygenre = G1*G2
         logger_matrix.exception('writing the genre files')
-        g =Pool(processes=int(100))
+        g =Pool(processes=int(25))
         g.map(similargenre,zip(genres_map.keys(),repeat(cosinesimilaritygenre)))
         g.close()
         g.join()
@@ -373,7 +379,7 @@ def cosine_similarity(tempA1,row_max,isSongs):
         global tempA2
         print tempA1.shape
         print 'getsizeof'
-        print tempA1.data.nbytes
+        #print tempA1.todense()
         #calculating the row sums 
         row_sums = ((tempA1.multiply(tempA1)).sum(axis=1))
         #calculating the sqrt of the sums
@@ -382,28 +388,28 @@ def cosine_similarity(tempA1,row_max,isSongs):
         row_indices, col_indices = tempA1.nonzero()
         tempA1.data = tempA1.data/rows_sums_sqrt[row_indices]
         
-        tempA2 = tempA1.transpose()
+        tempA2 = tempA1.transpose().tocsc()
         #change this to correct sparse matrix manipulations
 
         #break the matrix into peices
         #if(tempA1.shape[0]<100):
         #    block_indices = range(1,tempA1.shape[0])
         #else:
-        block_indices = range(100,tempA1.shape[0],100)
+        block_indices = range(100,tempA1.shape[0],300)
+        logger_matrix.exception(' '.join(str(block_indices)))
         #function returns the blocks of the main matrix        
         split_mat = split_sparse(tempA1,block_indices,[])
         
         index = 0
         block_indices = [0]+ block_indices + [row_max]
         #foreach block returned calculate the cosine similarity 
-        print 'there'
         print row_max
         #similarartist((split_mat[0],block_indices,0))
         p =Pool(processes=int(25))
         if(isSongs ==0):
 	    p.map(similarartist,zip(split_mat,repeat(block_indices),range(0,len(block_indices))))
         else:
-            p.map(similarsongs,zip(split_mat,repeat(block_indices),range(0,len(block_indices))))
+            p.map(similarsongs,zip(split_mat,repeat(block_indices),range(0,len(block_indices))),100)
 
         p.close()
 	p.join()
@@ -454,18 +460,23 @@ if __name__ == '__main__':
         songs_map = {}
         genres_map = {}
         artists_map = {}
+        #if(isSongs == 1):
         row_max_artists,col_max_artists = getmatrixdata_artists('remapped_songs_file.txt',row_max_artists,col_max_artists)
         row_max_genres,col_max_genres = getmatrixdata_genres('remapped_songs_file.txt',row_max_genres,col_max_genres)
+        #else:
+        #    row_max_artists,col_max_artists = getmatrixdata_artists('remapped_artist_file.txt',row_max_artists,col_max_artists)
+
         #popularity
         for curr_row in popularity_list:
             rows_popularity_list.append(0)
             cols_popularity_list.append(curr_row)
             data_popularity_list.append(popularity_list[curr_row])
         popularitymatrix = sp.coo_matrix((data_popularity_list,(rows_popularity_list,cols_popularity_list)),shape=(1,col_max_artists+1))
+        #if(isSongs == 1):
         for curr_row in popularity_list_songs:
-            rows_popularity_list_songs.append(0)
-            cols_popularity_list_songs.append(curr_row)
-            data_popularity_list_songs.append(popularity_list_songs[curr_row])
+                rows_popularity_list_songs.append(0)
+                cols_popularity_list_songs.append(curr_row)
+                data_popularity_list_songs.append(popularity_list_songs[curr_row])
 
         popularitymatrixsongs = sp.coo_matrix((data_popularity_list_songs,(rows_popularity_list_songs,cols_popularity_list_songs)),shape=(1,row_max_artists+1))
 
@@ -503,7 +514,7 @@ if __name__ == '__main__':
 
         AG.data = AG.data/rows_sums_sqrt[row_indices]
         
-
+        cosine_similarity_genres(genresongsmatrix)
         #sim_mat = AG * AGT
         #print sim_mat[1,:]
         if(isSongs == 0):
@@ -512,7 +523,7 @@ if __name__ == '__main__':
             cosine_similarity(G,G.shape[0],isSongs)
 
         
-        cosine_similarity_genres(genresongsmatrix)
+        #cosine_similarity_genres(genresongsmatrix)
         t2=datetime.now()
         print (t2-t1)
 
