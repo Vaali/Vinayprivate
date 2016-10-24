@@ -35,17 +35,18 @@ def addsongs(fname):
             logger_genre.error(curr_string + ':;' + style)
     except Exception as e:
         print fname
+        print e
 
 
 if __name__ == '__main__':
-    if(not os.path.exists('songsdir')):
-	os.mkdir('songsdir')
+    if(not os.path.exists('logs')):
+	os.mkdir('logs')
     else:
         try:
-            os.remove('songsdir/combinedsongs.txt')
+            os.remove('logs/combinedsongs.txt')
         except OSError:
             pass
-    logger_genre = loggingmodule.initialize_logger('songsdir/combinedsongs.txt',False)
+    logger_genre = loggingmodule.initialize_logger('combinedsongs.txt',False)
     logger_errors = loggingmodule.initialize_logger1('combined_songserrors.log')
     directory = raw_input("Enter directory: ")
     foldlist = glob.glob(directory+"/*.xml")
