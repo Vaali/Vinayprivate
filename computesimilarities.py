@@ -18,7 +18,7 @@ from sys import getsizeof
 #London:;0JFdt_8QvYA:;1221768:;Lord Sutch And Heavy Friends:;10087:;1970-05-25:;Rock:;0:;0
 #songname:;youtubeId:;artistid:;artistname:;popularity:;year:;genre:;songid:;genreid
 
-def getmatrixdata_artists(filename,row_max_artists,col_max_artists):
+def getmatrixdata_artists(filename,row_max_artists,col_max_artists,topnpopularities):
 	fileopen = codecs.open(filename,"r","utf-8")
 	lines = fileopen.readlines()
         lines = filter(lambda x: x.replace('\n','') != '',lines)
@@ -51,16 +51,28 @@ def getmatrixdata_artists(filename,row_max_artists,col_max_artists):
                     #cols_popularity_list.append(curr_row)
                     #data_popularity_list.append(int(words[5]))
                 if(curr_col not in artists_map):
-                    popularity_list[curr_col] = int(words[4])
+                    popularity_list[curr_col] = [int(words[4])]
                     artists_map[curr_col] = [words[1],words[2],words[3],words[4],words[5].split('-')[0],words[6]]
                 else:
-                    popularity_list[curr_col] += int(words[4])
+                    popularity_list[curr_col].append(int(words[4]))
 
                 if(row_max_artists < curr_row):
                     row_max_artists = curr_row
                 column_list_artists.append(curr_col) #remapped column
                 rows_list_artists.append(curr_row)
                 data_list_artists.append(1)
+        for curr_col in popularity_list:
+            curr_list = popularity_list[curr_col]
+            #print curr_list
+            curr_list = sorted(curr_list,reverse= True)
+            curr_list = curr_list[0:topnpopularities]
+            #print curr_list
+            if(topnpopularities != 0):
+                curr_list_sum = sum(curr_list)/topnpopularities
+            else:
+                curr_list_sum = sum(curr_list)
+            #print curr_list_sum
+            popularity_list[curr_col] = curr_list_sum
         print len(artists_map)
         return row_max_artists,curr_artist_count-1
 
@@ -162,7 +174,7 @@ def similarartist((split,block_indices,index)):
             t1 = datetime.now()
             curr_artistName = artists_map[artist_index][2]
             curr_artist_id = int(artists_map[artist_index][1])
-            curr_artist_popularity = int(artists_map[artist_index][3])
+            curr_artist_popularity = popularity_list[artist_index]#int(artists_map[artist_index][3])
             curr_artist_year = int(artists_map[artist_index][4])
             curr_artist = sa.artist()
             curr_artist.set_artistName(curr_artistName)
@@ -187,7 +199,7 @@ def similarartist((split,block_indices,index)):
                 written = 1
                 curr_similar_artist = artists_map[j][2]
                 curr_similar_artist_id = int(artists_map[j][1])
-                curr_similar_artist_popularity = int(artists_map[j][3])
+                curr_similar_artist_popularity = popularity_list[j]#int(artists_map[j][3])
                 curr_similar_artist_year = int(artists_map[j][4])
                 similar_artists = sa.similarArtists()
                 similar_artists.set_artistName(curr_similar_artist)
@@ -433,6 +445,9 @@ if __name__ == '__main__':
 	    os.mkdir('simsongsdir')
 
         isSongs = int(raw_input("Enter artists/songs: "))
+        topnpopularities = raw_input("Enter n for top top popularities: ")
+        topnpopularities = int(topnpopularities)
+
         column_list_artists = []
         rows_list_artists = []
         data_list_artists = []
@@ -461,7 +476,7 @@ if __name__ == '__main__':
         genres_map = {}
         artists_map = {}
         #if(isSongs == 1):
-        row_max_artists,col_max_artists = getmatrixdata_artists('remapped_songs_file.txt',row_max_artists,col_max_artists)
+        row_max_artists,col_max_artists = getmatrixdata_artists('remapped_songs_file.txt',row_max_artists,col_max_artists,topnpopularities)
         row_max_genres,col_max_genres = getmatrixdata_genres('remapped_songs_file.txt',row_max_genres,col_max_genres)
         #else:
         #    row_max_artists,col_max_artists = getmatrixdata_artists('remapped_artist_file.txt',row_max_artists,col_max_artists)
