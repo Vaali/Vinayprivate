@@ -554,7 +554,8 @@ def genXML(vid,avgcnt,avgcntrece,artistId,genreCountList):
         #mysong.set_artist(artistName)
         genreMatch = sorted(genreMatch)
         combinedgenrestring = ' '.join(genreMatch)
-        combinedgenrestring = combinedgenrestring.replace(' ','')
+        for ch in [' ','/','&','.','-','\\',"'",'(',')','!']:
+            combinedgenrestring = combinedgenrestring.replace(ch,'')
         mysong.set_genreMatch(combinedgenrestring)
         mysong.set_duration(timedelta(seconds=int(vid['length'])))
         if vid.has_key('viewcountRate'):
@@ -686,21 +687,21 @@ def CombineAlbums(oldsong,mysong):
 	#albList = api.albumList()
 	#album = api.album()
 	try:
-		for album in sourceList:
+            for album in sourceList:
 			destList.add_album(album)
 			print album.albumName
 			print album.country
 			print album.language
 			print album.barCode
-			print '-----'			
-		mysong.set_albumList(destList)
+			print '-----'
+            mysong.set_albumList(destList)
 	except Exception as e:
 		print e
 	return mysong
 	#print len(mysong.albumList.album)
 		
 
-def CalculateAverages(directory):
+def CalculateAverages(directory,topnsongs):
     averageCount = 0
     averageCountRecent = 0
     earlier_year = 10000
@@ -740,9 +741,11 @@ def CalculateAverages(directory):
 		averageCountRecent = ViewCountRateSum / len(songs) 
 		#print averagerating
     #viewcountlist = filter(lambda x:x>averageCount,viewcountlist)
-    #if(len(viewcountlist)>0):
-    #	averageCount = sum(viewcountlist)/len(viewcountlist)
-    print len(viewcountlist)
+    viewcountlist = sorted(viewcountlist,reverse = True)
+    viewcountlist = viewcountlist[0:topnsongs]
+    if(topnsongs >0 ):
+        averageCount = sum(viewcountlist)/topnsongs
+    print averageCount
     return averageCount,averageCountRecent,earlier_year
 
 def CalculateIdsforGenres(node,currentGenre):
@@ -842,7 +845,7 @@ def GetTotalGenresCountForArtist(vids,artistId,directory):
             percent = (genrecount[genre]*100.0)/TotalGenreStyleCount
             g.set_Percentage(percent)
         genreList.add_genresCount(g)
-        curr_parseVal.append(artistName)
+        curr_parseVal.append(changeName(artistName))
         curr_parseVal.append(artistId)
         if(genre in genreMat):
             curr_parseVal.append(genre)
@@ -864,7 +867,7 @@ def GetTotalGenresCountForArtist(vids,artistId,directory):
             percent = (stylecount[style]*100.0)/TotalGenreStyleCount
             g.set_Percentage(percent)
         genreList.add_genresCount(g)
-        curr_parseVal.append(artistName)
+        curr_parseVal.append(changeName(artistName))
         curr_parseVal.append(artistId)
         if(style in genreMat):
             curr_parseVal.append(style)
@@ -883,7 +886,9 @@ t1=datetime.now()
 #doc_str = myfile.read()
 #doc_str = doc_str.encode("UTF-8")
 #doc = etree.parse(open('discogs_genres.xml'))
-doc = etree.parse(open('Rock.xml'))
+hparser = etree.HTMLParser(encoding='utf-8')
+#htree   = etree.parse(fname, hparser)
+doc = etree.parse('Rock.xml',hparser)
 #doc = libxml2.parseFile('genres_manual.xml')
 #doc = libxml2.xmlReadFile("levels.xml","utf8")
 #doc = libxml2.parseDoc(doc_str)
@@ -942,6 +947,7 @@ fx.close()
 
 def generatexmls(dirlist):
     global IsIncremental
+    global topnsongs
     try:
         d = dirlist
         #for d in dirlist:
@@ -950,7 +956,7 @@ def generatexmls(dirlist):
 			return
         directory = d.strip()
         dindex = directory.rfind("/")
-        avgcnt,avgcntrece,earlier_year =  CalculateAverages(directory)
+        avgcnt,avgcntrece,earlier_year =  CalculateAverages(directory,topnsongs)
         print avgcnt,avgcntrece,earlier_year
         vids = []
         try:
@@ -994,6 +1000,9 @@ if __name__ == '__main__':
     m=int(m)
     IsIncremental = raw_input("Isincremental : ")
     IsIncremental = int(IsIncremental)
+    topnsongs = raw_input("Enter n for top songs: ")
+    topnsongs = int(topnsongs)
+
     foldlist = list()
     jobs=[]
     t1=datetime.now()
