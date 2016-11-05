@@ -17,6 +17,8 @@ sys.setdefaultencoding('utf8')
 def addsongs(fname):
     try:
         currsong = api.parse(fname)
+        if(currsong.songName == None):
+            return
         curr_string = currsong.songName 
         curr_string = curr_string + ':;' + currsong.youtubeId 
         curr_string = curr_string + ':;' + str(currsong.artistId) 
