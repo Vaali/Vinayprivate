@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 #
-# Generated Thu May 12 21:41:48 2016 by generateDS.py version 2.9a.
+# Generated Thu Nov 17 00:02:35 2016 by generateDS.py version 2.9a.
 #
 
 import sys
@@ -514,7 +514,7 @@ def _cast(typ, value):
 class songs(GeneratedsSuper):
     subclass = None
     superclass = None
-    def __init__(self, youtubeId=None, artistId=None, overLap=None, songName=None, youtubeName=None, artist=None, ftArtistList=None, indexedftArtistList=None, indexedArtistAliasList=None, connPhraseList=None, indexedArtist=None, url=None, releaseDate=None, decade=None, youtubeDate=None, crawlDate=None, viewcount=None, crawlDelta=None, isCompilation=None, releaseId=None, masterRelease=None, masterGenres=None, masterStyles=None, crawlHistoryList=None, genresCountList=None, rating=None, level1Genres=None, level2Genres=None, level3Genres=None, level4Genres=None, level5Genres=None, level6Genres=None, level7Genres=None, level8Genres=None, level9Genres=None, albumList=None, viewcountRate=None, duration=None, descriptions=None, viewCountGroup=None, decision=None, substring_song=None, substring_artist=None, substring_ftartist=None, songLanguage=None, earliestDate=None, songCountry=None, totalMatch=None, songMatch=None, artistMatch=None, youtubeList=None, soundcloudList=None):
+    def __init__(self, youtubeId=None, artistId=None, overLap=None, songName=None, youtubeName=None, artist=None, ftArtistList=None, indexedftArtistList=None, indexedArtistAliasList=None, connPhraseList=None, indexedArtist=None, url=None, releaseDate=None, decade=None, youtubeDate=None, crawlDate=None, viewcount=None, crawlDelta=None, isCompilation=None, releaseId=None, masterRelease=None, masterGenres=None, masterStyles=None, crawlHistoryList=None, genresCountList=None, rating=None, level1Genres=None, level2Genres=None, level3Genres=None, level4Genres=None, level5Genres=None, level6Genres=None, level7Genres=None, level8Genres=None, level9Genres=None, albumList=None, viewcountRate=None, duration=None, descriptions=None, viewCountGroup=None, decision=None, substring_song=None, substring_artist=None, substring_ftartist=None, songLanguage=None, earliestDate=None, songCountry=None, totalMatch=None, songMatch=None, artistMatch=None, genreTag=None, youtubeList=None, genreMatch=None, soundcloudList=None):
         self.youtubeId = youtubeId
         self.artistId = artistId
         self.overLap = overLap
@@ -565,7 +565,9 @@ class songs(GeneratedsSuper):
         self.totalMatch = totalMatch
         self.songMatch = songMatch
         self.artistMatch = artistMatch
+        self.genreTag = genreTag
         self.youtubeList = youtubeList
+        self.genreMatch = genreMatch
         self.soundcloudList = soundcloudList
     def factory(*args_, **kwargs_):
         if songs.subclass:
@@ -673,8 +675,12 @@ class songs(GeneratedsSuper):
     def set_songMatch(self, songMatch): self.songMatch = songMatch
     def get_artistMatch(self): return self.artistMatch
     def set_artistMatch(self, artistMatch): self.artistMatch = artistMatch
+    def get_genreTag(self): return self.genreTag
+    def set_genreTag(self, genreTag): self.genreTag = genreTag
     def get_youtubeList(self): return self.youtubeList
     def set_youtubeList(self, youtubeList): self.youtubeList = youtubeList
+    def get_genreMatch(self): return self.genreMatch
+    def set_genreMatch(self, genreMatch): self.genreMatch = genreMatch
     def get_soundcloudList(self): return self.soundcloudList
     def set_soundcloudList(self, soundcloudList): self.soundcloudList = soundcloudList
     def hasContent_(self):
@@ -729,7 +735,9 @@ class songs(GeneratedsSuper):
             self.totalMatch is not None or
             self.songMatch is not None or
             self.artistMatch is not None or
+            self.genreTag is not None or
             self.youtubeList is not None or
+            self.genreMatch is not None or
             self.soundcloudList is not None
             ):
             return True
@@ -888,8 +896,14 @@ class songs(GeneratedsSuper):
         if self.artistMatch is not None:
             showIndent(outfile, level, pretty_print)
             outfile.write('<%sartistMatch>%s</%sartistMatch>%s' % (namespace_, self.gds_format_float(self.artistMatch, input_name='artistMatch'), namespace_, eol_))
+        if self.genreTag is not None:
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sgenreTag>%s</%sgenreTag>%s' % (namespace_, self.gds_format_string(quote_xml(self.genreTag).encode(ExternalEncoding), input_name='genreTag'), namespace_, eol_))
         if self.youtubeList is not None:
             self.youtubeList.export(outfile, level, namespace_, name_='youtubeList', pretty_print=pretty_print)
+        if self.genreMatch is not None:
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sgenreMatch>%s</%sgenreMatch>%s' % (namespace_, self.gds_format_string(quote_xml(self.genreMatch).encode(ExternalEncoding), input_name='genreMatch'), namespace_, eol_))
         if self.soundcloudList is not None:
             self.soundcloudList.export(outfile, level, namespace_, name_='soundcloudList', pretty_print=pretty_print)
     def exportLiteral(self, outfile, level, name_='songs'):
@@ -1111,12 +1125,18 @@ class songs(GeneratedsSuper):
         if self.artistMatch is not None:
             showIndent(outfile, level)
             outfile.write('artistMatch=%f,\n' % self.artistMatch)
+        if self.genreTag is not None:
+            showIndent(outfile, level)
+            outfile.write('genreTag=%s,\n' % quote_python(self.genreTag).encode(ExternalEncoding))
         if self.youtubeList is not None:
             showIndent(outfile, level)
             outfile.write('youtubeList=model_.youtubeList(\n')
             self.youtubeList.exportLiteral(outfile, level)
             showIndent(outfile, level)
             outfile.write('),\n')
+        if self.genreMatch is not None:
+            showIndent(outfile, level)
+            outfile.write('genreMatch=%s,\n' % quote_python(self.genreMatch).encode(ExternalEncoding))
         if self.soundcloudList is not None:
             showIndent(outfile, level)
             outfile.write('soundcloudList=model_.soundcloudList(\n')
@@ -1390,10 +1410,18 @@ class songs(GeneratedsSuper):
                 raise_parse_error(child_, 'requires float or double: %s' % exp)
             fval_ = self.gds_validate_float(fval_, node, 'artistMatch')
             self.artistMatch = fval_
+        elif nodeName_ == 'genreTag':
+            genreTag_ = child_.text
+            genreTag_ = self.gds_validate_string(genreTag_, node, 'genreTag')
+            self.genreTag = genreTag_
         elif nodeName_ == 'youtubeList':
             obj_ = youtubeList.factory()
             obj_.build(child_)
             self.set_youtubeList(obj_)
+        elif nodeName_ == 'genreMatch':
+            genreMatch_ = child_.text
+            genreMatch_ = self.gds_validate_string(genreMatch_, node, 'genreMatch')
+            self.genreMatch = genreMatch_
         elif nodeName_ == 'soundcloudList':
             obj_ = soundcloudList.factory()
             obj_.build(child_)
