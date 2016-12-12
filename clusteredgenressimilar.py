@@ -13,6 +13,11 @@ import scipy.sparse as sp
 import numpy as np
 from multiprocessing import Pool
 import similar_artists_api as sa
+from multiprocessing.pool import ThreadPool
+import concurrent.futures
+import loggingmodule
+from itertools import repeat
+
 
 
 
@@ -78,9 +83,10 @@ def getmatrixdata_genres(filename,row_max_genres,col_max_genres):
 		data_list_genres.append(1)
                 rows_list_genres.append(curr_row)
         t3=datetime.now()
+        songsgenresmatrix = sp.coo_matrix((data_list_genres, (rows_list_genres, column_list_genres)), shape=(row_max_genres+1, col_max_genres+1))
         print 'reading time'
         print str(t3-t1)
-        return row_max_genres,col_max_genres
+        return songsgenresmatrix
 
 '''
 Reads the songs to genres matrix and creates the combinedgenresmatrix which is read by the function generateCombinedMatrix.
@@ -132,7 +138,7 @@ def getCombinedgenres():
         t3=datetime.now()
         print (t3-t2)
     except Exception as e:
-        print e
+        logger_matrix.exception(e)
 
 
 '''
@@ -155,7 +161,7 @@ def cosine_similarity_genres(genresongsmatrix):
         print cosinesimilaritygenre.shape
         return cosinesimilaritygenre
     except Exception as e:
-        print e
+        logger_matrix.exception(e)
 	#logger_matrix.exception(e)
 
 '''
@@ -202,8 +208,7 @@ def charePartialMatrix(curr_block):
         #print 'done'
         return [curr_index,d1_csr_matrix]
     except Exception as e:
-        print e
-
+        logger_matrix.exception(e)
 
 '''
 Add the missing values for the current row
@@ -211,6 +216,7 @@ Add the missing values for the current row
 def changematrix(songscombinedgenresmatrix,curr_combined_row,cr):
     try:
         global cosinesimilaritygenre
+        #global songscombinedgenresmatrix
         count = songscombinedgenresmatrix.shape[0]
         repeat_mat = [curr_combined_row[0],]*count
         repeat_mat_sp = sp.coo_matrix(repeat_mat)
@@ -237,24 +243,25 @@ def changematrix(songscombinedgenresmatrix,curr_combined_row,cr):
         blocks_matrix = split_sparse(d1,split_indices,[])
         blocks_total = split_sparse(d3,split_indices,[])
         blocks_diff = split_sparse(dt4,split_indices,[])
+        args_list = zip(blocks_matrix,blocks_total,blocks_diff,range(0,len(blocks_total)))
         #print blocks_total[1][0]
+        print 'start here'
         #ret = charePartialMatrix((blocks_matrix[1],blocks_total[1],blocks_diff[1],0)) 
-        g =Pool(processes=int(25))
+        with concurrent.futures.ThreadPoolExecutor(max_workers=50) as executor:
+                ret = executor.map(charePartialMatrix,args_list)
+
+        '''g =Pool(processes=int(5))
         ret = g.map(charePartialMatrix,zip(blocks_matrix,blocks_total,blocks_diff,range(0,len(blocks_total))))
         g.close()
-        g.join()
+        g.join()'''
+        print 'done'
         sorted_list = sorted(ret, key = lambda x: int(x[0]))
         temp_test = sorted_list[0][1]
-
-        #temp_test = sp.vstack([temp_test,temp_test])
         for i in sorted_list[1:]:
             temp_test = sp.vstack([temp_test,i[1]])
         #temp_test = ret[1]
         temp_test.eliminate_zeros()
-        print temp_test.getrow(15845)
-        print orig.getrow(0)
-        #print [x[0] for x in ret]
-        print 'there'
+        #print orig.getrow(0)
         t4=datetime.now()
         print str(t4-t3)
         print d1.shape
@@ -279,7 +286,7 @@ def changematrix(songscombinedgenresmatrix,curr_combined_row,cr):
         print tempA2.shape
         curr_row = temp_test.getrow(cr)
         d8 = curr_row * tempA2
-        d8.data *= d8.data>0.85
+        d8.data *= d8.data>0.8
         d8.eliminate_zeros()
 
         #oldcosine similarity added fr testing
@@ -300,17 +307,82 @@ def changematrix(songscombinedgenresmatrix,curr_combined_row,cr):
         d9.data *= d9.data>0.85
         d9.eliminate_zeros()
 
-        print 'changematrix' '''
+        '''
         return d8
     except Exception as e:
-        print e
+        logger_matrix.exception(e)
 
 
-def generateCombinedMatrix():
+def similarsongsoriginal(tempA4):
+    try:
+        global tempA2
+        tempA1 = tempA4.tocsr()
+        row_sums = ((tempA1.multiply(tempA1)).sum(axis=1))
+        #calculating the sqrt of the sums
+        rows_sums_sqrt = np.array(np.sqrt(row_sums))[:,0]
+        #divide and get the norms
+        row_indices, col_indices = tempA1.nonzero()
+        tempA1.data = tempA1.data/rows_sums_sqrt[row_indices]
+        row_max = tempA1.shape[0]
+        tempA2 = tempA1.transpose().tocsc()
+        #change this to correct sparse matrix manipulations
+
+        #break the matrix into peices
+        #if(tempA1.shape[0]<100):
+        #    block_indices = range(1,tempA1.shape[0])
+        #else:
+        block_indices = range(100,tempA1.shape[0],300)
+        #print block_indices
+        #logger_matrix.exception(' '.join(str(block_indices)))
+        #function returns the blocks of the main matrix        
+        split_mat = split_sparse(tempA1,block_indices,[])
+        
+        index = 0
+        block_indices = [0]+ block_indices + [row_max]
+        #foreach block returned calculate the cosine similarity 
+        print row_max
+        #similarsongs((split_mat[5],block_indices,5))
+        #similarsongs((split_mat[6],block_indices,6))
+        p =Pool(processes=int(25))
+        p.map(similarsongs,zip(split_mat,repeat(block_indices),range(0,len(block_indices))),100)
+        p.close()
+	p.join()
+    except Exception as e:
+        logger_matrix.exception(e)
+
+def similarsongs((split,block_indices,index)):
+    try:
+        #multiplying in blocks of matrix
+        t1=datetime.now()
+        cosinesimilaritysong = split[0]*tempA2
+        row_indices = np.split(cosinesimilaritysong.indices, cosinesimilaritysong.indptr[1:-1])
+        #logger_matrix.exception('writing the artists files')
+        indices = zip(range(block_indices[index],block_indices[index+1]),range(block_indices[index+1]-block_indices[index]))
+        #print cosinesimilarityartist
+        t2=datetime.now()
+        print 'multiplication time ' + str(t2 - t1)
+        #print indices
+        #print split[0].todense()
+        #songname,youtubeId,artistId,artistName,popularity,year,genre
+        curr_xmls = {}
+
+        for (song_index,sim_mat_index) in indices:
+            #print song_index,sim_mat_index
+            simi_genre = cosinesimilaritysong.getrow(sim_mat_index)
+            simi_genre.data *= simi_genre.data>=0.89
+            cr = song_index
+            writeClusteredGenresxmls(simi_genre,cr,combinedgenresdictrev)
+        t3 = datetime.now()
+        print 'writing time '+ str(t3-t2)
+    except Exception as e:
+        logger_matrix.exception(e)       
+
+def generateCombinedMatrix(songsgenresmatrix,changeMatrix):
     try:
         global cosinesimilaritygenre
+        global songscombinedgenresmatrix
+        global combinedgenresdictrev
         column_list_combinedgenres = []
-        combinedgenresdictrev = {}
         rows_list_combinedgenres = []
         data_list_combinedgenres = []
         t1=datetime.now()
@@ -351,19 +423,32 @@ def generateCombinedMatrix():
         #col_max_comgenres = len(column_list_combinedgenres)
         #print col_max_comgenres
         #print row_max_comgenres
+
         songscombinedgenresmatrix = sp.coo_matrix((data_comgenres, (row_comgenres, col_comgenres)), shape=(row_max+1, col_max+1))
+        print songscombinedgenresmatrix.shape
         t2=datetime.now()
         print 'matrix created'
         print str(t2-t1)
-        cosinesimilaritygenre = cosine_similarity_genres(songscombinedgenresmatrix)
+        #cosinesimilaritygenre = cosine_similarity_genres(songscombinedgenresmatrix)
+        cosinesimilaritygenre = cosine_similarity_genres(songsgenresmatrix)
+        
         t3=datetime.now()
         print 'genres matrix created'
         print str(t3-t2)
-        cr = 3
-        curr_comnined_row = songscombinedgenresmatrix.tocsr().getrow(cr).toarray()
+        if(changeMatrix == 1):
+            cr = range(0,100)
+            #changeandwritexmls(5)
+            gh =Pool(processes=int(100))
+            ret = gh.map(changeandwritexmls,cr)
+            gh.close()
+            gh.join()
+        else:
+            similarsongsoriginal(songscombinedgenresmatrix)
 
+        '''curr_comnined_row = songscombinedgenresmatrix.tocsr().getrow(cr).toarray()
+        #zip(repeat(combinedgenresdictrev),range(0,len(1000)))
         simi_genre = changematrix(songscombinedgenresmatrix,curr_comnined_row,cr)
-        writeClusteredGenresxmls(simi_genre,cr,combinedgenresdictrev)
+        writeClusteredGenresxmls(simi_genre,cr,combinedgenresdictrev) '''
         '''for (ind,data) in zip(simi_genre.indices,simi_genre.data):
             print ind
             print data
@@ -378,7 +463,21 @@ def generateCombinedMatrix():
         #print (curr_list)
         
     except Exception as e:
-        print e
+        logger_matrix.exception(e)
+
+
+def changeandwritexmls(cr):
+    global songscombinedgenresmatrix
+    global combinedgenresdictrev
+    try:
+        curr_comnined_row = songscombinedgenresmatrix.tocsr().getrow(cr).toarray()
+        #zip(repeat(combinedgenresdictrev),range(0,len(1000)))
+        simi_genre = changematrix(songscombinedgenresmatrix,curr_comnined_row,cr)
+        writeClusteredGenresxmls(simi_genre,cr,combinedgenresdictrev)
+    except Exception as e:
+        logger_matrix.exception(e)
+
+
 
 '''
 Writes the xmls for the current combined genre
@@ -390,7 +489,7 @@ def writeClusteredGenresxmls(curr_row,cr,combinedgenresdictrev):
 	curr_genre_id = cr
 	#curr_artist_popularity = int(artists_map[i][1])
 	#curr_artist_year = int(artists_map[i][2])
-	fname = 'simcombinedgenredir/' + str(curr_genre_id)+'.xml'
+	fname = 'simcombinedgenredirnew/' + str(curr_genre_id)+'.xml'
 	fx = codecs.open(fname,"w","utf-8")
 	fx.write('<?xml version="1.0" ?>\n')
 	curr_genre = sa.artist() 
@@ -412,27 +511,32 @@ def writeClusteredGenresxmls(curr_row,cr,combinedgenresdictrev):
 	curr_genre.export(fx,0)
 	fx.close()
     except Exception as e:
-        print e
+        logger_matrix.exception(e)
 
 def createDirectory(directoryName):
     if(not os.path.exists(directoryName)):
 	os.mkdir(directoryName)
 
 if __name__ == '__main__':
+    logger_matrix = loggingmodule.initialize_logger('clusteredgenres.log')    
     t1=datetime.now()
     column_list_genres = []
     rows_list_genres = []
     data_list_genres = []
+    combinedgenresdictrev = {}
     col_max_genres = 432
     row_max_genres =0
-    createDirectory('simcombinedgenredir')
+    createDirectory('simcombinedgenredirnew')
     cosinesimilaritygenre = []
+    songscombinedgenresmatrix = []
     #remapped_artist_file_newtest
-    row_max_genres,col_max_genres = getmatrixdata_genres('remapped_artist_sample.txt',row_max_genres,col_max_genres)
-    #row_max_genres,col_max_genres = getmatrixdata_genres('remapped_artist_file_newtest.txt',row_max_genres,col_max_genres)
-   
+    #songsgenresmatrix = getmatrixdata_genres('remapped_artist_sample.txt',row_max_genres,col_max_genres)
+    #print songsgenresmatrix.shape
+    songsgenresmatrix = getmatrixdata_genres('remapped_artist_file_newtest.txt',row_max_genres,col_max_genres)
+    changeMatrix = int(raw_input('Do you want to change the matrix?'))
     
-    generateCombinedMatrix()
+    
+    generateCombinedMatrix(songsgenresmatrix,changeMatrix)
     t2=datetime.now()
     print 'completed'
     print str(t2-t1)
