@@ -440,6 +440,7 @@ def genXML(vid,avgcnt,avgcntrece,artistId,genreCountList):
                             genres_levels[k] = [l]
                 
         style = vid['styles']
+        #print style
         Curr_Genres_List =[]
         if(style != None):
             #style = style.replace("{","")
@@ -465,6 +466,7 @@ def genXML(vid,avgcnt,avgcntrece,artistId,genreCountList):
                 #print "xmla styles :" +g
                 genre_paths = []
                 try:
+                    #print xmlpath
                     genre_paths = doc.xpath(xmlpath)
                 except Exception as ex:
                     logger_genre.error(xmlpath)
@@ -487,6 +489,7 @@ def genXML(vid,avgcnt,avgcntrece,artistId,genreCountList):
                     pathList = sAbsolutePath.split('/')
                     pathlength = len(pathList)
                     found = 0
+                    #print gp
                     #added change for discogs genres. only adding the genres from second level.
                     for k,l in enumerate(pathList[3:]):
                         if k+1 in genres_levels:
@@ -518,40 +521,49 @@ def genXML(vid,avgcnt,avgcntrece,artistId,genreCountList):
             masterStyles.add_genreName(g)
         mysong.set_masterGenres(masterGenres)
         mysong.set_masterStyles(masterStyles)
+        #print genres_levels
+        genre_tags = []
         for i in genres_levels:
             if(i == 0):
-		level1Genres = api.level1Genres()
-		for level1 in genres_levels[i]:
-		    level1 = decodexml(level1)
+                level1Genres = api.level1Genres()
+                for level1 in genres_levels[i]:
+                    level1 = decodexml(level1)
                     genreMatch.append(level1.lower())
-		    level1Genres.add_genreName(level1)
-		mysong.set_level1Genres(level1Genres)
-		continue
-	    if(i == 1):
-		level2Genres = api.level2Genres()
+                    genre_tags.append(level1.lower())
+                    level1Genres.add_genreName(level1)
+                mysong.set_level1Genres(level1Genres)
+                continue
+            if(i == 1):
+                level2Genres = api.level2Genres()
                 for level2 in genres_levels[i]:
-		    level2 = decodexml(level2)
+                    level2 = decodexml(level2)
                     genreMatch.append(level2.lower())
-		    level2Genres.add_genreName(level2)
-		mysong.set_level2Genres(level2Genres)
-		continue
-	    if(i == 2):
-		level3Genres = api.level3Genres()
+                    genre_tags.append(level2.lower())
+                    level2Genres.add_genreName(level2)
+                mysong.set_level2Genres(level2Genres)
+                continue
+            if(i == 2):
+                level3Genres = api.level3Genres()
                 for level3 in genres_levels[i]:
 		    level3 = decodexml(level3)
                     genreMatch.append(level3.lower())
+                    genre_tags.append(level3.lower())
 		    level3Genres.add_genreName(level3)
-		mysong.set_level3Genres(level3Genres)
-		continue
-	    if(i >= 3):
+                mysong.set_level3Genres(level3Genres)
+                continue
+            if(i >= 3):
                 level4Genres = api.level4Genres()
                 for level4 in genres_levels[i]:
-		    level4 = decodexml(level4)
+                    level4 = decodexml(level4)
                     genreMatch.append(level4.lower())
-		    level4Genres.add_genreName(level4)
+                    genre_tags.append(level4.lower())
+                    level4Genres.add_genreName(level4)
                 mysong.set_level4Genres(level4Genres)
-		continue
-        #mysong.set_artist(artistName)
+                continue
+        genre_tags = sorted(genre_tags)
+        combinedgenrestring = '@'.join(genre_tags)
+        combinedgenrestring = combinedgenrestring.lower()
+        mysong.set_genreTag(combinedgenrestring)
         genreMatch = sorted(genreMatch)
         combinedgenrestring = ' '.join(genreMatch)
         for ch in [' ','/','&','.','-','\\',"'",'(',')','!']:
@@ -886,9 +898,9 @@ t1=datetime.now()
 #doc_str = myfile.read()
 #doc_str = doc_str.encode("UTF-8")
 #doc = etree.parse(open('discogs_genres.xml'))
-hparser = etree.HTMLParser(encoding='utf-8')
+#hparser = etree.HTMLParser(encoding='utf-8')
 #htree   = etree.parse(fname, hparser)
-doc = etree.parse('Rock.xml',hparser)
+doc = etree.parse(codecs.open('Rock.xml'))
 #doc = libxml2.parseFile('genres_manual.xml')
 #doc = libxml2.xmlReadFile("levels.xml","utf8")
 #doc = libxml2.parseDoc(doc_str)
