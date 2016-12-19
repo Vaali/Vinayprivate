@@ -416,7 +416,7 @@ def get_song_list(directory,songs_list,full_country_list,aliases,ear_count,ear_y
                 if(curr_album['released_date'] != None):
                         curr_album['released_date'] = get_released_date(curr_album['released_date'])
                 temp_year_album = 0
-                temp_year_album = GetYearFromTitle(curr_album['title'])
+                #temp_year_album = GetYearFromTitle(curr_album['title'])
                 #print temp_year_album
                 if(curr_album['released_date'] != None and temp_year_album != 0):
                     if(str(curr_album['released_date']).split('-')[0] != ''):
@@ -596,7 +596,7 @@ def get_song_list_master(directory,songs_list,full_country_list,aliases,ear_coun
                 else:
                     earlier_year_skip = True
                 temp_year_album = 0
-                temp_year_album = GetYearFromTitle(curr_album['title'])
+                #temp_year_album = GetYearFromTitle(curr_album['title'])
                 if(curr_album['released_date'] != None and temp_year_album != 0):
                     if(str(curr_album['released_date']).split('-')[0] != ''):
                         curr_year = int(str(curr_album['released_date']).split('-')[0])
@@ -1626,7 +1626,7 @@ def getYoutubeUrl(video,flag,mostpopular):
     try:
         flist = ""
         yearfromName = 0
-        yearfromName = GetYearFromTitle(video.name)
+        #yearfromName = GetYearFromTitle(video.name)
         for f in video.ftArtist:
             ttt=f.strip("-")
             flist = flist+" "+ttt
