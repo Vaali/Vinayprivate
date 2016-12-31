@@ -120,6 +120,11 @@ def updateXml(filename):
 		oldsong.crawlDate =  datetime.now()
 		oldsong.viewcountRate = float(currentVideoViewCount)/getMonths(currentPublishedDate)
 		oldsong.viewcount = int(currentVideoViewCount)
+                genreTag = oldsong.genreTag
+                if(genreTag == None or genreTag == ''):
+                    genreTag = GetgenreTag(oldsong)
+                    oldsong.set_genreTag(genreTag)
+
 		fx = codecs.open(filename,"w","utf-8")
 		fx.write('<?xml version="1.0" ?>\n')
 		oldsong.export(fx,0)
@@ -128,6 +133,21 @@ def updateXml(filename):
 		logger_matrix.exception("Error")
 		return
 
+def GetgenreTag(oldsong):
+    print 'getting genres tags'
+    level1  = oldsong.level1Genres.genreName
+    level2 = oldsong.level2Genres.genreName
+    current_genres = []
+    for g in level1:
+        if(g.lower() not in current_genres):
+            current_genres.append(g.lower())
+    for g in level2:
+        if(g.lower() not in current_genres):
+            current_genres.append(g.lower())
+    genre_tags = sorted(current_genres)
+    combinedgenrestring = '@'.join(genre_tags)
+    return combinedgenrestring
+
 def updateGenreTags(filename):
     global connection_genre
     global connection_artist
@@ -135,9 +155,13 @@ def updateGenreTags(filename):
     #intersect = int(response.results.numFound)
     try:
         oldsong = api.parse(filename)
+
         print 'getting genres'
         try:
             genreTag = oldsong.genreTag
+            if(genreTag == None or genreTag == ''):
+                genreTag = GetgenreTag(oldsong)
+                oldsong.set_genreTag(genreTag)
             artistId = 'artistName:"'+str(genreTag)+ '"'
             response_genre = connection_genre.query(q="*:*",fq=[artistId],version=2.2,wt = 'json')
             intersect = int(response_genre.results.numFound)
@@ -204,7 +228,7 @@ if __name__ == '__main__':
     directory = raw_input("Enter directory: ")
     if not os.path.exists(directory):
         print 'directory doesnt exists'
-        return
+        exit()
     m = raw_input("Enter m: ")
     m=int(m)
     choiceUpdate = int(raw_input("Enter 0 to update views \n 1 to update genretags and simartits\n"))
@@ -220,8 +244,9 @@ if __name__ == '__main__':
         if(choiceUpdate == 0):
             p.map(updateXml,filelist)
         else:
+            #print filelist[8]
             p.map(updateGenreTags,filelist)
-            #updateGenreTags(filelist[8])
+            #updateGenreTags(directory+"/0000bWXlOO0-l8k.xml")
         p.close()
         p.join()
     except Exception as e:
