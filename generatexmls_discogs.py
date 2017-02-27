@@ -132,7 +132,7 @@ def changeName(artName):
     return " ".join(retNamewords)
      
     
-def genXML(vid,avgcnt,avgcntrece,artistId,genreCountList):
+def genXML(vid,avgcnt,avgcntrece,artistId,genreCountList,artistTopGenres):
     xmlpath = ""
     try:
         global opdir
@@ -381,8 +381,42 @@ def genXML(vid,avgcnt,avgcntrece,artistId,genreCountList):
 			rating = 0.0
         mysong.set_rating(rating)
         genres_levels = {0:[],1:[]}
+        
         genre = vid['genres']
+        style = vid['styles']
+        total_count = 0
+        total_set = set()
+
+
+        ''' Check if the total genres + styles list count >5 then replace it with popular genres of artist '''
+        if(genre != None):
+            total_count = len(genre)
+            total_set = set(genre)
+        if(style != None):
+            total_count += len(style)
+            total_set = list(set(total_set) | set(style))
+        total_set1 = []
+        for g in total_set:
+            g = g.replace("\"","")
+            g = g.lower()
+            total_set1.append(g)
+        if(total_count > 4):
+            #print 'combine genres'
+            #genre = list(set(artistTopGenres)& set(total_set1))
+            #style = None
+            mysong.set_totalGenreCount(total_count)
+        if(total_count == 1):
+            genre = list(set(artistTopGenres[0:3]) | set(total_set1))
+            style = None
+
+        if(url[-11:] == '6rgStv12dwA'):
+            print genre
+            print artistTopGenres
+
         #print genre
+        
+        
+        
         curr_genres_list = []
         if(genre != None):
             #genre = genre.replace("{","")
@@ -439,7 +473,6 @@ def genXML(vid,avgcnt,avgcntrece,artistId,genreCountList):
                         else:
                             genres_levels[k] = [l]
                 
-        style = vid['styles']
         #print style
         Curr_Genres_List =[]
         if(style != None):
@@ -593,12 +626,16 @@ def genXML(vid,avgcnt,avgcntrece,artistId,genreCountList):
                 print 'done'
             '''
             if(oldsong.isCompilation == True and mysong.isCompilation == False):
+                                if(url[-11:] == '6rgStv12dwA'):
+                                    print 'print "With this :"  fisrt'
 				print "With this :"
 				mysong = CombineAlbums(oldsong,mysong)
             elif(round(oldsong.totalMatch) < round(mysong.totalMatch)):
 				#print "overwriting :"
 				#print oldsong.overLap
 				#print oldsong.totalMatch
+                                #if(url[-11:] == '6rgStv12dwA'):
+                                #    print 'print "With this :" second'
 				print "With this :"
 				mysong = CombineAlbums(oldsong,mysong)
 				#print mysong.overLap
@@ -606,12 +643,16 @@ def genXML(vid,avgcnt,avgcntrece,artistId,genreCountList):
 				#print "overwriting :"
 				#print oldsong.totalMatch
 				#print oldsong.songMatch
+                                #if(url[-11:] == '6rgStv12dwA'):
+                                #    print 'print "With this :" third'
 				print "With this :"
 				mysong = CombineAlbums(oldsong,mysong)
 				#print mysong.match
             elif ((round(oldsong.songMatch) == round(mysong.songMatch)) and (round(oldsong.artistMatch) < round(mysong.artistMatch))):
 				#print "overwriting :"
 				#print oldsong.totalMatch
+                                #if(url[-11:] == '6rgStv12dwA'):
+                                #    print 'print "With this :" fourth'
 				print "With this :"
 				mysong = CombineAlbums(oldsong,mysong)
 				#print mysong.totalMatch
@@ -621,14 +662,20 @@ def genXML(vid,avgcnt,avgcntrece,artistId,genreCountList):
                 #        mysong = oldsong
                 
                 if(mysong.releaseDate != 1001 and int(oldsong.releaseDate) > int(mysong.releaseDate)):
-					print "With this :"
-					mysong = CombineAlbums(oldsong,mysong)  
+                    #if(url[-11:] == '6rgStv12dwA'):
+                    #    print 'print "With this :" sixth'
+		    print "With this :"
+                    mysong = CombineAlbums(oldsong,mysong)  
                 else:
+                    #if(url[-11:] == '6rgStv12dwA'):
+                    #    print 'print "With this :" fifth'
                     mysong = oldsong
                 #print oldsong.totalMatch
                 #print "With this :"
                 #print mysong.totalMatch
             else:
+                #if(url[-11:] == '6rgStv12dwA'):
+                #    print 'print "With this :" seventh'
                 mysong = oldsong
         fx = codecs.open(fname,"w","utf-8")
         fx.write('<?xml version="1.0" ?>\n')
@@ -788,6 +835,7 @@ def CalculateIds():
 
 def GetTotalGenresCountForArtist(vids,artistId,directory):
     genreList = api.genresCountList()
+    artistTopGenres = []
     genrecount = {}
     stylecount = {}
     TotalGenreStyleCount = 0
@@ -836,10 +884,6 @@ def GetTotalGenresCountForArtist(vids,artistId,directory):
                     stylecount[g] = 1
                 else:
                     stylecount[g] = stylecount[g] + 1
-    #print stylecount
-    #print genrecount
-    #print TotalGenreStyleCount
-    #print artists_count
     sorted_x = sorted(artists_count.items(), key=operator.itemgetter(1),reverse = True)
     print 'here'
     print sorted_x
@@ -847,6 +891,16 @@ def GetTotalGenresCountForArtist(vids,artistId,directory):
 	artistName = 'Unknown'
     else:	
         artistName = sorted_x[0][0]
+
+    ''' calculate total genres dictionary'''
+    totalGenresDict = dict(genrecount.items() + stylecount.items() + [(k, genrecount[k] + stylecount[k]) for k in stylecount.viewkeys() & genrecount.viewkeys()])
+    totalGenresDictSorted = sorted(totalGenresDict.items(), key=operator.itemgetter(1),reverse = True)
+    print totalGenresDictSorted
+    for x in totalGenresDictSorted:
+        artistTopGenres.append(x[0])
+
+    print artistTopGenres
+
     for genre in genrecount:
         g = api.genresCount()
         g.set_Genre(genre)
@@ -890,7 +944,7 @@ def GetTotalGenresCountForArtist(vids,artistId,directory):
         #curr_parseVal.append(percent)
         curr_parseVal.append(stylecount[style])
         parseMat.append(curr_parseVal)
-    return genreList,parseMat
+    return genreList,parseMat,artistTopGenres
 
 #Main starts here
 t1=datetime.now()
@@ -927,22 +981,7 @@ try:
 	failedxmls = config.get('Paths','failedxmls')
 except:
 	failedxmls = "failedxml"
-#errordir="/Volumes/Secondone/vina/ERRORS"
-##failedxmls = "/Volumes/Secondone/vina/solr_newData7/failedxml"
-#opdir = "/aurora.cs/local2/apo/solr_newData_output6"
-#errordir="/aurora.cs/local2/aposolr_newData_output6/ERRORS"
-#failedxmls = "/aurora.cs/local2/apo/solr_newData_output6/failedxml"
-#opdir = "solr_newData8"
-#errordir="solr_newData8/ERRORS"
-#failedxmls = "solr_newData8/failedxml"
 
-
-#opdir = "/home/navneet/Desktop/june1/mydata"
-#failedxmls = "/home/navneet/Desktop/june1/mydata"
-#opdir = "solr_newData4"
-#failedxmls = "solr_newData4/failedxml"
-#opdir = "/home/anudeep/Desktop/newData"
-#failedxmls = "/home/anudeep/Desktop/newData/failedxml"
 genres_levels = {}
 if(os.path.exists(opdir) == False):
 	os.mkdir(opdir)
@@ -980,7 +1019,7 @@ def generatexmls(dirlist):
 			#continue
 			return
         artistId = directory[dindex+1:]
-        genreCountList,parseMat = GetTotalGenresCountForArtist(vids,artistId,directory)
+        genreCountList,parseMat,artistTopGenres = GetTotalGenresCountForArtist(vids,artistId,directory)
         #print genreCountList
         #print parseMat
         if(IsIncremental == 1):
@@ -997,7 +1036,7 @@ def generatexmls(dirlist):
             t3=datetime.now()
             if(int(artistId) == 194):
                 artistId = v['artist_id']
-            genXML(v,avgcnt,avgcntrece,artistId,genreCountList)
+            genXML(v,avgcnt,avgcntrece,artistId,genreCountList,artistTopGenres)
         #logger_finished.error('Completed for directory '+ str(directory))
     except Exception as e:
         logging.exception(e)
