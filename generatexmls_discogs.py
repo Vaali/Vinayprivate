@@ -773,7 +773,7 @@ def CalculateAverages(directory,topnsongs):
 		json_data = codecs.open(path)
     except IOError as e:
 		print "File does not exist"
-		return 0,0
+		return 0,0,10000
     songs = json.load(json_data)
     json_data.close()
     count = 0
@@ -893,7 +893,7 @@ def GetTotalGenresCountForArtist(vids,artistId,directory):
         artistName = sorted_x[0][0]
 
     ''' calculate total genres dictionary'''
-    totalGenresDict = dict(genrecount.items() + stylecount.items() + [(k, genrecount[k] + stylecount[k]) for k in stylecount.viewkeys() & genrecount.viewkeys()])
+    totalGenresDict = dict(genrecount.items() + stylecount.items() + [(k, genrecount[k] + stylecount[k]) for k in set(stylecount.keys()) & set(genrecount.keys())])
     totalGenresDictSorted = sorted(totalGenresDict.items(), key=operator.itemgetter(1),reverse = True)
     print totalGenresDictSorted
     for x in totalGenresDictSorted:
