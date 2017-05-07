@@ -394,10 +394,7 @@ def genXML(vid,avgcnt,avgcntrece,artistId,genreCountList,artistTopGenres,country
                 print '----------------------------------' '''
         mysong.set_decade(int(releaseyear)/10)
         mysong.set_earliestDate(vid['year'])
-        if('songcountry' in vid):
-			mysong.set_songCountry(vid['songcountry'])
-        else:
-			mysong.set_songCountry('Unknown')
+	mysong.set_songCountry(country_name)
         mysong.set_albumList(albList)
         ydate = datetime.strptime(ydate,'%Y-%m-%d %H:%M:%S')
         mysong.set_youtubeDate(ydate)
