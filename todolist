@@ -1,0 +1,127 @@
+3) rewrite the m and blocks code
+4) 
+5) Compute the genres for the artist and order them based on the most popular genres.
+
+6) date based on the wikipedia
+7) Calculae the genres frequency from the unque songs dump.
+8) Log the failure cases for any stage.(write a completed file and then rerun it in incremental)
+9) Count the missing albums and put a limit ---- 
+
+13) scores in a list
+14) put the total scroes of all the songs for the artist / and the unique list 
+15)remove remix from other songs ---- 
+16) agreement with master or not flag --- 
+17) masterid -- release id 
+18)exta match with spaces removed.......
+19) artists 
+20) distance between genres
+21) double genres make it unique 
+22) If youtube year is smaller change it to that.
+23) count genres only for the main artist
+24) main artist and ft artist ID
+25) Club albums when over writing based on the artist
+26) master id and releases are wrong for led zeppelin [babe iam gonna leave you]  --- paranoid black sabath
+
+27) write to xml
+28) remove duplicates and adjust the ids for now 
+3057
+
+
+29) for viewcount computation from the dump remove the other artists songs from compilations
+
+43960
+
+1)logging
+2)classes
+
+
+1)country 
+2)similar artist based on time etc
+3)and xmls same as others
+4) songname is empty why check for example the artist 1488059
+5) remove year from title
+
+
+generate the data for extended genres
+create a core
+update the xmls with extended genres
+
+
+//
+1)crawl youtube for the songs of new artists
+
+2/20/2017
+1) Add the most popular genres of hte artists while selecting the closest tags.??
+bug--- why pop doesnt have friends
+2)Drop them for more than 5  intersection of artists
+3) Only one-- Add intersection -- done
+4) breaking ties with genres in the same artist() -- similar genres also ()
+5)check for adding the new genres which are in the main artist -- done
+6)0.5 is the clusteredgenres.xml --- for each song get the tag from the xmls...
+
+7) plugging the original distance ---- in the matrix.
+3/05/2017
+1) multiple genres mapping to parent --- 
+2) getting extra songs from youtube.
+3)
+
+3/05/2017 -- check one more and one less for that genres lisst
+3/8/2017
+Check rock.xml and replace the unicode characters with some other things. done json
+
+
+4/1/2017
+electronic,rock
+intersection of both.
+
+house,electro,trance,progressive house
+
+pop rock, classicrock,rock and roll,blues rock,alternative rock
+
+dropping a genre ??
+Adding a genre
+
+5/7/2017
+
+3-4
+
+expansion based on the popularity of the artists genres.
+
+dropping the most popular for the artists
+for more number of things we do an intersection with the artist popularity ---
+
+
+for more than one artists --- intersection between the artists 
+
+for each artist we make 3 expansions and 3 reductions of 1 level each
+dont reduce if its less than 3 and dont expand if its more than 5.
+
+country also as a filter
+
+
+
+2/6/17
+
+use genre also in the artist thing.
+songs crawling -- one thing
+sort the youtube songs in songsPreprocessing.py according to songids.
+
+1)go to gaia scripts classification.
+descriptors is missing ,you need to copy that .
+python train
+clear results directory
+clear datasets directory 
+run 
+project_apo  
+project_apo parameters
+5 fold -- smaller datasets --- 4 to fit and 1 to test.   4 -- 1 (5 times  to select the best)
+find the failing numbers
+essentia models -- classification
+copy the history and model
+svm_models from gaia/scripts/classification/svm_models
+
+run essentia -- config files
+
+
+
+
