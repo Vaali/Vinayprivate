@@ -291,7 +291,7 @@ def cosine_similarity():
         row_indices, col_indices = tempA1.nonzero()
         tempA1.data /= rows_sums_sqrt[row_indices]
         
-        tempA2 = tempA1.transpose()
+        tempA2 = tempA1.transpose().tocsc()
         #print (tempA1*tempA2).todense()
         #change this to correct sparse matrix manipulations
 

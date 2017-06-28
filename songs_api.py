@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 #
-# Generated Thu May 12 21:41:48 2016 by generateDS.py version 2.9a.
+# Generated Sun Feb 26 19:00:28 2017 by generateDS.py version 2.9a.
 #
 
 import sys
@@ -514,7 +514,7 @@ def _cast(typ, value):
 class songs(GeneratedsSuper):
     subclass = None
     superclass = None
-    def __init__(self, youtubeId=None, artistId=None, overLap=None, songName=None, youtubeName=None, artist=None, ftArtistList=None, indexedftArtistList=None, indexedArtistAliasList=None, connPhraseList=None, indexedArtist=None, url=None, releaseDate=None, decade=None, youtubeDate=None, crawlDate=None, viewcount=None, crawlDelta=None, isCompilation=None, releaseId=None, masterRelease=None, masterGenres=None, masterStyles=None, crawlHistoryList=None, genresCountList=None, rating=None, level1Genres=None, level2Genres=None, level3Genres=None, level4Genres=None, level5Genres=None, level6Genres=None, level7Genres=None, level8Genres=None, level9Genres=None, albumList=None, viewcountRate=None, duration=None, descriptions=None, viewCountGroup=None, decision=None, substring_song=None, substring_artist=None, substring_ftartist=None, songLanguage=None, earliestDate=None, songCountry=None, totalMatch=None, songMatch=None, artistMatch=None, youtubeList=None, soundcloudList=None):
+    def __init__(self, youtubeId=None, artistId=None, overLap=None, songName=None, youtubeName=None, artist=None, ftArtistList=None, indexedftArtistList=None, indexedArtistAliasList=None, connPhraseList=None, indexedArtist=None, url=None, releaseDate=None, decade=None, youtubeDate=None, crawlDate=None, viewcount=None, crawlDelta=None, isCompilation=None, releaseId=None, masterRelease=None, masterGenres=None, masterStyles=None, crawlHistoryList=None, genresCountList=None, rating=None, level1Genres=None, level2Genres=None, level3Genres=None, level4Genres=None, level5Genres=None, level6Genres=None, level7Genres=None, level8Genres=None, level9Genres=None, albumList=None, similarGenresTagList=None, similarArtistList=None, totalGenreCount=None, viewcountRate=None, duration=None, descriptions=None, viewCountGroup=None, decision=None, substring_song=None, substring_artist=None, substring_ftartist=None, songLanguage=None, earliestDate=None, songCountry=None, totalMatch=None, songMatch=None, artistMatch=None, genreTag=None, genreTagId=None, youtubeList=None, genreMatch=None, soundcloudList=None):
         self.youtubeId = youtubeId
         self.artistId = artistId
         self.overLap = overLap
@@ -551,6 +551,9 @@ class songs(GeneratedsSuper):
         self.level8Genres = level8Genres
         self.level9Genres = level9Genres
         self.albumList = albumList
+        self.similarGenresTagList = similarGenresTagList
+        self.similarArtistList = similarArtistList
+        self.totalGenreCount = totalGenreCount
         self.viewcountRate = viewcountRate
         self.duration = duration
         self.descriptions = descriptions
@@ -565,7 +568,10 @@ class songs(GeneratedsSuper):
         self.totalMatch = totalMatch
         self.songMatch = songMatch
         self.artistMatch = artistMatch
+        self.genreTag = genreTag
+        self.genreTagId = genreTagId
         self.youtubeList = youtubeList
+        self.genreMatch = genreMatch
         self.soundcloudList = soundcloudList
     def factory(*args_, **kwargs_):
         if songs.subclass:
@@ -645,6 +651,12 @@ class songs(GeneratedsSuper):
     def set_level9Genres(self, level9Genres): self.level9Genres = level9Genres
     def get_albumList(self): return self.albumList
     def set_albumList(self, albumList): self.albumList = albumList
+    def get_similarGenresTagList(self): return self.similarGenresTagList
+    def set_similarGenresTagList(self, similarGenresTagList): self.similarGenresTagList = similarGenresTagList
+    def get_similarArtistList(self): return self.similarArtistList
+    def set_similarArtistList(self, similarArtistList): self.similarArtistList = similarArtistList
+    def get_totalGenreCount(self): return self.totalGenreCount
+    def set_totalGenreCount(self, totalGenreCount): self.totalGenreCount = totalGenreCount
     def get_viewcountRate(self): return self.viewcountRate
     def set_viewcountRate(self, viewcountRate): self.viewcountRate = viewcountRate
     def get_duration(self): return self.duration
@@ -673,8 +685,14 @@ class songs(GeneratedsSuper):
     def set_songMatch(self, songMatch): self.songMatch = songMatch
     def get_artistMatch(self): return self.artistMatch
     def set_artistMatch(self, artistMatch): self.artistMatch = artistMatch
+    def get_genreTag(self): return self.genreTag
+    def set_genreTag(self, genreTag): self.genreTag = genreTag
+    def get_genreTagId(self): return self.genreTagId
+    def set_genreTagId(self, genreTagId): self.genreTagId = genreTagId
     def get_youtubeList(self): return self.youtubeList
     def set_youtubeList(self, youtubeList): self.youtubeList = youtubeList
+    def get_genreMatch(self): return self.genreMatch
+    def set_genreMatch(self, genreMatch): self.genreMatch = genreMatch
     def get_soundcloudList(self): return self.soundcloudList
     def set_soundcloudList(self, soundcloudList): self.soundcloudList = soundcloudList
     def hasContent_(self):
@@ -715,6 +733,9 @@ class songs(GeneratedsSuper):
             self.level8Genres is not None or
             self.level9Genres is not None or
             self.albumList is not None or
+            self.similarGenresTagList is not None or
+            self.similarArtistList is not None or
+            self.totalGenreCount is not None or
             self.viewcountRate is not None or
             self.duration is not None or
             self.descriptions is not None or
@@ -729,7 +750,10 @@ class songs(GeneratedsSuper):
             self.totalMatch is not None or
             self.songMatch is not None or
             self.artistMatch is not None or
+            self.genreTag is not None or
+            self.genreTagId is not None or
             self.youtubeList is not None or
+            self.genreMatch is not None or
             self.soundcloudList is not None
             ):
             return True
@@ -846,6 +870,13 @@ class songs(GeneratedsSuper):
             self.level9Genres.export(outfile, level, namespace_, name_='level9Genres', pretty_print=pretty_print)
         if self.albumList is not None:
             self.albumList.export(outfile, level, namespace_, name_='albumList', pretty_print=pretty_print)
+        if self.similarGenresTagList is not None:
+            self.similarGenresTagList.export(outfile, level, namespace_, name_='similarGenresTagList', pretty_print=pretty_print)
+        if self.similarArtistList is not None:
+            self.similarArtistList.export(outfile, level, namespace_, name_='similarArtistList', pretty_print=pretty_print)
+        if self.totalGenreCount is not None:
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%stotalGenreCount>%s</%stotalGenreCount>%s' % (namespace_, self.gds_format_integer(self.totalGenreCount, input_name='totalGenreCount'), namespace_, eol_))
         if self.viewcountRate is not None:
             showIndent(outfile, level, pretty_print)
             outfile.write('<%sviewcountRate>%s</%sviewcountRate>%s' % (namespace_, self.gds_format_float(self.viewcountRate, input_name='viewcountRate'), namespace_, eol_))
@@ -888,8 +919,17 @@ class songs(GeneratedsSuper):
         if self.artistMatch is not None:
             showIndent(outfile, level, pretty_print)
             outfile.write('<%sartistMatch>%s</%sartistMatch>%s' % (namespace_, self.gds_format_float(self.artistMatch, input_name='artistMatch'), namespace_, eol_))
+        if self.genreTag is not None:
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sgenreTag>%s</%sgenreTag>%s' % (namespace_, self.gds_format_string(quote_xml(self.genreTag).encode(ExternalEncoding), input_name='genreTag'), namespace_, eol_))
+        if self.genreTagId is not None:
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sgenreTagId>%s</%sgenreTagId>%s' % (namespace_, self.gds_format_integer(self.genreTagId, input_name='genreTagId'), namespace_, eol_))
         if self.youtubeList is not None:
             self.youtubeList.export(outfile, level, namespace_, name_='youtubeList', pretty_print=pretty_print)
+        if self.genreMatch is not None:
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sgenreMatch>%s</%sgenreMatch>%s' % (namespace_, self.gds_format_string(quote_xml(self.genreMatch).encode(ExternalEncoding), input_name='genreMatch'), namespace_, eol_))
         if self.soundcloudList is not None:
             self.soundcloudList.export(outfile, level, namespace_, name_='soundcloudList', pretty_print=pretty_print)
     def exportLiteral(self, outfile, level, name_='songs'):
@@ -1069,6 +1109,21 @@ class songs(GeneratedsSuper):
             self.albumList.exportLiteral(outfile, level)
             showIndent(outfile, level)
             outfile.write('),\n')
+        if self.similarGenresTagList is not None:
+            showIndent(outfile, level)
+            outfile.write('similarGenresTagList=model_.similarGenresTagList(\n')
+            self.similarGenresTagList.exportLiteral(outfile, level)
+            showIndent(outfile, level)
+            outfile.write('),\n')
+        if self.similarArtistList is not None:
+            showIndent(outfile, level)
+            outfile.write('similarArtistList=model_.similarArtistList(\n')
+            self.similarArtistList.exportLiteral(outfile, level)
+            showIndent(outfile, level)
+            outfile.write('),\n')
+        if self.totalGenreCount is not None:
+            showIndent(outfile, level)
+            outfile.write('totalGenreCount=%d,\n' % self.totalGenreCount)
         if self.viewcountRate is not None:
             showIndent(outfile, level)
             outfile.write('viewcountRate=%f,\n' % self.viewcountRate)
@@ -1111,12 +1166,21 @@ class songs(GeneratedsSuper):
         if self.artistMatch is not None:
             showIndent(outfile, level)
             outfile.write('artistMatch=%f,\n' % self.artistMatch)
+        if self.genreTag is not None:
+            showIndent(outfile, level)
+            outfile.write('genreTag=%s,\n' % quote_python(self.genreTag).encode(ExternalEncoding))
+        if self.genreTagId is not None:
+            showIndent(outfile, level)
+            outfile.write('genreTagId=%d,\n' % self.genreTagId)
         if self.youtubeList is not None:
             showIndent(outfile, level)
             outfile.write('youtubeList=model_.youtubeList(\n')
             self.youtubeList.exportLiteral(outfile, level)
             showIndent(outfile, level)
             outfile.write('),\n')
+        if self.genreMatch is not None:
+            showIndent(outfile, level)
+            outfile.write('genreMatch=%s,\n' % quote_python(self.genreMatch).encode(ExternalEncoding))
         if self.soundcloudList is not None:
             showIndent(outfile, level)
             outfile.write('soundcloudList=model_.soundcloudList(\n')
@@ -1314,6 +1378,22 @@ class songs(GeneratedsSuper):
             obj_ = albumList.factory()
             obj_.build(child_)
             self.set_albumList(obj_)
+        elif nodeName_ == 'similarGenresTagList':
+            obj_ = similarGenresTagList.factory()
+            obj_.build(child_)
+            self.set_similarGenresTagList(obj_)
+        elif nodeName_ == 'similarArtistList':
+            obj_ = similarArtistList.factory()
+            obj_.build(child_)
+            self.set_similarArtistList(obj_)
+        elif nodeName_ == 'totalGenreCount':
+            sval_ = child_.text
+            try:
+                ival_ = int(sval_)
+            except (TypeError, ValueError), exp:
+                raise_parse_error(child_, 'requires integer: %s' % exp)
+            ival_ = self.gds_validate_integer(ival_, node, 'totalGenreCount')
+            self.totalGenreCount = ival_
         elif nodeName_ == 'viewcountRate':
             sval_ = child_.text
             try:
@@ -1390,10 +1470,26 @@ class songs(GeneratedsSuper):
                 raise_parse_error(child_, 'requires float or double: %s' % exp)
             fval_ = self.gds_validate_float(fval_, node, 'artistMatch')
             self.artistMatch = fval_
+        elif nodeName_ == 'genreTag':
+            genreTag_ = child_.text
+            genreTag_ = self.gds_validate_string(genreTag_, node, 'genreTag')
+            self.genreTag = genreTag_
+        elif nodeName_ == 'genreTagId':
+            sval_ = child_.text
+            try:
+                ival_ = int(sval_)
+            except (TypeError, ValueError), exp:
+                raise_parse_error(child_, 'requires integer: %s' % exp)
+            ival_ = self.gds_validate_integer(ival_, node, 'genreTagId')
+            self.genreTagId = ival_
         elif nodeName_ == 'youtubeList':
             obj_ = youtubeList.factory()
             obj_.build(child_)
             self.set_youtubeList(obj_)
+        elif nodeName_ == 'genreMatch':
+            genreMatch_ = child_.text
+            genreMatch_ = self.gds_validate_string(genreMatch_, node, 'genreMatch')
+            self.genreMatch = genreMatch_
         elif nodeName_ == 'soundcloudList':
             obj_ = soundcloudList.factory()
             obj_.build(child_)
@@ -3550,6 +3646,400 @@ class album(GeneratedsSuper):
 # end class album
 
 
+class similarGenresTagList(GeneratedsSuper):
+    subclass = None
+    superclass = None
+    def __init__(self, similarGenreTag=None):
+        if similarGenreTag is None:
+            self.similarGenreTag = []
+        else:
+            self.similarGenreTag = similarGenreTag
+    def factory(*args_, **kwargs_):
+        if similarGenresTagList.subclass:
+            return similarGenresTagList.subclass(*args_, **kwargs_)
+        else:
+            return similarGenresTagList(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_similarGenreTag(self): return self.similarGenreTag
+    def set_similarGenreTag(self, similarGenreTag): self.similarGenreTag = similarGenreTag
+    def add_similarGenreTag(self, value): self.similarGenreTag.append(value)
+    def insert_similarGenreTag(self, index, value): self.similarGenreTag[index] = value
+    def hasContent_(self):
+        if (
+            self.similarGenreTag
+            ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespace_='', name_='similarGenresTagList', namespacedef_='', pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespace_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self.exportAttributes(outfile, level, already_processed, namespace_, name_='similarGenresTagList')
+        if self.hasContent_():
+            outfile.write('>%s' % (eol_, ))
+            self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespace_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def exportAttributes(self, outfile, level, already_processed, namespace_='', name_='similarGenresTagList'):
+        pass
+    def exportChildren(self, outfile, level, namespace_='', name_='similarGenresTagList', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        for similarGenreTag_ in self.similarGenreTag:
+            similarGenreTag_.export(outfile, level, namespace_, name_='similarGenreTag', pretty_print=pretty_print)
+    def exportLiteral(self, outfile, level, name_='similarGenresTagList'):
+        level += 1
+        already_processed = set()
+        self.exportLiteralAttributes(outfile, level, already_processed, name_)
+        if self.hasContent_():
+            self.exportLiteralChildren(outfile, level, name_)
+    def exportLiteralAttributes(self, outfile, level, already_processed, name_):
+        pass
+    def exportLiteralChildren(self, outfile, level, name_):
+        showIndent(outfile, level)
+        outfile.write('similarGenreTag=[\n')
+        level += 1
+        for similarGenreTag_ in self.similarGenreTag:
+            showIndent(outfile, level)
+            outfile.write('model_.similarGenreTag(\n')
+            similarGenreTag_.exportLiteral(outfile, level)
+            showIndent(outfile, level)
+            outfile.write('),\n')
+        level -= 1
+        showIndent(outfile, level)
+        outfile.write('],\n')
+    def build(self, node):
+        already_processed = set()
+        self.buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self.buildChildren(child, node, nodeName_)
+    def buildAttributes(self, node, attrs, already_processed):
+        pass
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False):
+        if nodeName_ == 'similarGenreTag':
+            obj_ = similarGenreTag.factory()
+            obj_.build(child_)
+            self.similarGenreTag.append(obj_)
+# end class similarGenresTagList
+
+
+class similarGenreTag(GeneratedsSuper):
+    subclass = None
+    superclass = None
+    def __init__(self, genreTagName=None, genreTagScore=None, genreTagId=None):
+        self.genreTagName = genreTagName
+        self.genreTagScore = genreTagScore
+        self.genreTagId = genreTagId
+    def factory(*args_, **kwargs_):
+        if similarGenreTag.subclass:
+            return similarGenreTag.subclass(*args_, **kwargs_)
+        else:
+            return similarGenreTag(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_genreTagName(self): return self.genreTagName
+    def set_genreTagName(self, genreTagName): self.genreTagName = genreTagName
+    def get_genreTagScore(self): return self.genreTagScore
+    def set_genreTagScore(self, genreTagScore): self.genreTagScore = genreTagScore
+    def get_genreTagId(self): return self.genreTagId
+    def set_genreTagId(self, genreTagId): self.genreTagId = genreTagId
+    def hasContent_(self):
+        if (
+            self.genreTagName is not None or
+            self.genreTagScore is not None or
+            self.genreTagId is not None
+            ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespace_='', name_='similarGenreTag', namespacedef_='', pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespace_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self.exportAttributes(outfile, level, already_processed, namespace_, name_='similarGenreTag')
+        if self.hasContent_():
+            outfile.write('>%s' % (eol_, ))
+            self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespace_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def exportAttributes(self, outfile, level, already_processed, namespace_='', name_='similarGenreTag'):
+        pass
+    def exportChildren(self, outfile, level, namespace_='', name_='similarGenreTag', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.genreTagName is not None:
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sgenreTagName>%s</%sgenreTagName>%s' % (namespace_, self.gds_format_string(quote_xml(self.genreTagName).encode(ExternalEncoding), input_name='genreTagName'), namespace_, eol_))
+        if self.genreTagScore is not None:
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sgenreTagScore>%s</%sgenreTagScore>%s' % (namespace_, self.gds_format_float(self.genreTagScore, input_name='genreTagScore'), namespace_, eol_))
+        if self.genreTagId is not None:
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%sgenreTagId>%s</%sgenreTagId>%s' % (namespace_, self.gds_format_integer(self.genreTagId, input_name='genreTagId'), namespace_, eol_))
+    def exportLiteral(self, outfile, level, name_='similarGenreTag'):
+        level += 1
+        already_processed = set()
+        self.exportLiteralAttributes(outfile, level, already_processed, name_)
+        if self.hasContent_():
+            self.exportLiteralChildren(outfile, level, name_)
+    def exportLiteralAttributes(self, outfile, level, already_processed, name_):
+        pass
+    def exportLiteralChildren(self, outfile, level, name_):
+        if self.genreTagName is not None:
+            showIndent(outfile, level)
+            outfile.write('genreTagName=%s,\n' % quote_python(self.genreTagName).encode(ExternalEncoding))
+        if self.genreTagScore is not None:
+            showIndent(outfile, level)
+            outfile.write('genreTagScore=%f,\n' % self.genreTagScore)
+        if self.genreTagId is not None:
+            showIndent(outfile, level)
+            outfile.write('genreTagId=%d,\n' % self.genreTagId)
+    def build(self, node):
+        already_processed = set()
+        self.buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self.buildChildren(child, node, nodeName_)
+    def buildAttributes(self, node, attrs, already_processed):
+        pass
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False):
+        if nodeName_ == 'genreTagName':
+            genreTagName_ = child_.text
+            genreTagName_ = self.gds_validate_string(genreTagName_, node, 'genreTagName')
+            self.genreTagName = genreTagName_
+        elif nodeName_ == 'genreTagScore':
+            sval_ = child_.text
+            try:
+                fval_ = float(sval_)
+            except (TypeError, ValueError), exp:
+                raise_parse_error(child_, 'requires float or double: %s' % exp)
+            fval_ = self.gds_validate_float(fval_, node, 'genreTagScore')
+            self.genreTagScore = fval_
+        elif nodeName_ == 'genreTagId':
+            sval_ = child_.text
+            try:
+                ival_ = int(sval_)
+            except (TypeError, ValueError), exp:
+                raise_parse_error(child_, 'requires integer: %s' % exp)
+            ival_ = self.gds_validate_integer(ival_, node, 'genreTagId')
+            self.genreTagId = ival_
+# end class similarGenreTag
+
+
+class similarArtistList(GeneratedsSuper):
+    subclass = None
+    superclass = None
+    def __init__(self, similarArtist=None):
+        if similarArtist is None:
+            self.similarArtist = []
+        else:
+            self.similarArtist = similarArtist
+    def factory(*args_, **kwargs_):
+        if similarArtistList.subclass:
+            return similarArtistList.subclass(*args_, **kwargs_)
+        else:
+            return similarArtistList(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_similarArtist(self): return self.similarArtist
+    def set_similarArtist(self, similarArtist): self.similarArtist = similarArtist
+    def add_similarArtist(self, value): self.similarArtist.append(value)
+    def insert_similarArtist(self, index, value): self.similarArtist[index] = value
+    def hasContent_(self):
+        if (
+            self.similarArtist
+            ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespace_='', name_='similarArtistList', namespacedef_='', pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespace_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self.exportAttributes(outfile, level, already_processed, namespace_, name_='similarArtistList')
+        if self.hasContent_():
+            outfile.write('>%s' % (eol_, ))
+            self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespace_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def exportAttributes(self, outfile, level, already_processed, namespace_='', name_='similarArtistList'):
+        pass
+    def exportChildren(self, outfile, level, namespace_='', name_='similarArtistList', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        for similarArtist_ in self.similarArtist:
+            similarArtist_.export(outfile, level, namespace_, name_='similarArtist', pretty_print=pretty_print)
+    def exportLiteral(self, outfile, level, name_='similarArtistList'):
+        level += 1
+        already_processed = set()
+        self.exportLiteralAttributes(outfile, level, already_processed, name_)
+        if self.hasContent_():
+            self.exportLiteralChildren(outfile, level, name_)
+    def exportLiteralAttributes(self, outfile, level, already_processed, name_):
+        pass
+    def exportLiteralChildren(self, outfile, level, name_):
+        showIndent(outfile, level)
+        outfile.write('similarArtist=[\n')
+        level += 1
+        for similarArtist_ in self.similarArtist:
+            showIndent(outfile, level)
+            outfile.write('model_.similarArtist(\n')
+            similarArtist_.exportLiteral(outfile, level)
+            showIndent(outfile, level)
+            outfile.write('),\n')
+        level -= 1
+        showIndent(outfile, level)
+        outfile.write('],\n')
+    def build(self, node):
+        already_processed = set()
+        self.buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self.buildChildren(child, node, nodeName_)
+    def buildAttributes(self, node, attrs, already_processed):
+        pass
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False):
+        if nodeName_ == 'similarArtist':
+            obj_ = similarArtist.factory()
+            obj_.build(child_)
+            self.similarArtist.append(obj_)
+# end class similarArtistList
+
+
+class similarArtist(GeneratedsSuper):
+    subclass = None
+    superclass = None
+    def __init__(self, similarArtistName=None, similarArtistScore=None, similarArtistId=None):
+        self.similarArtistName = similarArtistName
+        self.similarArtistScore = similarArtistScore
+        self.similarArtistId = similarArtistId
+    def factory(*args_, **kwargs_):
+        if similarArtist.subclass:
+            return similarArtist.subclass(*args_, **kwargs_)
+        else:
+            return similarArtist(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_similarArtistName(self): return self.similarArtistName
+    def set_similarArtistName(self, similarArtistName): self.similarArtistName = similarArtistName
+    def get_similarArtistScore(self): return self.similarArtistScore
+    def set_similarArtistScore(self, similarArtistScore): self.similarArtistScore = similarArtistScore
+    def get_similarArtistId(self): return self.similarArtistId
+    def set_similarArtistId(self, similarArtistId): self.similarArtistId = similarArtistId
+    def hasContent_(self):
+        if (
+            self.similarArtistName is not None or
+            self.similarArtistScore is not None or
+            self.similarArtistId is not None
+            ):
+            return True
+        else:
+            return False
+    def export(self, outfile, level, namespace_='', name_='similarArtist', namespacedef_='', pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        showIndent(outfile, level, pretty_print)
+        outfile.write('<%s%s%s' % (namespace_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        already_processed = set()
+        self.exportAttributes(outfile, level, already_processed, namespace_, name_='similarArtist')
+        if self.hasContent_():
+            outfile.write('>%s' % (eol_, ))
+            self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+            showIndent(outfile, level, pretty_print)
+            outfile.write('</%s%s>%s' % (namespace_, name_, eol_))
+        else:
+            outfile.write('/>%s' % (eol_, ))
+    def exportAttributes(self, outfile, level, already_processed, namespace_='', name_='similarArtist'):
+        pass
+    def exportChildren(self, outfile, level, namespace_='', name_='similarArtist', fromsubclass_=False, pretty_print=True):
+        if pretty_print:
+            eol_ = '\n'
+        else:
+            eol_ = ''
+        if self.similarArtistName is not None:
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%ssimilarArtistName>%s</%ssimilarArtistName>%s' % (namespace_, self.gds_format_string(quote_xml(self.similarArtistName).encode(ExternalEncoding), input_name='similarArtistName'), namespace_, eol_))
+        if self.similarArtistScore is not None:
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%ssimilarArtistScore>%s</%ssimilarArtistScore>%s' % (namespace_, self.gds_format_float(self.similarArtistScore, input_name='similarArtistScore'), namespace_, eol_))
+        if self.similarArtistId is not None:
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%ssimilarArtistId>%s</%ssimilarArtistId>%s' % (namespace_, self.gds_format_integer(self.similarArtistId, input_name='similarArtistId'), namespace_, eol_))
+    def exportLiteral(self, outfile, level, name_='similarArtist'):
+        level += 1
+        already_processed = set()
+        self.exportLiteralAttributes(outfile, level, already_processed, name_)
+        if self.hasContent_():
+            self.exportLiteralChildren(outfile, level, name_)
+    def exportLiteralAttributes(self, outfile, level, already_processed, name_):
+        pass
+    def exportLiteralChildren(self, outfile, level, name_):
+        if self.similarArtistName is not None:
+            showIndent(outfile, level)
+            outfile.write('similarArtistName=%s,\n' % quote_python(self.similarArtistName).encode(ExternalEncoding))
+        if self.similarArtistScore is not None:
+            showIndent(outfile, level)
+            outfile.write('similarArtistScore=%f,\n' % self.similarArtistScore)
+        if self.similarArtistId is not None:
+            showIndent(outfile, level)
+            outfile.write('similarArtistId=%d,\n' % self.similarArtistId)
+    def build(self, node):
+        already_processed = set()
+        self.buildAttributes(node, node.attrib, already_processed)
+        for child in node:
+            nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
+            self.buildChildren(child, node, nodeName_)
+    def buildAttributes(self, node, attrs, already_processed):
+        pass
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False):
+        if nodeName_ == 'similarArtistName':
+            similarArtistName_ = child_.text
+            similarArtistName_ = self.gds_validate_string(similarArtistName_, node, 'similarArtistName')
+            self.similarArtistName = similarArtistName_
+        elif nodeName_ == 'similarArtistScore':
+            sval_ = child_.text
+            try:
+                fval_ = float(sval_)
+            except (TypeError, ValueError), exp:
+                raise_parse_error(child_, 'requires float or double: %s' % exp)
+            fval_ = self.gds_validate_float(fval_, node, 'similarArtistScore')
+            self.similarArtistScore = fval_
+        elif nodeName_ == 'similarArtistId':
+            sval_ = child_.text
+            try:
+                ival_ = int(sval_)
+            except (TypeError, ValueError), exp:
+                raise_parse_error(child_, 'requires integer: %s' % exp)
+            ival_ = self.gds_validate_integer(ival_, node, 'similarArtistId')
+            self.similarArtistId = ival_
+# end class similarArtist
+
+
 class youtubeList(GeneratedsSuper):
     subclass = None
     superclass = None
@@ -4251,6 +4741,10 @@ __all__ = [
     "level9Genres",
     "masterGenres",
     "masterStyles",
+    "similarArtist",
+    "similarArtistList",
+    "similarGenreTag",
+    "similarGenresTagList",
     "songs",
     "soundcloudGenres",
     "soundcloudList",
