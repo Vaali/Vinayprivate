@@ -73,6 +73,13 @@ def IsReleaseCollection(formats):
                 bRet = True
     return bRet
 
+def changeName(artName):
+    artNamewords = artName.split()
+    retNamewords = []
+    for artword in artNamewords:
+         retNamewords.append(artword[0].upper()+ artword[1:])
+    return " ".join(retNamewords)
+
 def get_released_date(releaseDate):
     ''' 20041109 '''
     if('-' in releaseDate):
@@ -737,6 +744,37 @@ def get_song_list_master(directory,songs_list,full_country_list,aliases,ear_coun
 
     return combined_songs_list,full_country_list,aliases,ear_count,ear_year,ear_rel,ear_conflict,final_song_list
 
+def CheckifSongsExistsinSolr(sname,aname,fname):
+    try:
+        solrConnection1 = SolrConnection('http://aurora.cs.rutgers.edu:8181/solr/discogs_data_test')
+        songName = 'stringSongName:"'+sname+'"'
+        artistName = 'artistName:"'+changeName(aname)+'"'
+        facet_query = [songName,artistName]
+        if(len(fname) != 0):
+            for f in fname:
+                ftartistName = 'ftArtistName:"'+changeName(f)+'"'
+                facet_query.append(ftartistName)
+            #print facet_query
+        response = solrConnection1.query(q="*:*",fq= facet_query,version=2.2,wt = 'json')
+        intersect = int(response.results.numFound)
+        #print songName
+        #print artistName
+        
+        if(intersect > 0):
+            '''for result in response.results:
+                #print result['youtubeName']
+                #print result['artistName']
+                #print result['songName']
+                print fname
+                if('ftArtistName' in result):
+                    result['ftArtistName']
+                    
+                    #print len(response.results)'''
+            return True
+    except Exception as e:
+        logger_error.exception(e)
+    return False
+
 
 def crawlArtist(directory):
     logger_decisions.error(directory)
@@ -878,6 +916,7 @@ def crawlArtist(directory):
         vid = list()
         misses = 0
         hits = 0
+        found = 0
         fullComplete = checkpreviousfull(directory)
         print 'fullcomplete'
         print fullComplete
@@ -898,6 +937,11 @@ def crawlArtist(directory):
                 return_pool = executor.map(getVideoFromYoutube,parallel_songs_list)
         #print len(return_pool)
         for ret_val in return_pool:
+            
+            if(ret_val[2] == True):
+                    found = found + 1
+                    print ret_val[3]
+                    continue
             if(ret_val[0] == None ):
                 misses = misses+1
             else:
@@ -909,7 +953,7 @@ def crawlArtist(directory):
                         #print rv.__dict__
                         #tv = collections.OrderedDict(rv.__dict__)
                         vid.append(rv.__dict__)
-        print "Hits:"+str(hits)+" Misses:"+str(misses)
+        print "Hits:"+str(hits)+" Misses:"+str(misses) + " Found : "+ str(found)
         if(IsIncremental == 0):
             write(vid,directory+"/dump")
             with open(directory + '/last_full_part2.txt', 'wb') as f1:
@@ -1010,9 +1054,15 @@ def getVideoFromYoutube(curr_elem):
     retvid = None
     bret = False
     artname = curr_elem['artistName']
+    sname = curr_elem['name']
+    ftartists = curr_elem['featArtists']
     #print '---------------------'
     #print artname
     #print '-----------------'
+    if(CheckifSongsExistsinSolr(sname,artname,ftartists) == True):
+        print 'found the song'
+        retstring = sname + '------' + artname + '-----' + ','.join(ftartists)
+        return retvid,True,True,retstring
     try:
         retvid,bret = getVideo(curr_elem,0)
         if('anv' in curr_elem):
@@ -1039,7 +1089,7 @@ def getVideoFromYoutube(curr_elem):
         '''if('errorstr' in tempDictionary):
             logger_decisions.error(tempDictionary['errorstr'])
             logger_decisions.error('-----------------')'''
-    return retvid,bret
+    return retvid,bret,False
 
 
 def getVideo(curr_elem,flag):
