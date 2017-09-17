@@ -861,7 +861,7 @@ def crawlArtist(directory):
             logger_decisions.error(final_song_list[s]['albumInfo'])
             logger_decisions.error('----------------------------------------')'''
         vid = list()
-        if(IsIncremental == 0):
+        if(IsIncremental == 0 or IsIncremental == 2):
             with open(directory + '/uniquelist.txt', 'wb') as f:
 			    pickle.dump(final_song_list, f)
         else:
@@ -891,7 +891,7 @@ def crawlArtist(directory):
 
         t3= time.time()
         print len(parallel_songs_list)
-        if(IsIncremental == 0):
+        if(IsIncremental == 0 or IsIncremental ==2):
             with open(directory + '/last_full_part1.txt', 'wb') as f1:
                 f1.write(str(int(t3)))
                 f1.close()
@@ -954,7 +954,7 @@ def crawlArtist(directory):
                         #tv = collections.OrderedDict(rv.__dict__)
                         vid.append(rv.__dict__)
         print "Hits:"+str(hits)+" Misses:"+str(misses) + " Found : "+ str(found)
-        if(IsIncremental == 0):
+        if(IsIncremental == 0 or IsIncremental ==2):
             write(vid,directory+"/dump")
             with open(directory + '/last_full_part2.txt', 'wb') as f1:
                 f1.write(str(int(time.time())))
@@ -1051,6 +1051,7 @@ def checkFtArtist(ftartist1,ftartist2):
 
 
 def getVideoFromYoutube(curr_elem):
+    global IsIncremental
     retvid = None
     bret = False
     artname = curr_elem['artistName']
@@ -1059,10 +1060,11 @@ def getVideoFromYoutube(curr_elem):
     #print '---------------------'
     #print artname
     #print '-----------------'
-    if(CheckifSongsExistsinSolr(sname,artname,ftartists) == True):
-        print 'found the song'
-        retstring = sname + '------' + artname + '-----' + ','.join(ftartists)
-        return retvid,True,True,retstring
+    if(IsIncremental ==2):
+        if(CheckifSongsExistsinSolr(sname,artname,ftartists) == True):
+            print 'found the song'
+            retstring = sname + '------' + artname + '-----' + ','.join(ftartists)
+            return retvid,True,True,retstring
     try:
         retvid,bret = getVideo(curr_elem,0)
         if('anv' in curr_elem):
