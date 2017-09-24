@@ -428,6 +428,8 @@ def get_song_list(directory,songs_list,full_country_list,aliases,ear_count,ear_y
                 if(curr_album['released_date'] != None and temp_year_album != 0):
                     if(str(curr_album['released_date']).split('-')[0] != ''):
                         curr_year = int(str(curr_album['released_date']).split('-')[0])
+                        if(curr_year >2020):
+                            curr_year = 1001#print 'year greater than 2020'
                     else:
                         curr_year = 1001
                     if(curr_year == 1001 or (curr_year > int(temp_year_album))):
@@ -628,6 +630,7 @@ def get_song_list_master(directory,songs_list,full_country_list,aliases,ear_coun
                     song['styles'] = curr_album['styles']
                     song['genres'] = curr_album['genres']
                     song['year'] = curr_album['released_date']
+                    print song['year']
                     song['country'] = curr_album['country']
                     song['featArtists'] = []
                     song['connectors'] = []
@@ -779,10 +782,12 @@ def CheckifSongsExistsinSolr(sname,aname,fname):
 def crawlArtist(directory):
     logger_decisions.error(directory)
     #print os.path.basename(directory)
+    
     if(os.path.basename(directory) == '194' or os.path.basename(directory) == '355'):
         logger_decisions.error('skipping ' +directory)
         return
     try:
+        curr_artist_dir = os.path.basename(directory)
         songs_list = list()
         global misses
         global hits
@@ -950,6 +955,11 @@ def crawlArtist(directory):
                         misses = misses + 1
                     else:
                         hits = hits + 1
+                        if(rv.__dict__['artist_id'] == curr_artist_dir):
+                            rv.__dict__['same_artist'] = True
+                        else:
+                            rv.__dict__['same_artist'] = False
+
                         #print rv.__dict__
                         #tv = collections.OrderedDict(rv.__dict__)
                         vid.append(rv.__dict__)
@@ -972,7 +982,8 @@ def checkIfSongExists(curr_song,songs_list):
     retVal = False
     matched_song = ""
     song_name = curr_song['name']
-    for s in songs_list:
+    try:
+     for s in songs_list:
         #print song
         song = songs_list[s]['name']
         if(len(song) > len(song_name)):
@@ -1002,6 +1013,10 @@ def checkIfSongExists(curr_song,songs_list):
             #print str(phonectic_distance) + " ######### " + str(normal_distance)
             matched_song = s
             break
+    except Exception as ex:
+        #logger_error.exception(source)
+        #logger_error.exception(destination)
+        logger_error.exception(ex)
     return retVal,matched_song
 
 
@@ -1196,14 +1211,18 @@ class Audio(object):
 
 
 
-def GetYearFromTitle(vid_title):
+def GetYearFromTitle(vid_title,song_name):
     returnYear = 0
     yearList = re.findall(r'\d\d\d\d+',vid_title)
     #print yearList
     if(len(yearList) != 0):
         returnYear = int(yearList[0])
-        if(vid_title == yearList[0]):
+        if(returnYear > 2020):
             returnYear = 0
+            #print 'the year is greater than 2020'
+        if(vid_title == yearList[0] or (song_name.isdigit() and int(song_name) == yearList[0])):
+            returnYear = 0
+
     return returnYear
 
 def CalculateMatch(video,vid_title,vid_description,oldsong = False):
@@ -1737,7 +1756,7 @@ def getYoutubeUrl(video,flag,mostpopular):
                     [currentVideoDecision,currentVideoMatch,currentVideoTotalMatch,currentVideoSongMatch,currentVideoArtistMatch,error_str] = CalculateMatch(video,searchEntry['snippet']['title'],searchEntry['snippet']['description'])
                     video.errorstr = error_str
                     if(currentVideoDecision == "correct"):# || currentVideoDecision == "Incorrect"):
-                        currentVideoYear = GetYearFromTitle(searchEntry['snippet']['title'])
+                        currentVideoYear = GetYearFromTitle(searchEntry['snippet']['title'],video.name)
                         youtubeVideoId = searchEntry['id']['videoId']
                         videoUrl = "https://www.googleapis.com/youtube/v3/videos?id="+str(youtubeVideoId)+"&key=AIzaSyBE5nUPdQ7J_hlc3345_Z-I4IG-Po1ItPU&part=statistics,contentDetails,status"
                         try:
