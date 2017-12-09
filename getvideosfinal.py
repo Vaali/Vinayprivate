@@ -22,6 +22,7 @@ import fuzzy
 from solr import SolrConnection
 from solr.core import SolrException
 import operator
+import loggingmodule
 
 
 
@@ -32,7 +33,7 @@ Initialising the loggers
 
 '''
 
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(process)s - %(thread)s:%(message)s')
+'''formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(process)s - %(thread)s:%(message)s')
 logger_error = logging.getLogger('simple_logger')
 hdlr = logging.handlers.RotatingFileHandler(
               'errors_getVideos.log', maxBytes=1024*1024*1024, backupCount=10)
@@ -49,7 +50,10 @@ hdlr_1 = logging.handlers.RotatingFileHandler(
 #hdlr_1 = logging.FileHandler('decisions_new.log')
 hdlr_1.setFormatter(formatter1)
 logger_decisions.addHandler(hdlr_1)
-logger_decisions = logging.getLogger('simple_logger1')
+logger_decisions = logging.getLogger('simple_logger1')'''
+logger_decisions = loggingmodule.initialize_logger1('decisions','decisions_new.log')
+logger_error = loggingmodule.initialize_logger('errors','errors_getVideos.log')
+
 
 stemwords_uniquelist = ["(Edited Short Version)","(Alternate Early Version)","(Alternate Version)","(Mono)","(Radio Edit)","(Original Album Version)","(Different Mix)","(Music Film)","(Stereo)","(Single Version)","Stereo","Mono","(Album Version)","Demo","(Demo Version)"]
 solrConnection = SolrConnection('http://aurora.cs.rutgers.edu:8181/solr/discogs_artists')
@@ -780,6 +784,7 @@ def CheckifSongsExistsinSolr(sname,aname,fname):
 
 
 def crawlArtist(directory):
+    start_time = datetime.now()
     logger_decisions.error(directory)
     #print os.path.basename(directory)
     
@@ -913,8 +918,7 @@ def crawlArtist(directory):
                 f1.close()
     except Exception, e:
         logger_error.exception(e)
-    logger_decisions.error(directory + "Completed ")
-    logger_decisions.error('-----------------------')
+    logger_decisions.error(directory + " -- Completed with time -- " + str(datetime.now() - start_time))
     #print parallel_songs_list
     try:
         #print fl
@@ -964,6 +968,7 @@ def crawlArtist(directory):
                         #tv = collections.OrderedDict(rv.__dict__)
                         vid.append(rv.__dict__)
         print "Hits:"+str(hits)+" Misses:"+str(misses) + " Found : "+ str(found)
+        logger_decisions.error(directory +  "Hits:"+str(hits)+" Misses:"+str(misses) + " Found : "+ str(found))
         if(IsIncremental == 0 or IsIncremental ==2):
             write(vid,directory+"/dump")
             with open(directory + '/last_full_part2.txt', 'wb') as f1:
@@ -1619,7 +1624,7 @@ hq','band','audio','album','world','instrumental','intro','house','acoustic','so
             error_str += str(f)
         error_str += "##setratio total match:"
         error_str += str(setratio_totalmatch)
-        logger_decisions.error(error_str)
+        #logger_decisions.error(error_str)
         '''logger_decisions.error(decision)
         logger_decisions.error(condition)
         logger_decisions.error(match)
@@ -1703,16 +1708,18 @@ def getYoutubeUrl(video,flag,mostpopular):
             flist = flist+" "+ttt
         ftartists = flist
         allArtists = video.artist.strip("-")+" "+ftartists
+        key = "AIzaSyDVdjKb9XlLIXGsrEGnMqt6Yp-VXw0rlhY"
+        #key = "AIzaSyBE5nUPdQ7J_hlc3345_Z-I4IG-Po1ItPU"
         if(flag == 0):
             '''if('cover' not in video.name.lower()):
                 searchUrl = "https://www.googleapis.com/youtube/v3/search?part=snippet&q=allintitle%3A"+urllib.quote_plus(str(allArtists))+"+"+urllib.quote_plus(str(video.name))+"+-cover"+"&alt=json&type=video&max-results=5&key=AIzaSyBE5nUPdQ7J_hlc3345_Z-I4IG-Po1ItPU&videoCategoryId=10"
             else:'''
-            searchUrl = "https://www.googleapis.com/youtube/v3/search?part=snippet&q=allintitle%3A"+urllib.quote_plus(str(allArtists))+"+"+urllib.quote_plus(str(video.name))+"&alt=json&type=video&max-results=5&key=AIzaSyBE5nUPdQ7J_hlc3345_Z-I4IG-Po1ItPU&videoCategoryId=10"
+            searchUrl = "https://www.googleapis.com/youtube/v3/search?part=snippet&q=allintitle%3A"+urllib.quote_plus(str(allArtists))+"+"+urllib.quote_plus(str(video.name))+"&alt=json&type=video&max-results=5&key="+key+"&videoCategoryId=10"
         else:
             '''if('cover' not in video.name.lower()):
                 searchUrl = "https://www.googleapis.com/youtube/v3/search?part=snippet&q="+urllib.quote_plus(str(allArtists))+"+"+urllib.quote_plus(str(video.name))+"+-cover"+"&alt=json&type=video&max-results=5&key=AIzaSyBE5nUPdQ7J_hlc3345_Z-I4IG-Po1ItPU&videoCategoryId=10"
             else:'''
-            searchUrl = "https://www.googleapis.com/youtube/v3/search?part=snippet&q="+urllib.quote_plus(str(allArtists))+"+"+urllib.quote_plus(str(video.name))+"&alt=json&type=video&max-results=5&key=AIzaSyBE5nUPdQ7J_hlc3345_Z-I4IG-Po1ItPU&videoCategoryId=10"
+            searchUrl = "https://www.googleapis.com/youtube/v3/search?part=snippet&q="+urllib.quote_plus(str(allArtists))+"+"+urllib.quote_plus(str(video.name))+"&alt=json&type=video&max-results=5&key="+key+"&videoCategoryId=10"
             mostpopular = 1
         print searchUrl
         try:
@@ -1976,6 +1983,7 @@ if __name__ == '__main__':
             fwrite.write("\n")
             if(split[-1]!= None):
                 fwrite.write(str(split[-1]))
+                logger_decisions.error(str(split[-1]))
                 fwrite.write("\n")
         fwrite.close()
     except Exception as e:
