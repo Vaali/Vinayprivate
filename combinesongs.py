@@ -5,6 +5,7 @@ import logging
 import loggingmodule
 import os
 import glob
+import loggingmodule
 from multiprocessing import Pool
 
 
@@ -36,20 +37,21 @@ def addsongs(fname):
         for style in styleList:
             logger_genre.error(curr_string + ':;' + style)
     except Exception as e:
-        print fname
-        print e
+        logger_errors.exception(e)
+        logger_errors.exception(fname)
 
 
 if __name__ == '__main__':
+    logger_errors = loggingmodule.initialize_logger1('combine_songs.log')
+    #logger_errors.exception('hi there')
     if(not os.path.exists('logs')):
-	os.mkdir('logs')
+        os.mkdir('logs')
     else:
         try:
             os.remove('logs/combinedsongs.txt')
         except OSError:
             pass
     logger_genre = loggingmodule.initialize_logger('combinedsongs.txt',False)
-    logger_errors = loggingmodule.initialize_logger1('combined_songserrors.log')
     directory = raw_input("Enter directory: ")
     foldlist = glob.glob(directory+"/*.xml")
     #addsongs('solr_newData11/0000F6q4PpfcPnY.xml')
@@ -59,6 +61,7 @@ if __name__ == '__main__':
         p.close()
         p.join()
     except Exception as e:
+        print e
         logger_errors.exception(e)
 
 
