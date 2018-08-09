@@ -19,42 +19,49 @@ import time
 import operator
 from solr import SolrConnection
 from solr.core import SolrException
-import loggingmodule
 
 
 config = ConfigParser.ConfigParser()
 reload(sys)
 sys.setdefaultencoding('utf8')
-logger_genre = loggingmodule.initialize_logger1('genres.log')
-logger_errors = loggingmodule.initialize_logger('errors_part2.log')
+formatter = logging.Formatter('%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
+logger_genre = logging.getLogger('simple_logger')
+hdlr_1 = logging.FileHandler('genres.log')
+hdlr_1.setFormatter(formatter)
+logger_genre.addHandler(hdlr_1)
+logger_genre = logging.getLogger('simple_logger')
+formatter = logging.Formatter('%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
+logging.basicConfig(format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s',level=logging.DEBUG, filename='errors_part2.log')
+# second file logger
+logger_finished = logging.getLogger('simple_logger_2')
+hdlr_2 = logging.FileHandler('finishedpart2.log')    
+hdlr_2.setFormatter(formatter)
+logger_finished.addHandler(hdlr_2)
 
-def changeGenres(curr_genre):
-    if(curr_genre == 'Funk_/_soul'):
-        curr_genre = 'Funk/soul'
-    if(curr_genre == 'Folk,_world,_&_country'):
-        curr_genre = 'Folk-world-country'
-    return curr_genre
 
-def getSimilarGenresfromGenresDistances(genres,artistTopGenres):
+def getSimilarGenresfromGenresDistances(genres):
     count = len(genres)
-    #if(len(genres) > 6):
-    #print genres
-    simGenreTagsList = api.similarGenresTagList()
-    simGenreTag = api.similarGenreTag()
-    currentsimgenreTag =  '@'.join(sorted(genres))
-    simGenreTag.set_genreTagName(currentsimgenreTag)
-    simGenreTagsList.add_similarGenreTag(simGenreTag)
-    if(len(genres) < 5):
-        for g in artistTopGenres[0:10]:
-            if(g[0] not in genres):
-                currentgenres = genres + [g[0]]
-                currentsimgenreTag =  '@'.join(sorted(currentgenres))
-                simGenreTag = api.similarGenreTag()
-                simGenreTag.set_genreTagName(currentsimgenreTag)
-                #simGenreTag.set_genreTagScore()
-                #simGenreTag.set_genreTagId(int(currListId[i]))
-                simGenreTagsList.add_similarGenreTag(simGenreTag)
-    return simGenreTagsList
+    intersect = 0
+    try:
+        artistId = 'artistName:"'+str(genres[0])+ '"'
+        response_genre = connection_genre.query(q="*:*",fq=[artistId],version=2.2,wt = 'json')
+        intersect = int(response_genre.results.numFound)
+    except Exception as e:
+        #logging.exception('genres writing error')
+        #logging.exception(e)
+        #getSimilarGenresfromGenresDistances(test)
+        print e
+    if(intersect > 0):
+        for result in response_genre.results:
+            simgenres = result['similarartistName']
+            simgenresscore = result['similarCosineDistance']
+            combined_values = zip(simgenres,simgenresscore)
+            sorted_x = sorted(combined_values,key = lambda x: x[1],reverse = True)
+            print sorted_x[0:5]
+            break
+
+
+    
 
 
 
@@ -285,15 +292,13 @@ def genXML(vid,avgcnt,avgcntrece,artistId,genreCountList,artistTopGenres,country
         yname = yname.lower().replace("featuring","")
         y1 = yname.find("-")
         y2 = yname.find(":")
-        if('same_artist' in vid):
-            decision = vid['same_artist']
-        else:
-            decision = True
+        
+        decision = "Incorrect"
         mysong.set_totalMatch(vid['tm'])
         mysong.set_songMatch(vid['sm'])
         mysong.set_artistMatch(vid['am'])
         mysong.set_overLap(vid['match'])
-        mysong.set_decision(vid['same_artist'])
+        mysong.set_decision(decision)
         mysong.set_genresCountList(genreCountList)
 		###adding audio details 
         '''audioList = api.soundcloudList()
@@ -419,20 +424,14 @@ def genXML(vid,avgcnt,avgcntrece,artistId,genreCountList,artistTopGenres,country
         mysong.set_rating(rating)
         genres_levels = {0:[],1:[]}
         
-        genre = vid['genres'] if vid['genres'] != None else []
-        style = vid['styles'] if vid['styles'] != None else []
+        genre = vid['genres']
+        style = vid['styles']
         total_count = 0
         total_set = set()
 
 
         ''' Check if the total genres + styles list count >5 then replace it with popular genres of artist '''
-        '''Adding to remove the wrong entry in discogs.'''
-        if('hip hop' in genre or '"Hip Hop"' in genre):
-            genre.remove('"Hip Hop"')
-            genre.append("Electronic")
-            style.append('Hip Hop')
-            #print style
-        if(genre != None):                    
+        if(genre != None):
             total_count = len(genre)
             total_set = set(genre)
         if(style != None):
@@ -443,25 +442,23 @@ def genXML(vid,avgcnt,avgcntrece,artistId,genreCountList,artistTopGenres,country
             g = g.replace("\"","")
             g = g.lower()
             total_set1.append(g)
-        if(total_count > 4):
+        #if(total_count > 4):
             #print 'combine genres'
-            curr_art_genres = [x[0] for x in artistTopGenres]
-            genre = list(set(curr_art_genres[0:3])& set(total_set1))
-            #print curr_art_genres[0:3]
-            #print total_set1
-            style = None
-            #print genre
+            #genre = list(set(artistTopGenres)& set(total_set1))
+            #style = None
         mysong.set_totalGenreCount(total_count)
-        #print total_count
         if(total_count == 1):
-            if(len(artistTopGenres) != 0):
-                genre = list(set([artistTopGenres[0:1][0][0]]) | set(total_set1))
-                if(len(genre) == 1 and (len(artistTopGenres) > 1)):
-                    genre = list(set([artistTopGenres[1:2][0][0]]) | set(total_set1))
-            else:
-                genre = list(set(total_set1))
-            #print genre
-	    style = None
+            genre = list(set(artistTopGenres[0:1]) | set(total_set1))
+            style = None
+
+        if(url[-11:] == '6rgStv12dwA'):
+            print genre
+            print artistTopGenres
+
+        #print genre
+        
+        
+        
         curr_genres_list = []
         if(genre != None):
             #genre = genre.replace("{","")
@@ -481,21 +478,14 @@ def genXML(vid,avgcnt,avgcntrece,artistId,genreCountList,artistTopGenres,country
                     g = g.replace('&','and')
                     g.strip() '''
                 g = g.replace("\"","")
-                g = g.replace(" ","_")
                 g = g.lower()
                 g = g[0].upper()+g[1:]
                 if(g.strip() == ""):
                     continue
                 #g = encodexml(g)
                 #element,orig_dict,path
-                g = changeGenres(g)
                 x = findPath(g,genres_list_dict,[])
-                if(len(x) == 0):
-                    logger_genre.error(g)
-
-                '''if(url.find('weeI1G46q0o') != -1):
-                    print 'found out'
-                    print g'''
+                #print x
                 for k,l in enumerate(x[1:]):
                         #print k,l
                         if k in genres_levels:
@@ -510,14 +500,14 @@ def genXML(vid,avgcnt,avgcntrece,artistId,genreCountList,artistTopGenres,country
                     genre_paths = doc.xpath(xmlpath)
                 except Exception as ex:
                     logger_genre.error(xmlpath)
-                    logger_errors.exception("Error in path for "+xmlpath)'''
+                    logging.exception("Error in path for "+xmlpath)'''
                 '''if(len(genre_paths) == 0):
                     xmlpath = "//"+str(g+"_music")
                     try:
                         genre_paths = doc.xpath(xmlpath)
                     except Exception as ex:
                         logger_genre.error(xmlpath)
-                        logger_errors.exception("Error in path for "+xmlpath)
+                        logging.exception("Error in path for "+xmlpath)
                     if(len(genre_paths) == 0):
                         logger_genre.error(g)
                     else:
@@ -559,10 +549,8 @@ def genXML(vid,avgcnt,avgcntrece,artistId,genreCountList,artistTopGenres,country
                 g = g.lower()
                 g = g[0].upper()+g[1:]'''
                 #g = encodexml(g)
-                g = changeGenres(g)
                 x = findPath(g,genres_list_dict,[])
-                if(len(x) == 0):
-                    logger_genre.error(g)
+                #print x
                 for k,l in enumerate(x[1:]):
                         #print k,l
                         if k in genres_levels:
@@ -579,14 +567,14 @@ def genXML(vid,avgcnt,avgcntrece,artistId,genreCountList,artistTopGenres,country
                     genre_paths = doc.xpath(xmlpath)
                 except Exception as ex:
                     logger_genre.error(xmlpath)
-                    logger_errors.exception("Error in path for "+xmlpath)
+                    logging.exception("Error in path for "+xmlpath)
                 if(len(genre_paths) == 0):
                     xmlpath = "//"+str(g+"_music")
                     try:
                         genre_paths = doc.xpath(xmlpath)
                     except Exception as ex:
                         logger_genre.error(xmlpath)
-                        logger_errors.exception("Error in path for "+xmlpath)'''
+                        logging.exception("Error in path for "+xmlpath)'''
                 '''if(len(genre_paths) == 0):
                         logger_genre.error(g)
                     else:
@@ -671,8 +659,7 @@ def genXML(vid,avgcnt,avgcntrece,artistId,genreCountList,artistTopGenres,country
                 continue
 
         genre_tags = sorted(genre_tags)
-        simGenreTagsList = getSimilarGenresfromGenresDistances(genre_tags,artistTopGenres)
-        mysong.set_similarGenresTagList(simGenreTagsList)
+        getSimilarGenresfromGenresDistances(genre_tags)
         combinedgenrestring = '@'.join(genre_tags)
         combinedgenrestring = combinedgenrestring.lower()
         mysong.set_genreTag(combinedgenrestring)
@@ -688,14 +675,14 @@ def genXML(vid,avgcnt,avgcntrece,artistId,genreCountList,artistTopGenres,country
         if not os.path.exists(path):
 			os.mkdir(path)
         fname = path + "/0000" +url[-11:] + ".xml"
-            
+        
         if os.path.exists(fname):
             fr = codecs.open(fname,'r','utf-8')
             try:
                 oldsong = api.parse(fname)
             except Exception as ex:
-                logger_errors.exception(ex)
-                logger_errors.exception(fname)
+                logging.exception(ex)
+                logging.exception(fname)
                 
 
             '''if(url[-11:].lower() == "aVIA1n5ng4Y".lower()):
@@ -749,12 +736,8 @@ def genXML(vid,avgcnt,avgcntrece,artistId,genreCountList,artistTopGenres,country
                 if(mysong.releaseDate != 1001 and int(oldsong.releaseDate) > int(mysong.releaseDate)):
                     #if(url[-11:] == '6rgStv12dwA'):
                     #    print 'print "With this :" sixth'
-
 		    print "With this :"
-                    mysong = CombineAlbums(oldsong,mysong)
-                elif(oldsong.decision == False):
-                    mysong = CombineAlbums(oldsong,mysong)
-                    mysong.releaseDate = oldsong.releaseDate
+                    mysong = CombineAlbums(oldsong,mysong)  
                 else:
                     #if(url[-11:] == '6rgStv12dwA'):
                     #    print 'print "With this :" fifth'
@@ -788,8 +771,7 @@ def genXML(vid,avgcnt,avgcntrece,artistId,genreCountList,artistTopGenres,country
 	    fx.write(artistId) 
 	    fx.close()
     except Exception as ex:
-        logger_errors.exception(ex)
-        print 'rror'
+        logging.exception(ex)
 
 
 
@@ -1010,8 +992,7 @@ def GetTotalGenresCountForArtist(vids,artistId,directory):
             curr_parseVal.append(genre)
             curr_parseVal.append(genreMat[genre])
         else:
-            print genre
-            #logger_genre.error(genre)
+            logger_genre.error(genre)
             continue
         curr_parseVal.append(genrecount[genre])
         print genrecount[genre]
@@ -1033,13 +1014,12 @@ def GetTotalGenresCountForArtist(vids,artistId,directory):
             curr_parseVal.append(style)
             curr_parseVal.append(genreMat[style])
         else:
-            print style
-            #logger_genre.error(style)
+            logger_genre.error(style)
             continue
         #curr_parseVal.append(percent)
         curr_parseVal.append(stylecount[style])
         parseMat.append(curr_parseVal)
-    return genreList,parseMat,totalGenresDictSorted
+    return genreList,parseMat,artistTopGenres
 
 def getCountry(vids,artistId,directory):
     country_count = {}
@@ -1053,8 +1033,6 @@ def getCountry(vids,artistId,directory):
             continue
         if('songcountry' in v):
             curr_country = v['songcountry']
-            if(curr_country == None):
-				continue
             curr_country = curr_country.strip()
             if(not (curr_country and curr_country.strip())):
                 continue
@@ -1149,7 +1127,7 @@ def generatexmls(dirlist):
         artistId = directory[dindex+1:]
         genreCountList,parseMat,artistTopGenres = GetTotalGenresCountForArtist(vids,artistId,directory)
         country_name = getCountry(vids,artistId,directory)
-        print genreCountList
+        #print genreCountList
         #print parseMat
         if(IsIncremental == 1):
                 f = codecs.open(directory+'/matrix.txt','a','utf8')
@@ -1168,7 +1146,7 @@ def generatexmls(dirlist):
             genXML(v,avgcnt,avgcntrece,artistId,genreCountList,artistTopGenres,country_name)
         #logger_finished.error('Completed for directory '+ str(directory))
     except Exception as e:
-        logger_errors.exception(e)
+        logging.exception(e)
 
 
 #main starts here
@@ -1211,7 +1189,7 @@ if __name__ == '__main__':
         p.close()
         p.join()
     except Exception as e:
-        logger_errors.exception(e)
+        logging.exception(e)
     t2=datetime.now()
 
     print "time=" +str(t2-t1)

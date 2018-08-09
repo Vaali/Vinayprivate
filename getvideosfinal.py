@@ -22,7 +22,6 @@ import fuzzy
 from solr import SolrConnection
 from solr.core import SolrException
 import operator
-import loggingmodule
 
 
 
@@ -33,7 +32,7 @@ Initialising the loggers
 
 '''
 
-'''formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(process)s - %(thread)s:%(message)s')
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(process)s - %(thread)s:%(message)s')
 logger_error = logging.getLogger('simple_logger')
 hdlr = logging.handlers.RotatingFileHandler(
               'errors_getVideos.log', maxBytes=1024*1024*1024, backupCount=10)
@@ -50,10 +49,7 @@ hdlr_1 = logging.handlers.RotatingFileHandler(
 #hdlr_1 = logging.FileHandler('decisions_new.log')
 hdlr_1.setFormatter(formatter1)
 logger_decisions.addHandler(hdlr_1)
-logger_decisions = logging.getLogger('simple_logger1')'''
-logger_decisions = loggingmodule.initialize_logger1('decisions','decisions_new.log')
-logger_error = loggingmodule.initialize_logger('errors','errors_getVideos.log')
-
+logger_decisions = logging.getLogger('simple_logger1')
 
 stemwords_uniquelist = ["(Edited Short Version)","(Alternate Early Version)","(Alternate Version)","(Mono)","(Radio Edit)","(Original Album Version)","(Different Mix)","(Music Film)","(Stereo)","(Single Version)","Stereo","Mono","(Album Version)","Demo","(Demo Version)"]
 solrConnection = SolrConnection('http://aurora.cs.rutgers.edu:8181/solr/discogs_artists')
@@ -76,13 +72,6 @@ def IsReleaseCollection(formats):
             if(desc == "collections" or desc == "mixed" or desc == "compilation"):
                 bRet = True
     return bRet
-
-def changeName(artName):
-    artNamewords = artName.split()
-    retNamewords = []
-    for artword in artNamewords:
-         retNamewords.append(artword[0].upper()+ artword[1:])
-    return " ".join(retNamewords)
 
 def get_released_date(releaseDate):
     ''' 20041109 '''
@@ -432,8 +421,6 @@ def get_song_list(directory,songs_list,full_country_list,aliases,ear_count,ear_y
                 if(curr_album['released_date'] != None and temp_year_album != 0):
                     if(str(curr_album['released_date']).split('-')[0] != ''):
                         curr_year = int(str(curr_album['released_date']).split('-')[0])
-                        if(curr_year >2020):
-                            curr_year = 1001#print 'year greater than 2020'
                     else:
                         curr_year = 1001
                     if(curr_year == 1001 or (curr_year > int(temp_year_album))):
@@ -634,7 +621,6 @@ def get_song_list_master(directory,songs_list,full_country_list,aliases,ear_coun
                     song['styles'] = curr_album['styles']
                     song['genres'] = curr_album['genres']
                     song['year'] = curr_album['released_date']
-                    print song['year']
                     song['country'] = curr_album['country']
                     song['featArtists'] = []
                     song['connectors'] = []
@@ -751,48 +737,14 @@ def get_song_list_master(directory,songs_list,full_country_list,aliases,ear_coun
 
     return combined_songs_list,full_country_list,aliases,ear_count,ear_year,ear_rel,ear_conflict,final_song_list
 
-def CheckifSongsExistsinSolr(sname,aname,fname):
-    try:
-        solrConnection1 = SolrConnection('http://aurora.cs.rutgers.edu:8181/solr/discogs_data_test')
-        songName = 'stringSongName:"'+sname+'"'
-        artistName = 'artistName:"'+changeName(aname)+'"'
-        facet_query = [songName,artistName]
-        if(len(fname) != 0):
-            for f in fname:
-                ftartistName = 'ftArtistName:"'+changeName(f)+'"'
-                facet_query.append(ftartistName)
-            #print facet_query
-        response = solrConnection1.query(q="*:*",fq= facet_query,version=2.2,wt = 'json')
-        intersect = int(response.results.numFound)
-        #print songName
-        #print artistName
-        
-        if(intersect > 0):
-            '''for result in response.results:
-                #print result['youtubeName']
-                #print result['artistName']
-                #print result['songName']
-                print fname
-                if('ftArtistName' in result):
-                    result['ftArtistName']
-                    
-                    #print len(response.results)'''
-            return True
-    except Exception as e:
-        logger_error.exception(e)
-    return False
-
 
 def crawlArtist(directory):
-    start_time = datetime.now()
     logger_decisions.error(directory)
     #print os.path.basename(directory)
-    
     if(os.path.basename(directory) == '194' or os.path.basename(directory) == '355'):
         logger_decisions.error('skipping ' +directory)
         return
     try:
-        curr_artist_dir = os.path.basename(directory)
         songs_list = list()
         global misses
         global hits
@@ -871,7 +823,7 @@ def crawlArtist(directory):
             logger_decisions.error(final_song_list[s]['albumInfo'])
             logger_decisions.error('----------------------------------------')'''
         vid = list()
-        if(IsIncremental == 0 or IsIncremental == 2):
+        if(IsIncremental == 0):
             with open(directory + '/uniquelist.txt', 'wb') as f:
 			    pickle.dump(final_song_list, f)
         else:
@@ -901,7 +853,7 @@ def crawlArtist(directory):
 
         t3= time.time()
         print len(parallel_songs_list)
-        if(IsIncremental == 0 or IsIncremental ==2):
+        if(IsIncremental == 0):
             with open(directory + '/last_full_part1.txt', 'wb') as f1:
                 f1.write(str(int(t3)))
                 f1.close()
@@ -918,14 +870,14 @@ def crawlArtist(directory):
                 f1.close()
     except Exception, e:
         logger_error.exception(e)
-    logger_decisions.error(directory + " -- Completed with time -- " + str(datetime.now() - start_time))
+    logger_decisions.error(directory + "Completed ")
+    logger_decisions.error('-----------------------')
     #print parallel_songs_list
     try:
         #print fl
         vid = list()
         misses = 0
         hits = 0
-        found = 0
         fullComplete = checkpreviousfull(directory)
         print 'fullcomplete'
         print fullComplete
@@ -946,11 +898,6 @@ def crawlArtist(directory):
                 return_pool = executor.map(getVideoFromYoutube,parallel_songs_list)
         #print len(return_pool)
         for ret_val in return_pool:
-            
-            if(ret_val[2] == True):
-                    found = found + 1
-                    print ret_val[3]
-                    continue
             if(ret_val[0] == None ):
                 misses = misses+1
             else:
@@ -959,17 +906,11 @@ def crawlArtist(directory):
                         misses = misses + 1
                     else:
                         hits = hits + 1
-                        if(rv.__dict__['artist_id'] == curr_artist_dir):
-                            rv.__dict__['same_artist'] = True
-                        else:
-                            rv.__dict__['same_artist'] = False
-
                         #print rv.__dict__
                         #tv = collections.OrderedDict(rv.__dict__)
                         vid.append(rv.__dict__)
-        print "Hits:"+str(hits)+" Misses:"+str(misses) + " Found : "+ str(found)
-        logger_decisions.error(directory +  "Hits:"+str(hits)+" Misses:"+str(misses) + " Found : "+ str(found))
-        if(IsIncremental == 0 or IsIncremental ==2):
+        print "Hits:"+str(hits)+" Misses:"+str(misses)
+        if(IsIncremental == 0):
             write(vid,directory+"/dump")
             with open(directory + '/last_full_part2.txt', 'wb') as f1:
                 f1.write(str(int(time.time())))
@@ -987,8 +928,7 @@ def checkIfSongExists(curr_song,songs_list):
     retVal = False
     matched_song = ""
     song_name = curr_song['name']
-    try:
-     for s in songs_list:
+    for s in songs_list:
         #print song
         song = songs_list[s]['name']
         if(len(song) > len(song_name)):
@@ -1018,10 +958,6 @@ def checkIfSongExists(curr_song,songs_list):
             #print str(phonectic_distance) + " ######### " + str(normal_distance)
             matched_song = s
             break
-    except Exception as ex:
-        #logger_error.exception(source)
-        #logger_error.exception(destination)
-        logger_error.exception(ex)
     return retVal,matched_song
 
 
@@ -1071,20 +1007,12 @@ def checkFtArtist(ftartist1,ftartist2):
 
 
 def getVideoFromYoutube(curr_elem):
-    global IsIncremental
     retvid = None
     bret = False
     artname = curr_elem['artistName']
-    sname = curr_elem['name']
-    ftartists = curr_elem['featArtists']
     #print '---------------------'
     #print artname
     #print '-----------------'
-    if(IsIncremental ==2):
-        if(CheckifSongsExistsinSolr(sname,artname,ftartists) == True):
-            print 'found the song'
-            retstring = sname + '------' + artname + '-----' + ','.join(ftartists)
-            return retvid,True,True,retstring
     try:
         retvid,bret = getVideo(curr_elem,0)
         if('anv' in curr_elem):
@@ -1111,7 +1039,7 @@ def getVideoFromYoutube(curr_elem):
         '''if('errorstr' in tempDictionary):
             logger_decisions.error(tempDictionary['errorstr'])
             logger_decisions.error('-----------------')'''
-    return retvid,bret,False
+    return retvid,bret
 
 
 def getVideo(curr_elem,flag):
@@ -1216,18 +1144,14 @@ class Audio(object):
 
 
 
-def GetYearFromTitle(vid_title,song_name):
+def GetYearFromTitle(vid_title):
     returnYear = 0
     yearList = re.findall(r'\d\d\d\d+',vid_title)
     #print yearList
     if(len(yearList) != 0):
         returnYear = int(yearList[0])
-        if(returnYear > 2020):
+        if(vid_title == yearList[0]):
             returnYear = 0
-            #print 'the year is greater than 2020'
-        if(vid_title == yearList[0] or (song_name.isdigit() and int(song_name) == yearList[0])):
-            returnYear = 0
-
     return returnYear
 
 def CalculateMatch(video,vid_title,vid_description,oldsong = False):
@@ -1624,7 +1548,7 @@ hq','band','audio','album','world','instrumental','intro','house','acoustic','so
             error_str += str(f)
         error_str += "##setratio total match:"
         error_str += str(setratio_totalmatch)
-        #logger_decisions.error(error_str)
+        logger_decisions.error(error_str)
         '''logger_decisions.error(decision)
         logger_decisions.error(condition)
         logger_decisions.error(match)
@@ -1708,18 +1632,16 @@ def getYoutubeUrl(video,flag,mostpopular):
             flist = flist+" "+ttt
         ftartists = flist
         allArtists = video.artist.strip("-")+" "+ftartists
-        key = "AIzaSyDVdjKb9XlLIXGsrEGnMqt6Yp-VXw0rlhY"
-        #key = "AIzaSyBE5nUPdQ7J_hlc3345_Z-I4IG-Po1ItPU"
         if(flag == 0):
             '''if('cover' not in video.name.lower()):
                 searchUrl = "https://www.googleapis.com/youtube/v3/search?part=snippet&q=allintitle%3A"+urllib.quote_plus(str(allArtists))+"+"+urllib.quote_plus(str(video.name))+"+-cover"+"&alt=json&type=video&max-results=5&key=AIzaSyBE5nUPdQ7J_hlc3345_Z-I4IG-Po1ItPU&videoCategoryId=10"
             else:'''
-            searchUrl = "https://www.googleapis.com/youtube/v3/search?part=snippet&q=allintitle%3A"+urllib.quote_plus(str(allArtists))+"+"+urllib.quote_plus(str(video.name))+"&alt=json&type=video&max-results=5&key="+key+"&videoCategoryId=10"
+            searchUrl = "https://www.googleapis.com/youtube/v3/search?part=snippet&q=allintitle%3A"+urllib.quote_plus(str(allArtists))+"+"+urllib.quote_plus(str(video.name))+"&alt=json&type=video&max-results=5&key=AIzaSyBE5nUPdQ7J_hlc3345_Z-I4IG-Po1ItPU&videoCategoryId=10"
         else:
             '''if('cover' not in video.name.lower()):
                 searchUrl = "https://www.googleapis.com/youtube/v3/search?part=snippet&q="+urllib.quote_plus(str(allArtists))+"+"+urllib.quote_plus(str(video.name))+"+-cover"+"&alt=json&type=video&max-results=5&key=AIzaSyBE5nUPdQ7J_hlc3345_Z-I4IG-Po1ItPU&videoCategoryId=10"
             else:'''
-            searchUrl = "https://www.googleapis.com/youtube/v3/search?part=snippet&q="+urllib.quote_plus(str(allArtists))+"+"+urllib.quote_plus(str(video.name))+"&alt=json&type=video&max-results=5&key="+key+"&videoCategoryId=10"
+            searchUrl = "https://www.googleapis.com/youtube/v3/search?part=snippet&q="+urllib.quote_plus(str(allArtists))+"+"+urllib.quote_plus(str(video.name))+"&alt=json&type=video&max-results=5&key=AIzaSyBE5nUPdQ7J_hlc3345_Z-I4IG-Po1ItPU&videoCategoryId=10"
             mostpopular = 1
         print searchUrl
         try:
@@ -1763,7 +1685,7 @@ def getYoutubeUrl(video,flag,mostpopular):
                     [currentVideoDecision,currentVideoMatch,currentVideoTotalMatch,currentVideoSongMatch,currentVideoArtistMatch,error_str] = CalculateMatch(video,searchEntry['snippet']['title'],searchEntry['snippet']['description'])
                     video.errorstr = error_str
                     if(currentVideoDecision == "correct"):# || currentVideoDecision == "Incorrect"):
-                        currentVideoYear = GetYearFromTitle(searchEntry['snippet']['title'],video.name)
+                        currentVideoYear = GetYearFromTitle(searchEntry['snippet']['title'])
                         youtubeVideoId = searchEntry['id']['videoId']
                         videoUrl = "https://www.googleapis.com/youtube/v3/videos?id="+str(youtubeVideoId)+"&key=AIzaSyBE5nUPdQ7J_hlc3345_Z-I4IG-Po1ItPU&part=statistics,contentDetails,status"
                         try:
@@ -1983,7 +1905,6 @@ if __name__ == '__main__':
             fwrite.write("\n")
             if(split[-1]!= None):
                 fwrite.write(str(split[-1]))
-                logger_decisions.error(str(split[-1]))
                 fwrite.write("\n")
         fwrite.close()
     except Exception as e:
