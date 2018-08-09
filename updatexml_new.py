@@ -14,6 +14,8 @@ import traceback
 import loggingmodule
 from solr import SolrConnection
 from solr.core import SolrException
+from itertools import repeat
+
 
 #logging.basicConfig(format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s',level=logging.DEBUG, filename='errors.log')
 
@@ -80,15 +82,25 @@ def updateXml(filename):
 		if videoResult.has_key('items'):
 			if(len(videoResult['items']) == 0):
 				#fwrite_error.write("Error :No items returned "+ filename + "\n")
-				logging.exception("Error :No items returned "+ filename + "\n")
+				logger_matrix.exception("Error :No items returned "+ filename + "\n")
 				moveFiles(filename)
 				return
 			videoEntry = videoResult['items'][0]
-			currentVideoViewCount = videoEntry['statistics']['viewCount']
-			currentVideolikes = videoEntry['statistics']['likeCount']
-			currentVideodislikes = videoEntry['statistics']['dislikeCount']
-			currentVideoEmbedded = videoEntry['status']['embeddable']
-			currentVideoStatus = videoEntry['status']['privacyStatus']
+                        currentVideoViewCount = 0
+                        currentVideolikes = 0
+                        currentVideodislikes = 0
+                        currentVideoStatus = 'public'
+                        currentVideoEmbedded = 'true'
+                        if('viewCount' in videoEntry['statistics']):
+			    currentVideoViewCount = videoEntry['statistics']['viewCount']
+                        if('likeCount' in videoEntry['statistics']):
+			    currentVideolikes = videoEntry['statistics']['likeCount']
+                        if('dislikeCount' in videoEntry['statistics']):
+			    currentVideodislikes = videoEntry['statistics']['dislikeCount']
+                        if('embeddable' in videoEntry['statistics']):
+			    currentVideoEmbedded = videoEntry['status']['embeddable']
+                        if('privacyStatus' in videoEntry['statistics']):
+                            currentVideoStatus = videoEntry['status']['privacyStatus']
 			currentPublishedDate = videoEntry['snippet']['publishedAt']
 			if(currentVideoEmbedded == False or currentVideoStatus != 'public'):
 				moveFiles(filename)
@@ -148,17 +160,18 @@ def GetgenreTag(oldsong):
     combinedgenrestring = '@'.join(genre_tags)
     return combinedgenrestring
 
-def updateGenreTags(filename):
-    global connection_genre
-    global connection_artist
+def updateGenreTags((filename,cutoff)):
+    #global connection_genre
+    #global connection_artist
     #response = connection.query(q="*:*",fq=[artistName],version=2.2,wt = 'json')
     #intersect = int(response.results.numFound)
     try:
         oldsong = api.parse(filename)
 
         print 'getting genres'
-        try:
+        '''try:
             genreTag = oldsong.genreTag
+            #print genreTag 
             if(genreTag == None or genreTag == ''):
                 genreTag = GetgenreTag(oldsong)
                 oldsong.set_genreTag(genreTag)
@@ -166,12 +179,20 @@ def updateGenreTags(filename):
             response_genre = connection_genre.query(q="*:*",fq=[artistId],version=2.2,wt = 'json')
             intersect = int(response_genre.results.numFound)
             if(intersect > 0):
+                print 'genres tags found'
                 simGenreTagsList = api.similarGenresTagList()
                 for result in response_genre.results:
+                    count = len(result['similarartistName'])
+                    #print count
                     currList = result['similarartistName']
                     currScores = result['similarCosineDistance']
                     currListId = result['similarartistId']
+                    print cutoff
+                    currScores = currScores[:cutoff]
+                    currList = currList[:cutoff]
+                    currListId = currListId[:cutoff]
                     count = len(currList)
+                    
                     for i in range(0,count):
                         simGenreTag = api.similarGenreTag()
                         simGenreTag.set_genreTagName(currList[i])
@@ -182,7 +203,7 @@ def updateGenreTags(filename):
                     oldsong.set_genreTagId(int(result['artistId']))
         except Exception as e:
             logger_matrix.exception('genres writing error')
-            logger_matrix.exception(e)
+            logger_matrix.exception(e) '''
 
         print 'getting artists'
         try:
@@ -233,9 +254,10 @@ if __name__ == '__main__':
     m=int(m)
     choiceUpdate = int(raw_input("Enter 0 to update views \n 1 to update genretags and simartits\n"))
     filelist = list()
+    
     t1=time.time()
     connection_genre = SolrConnection('http://aurora.cs.rutgers.edu:8181/solr/genretags')
-    connection_artist = SolrConnection('http://aurora.cs.rutgers.edu:8181/solr/similar_artistsfromsongs')
+    connection_artist = SolrConnection('http://aurora.cs.rutgers.edu:8181/solr/similar_artists1')
 
 
     try:
@@ -244,9 +266,11 @@ if __name__ == '__main__':
         if(choiceUpdate == 0):
             p.map(updateXml,filelist)
         else:
+            cutoff = int(raw_input("Enter the cutoff point\n"))
+            print cutoff
             #print filelist[8]
-            p.map(updateGenreTags,filelist)
-            #updateGenreTags(directory+"/0000bWXlOO0-l8k.xml")
+            p.map(updateGenreTags,zip(filelist,repeat(cutoff)))
+            #updateGenreTags(directory+"/0000u4UNot_W9_Q.xml")
         p.close()
         p.join()
     except Exception as e:
