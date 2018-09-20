@@ -23,6 +23,7 @@ from solr import SolrConnection
 from solr.core import SolrException
 import operator
 import loggingmodule
+import random
 
 
 
@@ -151,6 +152,11 @@ def getGenresAndStyles(genres,styles):
         genre = genres.replace("{","")
         genre = genre.replace("}","")
         genre = genre.replace("\"Folk, World, & Country\"","fwc")
+        
+        '''
+        This change is to replace the user error of adding hip hop in genres instead of hip-hop.
+        '''
+        #genre = genre.lower().replace("hip hop","Hip-hop")
         genre = genre.split(',')
         if("fwc" in genre):
             genre.remove("fwc")
@@ -281,6 +287,7 @@ def GetUniquesongs(songs_list,final_song_list,isMaster,same_album,ear_count,full
         isPresentSong = False
         song['genres'],song['styles'] = getGenresAndStyles(song['genres'],song['styles'])
         song['masterGenres'],song['masterStyles'] = getGenresAndStyles(song['masterGenres'],song['masterStyles'])
+        #print song['masterGenres'],song['masterStyles']
         if(keySong not in final_song_list):
             ''' First check in the full songlist. '''
             isPresentSong,matchedsong = checkIfSongExists(song,full_songs_list)
@@ -384,7 +391,7 @@ def get_song_list(directory,songs_list,full_country_list,aliases,ear_count,ear_y
     global prev_time
     global IsIncremental
     retVal = checkpreviousfull(directory)
-    if(IsIncremental == 1 and retVal == 1):
+    if((IsIncremental == 1 or IsIncremental == 3) and retVal == 1):
         master_list = glob.glob(directory+"/release*.json")
         for fileName in master_list:
             if( os.path.getmtime(fileName) > prev_time):
@@ -553,7 +560,7 @@ def get_song_list_master(directory,songs_list,full_country_list,aliases,ear_coun
     global prev_time
     global IsIncremental
     retVal = checkpreviousfull(directory)
-    if(IsIncremental == 1 and retVal == 1):
+    if((IsIncremental == 1 or IsIncremental == 3) and retVal == 1):
         master_list = glob.glob(directory+"/master*.json")
         for fileName in master_list:
             if( os.path.getmtime(fileName) > prev_time):
@@ -562,7 +569,7 @@ def get_song_list_master(directory,songs_list,full_country_list,aliases,ear_coun
                     releases_list.append(curr_master)'''
                 releases_list.append(fileName)
         #print prev_time
-        print releases_list
+        #print releases_list
     else:
         releases_list = []
         for filename in glob.glob(directory+"/master*.json"):
@@ -812,7 +819,7 @@ def crawlArtist(directory):
         ##Get the songs from the full trial
         retVal = checkpreviousfull(directory)
 
-        if(IsIncremental == 1 and retVal == 1):
+        if((IsIncremental == 1 or IsIncremental == 3) and retVal == 1):
             infile = directory + '/songslist.txt'
             try:
                 fread = open(infile,'r')
@@ -995,7 +1002,10 @@ def checkIfSongExists(curr_song,songs_list):
             soundex = fuzzy.Soundex(len(song))
         else:
             soundex = fuzzy.Soundex(len(song_name))
-        phonectic_distance = fuzz.ratio(soundex(song),soundex(song_name))
+        try:
+            phonectic_distance = fuzz.ratio(soundex(song),soundex(song_name))
+        except Exception as ex:
+            logger_error("fix soundex error")
         if('(' in song.lower() and '(' in song_name.lower()):
             parmatch,tryagain = getparanthesismatch(song.lower(),song_name.lower())
             if(parmatch == True):
@@ -1037,8 +1047,10 @@ def getparanthesismatch(source,destination):
             return False,1
         slist = [s for s in sourcelist[0] if s != "" ]
         dlist = [s for s in destinationlist[0] if s != "" ]
-
-        part1_dist = fuzz.ratio(slist[0].lower(),dlist[0].lower())
+        try:
+            part1_dist = fuzz.ratio(slist[0].lower(),dlist[0].lower())
+        except Exception, e:
+            return False,0
         part2_dist = 0
         if(len(slist) >1 and len(dlist) > 1):
             fuzz.ratio(slist[1].lower(),dlist[1].lower())
@@ -1077,25 +1089,26 @@ def getVideoFromYoutube(curr_elem):
     artname = curr_elem['artistName']
     sname = curr_elem['name']
     ftartists = curr_elem['featArtists']
+    shouldsleep = False
     #print '---------------------'
     #print artname
     #print '-----------------'
-    if(IsIncremental ==2):
+    if(IsIncremental >=2):#both for full and incremental 2,3
         if(CheckifSongsExistsinSolr(sname,artname,ftartists) == True):
             print 'found the song'
             retstring = sname + '------' + artname + '-----' + ','.join(ftartists)
             return retvid,True,True,retstring
     try:
-        retvid,bret = getVideo(curr_elem,0)
+        retvid,bret,shouldsleep = getVideo(curr_elem,0)
         if('anv' in curr_elem):
             curr_elem['artistName'] = curr_elem['anv']
-            retvid,bret = getVideo(curr_elem,0)
+            retvid,bret,shouldsleep = getVideo(curr_elem,0)
             if(retvid != None):
                 for rv in retvid:
                     rv.artist = artname
         if(retvid == None):
             curr_elem['artistName'] = artname
-            retvid,bret = getVideo(curr_elem,1)
+            retvid,bret,shouldsleep = getVideo(curr_elem,1)
         else:
             emptyvid = 0
             for rv in retvid:
@@ -1103,7 +1116,7 @@ def getVideoFromYoutube(curr_elem):
                     emptyvid = 1
             if(emptyvid == 0):
                 curr_elem['artistName'] = artname
-                retvid,bret = getVideo(curr_elem,1)
+                retvid,bret,shouldsleep = getVideo(curr_elem,1)
     except Exception as e:
         logger_error.exception('getVideoFromYoutube')
     if(retvid != None):
@@ -1111,6 +1124,12 @@ def getVideoFromYoutube(curr_elem):
         '''if('errorstr' in tempDictionary):
             logger_decisions.error(tempDictionary['errorstr'])
             logger_decisions.error('-----------------')'''
+    if(shouldsleep == True):
+        print "sleeping"
+        tomorrow = datetime.today() + timedelta(1)
+        midnight = datetime(year=tomorrow.year, month=tomorrow.month,day=tomorrow.day, hour=0, minute=0, second=0)
+        timetomidnight = (midnight - datetime.now()).seconds
+        time.sleep(3600*4+timetomidnight)
     return retvid,bret,False
 
 
@@ -1154,8 +1173,8 @@ def getVideo(curr_elem,flag):
                 if(l['year'] != None):
                     album_details.albumname = album_details.albumname + " " + l['year']
                 alist.append(album_details.__dict__)
-        if(len(alist)==0):
-            print curr_elem
+        #if(len(alist)==0):
+        #    print curr_elem
         video12.album = alist
         video12.year = curr_elem['year']
         video12.language = 'English'
@@ -1178,14 +1197,14 @@ def getVideo(curr_elem,flag):
             video1.masterGenres = curr_elem['masterGenres']
             video1.masterStyles = curr_elem['masterStyles']
             video1.isCompilation = curr_elem['isCompilation']
-            print curr_elem['release_Id']
+            #print curr_elem['release_Id']
             if('anv' in curr_elem):
                 video1.anv = curr_elem['anv']
             if('artistalias' in curr_elem):
                 video1.artistalias = curr_elem['artistalias']
             video1.genres = curr_elem['genres']
             video1.styles = curr_elem['styles']
-            video1,bret = getYoutubeUrl(video1,flag,0)
+            video1,bret,shouldsleep = getYoutubeUrl(video1,flag,0)
             video1.artist_id = curr_elem['artist_id']
             #print curr_elem['artist_id']
             #print curr_elem['artistName']
@@ -1198,7 +1217,7 @@ def getVideo(curr_elem,flag):
     except Exception as e:
             logger_error.exception(e)
             return None,bret
-    return [video1,video2],bret
+    return [video1,video2],bret,shouldsleep
 
 def write(self,filename):
 	with codecs.open(filename,"w","utf-8") as output:
@@ -1698,6 +1717,7 @@ def GetArtist(artistObj):
 
 def getYoutubeUrl(video,flag,mostpopular):
     global request_count
+    shouldsleep = False
     bret = False
     try:
         flist = ""
@@ -1708,8 +1728,13 @@ def getYoutubeUrl(video,flag,mostpopular):
             flist = flist+" "+ttt
         ftartists = flist
         allArtists = video.artist.strip("-")+" "+ftartists
-        key = "AIzaSyDVdjKb9XlLIXGsrEGnMqt6Yp-VXw0rlhY"
-        #key = "AIzaSyBE5nUPdQ7J_hlc3345_Z-I4IG-Po1ItPU"
+        #keys = ["AIzaSyDwhzqoVMCNuwZC1E16-FZuTXBUECEhqp0","AIzaSyBt6eZ_43NjjcgsPNp_DdcE4D24xKKAeVY","AIzaSyDDhsEMAZvh5HZAR13N5tPm5RB1A_KnZXY","AIzaSyAGe95SUVn1D2F3EUzWVFFZiXKftTJYBKo","AIzaSyC-LEAg8vZ5T4VKjihGnMgAc_VroJHJKDQ"]
+        #keys = ["AIzaSyCtcinkfxaMg4kacDN4AoVo1I-GiKRVmnM","AIzaSyDq1zRXH6J-uVgqdq3KM7PwZoyh198_mpc","AIzaSyAezh2CIOaBvFoOGzWIQfcsTlE2LDYJOYY","AIzaSyDcZ0eJB-IAuZWbBnC9VMCw0BATa7Et0Mw","AIzaSyCSh2D3-x_dm9lI84qsHJP9g0lo13jatho"]
+        keys = ["AIzaSyB34POCUa53BcFsdPURNsvm0i6AX4kqjWo","AIzaSyBA-UrozRMFbVqrBxivh5IqXzt1H9jwYSY","AIzaSyAfeaQZyCpnxmBpwIfa-DbZ1Ny9pw_rFvI","AIzaSyDz04gJUsb_9sX6CLsxiaS-AeX_toUOnhM","AIzaSyC-AJNub7xhMGFcSTcJ7IXOrQZuqfZOW00","AIzaSyCAxLZzH-AvClkqRJ5JM4WR-odnmdpFH2o","AIzaSyBXs075Y10IAhH4rlqeHYBmVuEzOeLz4xo","AIzaSyCgp8XEQfhDMFM9BoFHr8H2BSrAbBfb5U0"] #vinay
+        keys += ["AIzaSyCBjTtgWV16zl9ivezXUm7Gr5ac6QnHDgI","AIzaSyBZCO5-gQRcmYlvuZZCLJyVqqKxTzKLgiM","AIzaSyCW0fEzUcOQtewKeGcUc8XPXnN2j1EAKZY","AIzaSyDZoLt2Q0fkEkkiqepp60WPmkS69NTX370","AIzaSyDfESLhLqMa6qqvzigCGy5F36YURuW_Eus","AIzaSyCiFWuQWfXhsBKzXPZ5hQYy0Du_SMIal94","AIzaSyDud6MWfd1l5BPb53x9GGqCAUQoDYmUIGE","AIzaSyDZk4Kwal9BB9JxQbbP5WYvLvEOSAiV8Ao","AIzaSyD47DzEbad6eEPk29gkITOnYrgZUATXf_I","AIzaSyC9coydvCvnkysL6g-FIAyqg89LzUtqq-o"]#kin
+        #keys = ["AIzaSyCBjTtgWV16zl9ivezXUm7Gr5ac6QnHDgI","AIzaSyDcZ0eJB-IAuZWbBnC9VMCw0BATa7Et0Mw"]
+        key = keys[random.randint(0,len(keys)-1)]
+        #key = "AIzaSyBEM6ijEuRqrGREP8lxZU8XzEufEMVToO0"
         if(flag == 0):
             '''if('cover' not in video.name.lower()):
                 searchUrl = "https://www.googleapis.com/youtube/v3/search?part=snippet&q=allintitle%3A"+urllib.quote_plus(str(allArtists))+"+"+urllib.quote_plus(str(video.name))+"+-cover"+"&alt=json&type=video&max-results=5&key=AIzaSyBE5nUPdQ7J_hlc3345_Z-I4IG-Po1ItPU&videoCategoryId=10"
@@ -1726,19 +1751,23 @@ def getYoutubeUrl(video,flag,mostpopular):
             searchResult = simplejson.load(urlopen(searchUrl),"utf-8")
             request_count = request_count + 100
             #print searchResult
-        except HTTPError as e:
-            request_count = request_count + 100
-            logger_error.exception(e.read())
-            return video,bret
+        except HTTPError as e:            
+            if(e.code == 403 and "Forbidden" in e.reason):
+                logger_error.exception("Daily Limit Exceeded")
+                shouldsleep = True
+            else:
+                request_count = request_count + 100
+                logger_error.exception(e.message)
+            return video,bret,shouldsleep
         except URLError as e:
             request_count = request_count + 100
             logger_error.exception(e.reason)
-            return video,bret
+            return video,bret,shouldsleep
         except Exception as e:
             request_count = request_count + 100
             logger_error.exception(e)
             #print "An HTTP error %d occurred:\n%s" % (e.resp.status, e.content)
-            return video,bret
+            return video,bret,shouldsleep
         now = datetime.now()
         try:
             if searchResult.has_key('items') and len(searchResult['items'])!= 0:
@@ -1765,7 +1794,7 @@ def getYoutubeUrl(video,flag,mostpopular):
                     if(currentVideoDecision == "correct"):# || currentVideoDecision == "Incorrect"):
                         currentVideoYear = GetYearFromTitle(searchEntry['snippet']['title'],video.name)
                         youtubeVideoId = searchEntry['id']['videoId']
-                        videoUrl = "https://www.googleapis.com/youtube/v3/videos?id="+str(youtubeVideoId)+"&key=AIzaSyBE5nUPdQ7J_hlc3345_Z-I4IG-Po1ItPU&part=statistics,contentDetails,status"
+                        videoUrl = "https://www.googleapis.com/youtube/v3/videos?id="+str(youtubeVideoId)+"&key="+key+"&part=statistics,contentDetails,status"
                         try:
                             videoResult = simplejson.load(urlopen(videoUrl),"utf-8")
                             request_count = request_count + 7
@@ -1901,7 +1930,7 @@ def getYoutubeUrl(video,flag,mostpopular):
     except Exception as e:
         logger_error.exception('getYoutubeUrl')
         logger_error.exception(e)
-    return video,bret
+    return video,bret,shouldsleep
 
 def checkpreviousfull(directory):
     retVal = 0
@@ -1930,7 +1959,7 @@ if __name__ == '__main__':
         IsIncremental = incr
         prev_time = 0
         timeFile = directory + "/timelog.txt"
-        if(incr == 1):
+        if(IsIncremental == 1 or IsIncremental == 3):
             try:
                 with open(timeFile,"r") as f:
                     prev_time = int(f.read())
