@@ -25,14 +25,16 @@ import loggingmodule
 config = ConfigParser.ConfigParser()
 reload(sys)
 sys.setdefaultencoding('utf8')
-logger_genre = loggingmodule.initialize_logger1('genres.log')
-logger_errors = loggingmodule.initialize_logger('errors_part2.log')
+logger_genre = loggingmodule.initialize_logger1('genres','genres.log')
+logger_errors = loggingmodule.initialize_logger('errors','errors_part2.log')
 
-def changeGenres(curr_genre):
+def changeGenres(curr_genre,isgenre):
     if(curr_genre == 'Funk_/_soul'):
         curr_genre = 'Funk/soul'
     if(curr_genre == 'Folk,_world,_&_country'):
         curr_genre = 'Folk-world-country'
+    if(curr_genre == 'Hip_hop' and isgenre == 1):
+        curr_genre = 'Hip-hop'
     return curr_genre
 
 def getSimilarGenresfromGenresDistances(genres,artistTopGenres):
@@ -427,10 +429,10 @@ def genXML(vid,avgcnt,avgcntrece,artistId,genreCountList,artistTopGenres,country
 
         ''' Check if the total genres + styles list count >5 then replace it with popular genres of artist '''
         '''Adding to remove the wrong entry in discogs.'''
-        if('hip hop' in genre or '"Hip Hop"' in genre):
+        '''if('hip hop' in genre or '"Hip Hop"' in genre):
             genre.remove('"Hip Hop"')
             genre.append("Electronic")
-            style.append('Hip Hop')
+            style.append('Hip Hop')'''
             #print style
         if(genre != None):                    
             total_count = len(genre)
@@ -488,7 +490,7 @@ def genXML(vid,avgcnt,avgcntrece,artistId,genreCountList,artistTopGenres,country
                     continue
                 #g = encodexml(g)
                 #element,orig_dict,path
-                g = changeGenres(g)
+                g = changeGenres(g,1)
                 x = findPath(g,genres_list_dict,[])
                 if(len(x) == 0):
                     logger_genre.error(g)
@@ -559,7 +561,7 @@ def genXML(vid,avgcnt,avgcntrece,artistId,genreCountList,artistTopGenres,country
                 g = g.lower()
                 g = g[0].upper()+g[1:]'''
                 #g = encodexml(g)
-                g = changeGenres(g)
+                g = changeGenres(g,0)
                 x = findPath(g,genres_list_dict,[])
                 if(len(x) == 0):
                     logger_genre.error(g)
@@ -678,7 +680,7 @@ def genXML(vid,avgcnt,avgcntrece,artistId,genreCountList,artistTopGenres,country
         mysong.set_genreTag(combinedgenrestring)
         genreMatch = sorted(genreMatch)
         combinedgenrestring = ' '.join(genreMatch)
-        for ch in [' ','/','&','.','-','\\',"'",'(',')','!']:
+        for ch in [' ','/','&','.','\\',"'",'(',')','!']:
             combinedgenrestring = combinedgenrestring.replace(ch,'')
         mysong.set_genreMatch(combinedgenrestring)
         mysong.set_duration(timedelta(seconds=int(vid['length'])))
