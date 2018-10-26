@@ -14,17 +14,47 @@ import songs_api as api
 import codecs
 import urllib
 import urllib2
+from urllib2 import Request,urlopen, URLError, HTTPError
 import simplejson
 import re
 from datetime import datetime, date, timedelta
+import time
 import os
 import logging
-from multiprocessing import Pool
+from multiprocessing import Pool,Manager
 import glob
-from getvideosfinal import CalculateMatch
+from getvideosfinal import CalculateMatch#,getKey,resetProjKeys,waitforkeys,blocked_keys,curr_keys,proj_keys
+import loggingmodule
+import random
+
 reload(sys)
 sys.setdefaultencoding('utf8')
-logging.basicConfig(format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s',level=logging.DEBUG, filename= str(sys.argv[0])+'_errors.log')
+logger_crawl = loggingmodule.initialize_logger('crawlerrors','errors_recrawldeletedvideos.log')
+
+
+
+'''
+Utility functions
+'''
+
+def getKey():
+    if(len(curr_keys)==0):
+        return ""
+    return curr_keys[random.randint(0,len(curr_keys)-1)]
+
+def waitforkeys():
+    tomorrow = datetime.today() + timedelta(1)
+    midnight = datetime(year=tomorrow.year, month=tomorrow.month,day=tomorrow.day, hour=0, minute=0, second=0)
+    timetomidnight = (midnight - datetime.now()).seconds
+    time.sleep(3600*4+timetomidnight)
+
+def resetProjKeys():
+    global curr_keys
+    curr_keys = manager.list()
+    for key in proj_keys:
+        curr_keys.append(key)
+        print 'adding key'
+
 
 def ParseTime(time):
 	time = time.replace('PT','')
@@ -261,14 +291,43 @@ def getVideo(oldsong):
 		flist = flist+" "+ttt
 	ftartists = flist[1:]
 	allArtists = oldsong.artist.artistName[0].strip("-")+" "+ftartists
+	#key = "AIzaSyB34POCUa53BcFsdPURNsvm0i6AX4kqjWo"
+	key = getKey()
+	print key
+	if(key == ""):
+            logger_crawl.error("sleeping")
+            print 'sleeping'
+            waitforkeys()
+            resetProjKeys()
+            key = getKey()
 	if('cover' not in songName.lower()):
-		searchUrl = "https://www.googleapis.com/youtube/v3/search?part=snippet&q=allintitle%3A"+urllib.quote_plus(str(allArtists))+"+"+urllib.quote_plus(str(songName))+"+-cover"+"&alt=json&type=video&channelID=UC-9-kyTW8ZkZNDHQJ6FgpwQ&max-results=5&key=AIzaSyBE5nUPdQ7J_hlc3345_Z-I4IG-Po1ItPU"
+		searchUrl = "https://www.googleapis.com/youtube/v3/search?part=snippet&q=allintitle%3A"+urllib.quote_plus(str(allArtists))+"+"+urllib.quote_plus(str(songName))+"+-cover&alt=json&type=video&max-results=5&key="+key+"&videoCategoryId=10"
+		#"https://www.googleapis.com/youtube/v3/search?part=snippet&q=allintitle%3A"+urllib.quote_plus(str(allArtists))+"+"+urllib.quote_plus(str(songName))+"+-cover"+"&alt=json&type=video&channelID=UC-9-kyTW8ZkZNDHQJ6FgpwQ&max-results=5&key="+
 	else:
-		searchUrl = "https://www.googleapis.com/youtube/v3/search?part=snippet&q=allintitle%3A"+urllib.quote_plus(str(allArtists))+"+"+urllib.quote_plus(str(songName))+"&alt=json&type=video&channelID=UC-9-kyTW8ZkZNDHQJ6FgpwQ&max-results=5&key=AIzaSyBE5nUPdQ7J_hlc3345_Z-I4IG-Po1ItPU"
+		searchUrl = "https://www.googleapis.com/youtube/v3/search?part=snippet&q=allintitle%3A"+urllib.quote_plus(str(allArtists))+"+"+urllib.quote_plus(str(songName))+"&alt=json&type=video&max-results=5&key="+key+"&videoCategoryId=10"
+		#"https://www.googleapis.com/youtube/v3/search?part=snippet&q=allintitle%3A"+urllib.quote_plus(str(allArtists))+"+"+urllib.quote_plus(str(songName))+"&alt=json&type=video&channelID=UC-9-kyTW8ZkZNDHQJ6FgpwQ&max-results=5&key="+
 	try:
 		searchResult = simplejson.load(urllib2.urlopen(searchUrl),"utf-8")
+	except HTTPError as e:
+		if(e.code == 403 and "Forbidden" in e.reason):
+			logger_crawl.error("Daily Limit Exceeded")
+			logger_crawl.error(blocked_keys)
+			shouldsleep = True
+			if(key in curr_keys):
+				curr_keys.remove(key)
+			if(key not in blocked_keys):
+				blocked_keys.append(key)
+			if(len(blocked_keys) == len(proj_keys)):
+				logger_crawl.error("sleeping")
+				print 'sleeping'
+				waitforkeys()
+				resetProjKeys()
+				print "error "+str(len(blocked_keys))+" "+str(len(proj_keys))
+		else:
+			logger_crawl.error(e.message)
+		return
 	except Exception as e:
-		logging.exception("Error")
+		logger_crawl.error(e)
 		return
 	now = datetime.now()
 	if searchResult.has_key('items') and len(searchResult['items'])!= 0:
@@ -291,17 +350,21 @@ def getVideo(oldsong):
 			[currentVideoDecision,currentVideoMatch,currentVideoTotalMatch,currentVideoSongMatch,currentVideoArtistMatch,error_str] = CalculateMatch(oldsong,searchEntry['snippet']['title'],searchEntry['snippet']['description'],True)
 			if(currentVideoDecision == "correct"):
 				youtubeVideoId = searchEntry['id']['videoId']
-				videoUrl = "https://www.googleapis.com/youtube/v3/videos?id="+str(youtubeVideoId)+"&key=AIzaSyBE5nUPdQ7J_hlc3345_Z-I4IG-Po1ItPU&part=statistics,contentDetails,status"
+				videoUrl = "https://www.googleapis.com/youtube/v3/videos?id="+str(youtubeVideoId)+"&key="+key+"&part=statistics,contentDetails,status"
 				try:
 					videoResult = simplejson.load(urllib2.urlopen(videoUrl),"utf-8")
 				except Exception as e:
-					logging.exception("Error")
+					logger_crawl.error("Error")
 					continue
 				if videoResult.has_key('items'):
 					videoEntry = videoResult['items'][0]
 					currentVideoViewCount = videoEntry['statistics']['viewCount']
-					currentVideolikes = videoEntry['statistics']['likeCount']
-					currentVideodislikes = videoEntry['statistics']['dislikeCount']
+					if('likeCount' in videoEntry['statistics']):
+						currentVideolikes = videoEntry['statistics']['likeCount']
+						currentVideodislikes = videoEntry['statistics']['dislikeCount']
+					else:
+						currentVideolikes = 0
+						currentVideodislikes = 0
 					currentVideoEmbedded = videoEntry['status']['embeddable']
 					currentVideoStatus = videoEntry['status']['privacyStatus']
 					if(currentVideoEmbedded == False or currentVideoStatus != 'public'):
@@ -355,6 +418,7 @@ def getVideo(oldsong):
 	return oldsong
 def getNewVideo(filename):
 	try:
+		print filename
 		global outputdirectory
 		oldsong = api.parse(filename)
 		newsong = getVideo(oldsong)
@@ -368,24 +432,31 @@ def getNewVideo(filename):
 		newsong.export(fx,0)
 		fx.close()
 	except Exception ,e:
-		logging.exception(e)	
+		logger_crawl.exception(e)	
 
 #output_directory = foldername+'/deletedvideos'
 #getNewVideo(str(sys.argv[1]))
 if __name__ == '__main__':
-    directory = raw_input("Enter directory: ")
-    outputdirectory = raw_input("Enter output directory: ")
-    if(not os.path.exists(outputdirectory)):
-        os.mkdir(outputdirectory)
-    m = raw_input("Enter m: ")
-    m=int(m)
-    try:
-        filelist = glob.glob(directory+"/*.xml")
-	print filelist
-	p =Pool(processes=int(m))
-	p.map(getNewVideo,filelist)
-	p.close()
-	p.join()
-    except Exception as e:
-	logging.exception("Error")	
+	manager = Manager()
+	blocked_keys = manager.list()
+	curr_keys = manager.list()
+	#proj_keys =['AIzaSyB34POCUa53BcFsdPURNsvm0i6AX4kqjWo']
+	proj_keys = ["AIzaSyB34POCUa53BcFsdPURNsvm0i6AX4kqjWo","AIzaSyBA-UrozRMFbVqrBxivh5IqXzt1H9jwYSY","AIzaSyAfeaQZyCpnxmBpwIfa-DbZ1Ny9pw_rFvI","AIzaSyDz04gJUsb_9sX6CLsxiaS-AeX_toUOnhM","AIzaSyC-AJNub7xhMGFcSTcJ7IXOrQZuqfZOW00","AIzaSyCAxLZzH-AvClkqRJ5JM4WR-odnmdpFH2o","AIzaSyBXs075Y10IAhH4rlqeHYBmVuEzOeLz4xo","AIzaSyCgp8XEQfhDMFM9BoFHr8H2BSrAbBfb5U0"] #vinay
+	proj_keys += ["AIzaSyCBjTtgWV16zl9ivezXUm7Gr5ac6QnHDgI","AIzaSyBZCO5-gQRcmYlvuZZCLJyVqqKxTzKLgiM","AIzaSyCW0fEzUcOQtewKeGcUc8XPXnN2j1EAKZY","AIzaSyDZoLt2Q0fkEkkiqepp60WPmkS69NTX370","AIzaSyDfESLhLqMa6qqvzigCGy5F36YURuW_Eus","AIzaSyCiFWuQWfXhsBKzXPZ5hQYy0Du_SMIal94","AIzaSyDud6MWfd1l5BPb53x9GGqCAUQoDYmUIGE","AIzaSyDZk4Kwal9BB9JxQbbP5WYvLvEOSAiV8Ao","AIzaSyD47DzEbad6eEPk29gkITOnYrgZUATXf_I","AIzaSyC9coydvCvnkysL6g-FIAyqg89LzUtqq-o"]#kin
+	resetProjKeys()
+	directory = raw_input("Enter directory: ")
+	outputdirectory = raw_input("Enter output directory: ")
+	if(not os.path.exists(outputdirectory)):
+		os.mkdir(outputdirectory)
+	m = raw_input("Enter m: ")
+	m=int(m)
+	try:
+		filelist = glob.glob(directory+"/*.xml")
+		#print filelist
+		p =Pool(processes=int(m))
+		p.map(getNewVideo,filelist)
+		p.close()
+		p.join()
+	except Exception as e:
+		logger_crawl.exception("Error")	
 
