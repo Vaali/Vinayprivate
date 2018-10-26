@@ -21,13 +21,15 @@ manager = Manager()
 blocked_keys = manager.list()
 curr_keys = manager.list()
 
-proj_keys = ['AIzaSyBX-WCpgMHu_9OGpfkdQJD3SMsJTcDCscE','AIzaSyAMGC-oG66RxddL1BrYupDPKGlUV16Fy0I','AIzaSyAUeAM6MhxAO-QoByqZTmkYkTbvcheyxAU']
+proj_keys = ['AIzaSyBX-WCpgMHu_9OGpfkdQJD3SMsJTcDCscE','AIzaSyAMGC-oG66RxddL1BrYupDPKGlUV16Fy0I']
 proj_keys +=['AIzaSyAUeAM6MhxAO-QoByqZTmkYkTbvcheyxAU','AIzaSyBplSw0EhZiACVBkMdqvrLkenQ_PTau9v0','AIzaSyBDVAu4lVhNGfH06875DatHXcz3u-1gKCI']
 proj_keys +=['AIzaSyBt8RP9znGKvWVlHvn8GWdNcLvVRduB4Ak','AIzaSyCl3UV_9k0aLBPI1viEkFoX1wqBPaV26NQ','AIzaSyALgk-GhC4LvlV9WvB8528vyX8ZK29grVc']
 proj_keys +=['AIzaSyCFKavfiehRz1aD7cgugi3wWy-4_e6unWw','AIzaSyC3WtfwN8Jzff32AZln7rDmWI9vsJvj01s']
 
 #logging.basicConfig(format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s',level=logging.DEBUG, filename='errors.log')
 def getKey():
+    if(len(curr_keys)==0):
+        return ""
     return curr_keys[random.randint(0,len(curr_keys)-1)]
 
 def getMonths(currentPublishedDate):
@@ -98,6 +100,12 @@ def updateXml(filename):
     try:
         print filename
         keys = getKey()
+        if(keys == ""):
+            logger_matrix.error("sleeping")
+            print 'sleeping'
+            waitforkeys()
+            resetProjKeys()
+            keys = getKey()
         try:
 			oldsong = api.parse(filename)
         except Exception as e:
@@ -112,8 +120,8 @@ def updateXml(filename):
             if(e.code == 403 and "Forbidden" in e.reason):
                 logger_matrix.error("Daily Limit Exceeded")
                 logger_matrix.error(blocked_keys)
-                if(keys in proj_keys):
-                    proj_keys.remove(keys)
+                if(keys in curr_keys):
+                    curr_keys.remove(keys)
                 if(keys not in blocked_keys):
                     blocked_keys.append(keys)
                     
@@ -123,7 +131,7 @@ def updateXml(filename):
                     waitforkeys()
                     resetProjKeys()
                     
-                print "error"
+                print "error "+str(len(blocked_keys))+" "+str(len(proj_keys))
             else:
                 print e
                 logger_matrix.exception("Error loading json"+ videoUrl + "\n")
