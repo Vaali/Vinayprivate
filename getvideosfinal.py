@@ -9,7 +9,7 @@ import urllib
 from urllib2 import Request,urlopen, URLError, HTTPError
 from datetime import datetime, date, timedelta
 import time
-from multiprocessing import Pool
+from multiprocessing import Pool,Manager
 import logging
 import logging.handlers
 import pickle
@@ -24,6 +24,7 @@ from solr.core import SolrException
 import operator
 import loggingmodule
 import random
+from functools import partial
 
 
 
@@ -34,24 +35,6 @@ Initialising the loggers
 
 '''
 
-'''formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(process)s - %(thread)s:%(message)s')
-logger_error = logging.getLogger('simple_logger')
-hdlr = logging.handlers.RotatingFileHandler(
-              'errors_getVideos.log', maxBytes=1024*1024*1024, backupCount=10)
-#hdlr = logging.FileHandler('errors_getVideos.log')
-hdlr.setFormatter(formatter)
-logger_error.addHandler(hdlr)
-logger_error = logging.getLogger('simple_logger')
-
-
-formatter1 = logging.Formatter('%(message)s')
-logger_decisions = logging.getLogger('simple_logger1')
-hdlr_1 = logging.handlers.RotatingFileHandler(
-              'decisions_new.log', maxBytes=1024*1024*1024, backupCount=10)
-#hdlr_1 = logging.FileHandler('decisions_new.log')
-hdlr_1.setFormatter(formatter1)
-logger_decisions.addHandler(hdlr_1)
-logger_decisions = logging.getLogger('simple_logger1')'''
 logger_decisions = loggingmodule.initialize_logger1('decisions','decisions_new.log')
 logger_error = loggingmodule.initialize_logger('errors','errors_getVideos.log')
 
@@ -59,12 +42,30 @@ logger_error = loggingmodule.initialize_logger('errors','errors_getVideos.log')
 stemwords_uniquelist = ["(Edited Short Version)","(Alternate Early Version)","(Alternate Version)","(Mono)","(Radio Edit)","(Original Album Version)","(Different Mix)","(Music Film)","(Stereo)","(Single Version)","Stereo","Mono","(Album Version)","Demo","(Demo Version)"]
 solrConnection = SolrConnection('http://aurora.cs.rutgers.edu:8181/solr/discogs_artists')
 
-#class 
-
-
+#class
+#proj_keys =['AIzaSyBX-WCpgMHu_9OGpfkdQJD3SMsJTcDCscE']
 '''
 Utility functions
 '''
+
+def getKey():
+    if(len(curr_keys)==0):
+        return ""
+    return curr_keys[random.randint(0,len(curr_keys)-1)]
+
+def waitforkeys():
+    tomorrow = datetime.today() + timedelta(1)
+    midnight = datetime(year=tomorrow.year, month=tomorrow.month,day=tomorrow.day, hour=0, minute=0, second=0)
+    timetomidnight = (midnight - datetime.now()).seconds
+    time.sleep(3600*4+timetomidnight)
+
+def resetProjKeys():
+    global curr_keys
+    curr_keys = manager.list()
+    for key in proj_keys:
+        curr_keys.append(key)
+        print 'adding key'
+
 def IsReleaseCollection(formats):
     bRet = False
     for format in formats:
@@ -534,7 +535,8 @@ def get_song_list(directory,songs_list,full_country_list,aliases,ear_count,ear_y
                     full_country_list[curr_album['country']] = full_country_list[curr_album['country']] + 1'''
                 albumInfo['language'] = "English"
                 song['albumInfo'] = [albumInfo]
-                songs_list.append(song)
+                if(CheckifSongsExistsinSolr(song['name'],song['artistName'],song['featArtists']) == False):
+                    songs_list.append(song)
                 if(song['isCompilation'] == True):
                     earlier_year_skip = True
             if(earlier_year_skip == False):
@@ -552,6 +554,7 @@ def get_song_list(directory,songs_list,full_country_list,aliases,ear_count,ear_y
         final_song_list = GetUniquesongs(songs_list,final_song_list,False,False,ear_count,full_songs_list)
         print len(songs_list)
         print len(final_song_list)
+        print directory
         print "------------"
     return songs_list,final_song_list,full_country_list,aliases,ear_count,ear_year,ear_rel
 
@@ -730,11 +733,12 @@ def get_song_list_master(directory,songs_list,full_country_list,aliases,ear_coun
                             full_country_list[curr_album['country']] = full_country_list[curr_album['country']] + 1'''
                     albumInfo['language'] = "English"
                     song['albumInfo'] = [albumInfo]
-                    if(curr_rel == True):
-                        release_song_list.append(song)
-                    else:
-                        curr_song_list.append(song)
-                    combined_songs_list.append(song)
+                    if(CheckifSongsExistsinSolr(song['name'],song['artistName'],song['featArtists']) == False):
+                        if(curr_rel == True):
+                            release_song_list.append(song)
+                        else:
+                            curr_song_list.append(song)
+                        combined_songs_list.append(song)
                     if(song['isCompilation'] == True):
                         earlier_year_skip = True
                     if(earlier_year_skip == False):
@@ -784,15 +788,17 @@ def CheckifSongsExistsinSolr(sname,aname,fname):
                     result['ftArtistName']
                     
                     #print len(response.results)'''
+            print '---Found song---'
             return True
     except Exception as e:
-        logger_error.exception(e)
+        pass
+        #logger_error.exception(e)
     return False
 
 
 def crawlArtist(directory):
     start_time = datetime.now()
-    logger_decisions.error(directory)
+    logger_decisions.error(directory + " ---- started ---")
     #print os.path.basename(directory)
     
     if(os.path.basename(directory) == '194' or os.path.basename(directory) == '355'):
@@ -801,8 +807,6 @@ def crawlArtist(directory):
     try:
         curr_artist_dir = os.path.basename(directory)
         songs_list = list()
-        global misses
-        global hits
         global IsIncremental
         full_lang_list = {}
         full_country_list ={}
@@ -850,8 +854,6 @@ def crawlArtist(directory):
         sorted_list = sorted(songs_list,key = lambda x:x['name'].lower())
         hits = 0
         misses = 0
-        global request_count
-        request_count = 0
         if(len(sorted_list) == 0):
             return
     except Exception, e:
@@ -927,8 +929,60 @@ def crawlArtist(directory):
         logger_error.exception(e)
     logger_decisions.error(directory + " -- Completed with time -- " + str(datetime.now() - start_time))
     #print parallel_songs_list
+    if(IsIncremental == 0 or IsIncremental == 2):
+        with open(directory + '/getyoutubelist.txt', 'wb') as f:
+			pickle.dump(parallel_songs_list, f)
+    else:
+        with open(directory + '/getyoutubelist_incr.txt', 'wb') as f:
+			pickle.dump(parallel_songs_list, f)
+    #runYoutubeApi(directory)
+
+
+
+def runYoutubeApi(directory):
     try:
         #print fl
+        start_time = datetime.now()
+        logger_decisions.error(directory + " ---- runYoutubeApi started ---")
+        global IsIncremental
+        global proj_keys
+        global blocked_keys
+        global curr_keys
+        global request_count
+        global misses
+        global hits
+        request_count = 0
+        curr_artist_dir = os.path.basename(directory)
+        if(IsIncremental == 0 or IsIncremental ==2):
+            lastrunfile = directory + '/lastrun.txt'
+        else:
+            lastrunfile = directory + '/lastrun_incr.txt'
+        lasttime =0
+        try:
+            fread = open(lastrunfile,'r')
+            lasttime = pickle.load(fread)
+            fread.close()
+        except Exception as e:
+            pass
+        print str(lasttime)+'----lttt'
+        currtime =0
+        if(IsIncremental == 0 or IsIncremental == 2):
+            infile = directory + '/getyoutubelist.txt'
+        else:
+            infile = directory + '/getyoutubelist_incr.txt'
+        if(os.path.exists(infile)):
+            currtime = int(os.path.getmtime(infile))
+            if(currtime < lasttime):
+                logger_decisions.error(directory + " -- runYoutubeApi Completed with time -- " + str(datetime.now() - start_time))
+                return
+        print str(currtime)+'------'
+        try:
+            fread = open(infile,'r')
+        except IOError as e:
+            logger_error.exception(e)
+            return
+        parallel_songs_list = pickle.load(fread)
+        isSleep = False
         vid = list()
         misses = 0
         hits = 0
@@ -953,7 +1007,8 @@ def crawlArtist(directory):
                 return_pool = executor.map(getVideoFromYoutube,parallel_songs_list)
         #print len(return_pool)
         for ret_val in return_pool:
-            
+            if(ret_val[3] == True): #getValue from threads.
+                isSleep = True;
             if(ret_val[2] == True):
                     found = found + 1
                     print ret_val[3]
@@ -986,14 +1041,20 @@ def crawlArtist(directory):
             with open(directory + '/last_incr_part2.txt', 'wb') as f1:
                 f1.write(str(int(time.time())))
                 f1.close()
+        with open(lastrunfile, 'wb') as f2:
+            print 'dumping '+str(int(time.time()))
+            pickle.dump(str(int(time.time())),f2)
+        logger_decisions.error(directory + " -- runYoutubeApi Completed with time -- " + str(datetime.now() - start_time))
     except Exception as e:
         print e
         logger_error.exception(e)
+    
 
 def checkIfSongExists(curr_song,songs_list):
     retVal = False
     matched_song = ""
     song_name = curr_song['name']
+    phonectic_distance = 0
     try:
      for s in songs_list:
         #print song
@@ -1005,7 +1066,9 @@ def checkIfSongExists(curr_song,songs_list):
         try:
             phonectic_distance = fuzz.ratio(soundex(song),soundex(song_name))
         except Exception as ex:
-            logger_error("fix soundex error")
+            #logger_error.error("fix soundex error")
+            #print 'soundex error'
+            pass
         if('(' in song.lower() and '(' in song_name.lower()):
             parmatch,tryagain = getparanthesismatch(song.lower(),song_name.lower())
             if(parmatch == True):
@@ -1091,8 +1154,9 @@ def getVideoFromYoutube(curr_elem):
     ftartists = curr_elem['featArtists']
     shouldsleep = False
     #print '---------------------'
-    #print artname
+    print artname
     #print '-----------------'
+
     if(IsIncremental >=2):#both for full and incremental 2,3
         if(CheckifSongsExistsinSolr(sname,artname,ftartists) == True):
             print 'found the song'
@@ -1124,13 +1188,7 @@ def getVideoFromYoutube(curr_elem):
         '''if('errorstr' in tempDictionary):
             logger_decisions.error(tempDictionary['errorstr'])
             logger_decisions.error('-----------------')'''
-    if(shouldsleep == True):
-        print "sleeping"
-        tomorrow = datetime.today() + timedelta(1)
-        midnight = datetime(year=tomorrow.year, month=tomorrow.month,day=tomorrow.day, hour=0, minute=0, second=0)
-        timetomidnight = (midnight - datetime.now()).seconds
-        time.sleep(3600*4+timetomidnight)
-    return retvid,bret,False
+    return retvid,bret,False,shouldsleep
 
 
 def getVideo(curr_elem,flag):
@@ -1717,6 +1775,9 @@ def GetArtist(artistObj):
 
 def getYoutubeUrl(video,flag,mostpopular):
     global request_count
+    #global proj_keys
+    #global blocked_keys
+    #global curr_keys
     shouldsleep = False
     bret = False
     try:
@@ -1728,12 +1789,13 @@ def getYoutubeUrl(video,flag,mostpopular):
             flist = flist+" "+ttt
         ftartists = flist
         allArtists = video.artist.strip("-")+" "+ftartists
-        #keys = ["AIzaSyDwhzqoVMCNuwZC1E16-FZuTXBUECEhqp0","AIzaSyBt6eZ_43NjjcgsPNp_DdcE4D24xKKAeVY","AIzaSyDDhsEMAZvh5HZAR13N5tPm5RB1A_KnZXY","AIzaSyAGe95SUVn1D2F3EUzWVFFZiXKftTJYBKo","AIzaSyC-LEAg8vZ5T4VKjihGnMgAc_VroJHJKDQ"]
-        #keys = ["AIzaSyCtcinkfxaMg4kacDN4AoVo1I-GiKRVmnM","AIzaSyDq1zRXH6J-uVgqdq3KM7PwZoyh198_mpc","AIzaSyAezh2CIOaBvFoOGzWIQfcsTlE2LDYJOYY","AIzaSyDcZ0eJB-IAuZWbBnC9VMCw0BATa7Et0Mw","AIzaSyCSh2D3-x_dm9lI84qsHJP9g0lo13jatho"]
-        keys = ["AIzaSyB34POCUa53BcFsdPURNsvm0i6AX4kqjWo","AIzaSyBA-UrozRMFbVqrBxivh5IqXzt1H9jwYSY","AIzaSyAfeaQZyCpnxmBpwIfa-DbZ1Ny9pw_rFvI","AIzaSyDz04gJUsb_9sX6CLsxiaS-AeX_toUOnhM","AIzaSyC-AJNub7xhMGFcSTcJ7IXOrQZuqfZOW00","AIzaSyCAxLZzH-AvClkqRJ5JM4WR-odnmdpFH2o","AIzaSyBXs075Y10IAhH4rlqeHYBmVuEzOeLz4xo","AIzaSyCgp8XEQfhDMFM9BoFHr8H2BSrAbBfb5U0"] #vinay
-        keys += ["AIzaSyCBjTtgWV16zl9ivezXUm7Gr5ac6QnHDgI","AIzaSyBZCO5-gQRcmYlvuZZCLJyVqqKxTzKLgiM","AIzaSyCW0fEzUcOQtewKeGcUc8XPXnN2j1EAKZY","AIzaSyDZoLt2Q0fkEkkiqepp60WPmkS69NTX370","AIzaSyDfESLhLqMa6qqvzigCGy5F36YURuW_Eus","AIzaSyCiFWuQWfXhsBKzXPZ5hQYy0Du_SMIal94","AIzaSyDud6MWfd1l5BPb53x9GGqCAUQoDYmUIGE","AIzaSyDZk4Kwal9BB9JxQbbP5WYvLvEOSAiV8Ao","AIzaSyD47DzEbad6eEPk29gkITOnYrgZUATXf_I","AIzaSyC9coydvCvnkysL6g-FIAyqg89LzUtqq-o"]#kin
-        #keys = ["AIzaSyCBjTtgWV16zl9ivezXUm7Gr5ac6QnHDgI","AIzaSyDcZ0eJB-IAuZWbBnC9VMCw0BATa7Et0Mw"]
-        key = keys[random.randint(0,len(keys)-1)]
+        key = getKey()
+        if(key == ""):
+            logger_error.error("sleeping")
+            print 'sleeping'
+            waitforkeys()
+            resetProjKeys()
+            key = getKey()
         #key = "AIzaSyBEM6ijEuRqrGREP8lxZU8XzEufEMVToO0"
         if(flag == 0):
             '''if('cover' not in video.name.lower()):
@@ -1754,7 +1816,18 @@ def getYoutubeUrl(video,flag,mostpopular):
         except HTTPError as e:            
             if(e.code == 403 and "Forbidden" in e.reason):
                 logger_error.exception("Daily Limit Exceeded")
+                logger_error.exception(blocked_keys)
                 shouldsleep = True
+                if(key in curr_keys):
+                    curr_keys.remove(key)
+                if(key not in blocked_keys):
+                    blocked_keys.append(key)
+                if(len(blocked_keys) == len(proj_keys)):
+                    logger_error.error("sleeping")
+                    print 'sleeping'
+                    waitforkeys()
+                    resetProjKeys()    
+                    print "error "+str(len(blocked_keys))+" "+str(len(proj_keys))
             else:
                 request_count = request_count + 100
                 logger_error.exception(e.message)
@@ -1946,6 +2019,15 @@ if __name__ == '__main__':
     sys.setdefaultencoding('utf8')
     filenameList = []
     t1 = datetime.now()
+    manager = Manager()
+    blocked_keys = manager.list()
+    curr_keys = manager.list()
+
+    proj_keys = ["AIzaSyB34POCUa53BcFsdPURNsvm0i6AX4kqjWo","AIzaSyBA-UrozRMFbVqrBxivh5IqXzt1H9jwYSY","AIzaSyAfeaQZyCpnxmBpwIfa-DbZ1Ny9pw_rFvI","AIzaSyDz04gJUsb_9sX6CLsxiaS-AeX_toUOnhM","AIzaSyC-AJNub7xhMGFcSTcJ7IXOrQZuqfZOW00","AIzaSyCAxLZzH-AvClkqRJ5JM4WR-odnmdpFH2o","AIzaSyBXs075Y10IAhH4rlqeHYBmVuEzOeLz4xo","AIzaSyCgp8XEQfhDMFM9BoFHr8H2BSrAbBfb5U0"] #vinay
+    proj_keys += ["AIzaSyCBjTtgWV16zl9ivezXUm7Gr5ac6QnHDgI","AIzaSyBZCO5-gQRcmYlvuZZCLJyVqqKxTzKLgiM","AIzaSyCW0fEzUcOQtewKeGcUc8XPXnN2j1EAKZY","AIzaSyDZoLt2Q0fkEkkiqepp60WPmkS69NTX370","AIzaSyDfESLhLqMa6qqvzigCGy5F36YURuW_Eus","AIzaSyCiFWuQWfXhsBKzXPZ5hQYy0Du_SMIal94","AIzaSyDud6MWfd1l5BPb53x9GGqCAUQoDYmUIGE","AIzaSyDZk4Kwal9BB9JxQbbP5WYvLvEOSAiV8Ao","AIzaSyD47DzEbad6eEPk29gkITOnYrgZUATXf_I","AIzaSyC9coydvCvnkysL6g-FIAyqg89LzUtqq-o"]#kin
+
+    resetProjKeys()
+    print len(curr_keys)
     try:
         lastdirectory = 0
         logger_error.debug("Discogs Main Program Starting")
@@ -1954,6 +2036,8 @@ if __name__ == '__main__':
         folders = raw_input("Enter number of folders: ")
         folders = int(folders)
         m1=int(m1)
+        crawlyoutube = raw_input("0 for collecting songs\n 1 for crawling youtube \n")
+        crawlyoutube = int(crawlyoutube)
         incr = raw_input("Isincremental : ")
         incr = int(incr)
         IsIncremental = incr
@@ -1999,11 +2083,14 @@ if __name__ == '__main__':
                             foldlist.append(strg)
             logger_error.debug("Folders List:")
             n = len(foldlist)
-
             logger_error.debug("Starting Processes:")
             songs_pool = Pool()
             songs_pool =Pool(processes=m1)
-            songs_pool.map_async(crawlArtist,foldlist)
+            if(crawlyoutube == 0):
+                songs_pool.imap(crawlArtist,foldlist)
+            else:
+                songs_pool.imap(runYoutubeApi,foldlist)
+                
             songs_pool.close()
             songs_pool.join()
             print datetime.now()-t1
