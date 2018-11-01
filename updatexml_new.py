@@ -9,28 +9,15 @@ import os
 import shutil
 import time
 import glob
-from multiprocessing import Pool,Manager
+from multiprocessing import Pool
 import traceback
 import loggingmodule
 from solr import SolrConnection
 from solr.core import SolrException
 from itertools import repeat
 import random
+import managekeys
 
-manager = Manager()
-blocked_keys = manager.list()
-curr_keys = manager.list()
-
-proj_keys = ['AIzaSyBX-WCpgMHu_9OGpfkdQJD3SMsJTcDCscE','AIzaSyAMGC-oG66RxddL1BrYupDPKGlUV16Fy0I']
-proj_keys +=['AIzaSyAUeAM6MhxAO-QoByqZTmkYkTbvcheyxAU','AIzaSyBplSw0EhZiACVBkMdqvrLkenQ_PTau9v0','AIzaSyBDVAu4lVhNGfH06875DatHXcz3u-1gKCI']
-proj_keys +=['AIzaSyBt8RP9znGKvWVlHvn8GWdNcLvVRduB4Ak','AIzaSyCl3UV_9k0aLBPI1viEkFoX1wqBPaV26NQ','AIzaSyALgk-GhC4LvlV9WvB8528vyX8ZK29grVc']
-proj_keys +=['AIzaSyCFKavfiehRz1aD7cgugi3wWy-4_e6unWw','AIzaSyC3WtfwN8Jzff32AZln7rDmWI9vsJvj01s']
-
-#logging.basicConfig(format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s',level=logging.DEBUG, filename='errors.log')
-def getKey():
-    if(len(curr_keys)==0):
-        return ""
-    return curr_keys[random.randint(0,len(curr_keys)-1)]
 
 def getMonths(currentPublishedDate):
 	now = datetime.now()	
@@ -82,56 +69,34 @@ def getDelta(oldDate,oldViewcount,newViewcount):
 	delta = (newViewcount - oldViewcount)/days
 	return delta
 
-def waitforkeys():
-    tomorrow = datetime.today() + timedelta(1)
-    midnight = datetime(year=tomorrow.year, month=tomorrow.month,day=tomorrow.day, hour=0, minute=0, second=0)
-    timetomidnight = (midnight - datetime.now()).seconds
-    time.sleep(3600*4+timetomidnight)
-
-def resetProjKeys():
-    global curr_keys
-    curr_keys = manager.list()
-    for key in proj_keys:
-        curr_keys.append(key)
-        print 'adding key'
-
 
 def updateXml(filename):
     try:
         print filename
-        keys = getKey()
-        if(keys == ""):
-            logger_matrix.error("sleeping")
-            print 'sleeping'
-            waitforkeys()
-            resetProjKeys()
-            keys = getKey()
+        key = manager.getkey()
+        if(key == ""):
+            manager.keys_exhausted()
+            key = manager.getkey()
+            if(key == ""):
+                print 'empty key'
+                return
         try:
 			oldsong = api.parse(filename)
         except Exception as e:
 			logger_matrix.exception("Error")
 			return
         
-        videoUrl = "https://www.googleapis.com/youtube/v3/videos?id="+str(oldsong.youtubeId)+"&key="+keys+"&part=statistics,snippet,status"
+        videoUrl = "https://www.googleapis.com/youtube/v3/videos?id="+str(oldsong.youtubeId)+"&key="+key+"&part=statistics,snippet,status"
         
         try:
 			videoResult = simplejson.load(urllib2.urlopen(videoUrl),"utf-8")
         except Exception as e:
             if(e.code == 403 and "Forbidden" in e.reason):
                 logger_matrix.error("Daily Limit Exceeded")
-                logger_matrix.error(blocked_keys)
-                if(keys in curr_keys):
-                    curr_keys.remove(keys)
-                if(keys not in blocked_keys):
-                    blocked_keys.append(keys)
-                    
-                if(len(blocked_keys) == len(proj_keys)):
-                    logger_matrix.error("sleeping")
-                    print 'sleeping'
-                    waitforkeys()
-                    resetProjKeys()
-                    
-                print "error "+str(len(blocked_keys))+" "+str(len(proj_keys))
+                logger_matrix.error(manager.get_blocked_keys())
+                manager.removekey(key)
+                manager.add_blockedkey(key)
+                manager.keys_exhausted()    
             else:
                 print e
                 logger_matrix.exception("Error loading json"+ videoUrl + "\n")
@@ -303,7 +268,10 @@ reload(sys)
 sys.setdefaultencoding('utf8')
 
 if __name__ == '__main__':
+
     logger_matrix = loggingmodule.initialize_logger('updatexml','updatexmls.log')
+    manager = managekeys.ManageKeys()
+    manager.reset_projkeys()
     directory = raw_input("Enter directory: ")
     if not os.path.exists(directory):
         print 'directory doesnt exists'
@@ -316,26 +284,16 @@ if __name__ == '__main__':
     t1=time.time()
     connection_genre = SolrConnection('http://aurora.cs.rutgers.edu:8181/solr/genretags')
     connection_artist = SolrConnection('http://aurora.cs.rutgers.edu:8181/solr/similar_artists1')
-    
-    resetProjKeys()
-    print len(curr_keys)
-    '''kk = getKey()
-    if(kk in curr_keys):
-        curr_keys.remove(kk)
-    print len(curr_keys)'''
+
     try:
         filelist = glob.glob(directory+"/*.xml")
         p =Pool(processes=int(m))
         if(choiceUpdate == 0):
-            curr_keys = proj_keys
-            blocked_keys = set([])
             p.map(updateXml,filelist)
         else:
             cutoff = int(raw_input("Enter the cutoff point\n"))
             print cutoff
-            #print filelist[8]
             p.map(updateGenreTags,zip(filelist,repeat(cutoff)))
-            #updateGenreTags(directory+"/0000u4UNot_W9_Q.xml")
         p.close()
         p.join()
     except Exception as e:

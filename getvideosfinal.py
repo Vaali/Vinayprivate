@@ -9,7 +9,7 @@ import urllib
 from urllib2 import Request,urlopen, URLError, HTTPError
 from datetime import datetime, date, timedelta
 import time
-from multiprocessing import Pool,Manager
+from multiprocessing import Pool
 import logging
 import logging.handlers
 import pickle
@@ -25,6 +25,7 @@ import operator
 import loggingmodule
 import random
 from functools import partial
+import managekeys
 
 
 
@@ -48,23 +49,6 @@ solrConnection = SolrConnection('http://aurora.cs.rutgers.edu:8181/solr/discogs_
 Utility functions
 '''
 
-def getKey():
-    if(len(curr_keys)==0):
-        return ""
-    return curr_keys[random.randint(0,len(curr_keys)-1)]
-
-def waitforkeys():
-    tomorrow = datetime.today() + timedelta(1)
-    midnight = datetime(year=tomorrow.year, month=tomorrow.month,day=tomorrow.day, hour=0, minute=0, second=0)
-    timetomidnight = (midnight - datetime.now()).seconds
-    time.sleep(3600*4+timetomidnight)
-
-def resetProjKeys():
-    global curr_keys
-    curr_keys = manager.list()
-    for key in proj_keys:
-        curr_keys.append(key)
-        print 'adding key'
 
 def IsReleaseCollection(formats):
     bRet = False
@@ -945,9 +929,6 @@ def runYoutubeApi(directory):
         start_time = datetime.now()
         logger_decisions.error(directory + " ---- runYoutubeApi started ---")
         global IsIncremental
-        global proj_keys
-        global blocked_keys
-        global curr_keys
         global request_count
         global misses
         global hits
@@ -1789,13 +1770,13 @@ def getYoutubeUrl(video,flag,mostpopular):
             flist = flist+" "+ttt
         ftartists = flist
         allArtists = video.artist.strip("-")+" "+ftartists
-        key = getKey()
+        key = manager.getkey()
         if(key == ""):
-            logger_error.error("sleeping")
-            print 'sleeping'
-            waitforkeys()
-            resetProjKeys()
-            key = getKey()
+            manager.keys_exhausted()
+            key = manager.getkey()
+            if(key == ""):
+                print 'empty key'
+                return
         #key = "AIzaSyBEM6ijEuRqrGREP8lxZU8XzEufEMVToO0"
         if(flag == 0):
             '''if('cover' not in video.name.lower()):
@@ -1816,18 +1797,10 @@ def getYoutubeUrl(video,flag,mostpopular):
         except HTTPError as e:            
             if(e.code == 403 and "Forbidden" in e.reason):
                 logger_error.exception("Daily Limit Exceeded")
-                logger_error.exception(blocked_keys)
-                shouldsleep = True
-                if(key in curr_keys):
-                    curr_keys.remove(key)
-                if(key not in blocked_keys):
-                    blocked_keys.append(key)
-                if(len(blocked_keys) == len(proj_keys)):
-                    logger_error.error("sleeping")
-                    print 'sleeping'
-                    waitforkeys()
-                    resetProjKeys()    
-                    print "error "+str(len(blocked_keys))+" "+str(len(proj_keys))
+                logger_matrix.error(manager.get_blocked_keys())
+                manager.removekey(key)
+                manager.add_blockedkey(key)
+                manager.keys_exhausted()
             else:
                 request_count = request_count + 100
                 logger_error.exception(e.message)
@@ -2019,15 +1992,16 @@ if __name__ == '__main__':
     sys.setdefaultencoding('utf8')
     filenameList = []
     t1 = datetime.now()
-    manager = Manager()
-    blocked_keys = manager.list()
-    curr_keys = manager.list()
+    manager = managekeys.ManageKeys()
+    manager.reset_projkeys()
+    #blocked_keys = manager.list()
+    #curr_keys = manager.list()
 
-    proj_keys = ["AIzaSyB34POCUa53BcFsdPURNsvm0i6AX4kqjWo","AIzaSyBA-UrozRMFbVqrBxivh5IqXzt1H9jwYSY","AIzaSyAfeaQZyCpnxmBpwIfa-DbZ1Ny9pw_rFvI","AIzaSyDz04gJUsb_9sX6CLsxiaS-AeX_toUOnhM","AIzaSyC-AJNub7xhMGFcSTcJ7IXOrQZuqfZOW00","AIzaSyCAxLZzH-AvClkqRJ5JM4WR-odnmdpFH2o","AIzaSyBXs075Y10IAhH4rlqeHYBmVuEzOeLz4xo","AIzaSyCgp8XEQfhDMFM9BoFHr8H2BSrAbBfb5U0"] #vinay
-    proj_keys += ["AIzaSyCBjTtgWV16zl9ivezXUm7Gr5ac6QnHDgI","AIzaSyBZCO5-gQRcmYlvuZZCLJyVqqKxTzKLgiM","AIzaSyCW0fEzUcOQtewKeGcUc8XPXnN2j1EAKZY","AIzaSyDZoLt2Q0fkEkkiqepp60WPmkS69NTX370","AIzaSyDfESLhLqMa6qqvzigCGy5F36YURuW_Eus","AIzaSyCiFWuQWfXhsBKzXPZ5hQYy0Du_SMIal94","AIzaSyDud6MWfd1l5BPb53x9GGqCAUQoDYmUIGE","AIzaSyDZk4Kwal9BB9JxQbbP5WYvLvEOSAiV8Ao","AIzaSyD47DzEbad6eEPk29gkITOnYrgZUATXf_I","AIzaSyC9coydvCvnkysL6g-FIAyqg89LzUtqq-o"]#kin
+    #proj_keys = ["AIzaSyB34POCUa53BcFsdPURNsvm0i6AX4kqjWo","AIzaSyBA-UrozRMFbVqrBxivh5IqXzt1H9jwYSY","AIzaSyAfeaQZyCpnxmBpwIfa-DbZ1Ny9pw_rFvI","AIzaSyDz04gJUsb_9sX6CLsxiaS-AeX_toUOnhM","AIzaSyC-AJNub7xhMGFcSTcJ7IXOrQZuqfZOW00","AIzaSyCAxLZzH-AvClkqRJ5JM4WR-odnmdpFH2o","AIzaSyBXs075Y10IAhH4rlqeHYBmVuEzOeLz4xo","AIzaSyCgp8XEQfhDMFM9BoFHr8H2BSrAbBfb5U0"] #vinay
+    #proj_keys += ["AIzaSyCBjTtgWV16zl9ivezXUm7Gr5ac6QnHDgI","AIzaSyBZCO5-gQRcmYlvuZZCLJyVqqKxTzKLgiM","AIzaSyCW0fEzUcOQtewKeGcUc8XPXnN2j1EAKZY","AIzaSyDZoLt2Q0fkEkkiqepp60WPmkS69NTX370","AIzaSyDfESLhLqMa6qqvzigCGy5F36YURuW_Eus","AIzaSyCiFWuQWfXhsBKzXPZ5hQYy0Du_SMIal94","AIzaSyDud6MWfd1l5BPb53x9GGqCAUQoDYmUIGE","AIzaSyDZk4Kwal9BB9JxQbbP5WYvLvEOSAiV8Ao","AIzaSyD47DzEbad6eEPk29gkITOnYrgZUATXf_I","AIzaSyC9coydvCvnkysL6g-FIAyqg89LzUtqq-o"]#kin
 
-    resetProjKeys()
-    print len(curr_keys)
+    #resetProjKeys()
+    #print len(curr_keys)
     try:
         lastdirectory = 0
         logger_error.debug("Discogs Main Program Starting")

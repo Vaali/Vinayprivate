@@ -21,11 +21,12 @@ from datetime import datetime, date, timedelta
 import time
 import os
 import logging
-from multiprocessing import Pool,Manager
+from multiprocessing import Pool
 import glob
-from getvideosfinal import CalculateMatch#,getKey,resetProjKeys,waitforkeys,blocked_keys,curr_keys,proj_keys
+from getvideosfinal import CalculateMatch
 import loggingmodule
 import random
+import managekeys
 
 reload(sys)
 sys.setdefaultencoding('utf8')
@@ -36,25 +37,6 @@ logger_crawl = loggingmodule.initialize_logger('crawlerrors','errors_recrawldele
 '''
 Utility functions
 '''
-
-def getKey():
-    if(len(curr_keys)==0):
-        return ""
-    return curr_keys[random.randint(0,len(curr_keys)-1)]
-
-def waitforkeys():
-    tomorrow = datetime.today() + timedelta(1)
-    midnight = datetime(year=tomorrow.year, month=tomorrow.month,day=tomorrow.day, hour=0, minute=0, second=0)
-    timetomidnight = (midnight - datetime.now()).seconds
-    time.sleep(3600*4+timetomidnight)
-
-def resetProjKeys():
-    global curr_keys
-    curr_keys = manager.list()
-    for key in proj_keys:
-        curr_keys.append(key)
-        print 'adding key'
-
 
 def ParseTime(time):
 	time = time.replace('PT','')
@@ -292,14 +274,11 @@ def getVideo(oldsong):
 	ftartists = flist[1:]
 	allArtists = oldsong.artist.artistName[0].strip("-")+" "+ftartists
 	#key = "AIzaSyB34POCUa53BcFsdPURNsvm0i6AX4kqjWo"
-	key = getKey()
+	key = manager.getkey()
 	print key
 	if(key == ""):
-            logger_crawl.error("sleeping")
-            print 'sleeping'
-            waitforkeys()
-            resetProjKeys()
-            key = getKey()
+            manager.keys_exhausted()
+            key = manager.getkey()
 	if('cover' not in songName.lower()):
 		searchUrl = "https://www.googleapis.com/youtube/v3/search?part=snippet&q=allintitle%3A"+urllib.quote_plus(str(allArtists))+"+"+urllib.quote_plus(str(songName))+"+-cover&alt=json&type=video&max-results=5&key="+key+"&videoCategoryId=10"
 		#"https://www.googleapis.com/youtube/v3/search?part=snippet&q=allintitle%3A"+urllib.quote_plus(str(allArtists))+"+"+urllib.quote_plus(str(songName))+"+-cover"+"&alt=json&type=video&channelID=UC-9-kyTW8ZkZNDHQJ6FgpwQ&max-results=5&key="+
@@ -311,18 +290,10 @@ def getVideo(oldsong):
 	except HTTPError as e:
 		if(e.code == 403 and "Forbidden" in e.reason):
 			logger_crawl.error("Daily Limit Exceeded")
-			logger_crawl.error(blocked_keys)
-			shouldsleep = True
-			if(key in curr_keys):
-				curr_keys.remove(key)
-			if(key not in blocked_keys):
-				blocked_keys.append(key)
-			if(len(blocked_keys) == len(proj_keys)):
-				logger_crawl.error("sleeping")
-				print 'sleeping'
-				waitforkeys()
-				resetProjKeys()
-				print "error "+str(len(blocked_keys))+" "+str(len(proj_keys))
+			logger_crawl.error(manager.get_blocked_keys())
+			manager.removekey(key)
+			manager.add_blockedkey(key)
+			manager.keys_exhausted()
 		else:
 			logger_crawl.error(e.message)
 		return
@@ -437,13 +408,8 @@ def getNewVideo(filename):
 #output_directory = foldername+'/deletedvideos'
 #getNewVideo(str(sys.argv[1]))
 if __name__ == '__main__':
-	manager = Manager()
-	blocked_keys = manager.list()
-	curr_keys = manager.list()
-	#proj_keys =['AIzaSyB34POCUa53BcFsdPURNsvm0i6AX4kqjWo']
-	proj_keys = ["AIzaSyB34POCUa53BcFsdPURNsvm0i6AX4kqjWo","AIzaSyBA-UrozRMFbVqrBxivh5IqXzt1H9jwYSY","AIzaSyAfeaQZyCpnxmBpwIfa-DbZ1Ny9pw_rFvI","AIzaSyDz04gJUsb_9sX6CLsxiaS-AeX_toUOnhM","AIzaSyC-AJNub7xhMGFcSTcJ7IXOrQZuqfZOW00","AIzaSyCAxLZzH-AvClkqRJ5JM4WR-odnmdpFH2o","AIzaSyBXs075Y10IAhH4rlqeHYBmVuEzOeLz4xo","AIzaSyCgp8XEQfhDMFM9BoFHr8H2BSrAbBfb5U0"] #vinay
-	proj_keys += ["AIzaSyCBjTtgWV16zl9ivezXUm7Gr5ac6QnHDgI","AIzaSyBZCO5-gQRcmYlvuZZCLJyVqqKxTzKLgiM","AIzaSyCW0fEzUcOQtewKeGcUc8XPXnN2j1EAKZY","AIzaSyDZoLt2Q0fkEkkiqepp60WPmkS69NTX370","AIzaSyDfESLhLqMa6qqvzigCGy5F36YURuW_Eus","AIzaSyCiFWuQWfXhsBKzXPZ5hQYy0Du_SMIal94","AIzaSyDud6MWfd1l5BPb53x9GGqCAUQoDYmUIGE","AIzaSyDZk4Kwal9BB9JxQbbP5WYvLvEOSAiV8Ao","AIzaSyD47DzEbad6eEPk29gkITOnYrgZUATXf_I","AIzaSyC9coydvCvnkysL6g-FIAyqg89LzUtqq-o"]#kin
-	resetProjKeys()
+	manager = managekeys.ManageKeys()
+	manager.reset_projkeys()
 	directory = raw_input("Enter directory: ")
 	outputdirectory = raw_input("Enter output directory: ")
 	if(not os.path.exists(outputdirectory)):
