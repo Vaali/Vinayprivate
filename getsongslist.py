@@ -13,9 +13,12 @@ from solr import SolrConnection
 from solr.core import SolrException
 from datetime import datetime, date, timedelta
 from fuzzywuzzy import fuzz
-#from multiprocessing.pool import ThreadPool
+from multiprocessing.pool import ThreadPool
+import concurrent.futures
 from multiprocessing import Pool
 import operator
+from itertools import repeat
+
 
 
 
@@ -41,7 +44,7 @@ def GetSongsFromFullList(songs_details):
 
 def checkpreviousfull(directory):
     retVal = 0
-    if(os.path.exists(directory+'/last_full_part2.txt')):
+    if(os.path.exists(directory+'/last_full_part1.txt')):
         retVal = 1
     #elif(os.path.exists(directory+'/dump')):
     #    retVal = 1
@@ -105,7 +108,7 @@ def getparanthesismatch(source,destination):
         dlist = [s for s in destinationlist[0] if s != "" ]
         try:
             part1_dist = fuzz.ratio(slist[0].lower(),dlist[0].lower())
-        except Exception, e:
+        except Exception as e:
             return False,0
         part2_dist = 0
         if(len(slist) >1 and len(dlist) > 1):
@@ -115,7 +118,7 @@ def getparanthesismatch(source,destination):
             return True,0
         else:
             return False,0
-    except Exception, e:
+    except Exception as e:
         logger_error.exception(source)
         logger_error.exception(destination)
         logger_error.exception(e)
@@ -163,7 +166,7 @@ def getAliasFromArtistsSolr(final_artist_alias_list,artist_id):
             #    for artnamevar in result['artistNameVariations']:
             #        if(artnamevar.lower() not in final_artist_alias_list):
             #            final_artist_alias_list.append(artnamevar.lower())
-    except Exception, e:
+    except Exception as e:
             logger_error.exception(e)
     return final_artist_alias_list
 
@@ -196,7 +199,7 @@ def CheckifSongsExistsinSolr(sname,aname,fname):
             print '---Found song---'
             return True
     except Exception as e:
-        pass
+        sys.exc_clear()
         #logger_error.exception(e)
     return False
 
@@ -294,7 +297,7 @@ def IsReleaseCollection(formats):
     return bRet
 
 
-def get_song_list(directory,songs_list,full_country_list,aliases,ear_count,ear_year,ear_rel,final_song_list,full_songs_list):
+def get_song_list_normal(directory,songs_list,full_country_list,aliases,ear_count,ear_year,ear_rel,final_song_list,full_songs_list):
     releases_list = []
     global prev_time
     global IsIncremental
@@ -456,7 +459,7 @@ def get_song_list(directory,songs_list,full_country_list,aliases,ear_count,ear_y
                         ear_count = curr_album['country']
                         ear_year = curr_album['released_date']
             #final_song_list = GetUniquesongs(release_song_list,final_song_list,True,False,ear_count)
-        except Exception, e:
+        except Exception as e:
             logger_error.exception(e)
         final_song_list = GetUniquesongs(songs_list,final_song_list,False,False,ear_count,full_songs_list)
         print len(songs_list)
@@ -466,7 +469,200 @@ def get_song_list(directory,songs_list,full_country_list,aliases,ear_count,ear_y
     return songs_list,final_song_list,full_country_list,aliases,ear_count,ear_year,ear_rel
 
 
+def get_song_list_normal_new(directory,songs_list,full_country_list,aliases,ear_count,ear_year,ear_rel,final_song_list,full_songs_list):
+    releases_list = []
+    start_time = datetime.now()
+    global prev_time
+    global IsIncremental
+    retVal = checkpreviousfull(directory)
+    try:
+        if((IsIncremental == 1 or IsIncremental == 3) and retVal == 1):
+            master_list = glob.glob(directory+"/release*.json")
+            for fileName in master_list:
+                if( os.path.getmtime(fileName) > prev_time):
+                    '''with codecs.open(fileName,"r","utf-8") as input1:
+                        curr_album = json.load(input1)
+                        releases_list.append(curr_album)'''
+                    releases_list.append(fileName)
+            #print prev_time
+            #print releases_list
+        else:
+            releases_list = []
+            for filename in glob.glob(directory+"/release*.json"):
+                '''with codecs.open(filename,"r","utf-8") as input1:
+                        curr_album = json.load(input1)
+                        releases_list.append(curr_album)'''
+                releases_list.append(filename)
+        print len(releases_list)
+        with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
+            return_pool = executor.map(get_list_from_normal_release,zip(releases_list,repeat(ear_count),repeat(ear_year),repeat(ear_rel)))
+        #print len(releases_list)
+        
+        logger_decisions.error('before merging normal  files '+str(datetime.now() - start_time))
+
+        for result in return_pool:
+            songs_list = result[0]
+            final_song_list = GetUniquesongs(result[0],final_song_list,False,False,result[1],full_songs_list)
+            print len(songs_list)
+            print len(final_song_list)
+        print directory
+        
+        logger_decisions.error('completed normal files '+str(datetime.now() - start_time))#directory+"------------ completed----normal"
+    except Exception as e:
+            logger_error.exception(e)
+    return songs_list,final_song_list,full_country_list,aliases,ear_count,ear_year,ear_rel
+
+
+def get_list_from_normal_release((release,ear_count,ear_year,ear_rel)):
+        songs_list = []
+        Iscompilation = False
+        try:
+            #curr_album = release
+            filename = release
+            with codecs.open(filename,"r","utf-8") as input1:
+                curr_album = json.load(input1)
+            earlier_year_skip = False #skip for the albums which have no artist attched to them
+            if('formats' in curr_album and IsReleaseCollection(curr_album['formats']) == True):
+                #print curr_album['formats']
+                Iscompilation  = True
+            #print len(curr_album['tracks'])
+
+            for track in curr_album['tracks']:
+
+                if(track == None):
+                    continue
+                if(track['position'] == "" and track['duration'] == ""):
+                    #print track['title']
+                    continue
+                if(track['title'] == ""):
+                    continue
+                bskip = False
+                song = {}
+                if(curr_album['released_date'] != None):
+                        curr_album['released_date'] = get_released_date(curr_album['released_date'])
+                temp_year_album = 0
+                #temp_year_album = GetYearFromTitle(curr_album['title'])
+                #print temp_year_album
+                if(curr_album['released_date'] != None and temp_year_album != 0):
+                    if(str(curr_album['released_date']).split('-')[0] != ''):
+                        curr_year = int(str(curr_album['released_date']).split('-')[0])
+                        if(curr_year >2020):
+                            curr_year = 1001#print 'year greater than 2020'
+                    else:
+                        curr_year = 1001
+                    if(curr_year == 1001 or (curr_year > int(temp_year_album))):
+                        curr_album['released_date'] = str(temp_year_album)
+                elif(temp_year_album != 0):
+                    curr_album['released_date'] = str(temp_year_album)
+                #print curr_album['released_date']
+                song['styles'] = curr_album['styles']
+                song['genres'] = curr_album['genres']
+                song['year'] = curr_album['released_date']
+                song['country'] = curr_album['country']
+                song['featArtists'] = []
+                song['featArtistsIds'] = []
+                song['connectors'] = []
+                song['extraArtists'] = []
+                song['extraArtistsconnectors'] = []
+                song['release_Id'] = curr_album['release_id']
+                song['masterRelease'] = curr_album['release_id']
+                song['masterGenres'] = curr_album['genres']
+                song['masterStyles'] = curr_album['styles']
+                song['isCompilation'] = Iscompilation
+                for artist in curr_album['releaseartists']:
+                    if(artist == None):
+                        continue
+                    artist['artist_name'] = re.sub(r'\(.*?\)', '', artist['artist_name']).strip().lower()
+                    if(', the' in artist['artist_name'].lower()):
+                                artist['artist_name'] = artist['artist_name'].lower().replace(', the','')
+                                artist['artist_name'] = 'the '+ artist['artist_name']
+                    if(artist['position'] == 1):
+                        song['artistName'] = re.sub(r'\(.*?\)', '', artist['artist_name'].lower()).strip()
+                        #print song['artistName']
+                        #print artist['artist_id']
+                        song['artist_id'] = artist['artist_id']
+                        #add anvs for the main artist alone
+                        if('anv' in artist and artist['anv'] != None):
+                            song['anv'] = artist['anv']
+                        if(artist['join_relation'] != None):
+                            song['connectors'].append(artist['join_relation'])
+                    elif(artist['artist_name'].lower() not in song['featArtists'] and ('artistName' not in song or (artist['artist_name'].lower() != song['artistName'].lower()))):
+                        song['featArtists'].append(artist['artist_name'].lower())
+                        if(artist['join_relation'] != None):
+                            song['connectors'].append(artist['join_relation'])
+                if('artists' in track and len(track['artists']) > 1):
+                    for artist in track['artists']:
+                        if(artist == None):
+                            continue
+                        if(artist['artist_id'] == 355):
+                                earlier_year_skip = True
+                                bskip = True
+                    retlist = GetArtist(track['artists'])
+                    if(retlist[0] != None):
+                        song['featArtists'] = retlist[2]
+                        song['connectors'] = retlist[3]
+                        song['artistName'] = retlist[0]
+                        song['artist_id'] = retlist[1]
+                if(bskip == True):
+                    continue
+                if('extraartists' in track and track['extraartists'] != None):
+                        extartists = track['extraartists']
+                        for extart in extartists:
+                            if(extart == None):
+                                continue
+                            extart['artist_name'] = re.sub(r'\(.*?\)', '', extart['artist_name']).strip().lower()
+                            if(', the' in extart['artist_name'].lower()):
+                                extart['artist_name'] = extart['artist_name'].lower().replace(', the','')
+                                extart['artist_name'] = 'the '+ extart['artist_name']
+                            if('role' in extart and extart['role'] != None):
+                                if(extart['role'].lower() == 'featuring' and ('artistName' not in song or (extart['artist_name'].lower() != song['artistName'].lower()))):
+                                    if(extart['artist_name'] not in song['featArtists']):
+                                        song['featArtists'].append(extart['artist_name'].lower())
+                                    if(extart['role'] not in song['connectors']):
+                                        song['connectors'].append(extart['role'])
+                                else:
+                                    song['extraArtists'].append(extart['artist_name'].lower())
+                                    song['extraArtistsconnectors'].append(extart['role'])
+
+                song['name'] = track['title']
+                song['name'] = remove_stemwords(song['name'])
+                if(song['name'] == ''):
+                        song['name'] = track['title']
+
+                if('duration' in curr_album):
+                    song['duration'] = track['duration']
+                albumInfo = {}
+                albumInfo['albumName'] = curr_album['title']
+                albumInfo['year'] = curr_album['released_date']
+                albumInfo['country'] = curr_album['country']
+                '''if(curr_album['country'] not in full_country_list):
+                    full_country_list[curr_album['country']] = 1
+                else:
+                    full_country_list[curr_album['country']] = full_country_list[curr_album['country']] + 1'''
+                albumInfo['language'] = "English"
+                song['albumInfo'] = [albumInfo]
+                if(CheckifSongsExistsinSolr(song['name'],song['artistName'],song['featArtists']) == False):
+                    songs_list.append(song)
+                if(song['isCompilation'] == True):
+                    earlier_year_skip = True
+            if(earlier_year_skip == False):
+                option = check(curr_album['released_date'],ear_year)
+                if(option == 3 and ear_rel== False):
+                    ear_count = curr_album['country']
+                    ear_year = curr_album['released_date']
+                    ear_rel = False
+                if(option == 1):
+                        ear_count = curr_album['country']
+                        ear_year = curr_album['released_date']
+        
+        except Exception as e:
+            logger_error.exception(e)
+        print len(songs_list)
+        return songs_list,ear_count
+
+
 def get_song_list_master(directory,songs_list,full_country_list,aliases,ear_count,ear_year,ear_rel,full_song_list):
+    start_time = datetime.now()
     releases_list = []
     global prev_time
     global IsIncremental
@@ -665,10 +861,405 @@ def get_song_list_master(directory,songs_list,full_country_list,aliases,ear_coun
                             ear_conflict = False
         except Exception as e:
             logger_error.exception(e)
+        logger_decisions.error('before merging master files '+str(datetime.now() - start_time))
         final_song_list = GetUniquesongs(release_song_list,final_song_list,False,False,ear_count,full_song_list)
         final_song_list = GetUniquesongs(curr_song_list,final_song_list,False,True,ear_count,full_song_list)
-
+    logger_decisions.error('completed master files '+str(datetime.now() - start_time))
     return combined_songs_list,full_country_list,aliases,ear_count,ear_year,ear_rel,ear_conflict,final_song_list
+
+
+
+
+def get_song_list_master_new(directory,songs_list,full_country_list,aliases,ear_count,ear_year,ear_rel,full_song_list):
+    releases_list = []
+    start_time = datetime.now()
+    global prev_time
+    global IsIncremental
+    retVal = checkpreviousfull(directory)
+    if((IsIncremental == 1 or IsIncremental == 3) and retVal == 1):
+        master_list = glob.glob(directory+"/master*.json")
+        for fileName in master_list:
+            if( os.path.getmtime(fileName) > prev_time):
+                '''with codecs.open(fileName,"r","utf-8") as input1:
+                    curr_master = json.load(input1)
+                    releases_list.append(curr_master)'''
+                releases_list.append(fileName)
+        #print prev_time
+        #print releases_list
+    else:
+        releases_list = []
+        for filename in glob.glob(directory+"/master*.json"):
+            releases_list.append(filename)
+            '''with codecs.open(filename,"r","utf-8") as input1:
+                    curr_master = json.load(input1)
+                    releases_list.append(curr_master)'''
+    ear_conflict = False
+    release_song_list = []
+    final_song_list = {}
+    releases_list = sorted(releases_list)
+    #release_pool = Pool()
+    #songs_pool =Pool(processes=15)
+    #results = songs_pool.imap(get_list_from_song,releases_list)
+    with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
+        return_pool = executor.map(get_list_from_release,zip(releases_list,repeat(ear_count),repeat(ear_year),repeat(ear_rel)))        
+    #songs_pool.close()
+    #songs_pool.join()
+    #get_list_from_song(releases_list[0])
+    '''for release in releases_list:
+        release_song_list = []
+        curr_song_list =[]
+        Iscompilation  = False
+        try:
+            #curr_master = release
+            filename = release
+            with codecs.open(filename,"r","utf-8") as input1:
+                curr_master = json.load(input1)
+            release_album = str(curr_master['main_release'])
+            earlier_year_skip = False #skip for the albums which have no artist attched to them
+            release_album = str(curr_master['main_release'])
+            remove_nulls = [k for k in  curr_master['releaselist'] if k!= None]
+            sorted_releases_list = sorted(remove_nulls, key=lambda k: int(k['release_id']))
+            for curr_album in sorted_releases_list:
+                earlier_year_skip = False
+                curr_rel = False
+                #print curr_album['formats']
+                if('formats' in curr_album and IsReleaseCollection(curr_album['formats']) == True):
+                    #print curr_album['formats']
+                    Iscompilation  = True
+                    #continue
+                #print curr_album['formats']
+                if(curr_album == None):
+                    continue
+                if(curr_album['release_id'] == release_album):
+                    curr_rel = True
+                    if(curr_album['country'] not in full_country_list):
+                            full_country_list[curr_album['country']] = 1
+                    else:
+                            full_country_list[curr_album['country']] = full_country_list[curr_album['country']] + 1
+                else:
+                    earlier_year_skip = True
+                temp_year_album = 0
+                #temp_year_album = GetYearFromTitle(curr_album['title'])
+                if(curr_album['released_date'] != None and temp_year_album != 0):
+                    if(str(curr_album['released_date']).split('-')[0] != ''):
+                        curr_year = int(str(curr_album['released_date']).split('-')[0])
+                    else:
+                        curr_year = 1001
+                    if(curr_year == 1001 or (curr_year > int(temp_year_album))):
+                        curr_album['released_date'] = str(temp_year_album)
+                elif(temp_year_album != 0):
+                    curr_album['released_date'] = str(temp_year_album)
+                for track in curr_album['tracks']:
+                    if(track == None):
+                        continue
+                    if(track['position'] == "" and track['duration'] == ""):
+                        #print track['title']
+                        continue
+                    if(track['title'] == ""):
+                        continue
+
+                    song = {}
+                    if(curr_album['released_date'] != None):
+                        curr_album['released_date'] = get_released_date(curr_album['released_date'])
+                    song['styles'] = curr_album['styles']
+                    song['genres'] = curr_album['genres']
+                    song['year'] = curr_album['released_date']
+                    print song['year']
+                    song['country'] = curr_album['country']
+                    song['featArtists'] = []
+                    song['connectors'] = []
+                    song['extraArtists'] = []
+                    song['extraArtistsconnectors'] = []
+                    song['release_Id'] = curr_album['release_id']
+                    song['masterRelease'] = curr_master['id']
+                    song['masterGenres'] = curr_master['genres']
+                    song['masterStyles'] = curr_master['styles']
+                    song['isCompilation'] = Iscompilation
+                    #if unknown artist present in the list of artist,skip the album
+                    bskip = False
+
+                    if(curr_album['release_id'] == release_album):
+                        song['release_album'] = True
+                    #Get the release artists
+                    for artist in curr_album['releaseartists']:
+                        if(artist == None):
+                            continue
+                        artist['artist_name'] = re.sub(r'\(.*?\)', '', artist['artist_name']).strip().lower()
+                        if(', the' in artist['artist_name'].lower()):
+                                artist['artist_name'] = artist['artist_name'].lower().replace(', the','')
+                                artist['artist_name'] = 'the '+ artist['artist_name']
+                        if(artist['position'] == 1):
+                            song['artistName'] = re.sub(r'\(.*?\)', '', artist['artist_name'].lower()).strip()
+                            song['artist_id'] = artist['artist_id']
+                            #add anvs for the main artist alone
+                            if('anv' in artist and artist['anv'] != None):
+                                song['anv'] = artist['anv']
+                            if(artist['join_relation'] != None):
+                                song['connectors'].append(artist['join_relation'])
+                        elif(artist['artist_name'].lower() not in song['featArtists'] and ('artistName' not in song or (artist['artist_name'].lower() != song['artistName'].lower()))):
+                            song['featArtists'].append(artist['artist_name'].lower())
+                            if(artist['join_relation'] != None):
+                                song['connectors'].append(artist['join_relation'])
+                    if('artists' in track and len(track['artists']) > 1):
+                        for artist in track['artists']:
+                            if(artist == None):
+                                continue
+                            if(artist['artist_id'] == 355):
+                                bskip = True
+                        retlist = GetArtist(track['artists'])
+                        if(retlist[0] != None):
+                            song['featArtists'] = retlist[2]
+                            song['connectors'] = retlist[3]
+                            song['artistName'] = retlist[0]
+                            song['artist_id'] = retlist[1]
+                    if(bskip == True):
+                        earlier_year_skip = True
+                        continue
+                    if('extraartists' in track and track['extraartists'] != None):
+                        extartists = track['extraartists']
+                        for extart in extartists:
+                            if(extart == None):
+                                continue
+                            extart['artist_name'] = re.sub(r'\(.*?\)', '', extart['artist_name']).strip().lower()
+                            if(', the' in extart['artist_name'].lower()):
+                                        extart['artist_name'] = extart['artist_name'].lower().replace(', the','')
+                                        extart['artist_name'] = 'the '+ extart['artist_name']
+                            if('role' in extart and extart['role'] != None):
+                                if(extart['role'].lower() == 'featuring'):
+                                    if(extart['artist_name'].lower() not in song['featArtists'] and ('artistName' not in song or (extart['artist_name'].lower() != song['artistName'].lower()))):
+                                        song['featArtists'].append(extart['artist_name'].lower())
+                                    if(extart['role'] not in song['connectors']):
+                                        song['connectors'].append(extart['role'])
+                                else:
+                                    song['extraArtists'].append(extart['artist_name'].lower())
+                                    song['extraArtistsconnectors'].append(extart['role'])
+
+
+                    song['name'] = track['title']
+                    song['name'] = remove_stemwords(song['name'])
+                    if(song['name'] == ''):
+                        song['name'] = track['title']
+                    #song['name'] = song['name'].replace("?",'').strip()
+                    if('duration' in curr_album):
+                        song['duration'] = track['duration']
+                    albumInfo = {}
+                    albumInfo['albumName'] = curr_album['title']
+                    albumInfo['year'] = curr_album['released_date']
+                    albumInfo['country'] = curr_album['country']
+                    albumInfo['language'] = "English"
+                    song['albumInfo'] = [albumInfo]
+                    if(CheckifSongsExistsinSolr(song['name'],song['artistName'],song['featArtists']) == False):
+                        if(curr_rel == True):
+                            release_song_list.append(song)
+                        else:
+                            curr_song_list.append(song)
+                        combined_songs_list.append(song)
+                    if(song['isCompilation'] == True):
+                        earlier_year_skip = True
+                    if(earlier_year_skip == False):
+                        option = check(curr_album['released_date'],ear_year)
+                        if(option == 3 and ear_rel== False and curr_rel == True):
+                            ear_count = curr_album['country']
+                            ear_year = curr_album['released_date']
+                            ear_rel = curr_rel
+                        elif(option ==3 and curr_rel == True):
+                            if(ear_count != curr_album['country']):
+                                ear_conflict = True
+                        if(option == 1):
+                            ear_count = curr_album['country']
+                            ear_year = curr_album['released_date']
+                            ear_rel = curr_rel
+                            ear_conflict = False
+        except Exception as e:
+            logger_error.exception(e)'''
+    combined_songs_list = []
+    #release_song_list,curr_song_list,full_song_list,ear_count
+    logger_decisions.error('before merging master files '+str(datetime.now() - start_time))
+    logger_decisions.error(len(list(return_pool)))
+    for result in return_pool:
+        combined_songs_list = combined_songs_list + result[3]
+        final_song_list = GetUniquesongs(result[0],final_song_list,False,False,result[2],full_song_list)
+        final_song_list = GetUniquesongs(result[1],final_song_list,False,True,result[2],full_song_list)
+    logger_decisions.error('completed master files '+str(datetime.now() - start_time))
+    return combined_songs_list,full_country_list,aliases,ear_count,ear_year,ear_rel,ear_conflict,final_song_list
+
+
+def get_list_from_release((release,ear_count,ear_year,ear_rel)):
+    release_song_list = []
+    curr_song_list =[]
+    combined_songs_list = []
+    full_country_list = {}
+    Iscompilation  = False
+    try:
+            #curr_master = release
+            filename = release
+            with codecs.open(filename,"r","utf-8") as input1:
+                curr_master = json.load(input1)
+            release_album = str(curr_master['main_release'])
+            earlier_year_skip = False #skip for the albums which have no artist attched to them
+            release_album = str(curr_master['main_release'])
+            remove_nulls = [k for k in  curr_master['releaselist'] if k!= None]
+            sorted_releases_list = sorted(remove_nulls, key=lambda k: int(k['release_id']))
+            for curr_album in sorted_releases_list:
+                earlier_year_skip = False
+                curr_rel = False
+                #print curr_album['formats']
+                if('formats' in curr_album and IsReleaseCollection(curr_album['formats']) == True):
+                    #print curr_album['formats']
+                    Iscompilation  = True
+                    #continue
+                #print curr_album['formats']
+                if(curr_album == None):
+                    continue
+                if(curr_album['release_id'] == release_album):
+                    curr_rel = True
+                    if(curr_album['country'] not in full_country_list):
+                            full_country_list[curr_album['country']] = 1
+                    else:
+                            full_country_list[curr_album['country']] = full_country_list[curr_album['country']] + 1
+                else:
+                    earlier_year_skip = True
+                temp_year_album = 0
+                #temp_year_album = GetYearFromTitle(curr_album['title'])
+                if(curr_album['released_date'] != None and temp_year_album != 0):
+                    if(str(curr_album['released_date']).split('-')[0] != ''):
+                        curr_year = int(str(curr_album['released_date']).split('-')[0])
+                    else:
+                        curr_year = 1001
+                    if(curr_year == 1001 or (curr_year > int(temp_year_album))):
+                        curr_album['released_date'] = str(temp_year_album)
+                elif(temp_year_album != 0):
+                    curr_album['released_date'] = str(temp_year_album)
+                for track in curr_album['tracks']:
+                    if(track == None):
+                        continue
+                    if(track['position'] == "" and track['duration'] == ""):
+                        #print track['title']
+                        continue
+                    if(track['title'] == ""):
+                        continue
+
+                    song = {}
+                    if(curr_album['released_date'] != None):
+                        curr_album['released_date'] = get_released_date(curr_album['released_date'])
+                    song['styles'] = curr_album['styles']
+                    song['genres'] = curr_album['genres']
+                    song['year'] = curr_album['released_date']
+                    print song['year']
+                    song['country'] = curr_album['country']
+                    song['featArtists'] = []
+                    song['connectors'] = []
+                    song['extraArtists'] = []
+                    song['extraArtistsconnectors'] = []
+                    song['release_Id'] = curr_album['release_id']
+                    song['masterRelease'] = curr_master['id']
+                    song['masterGenres'] = curr_master['genres']
+                    song['masterStyles'] = curr_master['styles']
+                    song['isCompilation'] = Iscompilation
+                    #if unknown artist present in the list of artist,skip the album
+                    bskip = False
+
+                    if(curr_album['release_id'] == release_album):
+                        song['release_album'] = True
+                    #Get the release artists
+                    for artist in curr_album['releaseartists']:
+                        if(artist == None):
+                            continue
+                        artist['artist_name'] = re.sub(r'\(.*?\)', '', artist['artist_name']).strip().lower()
+                        if(', the' in artist['artist_name'].lower()):
+                                artist['artist_name'] = artist['artist_name'].lower().replace(', the','')
+                                artist['artist_name'] = 'the '+ artist['artist_name']
+                        if(artist['position'] == 1):
+                            song['artistName'] = re.sub(r'\(.*?\)', '', artist['artist_name'].lower()).strip()
+                            song['artist_id'] = artist['artist_id']
+                            #add anvs for the main artist alone
+                            if('anv' in artist and artist['anv'] != None):
+                                song['anv'] = artist['anv']
+                            if(artist['join_relation'] != None):
+                                song['connectors'].append(artist['join_relation'])
+                        elif(artist['artist_name'].lower() not in song['featArtists'] and ('artistName' not in song or (artist['artist_name'].lower() != song['artistName'].lower()))):
+                            song['featArtists'].append(artist['artist_name'].lower())
+                            if(artist['join_relation'] != None):
+                                song['connectors'].append(artist['join_relation'])
+                    if('artists' in track and len(track['artists']) > 1):
+                        for artist in track['artists']:
+                            if(artist == None):
+                                continue
+                            if(artist['artist_id'] == 355):
+                                bskip = True
+                        retlist = GetArtist(track['artists'])
+                        if(retlist[0] != None):
+                            song['featArtists'] = retlist[2]
+                            song['connectors'] = retlist[3]
+                            song['artistName'] = retlist[0]
+                            song['artist_id'] = retlist[1]
+                    if(bskip == True):
+                        earlier_year_skip = True
+                        continue
+                    if('extraartists' in track and track['extraartists'] != None):
+                        extartists = track['extraartists']
+                        for extart in extartists:
+                            if(extart == None):
+                                continue
+                            extart['artist_name'] = re.sub(r'\(.*?\)', '', extart['artist_name']).strip().lower()
+                            if(', the' in extart['artist_name'].lower()):
+                                        extart['artist_name'] = extart['artist_name'].lower().replace(', the','')
+                                        extart['artist_name'] = 'the '+ extart['artist_name']
+                            if('role' in extart and extart['role'] != None):
+                                if(extart['role'].lower() == 'featuring'):
+                                    if(extart['artist_name'].lower() not in song['featArtists'] and ('artistName' not in song or (extart['artist_name'].lower() != song['artistName'].lower()))):
+                                        song['featArtists'].append(extart['artist_name'].lower())
+                                    if(extart['role'] not in song['connectors']):
+                                        song['connectors'].append(extart['role'])
+                                else:
+                                    song['extraArtists'].append(extart['artist_name'].lower())
+                                    song['extraArtistsconnectors'].append(extart['role'])
+
+
+                    song['name'] = track['title']
+                    song['name'] = remove_stemwords(song['name'])
+                    if(song['name'] == ''):
+                        song['name'] = track['title']
+                    #song['name'] = song['name'].replace("?",'').strip()
+                    if('duration' in curr_album):
+                        song['duration'] = track['duration']
+                    albumInfo = {}
+                    albumInfo['albumName'] = curr_album['title']
+                    albumInfo['year'] = curr_album['released_date']
+                    albumInfo['country'] = curr_album['country']
+                    '''if(curr_rel == True):
+                        if(curr_album['country'] not in full_country_list):
+                            full_country_list[curr_album['country']] = 1
+                        else:
+                            full_country_list[curr_album['country']] = full_country_list[curr_album['country']] + 1'''
+                    albumInfo['language'] = "English"
+                    song['albumInfo'] = [albumInfo]
+                    if(CheckifSongsExistsinSolr(song['name'],song['artistName'],song['featArtists']) == False):
+                        if(curr_rel == True):
+                            release_song_list.append(song)
+                        else:
+                            curr_song_list.append(song)
+                        combined_songs_list.append(song)
+                    if(song['isCompilation'] == True):
+                        earlier_year_skip = True
+                    if(earlier_year_skip == False):
+                        option = check(curr_album['released_date'],ear_year)
+                        if(option == 3 and ear_rel== False and curr_rel == True):
+                            ear_count = curr_album['country']
+                            ear_year = curr_album['released_date']
+                            ear_rel = curr_rel
+                        elif(option ==3 and curr_rel == True):
+                            if(ear_count != curr_album['country']):
+                                ear_conflict = True
+                        if(option == 1):
+                            ear_count = curr_album['country']
+                            ear_year = curr_album['released_date']
+                            ear_rel = curr_rel
+                            ear_conflict = False
+    except Exception as e:
+        logger_error.exception(e)
+    return release_song_list,curr_song_list,ear_count,combined_songs_list
+
 
 
 def checkIfSongExists(curr_song,songs_list):
@@ -689,7 +1280,7 @@ def checkIfSongExists(curr_song,songs_list):
         except Exception as ex:
             #logger_error.error("fix soundex error")
             #print 'soundex error'
-            pass
+            sys.exc_clear()
         if('(' in song.lower() and '(' in song_name.lower()):
             parmatch,tryagain = getparanthesismatch(song.lower(),song_name.lower())
             if(parmatch == True):
@@ -720,7 +1311,7 @@ def checkIfSongExists(curr_song,songs_list):
 
 
 
-def GetUniquesongs(songs_list,final_song_list,isMaster,same_album,ear_count,full_songs_list = []):
+def GetUniquesongs(songs_list,final_song_list,isMaster,same_album,ear_count,full_songs_list = {}):
     #artist_country = None
     for song in songs_list:
         keySong = song['name'].lower()
@@ -737,10 +1328,13 @@ def GetUniquesongs(songs_list,final_song_list,isMaster,same_album,ear_count,full
         #print song['masterGenres'],song['masterStyles']
         if(keySong not in final_song_list):
             ''' First check in the full songlist. '''
-            isPresentSong,matchedsong = checkIfSongExists(song,full_songs_list)
-            if(isPresentSong == True):
+            #isPresentSong,matchedsong = checkIfSongExists(song,full_songs_list)
+            if(keySong in full_songs_list):
+                print 'Skipping'
                 continue
-            isPresentSong,matchedsong = checkIfSongExists(song,final_song_list)
+            #if(isPresentSong == True):
+            #    continue
+            #isPresentSong,matchedsong = checkIfSongExists(song,final_song_list)
             if(isPresentSong == False):
                 song['genres_count'] = {}
                 song['styles_count'] = {}
@@ -833,218 +1427,6 @@ def GetUniquesongs(songs_list,final_song_list,isMaster,same_album,ear_count,full
     return final_song_list
 
 
-def get_song_list_master(directory,songs_list,full_country_list,aliases,ear_count,ear_year,ear_rel,full_song_list):
-    releases_list = []
-    global prev_time
-    global IsIncremental
-    retVal = checkpreviousfull(directory)
-    if((IsIncremental == 1 or IsIncremental == 3) and retVal == 1):
-        master_list = glob.glob(directory+"/master*.json")
-        for fileName in master_list:
-            if( os.path.getmtime(fileName) > prev_time):
-                '''with codecs.open(fileName,"r","utf-8") as input1:
-                    curr_master = json.load(input1)
-                    releases_list.append(curr_master)'''
-                releases_list.append(fileName)
-        #print prev_time
-        #print releases_list
-    else:
-        releases_list = []
-        for filename in glob.glob(directory+"/master*.json"):
-            releases_list.append(filename)
-            '''with codecs.open(filename,"r","utf-8") as input1:
-                    curr_master = json.load(input1)
-                    releases_list.append(curr_master)'''
-    ear_conflict = False
-    release_song_list = []
-    combined_songs_list = []
-    final_song_list = {}
-    releases_list = sorted(releases_list)
-    for release in releases_list:
-        release_song_list = []
-        curr_song_list =[]
-        Iscompilation  = False
-        try:
-            #curr_master = release
-            filename = release
-            with codecs.open(filename,"r","utf-8") as input1:
-                curr_master = json.load(input1)
-            release_album = str(curr_master['main_release'])
-            earlier_year_skip = False #skip for the albums which have no artist attched to them
-            release_album = str(curr_master['main_release'])
-            remove_nulls = [k for k in  curr_master['releaselist'] if k!= None]
-            sorted_releases_list = sorted(remove_nulls, key=lambda k: int(k['release_id']))
-            for curr_album in sorted_releases_list:
-                earlier_year_skip = False
-                curr_rel = False
-                #print curr_album['formats']
-                if('formats' in curr_album and IsReleaseCollection(curr_album['formats']) == True):
-                    #print curr_album['formats']
-                    Iscompilation  = True
-                    #continue
-                #print curr_album['formats']
-                if(curr_album == None):
-                    continue
-                if(curr_album['release_id'] == release_album):
-                    curr_rel = True
-                    if(curr_album['country'] not in full_country_list):
-                            full_country_list[curr_album['country']] = 1
-                    else:
-                            full_country_list[curr_album['country']] = full_country_list[curr_album['country']] + 1
-                else:
-                    earlier_year_skip = True
-                temp_year_album = 0
-                #temp_year_album = GetYearFromTitle(curr_album['title'])
-                if(curr_album['released_date'] != None and temp_year_album != 0):
-                    if(str(curr_album['released_date']).split('-')[0] != ''):
-                        curr_year = int(str(curr_album['released_date']).split('-')[0])
-                    else:
-                        curr_year = 1001
-                    if(curr_year == 1001 or (curr_year > int(temp_year_album))):
-                        curr_album['released_date'] = str(temp_year_album)
-                elif(temp_year_album != 0):
-                    curr_album['released_date'] = str(temp_year_album)
-                for track in curr_album['tracks']:
-                    if(track == None):
-                        continue
-                    if(track['position'] == "" and track['duration'] == ""):
-                        #print track['title']
-                        continue
-                    if(track['title'] == ""):
-                        continue
-
-                    song = {}
-                    if(curr_album['released_date'] != None):
-                        curr_album['released_date'] = get_released_date(curr_album['released_date'])
-                    song['styles'] = curr_album['styles']
-                    song['genres'] = curr_album['genres']
-                    song['year'] = curr_album['released_date']
-                    print song['year']
-                    song['country'] = curr_album['country']
-                    song['featArtists'] = []
-                    song['connectors'] = []
-                    song['extraArtists'] = []
-                    song['extraArtistsconnectors'] = []
-                    song['release_Id'] = curr_album['release_id']
-                    song['masterRelease'] = curr_master['id']
-                    song['masterGenres'] = curr_master['genres']
-                    song['masterStyles'] = curr_master['styles']
-                    song['isCompilation'] = Iscompilation
-                    #if unknown artist present in the list of artist,skip the album
-                    bskip = False
-
-                    if(curr_album['release_id'] == release_album):
-                        song['release_album'] = True
-                    #Get the release artists
-                    for artist in curr_album['releaseartists']:
-                        if(artist == None):
-                            continue
-                        artist['artist_name'] = re.sub(r'\(.*?\)', '', artist['artist_name']).strip().lower()
-                        if(', the' in artist['artist_name'].lower()):
-                                artist['artist_name'] = artist['artist_name'].lower().replace(', the','')
-                                artist['artist_name'] = 'the '+ artist['artist_name']
-                        if(artist['position'] == 1):
-                            song['artistName'] = re.sub(r'\(.*?\)', '', artist['artist_name'].lower()).strip()
-                            song['artist_id'] = artist['artist_id']
-                            #add anvs for the main artist alone
-                            if('anv' in artist and artist['anv'] != None):
-                                song['anv'] = artist['anv']
-                            if(artist['join_relation'] != None):
-                                song['connectors'].append(artist['join_relation'])
-                        elif(artist['artist_name'].lower() not in song['featArtists'] and ('artistName' not in song or (artist['artist_name'].lower() != song['artistName'].lower()))):
-                            song['featArtists'].append(artist['artist_name'].lower())
-                            if(artist['join_relation'] != None):
-                                song['connectors'].append(artist['join_relation'])
-                    if('artists' in track and len(track['artists']) > 1):
-                        for artist in track['artists']:
-                            if(artist == None):
-                                continue
-                            if(artist['artist_id'] == 355):
-                                bskip = True
-                        retlist = GetArtist(track['artists'])
-                        if(retlist[0] != None):
-                            song['featArtists'] = retlist[2]
-                            song['connectors'] = retlist[3]
-                            song['artistName'] = retlist[0]
-                            song['artist_id'] = retlist[1]
-                    if(bskip == True):
-                        earlier_year_skip = True
-                        continue
-                    if('extraartists' in track and track['extraartists'] != None):
-                        extartists = track['extraartists']
-                        for extart in extartists:
-                            if(extart == None):
-                                continue
-                            extart['artist_name'] = re.sub(r'\(.*?\)', '', extart['artist_name']).strip().lower()
-                            if(', the' in extart['artist_name'].lower()):
-                                        extart['artist_name'] = extart['artist_name'].lower().replace(', the','')
-                                        extart['artist_name'] = 'the '+ extart['artist_name']
-                            if('role' in extart and extart['role'] != None):
-                                if(extart['role'].lower() == 'featuring'):
-                                    if(extart['artist_name'].lower() not in song['featArtists'] and ('artistName' not in song or (extart['artist_name'].lower() != song['artistName'].lower()))):
-                                        song['featArtists'].append(extart['artist_name'].lower())
-                                    if(extart['role'] not in song['connectors']):
-                                        song['connectors'].append(extart['role'])
-                                else:
-                                    song['extraArtists'].append(extart['artist_name'].lower())
-                                    song['extraArtistsconnectors'].append(extart['role'])
-
-
-                    song['name'] = track['title']
-                    song['name'] = remove_stemwords(song['name'])
-                    if(song['name'] == ''):
-                        song['name'] = track['title']
-                    #song['name'] = song['name'].replace("?",'').strip()
-                    if('duration' in curr_album):
-                        song['duration'] = track['duration']
-                    albumInfo = {}
-                    albumInfo['albumName'] = curr_album['title']
-                    albumInfo['year'] = curr_album['released_date']
-                    albumInfo['country'] = curr_album['country']
-                    '''if(curr_rel == True):
-                        if(curr_album['country'] not in full_country_list):
-                            full_country_list[curr_album['country']] = 1
-                        else:
-                            full_country_list[curr_album['country']] = full_country_list[curr_album['country']] + 1'''
-                    albumInfo['language'] = "English"
-                    song['albumInfo'] = [albumInfo]
-                    if(CheckifSongsExistsinSolr(song['name'],song['artistName'],song['featArtists']) == False):
-                        if(curr_rel == True):
-                            release_song_list.append(song)
-                        else:
-                            curr_song_list.append(song)
-                        combined_songs_list.append(song)
-                    if(song['isCompilation'] == True):
-                        earlier_year_skip = True
-                    if(earlier_year_skip == False):
-                        option = check(curr_album['released_date'],ear_year)
-                        if(option == 3 and ear_rel== False and curr_rel == True):
-                            ear_count = curr_album['country']
-                            ear_year = curr_album['released_date']
-                            ear_rel = curr_rel
-                        elif(option ==3 and curr_rel == True):
-                            if(ear_count != curr_album['country']):
-                                ear_conflict = True
-                        if(option == 1):
-                            ear_count = curr_album['country']
-                            ear_year = curr_album['released_date']
-                            ear_rel = curr_rel
-                            ear_conflict = False
-        except Exception as e:
-            logger_error.exception(e)
-        final_song_list = GetUniquesongs(release_song_list,final_song_list,False,False,ear_count,full_song_list)
-        final_song_list = GetUniquesongs(curr_song_list,final_song_list,False,True,ear_count,full_song_list)
-
-    return combined_songs_list,full_country_list,aliases,ear_count,ear_year,ear_rel,ear_conflict,final_song_list
-
-
-
-
-
-
-
-
-
 
 
 
@@ -1083,14 +1465,15 @@ def crawlArtist(directory):
                 logger_error.exception(e)
             parallel_songs_list = pickle.load(fread)
             full_song_list = GetSongsFromFullList(parallel_songs_list)
-        songs_list,full_country_list,aliases,ear_count,ear_year,ear_rel,ear_conflict,final_song_list = get_song_list_master(directory,songs_list,full_country_list,aliases,ear_count,ear_year,ear_rel,full_song_list)
+        logger_decisions.error(directory + " -- Full songs list  -- "+str(len(full_song_list)))
+        songs_list,full_country_list,aliases,ear_count,ear_year,ear_rel,ear_conflict,final_song_list = get_song_list_master_new(directory,songs_list,full_country_list,aliases,ear_count,ear_year,ear_rel,full_song_list)
         print ear_count
         print ear_year
         if(len(songs_list) != 0):
             master_ear_count = ear_count
             master_ear_year = ear_year
             bskipflag = 1
-        songs_list,final_song_list,full_country_list,aliases,ear_count,ear_year,ear_rel = get_song_list(directory,songs_list,full_country_list,aliases,ear_count,ear_year,ear_rel,final_song_list,full_song_list)
+        songs_list,final_song_list,full_country_list,aliases,ear_count,ear_year,ear_rel = get_song_list_normal_new(directory,songs_list,full_country_list,aliases,ear_count,ear_year,ear_rel,final_song_list,full_song_list)
         print ear_count
         print ear_year
         if(bskipflag == 1):
@@ -1106,9 +1489,9 @@ def crawlArtist(directory):
         sorted_list = sorted(songs_list,key = lambda x:x['name'].lower())
         hits = 0
         misses = 0
-        if(len(sorted_list) == 0):
-            return
-    except Exception, e:
+        #if(len(sorted_list) == 0):
+        #    return
+    except Exception as e:
         logger_error.exception(e)
         return
     try:
@@ -1161,6 +1544,7 @@ def crawlArtist(directory):
                 parallel_songs_list.append(curr_elem)
 
         t3= time.time()
+        print 'parallel_songs_list'
         print len(parallel_songs_list)
         if(IsIncremental == 0 or IsIncremental ==2):
             with open(directory + '/last_full_part1.txt', 'wb') as f1:
@@ -1177,7 +1561,7 @@ def crawlArtist(directory):
             with open(directory + '/last_incr_part1.txt', 'wb') as f1:
                 f1.write(str(int(t3)))
                 f1.close()
-    except Exception, e:
+    except Exception as e:
         logger_error.exception(e)
     logger_decisions.error(directory + " -- Completed with time -- " + str(datetime.now() - start_time))
     #print parallel_songs_list
@@ -1185,6 +1569,8 @@ def crawlArtist(directory):
         with open(directory + '/getyoutubelist.txt', 'wb') as f:
 			pickle.dump(parallel_songs_list, f)
     else:
+        if(os.path.exists(directory + '/getyoutubelist_incr.txt')):
+            os.remove(directory + '/getyoutubelist_incr.txt')
         with open(directory + '/getyoutubelist_incr.txt', 'wb') as f:
 			pickle.dump(parallel_songs_list, f)
     #runYoutubeApi(directory)
