@@ -1130,6 +1130,7 @@ def generatexmls(dirlist):
     global IsIncremental
     global topnsongs
     try:
+        logger_genre.error('started for directory '+ str(directory))
         d = dirlist
         #for d in dirlist:
         if(len(d.strip()) == 0):
@@ -1168,7 +1169,7 @@ def generatexmls(dirlist):
             if(int(artistId) == 194):
                 artistId = v['artist_id']
             genXML(v,avgcnt,avgcntrece,artistId,genreCountList,artistTopGenres,country_name)
-        #logger_finished.error('Completed for directory '+ str(directory))
+        logger_genre.error('Completed for directory '+ str(directory))
     except Exception as e:
         logger_errors.exception(e)
 
