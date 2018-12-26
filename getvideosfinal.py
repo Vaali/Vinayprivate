@@ -775,7 +775,7 @@ def CheckifSongsExistsinSolr(sname,aname,fname):
             print '---Found song---'
             return True
     except Exception as e:
-        pass
+        sys.exc_clear()
         #logger_error.exception(e)
     return False
 
@@ -944,26 +944,25 @@ def runYoutubeApi(directory):
             lasttime = pickle.load(fread)
             fread.close()
         except Exception as e:
-            pass
+            sys.exc_clear()
         print str(lasttime)+'----lttt'
         currtime =0
         if(IsIncremental == 0 or IsIncremental == 2):
             infile = directory + '/getyoutubelist.txt'
         else:
             infile = directory + '/getyoutubelist_incr.txt'
-        if(os.path.exists(infile)):
+        '''if(os.path.exists(infile)):
             currtime = int(os.path.getmtime(infile))
             if(currtime < lasttime):
                 logger_decisions.error(directory + " -- runYoutubeApi Completed with time -- " + str(datetime.now() - start_time))
-                return
+                return'''
         print str(currtime)+'------'
         try:
             fread = open(infile,'r')
         except IOError as e:
-            logger_error.exception(e)
+            logger_error.error(e)
             return
         parallel_songs_list = pickle.load(fread)
-        isSleep = False
         vid = list()
         misses = 0
         hits = 0
@@ -988,11 +987,8 @@ def runYoutubeApi(directory):
                 return_pool = executor.map(getVideoFromYoutube,parallel_songs_list)
         #print len(return_pool)
         for ret_val in return_pool:
-            if(ret_val[3] == True): #getValue from threads.
-                isSleep = True;
             if(ret_val[2] == True):
                     found = found + 1
-                    print ret_val[3]
                     continue
             if(ret_val[0] == None ):
                 misses = misses+1
@@ -1018,6 +1014,8 @@ def runYoutubeApi(directory):
                 f1.write(str(int(time.time())))
                 f1.close()
         else:
+            if(os.path.exists(directory+"/dump_incr")):
+                os.remove(directory+"/dump_incr")
             write(vid,directory+"/dump_incr")
             with open(directory + '/last_incr_part2.txt', 'wb') as f1:
                 f1.write(str(int(time.time())))
@@ -1049,7 +1047,7 @@ def checkIfSongExists(curr_song,songs_list):
         except Exception as ex:
             #logger_error.error("fix soundex error")
             #print 'soundex error'
-            pass
+            sys.exc_clear()
         if('(' in song.lower() and '(' in song_name.lower()):
             parmatch,tryagain = getparanthesismatch(song.lower(),song_name.lower())
             if(parmatch == True):
@@ -1133,7 +1131,6 @@ def getVideoFromYoutube(curr_elem):
     artname = curr_elem['artistName']
     sname = curr_elem['name']
     ftartists = curr_elem['featArtists']
-    shouldsleep = False
     #print '---------------------'
     print artname
     #print '-----------------'
@@ -1144,16 +1141,16 @@ def getVideoFromYoutube(curr_elem):
             retstring = sname + '------' + artname + '-----' + ','.join(ftartists)
             return retvid,True,True,retstring
     try:
-        retvid,bret,shouldsleep = getVideo(curr_elem,0)
+        retvid,bret = getVideo(curr_elem,0)
         if('anv' in curr_elem):
             curr_elem['artistName'] = curr_elem['anv']
-            retvid,bret,shouldsleep = getVideo(curr_elem,0)
+            retvid,bret = getVideo(curr_elem,0)
             if(retvid != None):
                 for rv in retvid:
                     rv.artist = artname
         if(retvid == None):
             curr_elem['artistName'] = artname
-            retvid,bret,shouldsleep = getVideo(curr_elem,1)
+            retvid,bret = getVideo(curr_elem,1)
         else:
             emptyvid = 0
             for rv in retvid:
@@ -1161,15 +1158,15 @@ def getVideoFromYoutube(curr_elem):
                     emptyvid = 1
             if(emptyvid == 0):
                 curr_elem['artistName'] = artname
-                retvid,bret,shouldsleep = getVideo(curr_elem,1)
+                retvid,bret = getVideo(curr_elem,1)
     except Exception as e:
         logger_error.exception('getVideoFromYoutube')
-    if(retvid != None):
+    '''if(retvid != None):
         tempDictionary = retvid[0].__dict__
-        '''if('errorstr' in tempDictionary):
+        if('errorstr' in tempDictionary):
             logger_decisions.error(tempDictionary['errorstr'])
             logger_decisions.error('-----------------')'''
-    return retvid,bret,False,shouldsleep
+    return retvid,bret,False
 
 
 def getVideo(curr_elem,flag):
@@ -1222,7 +1219,7 @@ def getVideo(curr_elem,flag):
         #Apostolos
         try:
             video1 = Video()
-            video2 = Video()
+            #video2 = Video()
             video1.artist = curr_elem['artistName']
             video1.ftArtist = curr_elem['featArtists']
             video1.name = curr_elem['name']
@@ -1243,7 +1240,7 @@ def getVideo(curr_elem,flag):
                 video1.artistalias = curr_elem['artistalias']
             video1.genres = curr_elem['genres']
             video1.styles = curr_elem['styles']
-            video1,bret,shouldsleep = getYoutubeUrl(video1,flag,0)
+            video1,bret = getYoutubeUrl(video1,flag,0)
             video1.artist_id = curr_elem['artist_id']
             #print curr_elem['artist_id']
             #print curr_elem['artistName']
@@ -1256,7 +1253,7 @@ def getVideo(curr_elem,flag):
     except Exception as e:
             logger_error.exception(e)
             return None,bret
-    return [video1,video2],bret,shouldsleep
+    return [video1],bret
 
 def write(self,filename):
 	with codecs.open(filename,"w","utf-8") as output:
@@ -1756,10 +1753,6 @@ def GetArtist(artistObj):
 
 def getYoutubeUrl(video,flag,mostpopular):
     global request_count
-    #global proj_keys
-    #global blocked_keys
-    #global curr_keys
-    shouldsleep = False
     bret = False
     try:
         flist = ""
@@ -1772,11 +1765,13 @@ def getYoutubeUrl(video,flag,mostpopular):
         allArtists = video.artist.strip("-")+" "+ftartists
         key = manager.getkey()
         if(key == ""):
+            logger_error.error(manager.get_blocked_keys())
             manager.keys_exhausted()
+            logger_error.error('Waking up')
             key = manager.getkey()
             if(key == ""):
-                print 'empty key'
-                return
+                logger_error.error('empty key')
+                return None,False
         #key = "AIzaSyBEM6ijEuRqrGREP8lxZU8XzEufEMVToO0"
         if(flag == 0):
             '''if('cover' not in video.name.lower()):
@@ -1796,24 +1791,24 @@ def getYoutubeUrl(video,flag,mostpopular):
             #print searchResult
         except HTTPError as e:            
             if(e.code == 403 and "Forbidden" in e.reason):
-                logger_error.exception("Daily Limit Exceeded")
-                logger_matrix.error(manager.get_blocked_keys())
+                logger_error.error("Daily Limit Exceeded")
+                logger_error.error(manager.get_blocked_keys())
                 manager.removekey(key)
                 manager.add_blockedkey(key)
                 manager.keys_exhausted()
             else:
                 request_count = request_count + 100
                 logger_error.exception(e.message)
-            return video,bret,shouldsleep
+            return video,bret
         except URLError as e:
             request_count = request_count + 100
             logger_error.exception(e.reason)
-            return video,bret,shouldsleep
+            return video,bret
         except Exception as e:
             request_count = request_count + 100
             logger_error.exception(e)
             #print "An HTTP error %d occurred:\n%s" % (e.resp.status, e.content)
-            return video,bret,shouldsleep
+            return video,bret
         now = datetime.now()
         try:
             if searchResult.has_key('items') and len(searchResult['items'])!= 0:
@@ -1845,9 +1840,15 @@ def getYoutubeUrl(video,flag,mostpopular):
                             videoResult = simplejson.load(urlopen(videoUrl),"utf-8")
                             request_count = request_count + 7
                         except HTTPError as e:
+                            if(e.code == 403 and "Forbidden" in e.reason):
+                                logger_error.error("Daily Limit Exceeded")
+                                logger_error.error(manager.get_blocked_keys())
+                                manager.removekey(key)
+                                manager.add_blockedkey(key)
+                                manager.keys_exhausted()
                             request_count = request_count + 7
                             #erro_message = e.read()
-                            logger_error.exception(e.read())
+                            #logger_error.exception(e.read())
                             continue
                         except URLError as e:
                             request_count = request_count + 7
@@ -1976,7 +1977,7 @@ def getYoutubeUrl(video,flag,mostpopular):
     except Exception as e:
         logger_error.exception('getYoutubeUrl')
         logger_error.exception(e)
-    return video,bret,shouldsleep
+    return video,bret
 
 def checkpreviousfull(directory):
     retVal = 0
