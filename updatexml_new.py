@@ -78,8 +78,10 @@ def updateXml(filename):
             manager.keys_exhausted()
             key = manager.getkey()
             if(key == ""):
-                print 'empty key'
-                return
+                logger_matrix.error(manager.get_blocked_keys())
+                manager.keys_exhausted()
+                logger_matrix.error('Waking up')
+                key = manager.getkey()
         try:
 			oldsong = api.parse(filename)
         except Exception as e:
@@ -127,6 +129,7 @@ def updateXml(filename):
                 currentVideoStatus = videoEntry['status']['privacyStatus']
             currentPublishedDate = videoEntry['snippet']['publishedAt']
             if(currentVideoEmbedded == False or currentVideoStatus != 'public'):
+                logger_matrix.exception("Error :No items returned "+ filename + "\n")
                 movefilestodeleted(filename)
                 return
             if(int(currentVideolikes) !=0 and int(currentVideodislikes)!=0):
