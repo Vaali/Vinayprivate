@@ -277,8 +277,9 @@ def getVideo(oldsong):
 	key = manager.getkey()
 	print key
 	if(key == ""):
-            manager.keys_exhausted()
-            key = manager.getkey()
+			logger_crawl.error(manager.get_blocked_keys())
+			manager.keys_exhausted()
+			key = manager.getkey()
 	if('cover' not in songName.lower()):
 		searchUrl = "https://www.googleapis.com/youtube/v3/search?part=snippet&q=allintitle%3A"+urllib.quote_plus(str(allArtists))+"+"+urllib.quote_plus(str(songName))+"+-cover&alt=json&type=video&max-results=5&key="+key+"&videoCategoryId=10"
 		#"https://www.googleapis.com/youtube/v3/search?part=snippet&q=allintitle%3A"+urllib.quote_plus(str(allArtists))+"+"+urllib.quote_plus(str(songName))+"+-cover"+"&alt=json&type=video&channelID=UC-9-kyTW8ZkZNDHQJ6FgpwQ&max-results=5&key="+
