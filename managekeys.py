@@ -1,4 +1,4 @@
-from multiprocessing import Manager
+from multiprocessing import Manager,Lock
 import random
 from datetime import datetime, date, timedelta
 import time
@@ -7,6 +7,7 @@ import loggingmodule
 
 class ManageKeys():
     manager = Manager()
+    lock = Lock()
     blocked_keys = manager.list()
     curr_keys = manager.list()
     proj_keys = []
@@ -21,9 +22,13 @@ class ManageKeys():
 
 
     def getkey(self):
+        self.lock.acquire()
         if(len(self.curr_keys)==0):
+            self.lock.release()
             return ""
-        return self.curr_keys[random.randint(0,len(self.curr_keys)-1)]
+        retKey = self.curr_keys[random.randint(0,len(self.curr_keys)-1)]
+        self.lock.release()
+        return retKey
     
 
     def wait_for_keys(self):
@@ -40,12 +45,16 @@ class ManageKeys():
             self.logger_managedkeys.error('adding key')
 
     def removekey(self,key):
+        self.lock.acquire()
         if(key in self.curr_keys):
 		    self.curr_keys.remove(key)
+        self.lock.release()
 
     def add_blockedkey(self,key):
+        #self.lock.acquire()
         if(key not in self.blocked_keys):
 		    self.blocked_keys.append(key)
+        #self.lock.release()
 
     def keys_exhausted(self):
         if(len(self.blocked_keys) == len(self.proj_keys)):
