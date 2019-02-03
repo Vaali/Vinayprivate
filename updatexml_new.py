@@ -17,7 +17,7 @@ from solr.core import SolrException
 from itertools import repeat
 import random
 import managekeys
-
+from songsutils import is_songname_same_artistname
 
 def getMonths(currentPublishedDate):
 	now = datetime.now()	
@@ -61,6 +61,9 @@ def movefilestodeleted(filename):
 def movefilestofailed(filename):
     moveFiles(filename,'failedvideos')
 
+def movefilestowrong(filename):
+    moveFiles(filename,'wrongvideos')
+
 def getDelta(oldDate,oldViewcount,newViewcount):
 	now = datetime.now()
 	days = (now - oldDate).days
@@ -83,7 +86,10 @@ def updateXml(filename):
                 logger_matrix.error('Waking up')
                 key = manager.getkey()
         try:
-			oldsong = api.parse(filename)
+            oldsong = api.parse(filename)
+            if(is_songname_same_artistname(oldsong.songName,oldsong.artist.artistName[0]) == True):
+                movefilestowrong(filename)
+                return
         except Exception as e:
 			logger_matrix.exception("Error")
 			return
