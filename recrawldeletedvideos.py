@@ -281,13 +281,13 @@ def getVideo(oldsong):
 			manager.keys_exhausted()
 			key = manager.getkey()
 	if('cover' not in songName.lower()):
-		searchUrl = "https://www.googleapis.com/youtube/v3/search?part=snippet&q=allintitle%3A"+urllib.quote_plus(str(allArtists))+"+"+urllib.quote_plus(str(songName))+"+-cover&alt=json&type=video&max-results=5&key="+key+"&videoCategoryId=10"
-		#"https://www.googleapis.com/youtube/v3/search?part=snippet&q=allintitle%3A"+urllib.quote_plus(str(allArtists))+"+"+urllib.quote_plus(str(songName))+"+-cover"+"&alt=json&type=video&channelID=UC-9-kyTW8ZkZNDHQJ6FgpwQ&max-results=5&key="+
+		search_url = "https://www.googleapis.com/youtube/v3/search?part=snippet&q=allintitle%3A"+urllib.quote_plus(str(allArtists))+"+"+urllib.quote_plus(str(songName))+"+-cover&alt=json&type=video&maxResults=5&key="+key+"&videoCategoryId=10"
+		#"https://www.googleapis.com/youtube/v3/search?part=snippet&q=allintitle%3A"+urllib.quote_plus(str(allArtists))+"+"+urllib.quote_plus(str(songName))+"+-cover"+"&alt=json&type=video&channelID=UC-9-kyTW8ZkZNDHQJ6FgpwQ&maxResults=5&key="+
 	else:
-		searchUrl = "https://www.googleapis.com/youtube/v3/search?part=snippet&q=allintitle%3A"+urllib.quote_plus(str(allArtists))+"+"+urllib.quote_plus(str(songName))+"&alt=json&type=video&max-results=5&key="+key+"&videoCategoryId=10"
-		#"https://www.googleapis.com/youtube/v3/search?part=snippet&q=allintitle%3A"+urllib.quote_plus(str(allArtists))+"+"+urllib.quote_plus(str(songName))+"&alt=json&type=video&channelID=UC-9-kyTW8ZkZNDHQJ6FgpwQ&max-results=5&key="+
+		search_url = "https://www.googleapis.com/youtube/v3/search?part=snippet&q=allintitle%3A"+urllib.quote_plus(str(allArtists))+"+"+urllib.quote_plus(str(songName))+"&alt=json&type=video&maxResults=5&key="+key+"&videoCategoryId=10"
+		#"https://www.googleapis.com/youtube/v3/search?part=snippet&q=allintitle%3A"+urllib.quote_plus(str(allArtists))+"+"+urllib.quote_plus(str(songName))+"&alt=json&type=video&channelID=UC-9-kyTW8ZkZNDHQJ6FgpwQ&maxResults=5&key="+
 	try:
-		searchResult = simplejson.load(urllib2.urlopen(searchUrl),"utf-8")
+		searchResult = simplejson.load(urllib2.urlopen(search_url),"utf-8")
 	except HTTPError as e:
 		if(e.code == 403 and "Forbidden" in e.reason):
 			logger_crawl.error("Daily Limit Exceeded")
@@ -349,6 +349,7 @@ def getVideo(oldsong):
 						selectedVideoArtistMatch = currentVideoArtistMatch
 						selectedVideoTitle = searchEntry['snippet']['title']
 						selectedVideoUrl = "https://www.youtube.com/watch?v="+str(youtubeVideoId)
+						selectedVideoId = youtubeVideoId
 						selectedVideoPublishedDate = searchEntry['snippet']['publishedAt']
 						selectedVideoDuration = ParseTime(videoEntry['contentDetails']['duration'])
 						selectedVideolikes = currentVideolikes
@@ -367,6 +368,7 @@ def getVideo(oldsong):
 		oldsong.am = selectedVideoArtistMatch
 		oldsong.title = selectedVideoTitle
 		oldsong.published = selectedVideoPublishedDate
+		oldsong.videoId = selectedVideoId
 		m = re.search(re.compile("[0-9]{4}[-][0-9]{2}[-][0-9]{2}"),oldsong.published)
 		n = re.search(re.compile("[0-9]{2}[:][0-9]{2}[:][0-9]{2}"),oldsong.published)
 		ydate = m.group()+" "+n.group()
