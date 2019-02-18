@@ -261,7 +261,7 @@ def CalculateMatch12(oldsong,vid_title):
 
 	if(bhiphen == "true" and (songMatch == 0  or (leftMatch == 0.0 and rightMatch == 0.0))):
 		decision = "Incorrect"
-	print decision
+	#print decision
 	return decision,match,tm,sm,am
 	
 def getVideo(oldsong):
@@ -275,7 +275,7 @@ def getVideo(oldsong):
 	allArtists = oldsong.artist.artistName[0].strip("-")+" "+ftartists
 	#key = "AIzaSyB34POCUa53BcFsdPURNsvm0i6AX4kqjWo"
 	key = manager.getkey()
-	print key
+	#print key
 	if(key == ""):
 			logger_crawl.error(manager.get_blocked_keys())
 			manager.keys_exhausted()
