@@ -6,7 +6,6 @@ import simplejson
 import re
 from datetime import datetime, date, timedelta
 import os
-import shutil
 import time
 import glob
 from multiprocessing import Pool
@@ -17,7 +16,7 @@ from solr.core import SolrException
 from itertools import repeat
 import random
 import managekeys
-from songsutils import is_songname_same_artistname
+from songsutils import is_songname_same_artistname,moveFiles
 
 def getMonths(currentPublishedDate):
 	now = datetime.now()	
@@ -44,16 +43,7 @@ def getCurrentTime():
 		dd = str(now.day)
 	hh = now.hours
 	mins = now.mins
-def moveFiles(filename,movetype):
-    fname = filename[filename.rfind('/')+1:]
-    foldername = filename[:filename.rfind('/')]
-    output_directory = foldername+'/'+movetype
-    if(not os.path.exists(output_directory)):
-		os.makedirs(output_directory)
-    if(os.path.exists(os.path.join(output_directory, fname))):
-		os.remove(os.path.join(output_directory, fname))
-    dest = output_directory+'/'+fname
-    shutil.move(filename,dest)
+
 
 def movefilestodeleted(filename):
     moveFiles(filename,'deletedvideos')
