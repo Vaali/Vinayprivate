@@ -21,8 +21,8 @@ def moveFiles(filename,movetype):
     foldername = filename[:filename.rfind('/')]
     output_directory = foldername+'/'+movetype
     if(not os.path.exists(output_directory)):
-		os.makedirs(output_directory)
+      os.makedirs(output_directory)
     if(os.path.exists(os.path.join(output_directory, fname))):
-		os.remove(os.path.join(output_directory, fname))
+      os.remove(os.path.join(output_directory, fname))
     dest = output_directory+'/'+fname
     shutil.move(filename,dest)
