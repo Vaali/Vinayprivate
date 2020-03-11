@@ -875,7 +875,7 @@ def CalculateAverages(directory,topnsongs):
         if('isCompilation' in s and s['isCompilation']== True):
             continue
 	releaseyear = 2050
-        if('year' in s):
+        if('year' in s and '-' in str(s['year'])):
             releaseyear = int(str(s['year']).split('-')[0])
         if(earlier_year > releaseyear and releaseyear > 1900):
 		earlier_year = releaseyear
@@ -1130,9 +1130,10 @@ def generatexmls(dirlist):
     global IsIncremental
     global topnsongs
     try:
-        logger_genre.error('started for directory '+ str(directory))
+        logger_genre.error('started for directory '+ str(dirlist))
         d = dirlist
         #for d in dirlist:
+        print d
         if(len(d.strip()) == 0):
 			#continue
 			return
@@ -1208,6 +1209,7 @@ if __name__ == '__main__':
 				strg = os.path.join(curr_dir,sd)
 				foldlist.append(strg)
     #generatexmls(foldlist)
+    print foldlist
     try:
         p =Pool(processes=int(m))
         p.map(generatexmls,foldlist)
