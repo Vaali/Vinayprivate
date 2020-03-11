@@ -16,3 +16,5 @@ parallel_getSongs.py
 
 *.xml
 *.log.*
+*.mp3
+*.tar
