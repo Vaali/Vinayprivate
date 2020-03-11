@@ -269,7 +269,7 @@ sys.setdefaultencoding('utf8')
 if __name__ == '__main__':
 
     logger_matrix = loggingmodule.initialize_logger('updatexml','updatexmls.log')
-    manager = managekeys.ManageKeys()
+    manager = managekeys.ManageKeys(0)
     manager.reset_projkeys()
     directory = raw_input("Enter directory: ")
     if not os.path.exists(directory):
@@ -277,7 +277,7 @@ if __name__ == '__main__':
         exit()
     m = raw_input("Enter m: ")
     m=int(m)
-    choiceUpdate = int(raw_input("Enter 0 to update views \n 1 to update genretags and simartits\n"))
+    choiceUpdate = int(raw_input("Enter 0 to update views \n 1 to update genretags and simartists\n"))
     filelist = list()
     
     t1=time.time()
