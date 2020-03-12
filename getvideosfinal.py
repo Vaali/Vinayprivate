@@ -26,9 +26,8 @@ import loggingmodule
 import random
 from functools import partial
 import managekeys
-from itertools import repeat
-from songsutils import is_songname_same_artistname,get_artistid
-
+from songsutils import is_songname_same_artistname
+import soundcloud
 
 
 reload(sys)
@@ -782,22 +781,6 @@ def CheckifSongsExistsinSolr(sname,aname,fname):
     return False
 
 
-def get_artist_name(directory):
-    try:
-        solrConnection1 = SolrConnection('http://aurora.cs.rutgers.edu:8181/solr/discogs_data_test')
-        aname = get_artistid(directory);
-        artistName = 'artistId:"'+changeName(aname)+'"'
-        facet_query = [artistName]
-        response = solrConnection1.query(q="*:*",fq= facet_query,version=2.2,wt = 'json')
-        intersect = int(response.results.numFound)
-        print intersect
-        if(intersect > 10):
-            return response.results[0]['artistName'][0],intersect
-        return "",0
-    except Exception, e:
-        logger_error.exception(e)
-        return "",0
-
 def crawlArtist(directory):
     start_time = datetime.now()
     logger_decisions.error(directory + " ---- started ---")
@@ -939,53 +922,7 @@ def crawlArtist(directory):
 			pickle.dump(parallel_songs_list, f)
     #runYoutubeApi(directory)
 
-def get_artist_songs_from_youtube(directory):
-    artist_name,total_songs_from_solr = get_artist_name(directory)
-    songs_from_youtube = []
-    total_results = 0
-    total_songs_to_get = 0
-    results_per_page = 0
-    next_page_token = ""
-    total_songs_to_get = total_songs_from_solr*2
-    return_search_results = {"items":[]}
-    print total_songs_to_get
-    if(artist_name == ""):
-        return
-    try:
-        while(total_songs_to_get > 0):
-            key = "AIzaSyCjEvD5rDmRyBMVZ8D30bRp7oqlWLdotp8"#manager.getkey()
-            if(key == ""):
-                logger_error.error(manager.get_blocked_keys())
-                manager.keys_exhausted()
-                logger_error.error('Waking up')
-            search_url = "https://www.googleapis.com/youtube/v3/search?part=snippet&q=allintitle%3A"+urllib.quote_plus(str(artist_name))+"&alt=json&type=video&maxResults=50&key="+key+"&videoCategoryId=10"
-            
-            if(next_page_token != ""):
-                search_url += ("&pageToken="+next_page_token)
-            print search_url
-            search_result,bret = query_youtube(search_url,key)
-            if(bret == False):
-                break
-            if(search_result.has_key('pageInfo') and search_result['pageInfo'].has_key('totalResults')):
-                total_results = search_result['pageInfo']['totalResults']
-                results_per_page = search_result['pageInfo']['resultsPerPage']
-            if(search_result.has_key('nextPageToken')):
-                next_page_token = search_result['nextPageToken']
-            else:
-                next_page_token = ""
-            total_songs_to_get -= results_per_page
-            if(total_results < total_songs_to_get):
-                total_songs_to_get = total_results
-            if search_result.has_key('items') and len(search_result['items'])!= 0:
-                return_search_results['items'].extend(search_result['items'])
-                print total_songs_to_get
-                print len(search_result['items'])
-                print total_results
-            else:
-                break
-    except Exception, e:
-        logger_error.exception(e) 
-    return return_search_results
+
 
 def runYoutubeApi(directory):
     try:
@@ -1046,13 +983,10 @@ def runYoutubeApi(directory):
         #songs_pool = Pool()
         #songs_pool =ThreadPool(processes=5)
         print len(parallel_songs_list)
-        return_search_results = get_artist_songs_from_youtube(directory)
-        print len(return_search_results['items'])
         #print parallel_songs_list
         with concurrent.futures.ThreadPoolExecutor(max_workers=4) as executor:
-                return_pool = executor.map(getVideoFromYoutube,zip(parallel_songs_list,repeat(return_search_results)))
-        
-        #return_pool=[]
+                return_pool = executor.map(getVideoFromYoutube,parallel_songs_list)
+        #print len(return_pool)
         for ret_val in return_pool:
             if(ret_val[2] == True):
                     found = found + 1
@@ -1193,7 +1127,7 @@ def checkFtArtist(ftartist1,ftartist2):
 
 
 
-def getVideoFromYoutube((curr_elem,return_search_results)):
+def getVideoFromYoutube(curr_elem):
     global IsIncremental
     retvid = None
     bret = False
@@ -1212,10 +1146,10 @@ def getVideoFromYoutube((curr_elem,return_search_results)):
             retstring = sname + '------' + artname + '-----' + ','.join(ftartists)
             return retvid,True,True,retstring
     try:
-        retvid,bret = getVideo(curr_elem,0,return_search_results)
+        retvid,bret = getVideo(curr_elem,0)
         if('anv' in curr_elem):
             curr_elem['artistName'] = curr_elem['anv']
-            retvid,bret = getVideo(curr_elem,0,return_search_results)
+            retvid,bret = getVideo(curr_elem,0)
             if(retvid != None):
                 for rv in retvid:
                     if(rv == None):
@@ -1223,7 +1157,7 @@ def getVideoFromYoutube((curr_elem,return_search_results)):
                     rv.artist = artname
         if(retvid == None):
             curr_elem['artistName'] = artname
-            retvid,bret = getVideo(curr_elem,1,return_search_results)
+            retvid,bret = getVideo(curr_elem,1)
         else:
             emptyvid = 0
             for rv in retvid:
@@ -1233,7 +1167,7 @@ def getVideoFromYoutube((curr_elem,return_search_results)):
                     emptyvid = 1
             if(emptyvid == 0):
                 curr_elem['artistName'] = artname
-                retvid,bret = getVideo(curr_elem,1,return_search_results)
+                retvid,bret = getVideo(curr_elem,1)
     except Exception as e:
         logger_error.exception('getVideoFromYoutube')
     '''if(retvid != None):
@@ -1244,7 +1178,7 @@ def getVideoFromYoutube((curr_elem,return_search_results)):
     return retvid,bret,False
 
 
-def getVideo(curr_elem,flag,return_search_results):
+def getVideo(curr_elem,flag):
     try:
         global request_count
         mostpopular = 0
@@ -1253,8 +1187,13 @@ def getVideo(curr_elem,flag,return_search_results):
         #print curr_elem['artistName']
         alist = list()
         ylist = list()
+        video12 = Video()
         bret = False
         #album_details = Album_Data()
+        video12.artist = curr_elem['artistName']
+        video12.ftArtist = curr_elem['featArtists']
+        video12.name = curr_elem['name']
+        video12.connectors = curr_elem['connectors']
         songs_list = curr_elem['albumInfo']
         unique_albums = []
         #combine all the album information for the songs into a list.
@@ -1281,6 +1220,10 @@ def getVideo(curr_elem,flag,return_search_results):
                 alist.append(album_details.__dict__)
         #if(len(alist)==0):
         #    print curr_elem
+        video12.album = alist
+        video12.year = curr_elem['year']
+        video12.language = 'English'
+        video12.songcountry = curr_elem['songcountry']
         flist = ""
         #Apostolos
         try:
@@ -1306,7 +1249,7 @@ def getVideo(curr_elem,flag,return_search_results):
                 video1.artistalias = curr_elem['artistalias']
             video1.genres = curr_elem['genres']
             video1.styles = curr_elem['styles']
-            video1,bret = getYoutubeUrl(video1,flag,0,return_search_results)
+            video1,bret = getYoutubeUrl(video1,flag,0)
             if(video1 != None):
                 video1.artist_id = curr_elem['artist_id']
             #print curr_elem['artist_id']
@@ -1815,39 +1758,7 @@ def GetArtist(artistObj):
     return artistName,artist_id,ftArtistList,connList
 
 
-def query_youtube(search_url,key):
-        global request_count
-        try:
-            searchResult = simplejson.load(urlopen(search_url),"utf-8")
-            request_count = request_count + 100
-            #print searchResult
-        except HTTPError as e:            
-            if(e.code == 403 and "Forbidden" in e.reason):
-                logger_error.error("Daily Limit Exceeded")
-                logger_error.error(manager.get_blocked_keys())
-                manager.removekey(key)
-                manager.add_blockedkey(key)
-                manager.keys_exhausted()
-            else:
-                request_count = request_count + 100
-                logger_error.exception(e.message)
-            return {},False
-        except URLError as e:
-            request_count = request_count + 100
-            logger_error.exception(e.reason)
-            return {},False
-        except Exception as e:
-            request_count = request_count + 100
-            logger_error.exception(e)
-            #print "An HTTP error %d occurred:\n%s" % (e.resp.status, e.content)
-            return {},False
-        return searchResult,True
-
-
-
-
-
-def getYoutubeUrl(video,flag,mostpopular,return_search_results):
+def getYoutubeUrl(video,flag,mostpopular):
     global request_count
     bret = False
     try:
@@ -1864,24 +1775,47 @@ def getYoutubeUrl(video,flag,mostpopular,return_search_results):
             logger_error.error(manager.get_blocked_keys())
             manager.keys_exhausted()
             logger_error.error('Waking up')
+            #key = manager.getkey()
+            #if(key == ""):
+            #logger_error.error('empty key')
             return None,False
-        key = "AIzaSyCjEvD5rDmRyBMVZ8D30bRp7oqlWLdotp8"
+        #key = "AIzaSyBEM6ijEuRqrGREP8lxZU8XzEufEMVToO0"
         if(flag == 0):
             '''if('cover' not in video.name.lower()):
-                search_url = "https://www.googleapis.com/youtube/v3/search?part=snippet&q=allintitle%3A"+urllib.quote_plus(str(allArtists))+"+"+urllib.quote_plus(str(video.name))+"+-cover"+"&alt=json&type=video&maxResults=5&key=AIzaSyBE5nUPdQ7J_hlc3345_Z-I4IG-Po1ItPU&videoCategoryId=10"
+                searchUrl = "https://www.googleapis.com/youtube/v3/search?part=snippet&q=allintitle%3A"+urllib.quote_plus(str(allArtists))+"+"+urllib.quote_plus(str(video.name))+"+-cover"+"&alt=json&type=video&max-results=5&key=AIzaSyBE5nUPdQ7J_hlc3345_Z-I4IG-Po1ItPU&videoCategoryId=10"
             else:'''
-            search_url = "https://www.googleapis.com/youtube/v3/search?part=snippet&q=allintitle%3A"+urllib.quote_plus(str(allArtists))+"+"+urllib.quote_plus(str(video.name))+"&alt=json&type=video&maxResults=5&key="+key+"&videoCategoryId=10"
+            searchUrl = "https://www.googleapis.com/youtube/v3/search?part=snippet&q=allintitle%3A"+urllib.quote_plus(str(allArtists))+"+"+urllib.quote_plus(str(video.name))+"&alt=json&type=video&max-results=5&key="+key+"&videoCategoryId=10"
         else:
             '''if('cover' not in video.name.lower()):
-                search_url = "https://www.googleapis.com/youtube/v3/search?part=snippet&q="+urllib.quote_plus(str(allArtists))+"+"+urllib.quote_plus(str(video.name))+"+-cover"+"&alt=json&type=video&maxResults=5&key=AIzaSyBE5nUPdQ7J_hlc3345_Z-I4IG-Po1ItPU&videoCategoryId=10"
+                searchUrl = "https://www.googleapis.com/youtube/v3/search?part=snippet&q="+urllib.quote_plus(str(allArtists))+"+"+urllib.quote_plus(str(video.name))+"+-cover"+"&alt=json&type=video&max-results=5&key=AIzaSyBE5nUPdQ7J_hlc3345_Z-I4IG-Po1ItPU&videoCategoryId=10"
             else:'''
-            search_url = "https://www.googleapis.com/youtube/v3/search?part=snippet&q="+urllib.quote_plus(str(allArtists))+"+"+urllib.quote_plus(str(video.name))+"&alt=json&type=video&maxResults=5&key="+key+"&videoCategoryId=10"
+            searchUrl = "https://www.googleapis.com/youtube/v3/search?part=snippet&q="+urllib.quote_plus(str(allArtists))+"+"+urllib.quote_plus(str(video.name))+"&alt=json&type=video&max-results=5&key="+key+"&videoCategoryId=10"
             mostpopular = 1
-        print search_url
-        searchResult,bret = query_youtube(search_url,key)
-        if(bret == False):
-            return None,False
-        
+        print searchUrl
+        try:
+            searchResult = simplejson.load(urlopen(searchUrl),"utf-8")
+            request_count = request_count + 100
+            #print searchResult
+        except HTTPError as e:            
+            if(e.code == 403 and "Forbidden" in e.reason):
+                logger_error.error("Daily Limit Exceeded")
+                logger_error.error(manager.get_blocked_keys())
+                manager.removekey(key)
+                manager.add_blockedkey(key)
+                manager.keys_exhausted()
+            else:
+                request_count = request_count + 100
+                logger_error.exception(e.message)
+            return video,bret
+        except URLError as e:
+            request_count = request_count + 100
+            logger_error.exception(e.reason)
+            return video,bret
+        except Exception as e:
+            request_count = request_count + 100
+            logger_error.exception(e)
+            #print "An HTTP error %d occurred:\n%s" % (e.resp.status, e.content)
+            return video,bret
         now = datetime.now()
         try:
             if searchResult.has_key('items') and len(searchResult['items'])!= 0:
@@ -1909,8 +1843,29 @@ def getYoutubeUrl(video,flag,mostpopular,return_search_results):
                         currentVideoYear = GetYearFromTitle(searchEntry['snippet']['title'],video.name)
                         youtubeVideoId = searchEntry['id']['videoId']
                         videoUrl = "https://www.googleapis.com/youtube/v3/videos?id="+str(youtubeVideoId)+"&key="+key+"&part=statistics,contentDetails,status"
-                        videoResult,bret = query_youtube(videoUrl,key)
-                        if(bret == False):
+                        try:
+                            videoResult = simplejson.load(urlopen(videoUrl),"utf-8")
+                            request_count = request_count + 7
+                        except HTTPError as e:
+                            if(e.code == 403 and "Forbidden" in e.reason):
+                                logger_error.error("Daily Limit Exceeded")
+                                logger_error.error(manager.get_blocked_keys())
+                                manager.removekey(key)
+                                manager.add_blockedkey(key)
+                                manager.keys_exhausted()
+                                key = manager.getkey()
+                            request_count = request_count + 7
+                            #erro_message = e.read()
+                            #logger_error.exception(e.read())
+                            continue
+                        except URLError as e:
+                            request_count = request_count + 7
+                            logger_error.exception(e.reason)
+                            continue
+                        except Exception as e:
+                            request_count = request_count + 7
+                            logger_error.exception(e)
+                            #logger_error.exception("Error %d --- %s"% (e.resp.status, e.content))
                             continue
                         if(videoResult.has_key('items') and  (len(videoResult['items'])>0)):
                             videoEntry = videoResult['items'][0]
@@ -1970,7 +1925,6 @@ def getYoutubeUrl(video,flag,mostpopular,return_search_results):
                                 iindex=i
                     i = i + 1
                 #get the videos
-                
                 if(iindex != -1):
                         bret = True
                         if(int(selectedVideolikes) !=0 and int(selectedVideodislikes)!=0):
