@@ -1,0 +1,320 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+<xs:element name="songs">
+  <xs:complexType>
+    <xs:sequence>
+      <xs:element name="Id" type="xs:string"/>
+      <xs:element name="artistId" type="xs:integer"/>
+      <xs:element name="overLap" type="xs:string"/>
+      <xs:element name="songName" type="xs:string"/>
+      <xs:element name="SCName" type="xs:string"/>
+      <xs:element name="artist">
+		<xs:complextype>
+			<xs:sequence>
+				<xs:element name="artistName" maxOccurs="unbounded" type="xs:string"/>
+			</xs:sequence>
+			<xs:sequence>
+				<xs:element name="artistAlias" maxOccurs="unbounded" type="xs:string"/>
+			</xs:sequence>
+			<xs:element name="artistPopularityAll" type="xs:integer"/>
+			<xs:element name="artistPopularityRecent" type="xs:integer"/>
+
+		</xs:complextype>
+      </xs:element>
+	  <xs:element name="ftArtistList">
+		<xs:complextype>
+			<xs:sequence>
+				<xs:element name="ftArtistName" maxOccurs="unbounded" type="xs:string"/>
+
+				<!--	<xs:element name="ftArtistName" type="xs:string"/>
+					<xs:element name="artistId" type="xs:integer"/> -->
+			</xs:sequence>
+		</xs:complextype>
+      </xs:element>
+      <xs:element name="indexedftArtistList">
+		<xs:complextype>
+			<xs:sequence>
+				<xs:element name="indexedftArtistName" maxOccurs="unbounded" type="xs:string"/>
+			</xs:sequence>
+		</xs:complextype>
+      </xs:element>
+	  
+      <xs:element name="indexedArtistAliasList">
+		<xs:complextype>
+			<xs:sequence>
+				<xs:element name="indexedArtistAliasName" maxOccurs="unbounded" type="xs:string"/>
+			</xs:sequence>
+		</xs:complextype>
+      </xs:element>
+	  <xs:element name="connPhraseList">
+		<xs:complextype>
+			<xs:sequence>
+				<xs:element name="connPhrase" maxOccurs="unbounded" type="xs:string"/>
+			</xs:sequence>
+		</xs:complextype>
+      </xs:element>
+      <xs:element name="indexedArtist">
+		<xs:complextype>
+			<xs:sequence>
+				<xs:element name="indexedArtistName" maxOccurs="unbounded" type="xs:string"/>
+			</xs:sequence>
+		</xs:complextype>
+      </xs:element>
+      <xs:element name="url" type="xs:string"/>
+      <xs:element name="releaseDate" type="xs:integer"/>
+      <xs:element name="decade" type="xs:integer"/>
+      <xs:element name="videoDate" type="xs:date"/>
+      <xs:element name="crawlDate" type="xs:date"/>
+      <xs:element name="viewcount" type="xs:integer"/>
+      <xs:element name="crawlDelta" type="xs:integer"/>
+      <xs:element name="isCompilation" type="xs:boolean"/>
+      <xs:element name="releaseId" type="xs:integer"/>
+      <xs:element name="masterRelease" type="xs:integer"/>
+
+	  <xs:element name="soundcloudList">
+		<xs:complextype>
+			<xs:sequence>
+      			<xs:element name="soundcloudAudio" maxOccurs="unbounded">
+					<xs:complextype>
+						<xs:sequence>
+							<xs:element name="playback_count"  type="xs:integer"/>
+							<xs:element name="url"  type="xs:string"/>
+							<xs:element name="scName"  type="xs:string"/>
+							<xs:element name="Id" type="xs:string"/>
+							<xs:element name="totalMatch" type="xs:decimal"/>		     		     
+	   						<xs:element name="songMatch" type="xs:decimal"/>		     
+	   						<xs:element name="artistMatch" type="xs:decimal"/>
+							<xs:element name="overLap" type="xs:string"/>   
+							<xs:element name="tags" type="xs:string"/>
+						</xs:sequence>
+					</xs:complextype>
+       			</xs:element>
+       			</xs:sequence>
+		</xs:complextype>
+      </xs:element>
+
+
+      <xs:element name="masterGenres">
+		<xs:complextype>
+			<xs:sequence>
+				<xs:element name="genreName" maxOccurs="unbounded" type="xs:string"/>
+			</xs:sequence>
+		</xs:complextype>
+       </xs:element>
+      <xs:element name="masterStyles">
+		<xs:complextype>
+			<xs:sequence>
+				<xs:element name="genreName" maxOccurs="unbounded" type="xs:string"/>
+			</xs:sequence>
+		</xs:complextype>
+       </xs:element>
+
+      <xs:element name="crawlHistoryList">
+		<xs:complextype>
+			<xs:sequence>
+      			<xs:element name="crawlHistory" maxOccurs="unbounded">
+					<xs:complextype>
+						<xs:sequence>
+							<xs:element name="Views"  type="xs:integer"/>
+							<xs:element name="Date"  type="xs:string"/>
+							<xs:element name="Delta" type="xs:integer"/>
+						</xs:sequence>
+					</xs:complextype>
+       			</xs:element>
+       			</xs:sequence>
+		</xs:complextype>
+    </xs:element>
+    <xs:element name="genresCountList">
+		<xs:complextype>
+			<xs:sequence>
+      			<xs:element name="genresCount" maxOccurs="unbounded">
+					<xs:complextype>
+						<xs:sequence>
+							<xs:element name="Percentage"  type="xs:decimal"/>
+							<xs:element name="Count"  type="xs:integer"/>
+							<xs:element name="Genre"  type="xs:string"/>
+						</xs:sequence>
+					</xs:complextype>
+       			</xs:element>
+       			</xs:sequence>
+		</xs:complextype>
+    </xs:element>
+      <xs:element name="rating" type="xs:decimal"/>
+      <xs:element name="level1Genres">
+		<xs:complextype>
+			<xs:sequence>
+				<xs:element name="genreName" maxOccurs="unbounded" type="xs:string"/>
+			</xs:sequence>
+		</xs:complextype>
+       </xs:element>
+      <xs:element name="level2Genres">
+		<xs:complextype>
+			<xs:sequence>
+				<xs:element name="genreName" maxOccurs="unbounded" type="xs:string"/>
+			</xs:sequence>
+		</xs:complextype>
+       </xs:element>
+       <xs:element name="level3Genres">
+		<xs:complextype>
+			<xs:sequence>
+				<xs:element name="genreName" maxOccurs="unbounded" type="xs:string"/>
+			</xs:sequence>
+		</xs:complextype>
+       </xs:element>
+       <xs:element name="level4Genres">
+		<xs:complextype>
+			<xs:sequence>
+				<xs:element name="genreName" maxOccurs="unbounded" type="xs:string"/>
+			</xs:sequence>
+		</xs:complextype>
+       </xs:element>
+       <xs:element name="level5Genres">
+		<xs:complextype>
+			<xs:sequence>
+				<xs:element name="genreName" maxOccurs="unbounded" type="xs:string"/>
+			</xs:sequence>
+		</xs:complextype>
+       </xs:element>
+       <xs:element name="level6Genres">
+		<xs:complextype>
+			<xs:sequence>
+				<xs:element name="genreName" maxOccurs="unbounded" type="xs:string"/>
+			</xs:sequence>
+		</xs:complextype>
+       </xs:element>
+       <xs:element name="level7Genres">
+		<xs:complextype>
+			<xs:sequence>
+				<xs:element name="genreName" maxOccurs="unbounded" type="xs:string"/>
+			</xs:sequence>
+		</xs:complextype>
+       </xs:element>
+       <xs:element name="level8Genres">
+		<xs:complextype>
+			<xs:sequence>
+				<xs:element name="genreName" maxOccurs="unbounded" type="xs:string"/>
+			</xs:sequence>
+		</xs:complextype>
+       </xs:element>
+       <xs:element name="level9Genres">
+		<xs:complextype>
+			<xs:sequence>
+				<xs:element name="genreName" maxOccurs="unbounded" type="xs:string"/>
+			</xs:sequence>
+		</xs:complextype>
+       </xs:element>
+       <xs:element name="albumList">
+		<xs:complextype>
+			<xs:sequence>
+				<xs:element name="album" maxOccurs="unbounded">
+					<xs:complextype>
+						<xs:sequence>
+							<xs:element name="albumName" type="xs:string"/>
+							<xs:element name="albumReleasedate" type="xs:integer"/>
+							<xs:element name="country" minOccurs="0" maxOccurs="1" type="xs:string"/>
+							<xs:element name="language" minOccurs="0" maxOccurs="1" type="xs:string"/>
+							<xs:element name="barCode" minOccurs="0" maxOccurs="1" type="xs:string"/>
+							<xs:element name="catalogue" minOccurs="0" maxOccurs="1" type="xs:string"/>
+							<xs:element name="label" minOccurs="0" maxOccurs="1" type="xs:string"/>
+						</xs:sequence>
+					</xs:complextype>
+				</xs:element>
+			</xs:sequence>
+		</xs:complextype>
+		</xs:element>
+
+		<xs:element name="similarGenresTagList">
+		<xs:complextype>
+		<xs:sequence>
+			<xs:element name="similarGenreTag" maxOccurs="unbounded">
+					<xs:complextype>
+						<xs:sequence>
+							<xs:element name="genreTagName" type="xs:string"/>
+							<xs:element name="genreTagScore" type="xs:decimal"/>
+							<xs:element name="genreTagId" type="xs:integer"/>
+						</xs:sequence>
+					</xs:complextype>
+			</xs:element>
+		</xs:sequence>
+		</xs:complextype>
+       </xs:element>
+	   <xs:element name="similarArtistList">
+		<xs:complextype>
+		<xs:sequence>
+			<xs:element name="similarArtist" maxOccurs="unbounded">
+					<xs:complextype>
+						<xs:sequence>
+							<xs:element name="similarArtistName" type="xs:string"/>
+							<xs:element name="similarArtistScore" type="xs:decimal"/>
+							<xs:element name="similarArtistId" type="xs:integer"/>
+						</xs:sequence>
+					</xs:complextype>
+			</xs:element>
+		</xs:sequence>
+		</xs:complextype>
+       </xs:element>
+	   <xs:element name="totalGenreCount" type="xs:integer"/>
+       <xs:element name="viewcountRate" type="xs:decimal"/>
+       <xs:element name="duration" type="xs:string"/>
+       <xs:element name="descriptions" type="xs:string"/>
+       <xs:element name="viewCountGroup" type="xs:integer"/>
+       <xs:element name="decision" type="xs:string"/>
+       <xs:element name="substring_song" type="xs:string"/>
+       <xs:element name="substring_artist" type="xs:string"/>
+       <xs:element name="substring_ftartist" type="xs:string"/>
+       <xs:element name="songLanguage" type="xs:string"/>
+       <xs:element name="earliestDate" type="xs:string"/>
+	   <xs:element name="songCountry" type="xs:string"/>
+	   <xs:element name="totalMatch" type="xs:decimal"/>		     		     
+	   <xs:element name="songMatch" type="xs:decimal"/>		     
+	   <xs:element name="artistMatch" type="xs:decimal"/>
+	   <xs:element name="genreTag" type="xs:string"/>
+	   <xs:element name="genreTagId" type="xs:integer"/>		   
+	   <xs:element name="youtubeList">
+		<xs:complextype>
+			<xs:sequence>
+				<xs:element name="video" maxOccurs="unbounded">
+					<xs:complextype>
+						<xs:sequence>
+							<xs:element name="Id" type="xs:string"/>
+							<xs:element name="startTime" type="xs:integer"/>
+							<xs:element name="endTime" minOccurs="0" maxOccurs="1" type="xs:integer"/>
+							<xs:element name="totalTime" minOccurs="0" maxOccurs="1" type="xs:integer"/>
+							<xs:element name="viewcountRate" minOccurs="0" maxOccurs="1" type="xs:decimal"/>
+							<xs:element name="viewcount" minOccurs="0" maxOccurs="1" type="xs:integer"/>
+							<xs:element name="rating" minOccurs="0" maxOccurs="1" type="xs:decimal"/>
+						</xs:sequence>
+					</xs:complextype>
+				</xs:element>
+			</xs:sequence>
+		</xs:complextype>
+       </xs:element>
+    <xs:element name="genreMatch" type="xs:string"/>
+	<!--<xs:element name="soundcloudList">
+		<xs:complextype>
+			<xs:sequence>
+				<xs:element name="audio" maxOccurs="unbounded">
+					<xs:complextype>
+						<xs:sequence>
+							<xs:element name="soundcloudUrl" type="xs:string"/>
+							<xs:element name="soundcloudViewcount" minOccurs="0" maxOccurs="1" type="xs:integer"/>
+      							<xs:element name="soundcloudLikes" type="xs:integer"/>
+							<xs:element name="soundcloudGenres">
+								<xs:complextype>
+									<xs:sequence>
+										<xs:element name="genreName" maxOccurs="unbounded" type="xs:string"/>
+									</xs:sequence>
+								</xs:complextype>
+       							</xs:element>
+						</xs:sequence>
+					</xs:complextype>
+				</xs:element>
+			</xs:sequence>
+		</xs:complextype>
+       </xs:element>  -->
+
+    </xs:sequence>
+  </xs:complexType>
+</xs:element>
+</xs:schema>
