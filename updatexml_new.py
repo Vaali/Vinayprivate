@@ -1,8 +1,6 @@
 import sys
 import songs_api as api
 import codecs
-import urllib2
-import simplejson
 import re
 from datetime import datetime, date, timedelta
 import os
@@ -15,21 +13,29 @@ from solr import SolrConnection
 from solr.core import SolrException
 from itertools import repeat
 import random
+from songsutils import is_songname_same_artistname,movefilestodeleted,movefilestofailed,movefilestowrong
+from youtubeapis import youtubecalls,youtubedlcalls
 import managekeys
-from songsutils import is_songname_same_artistname,moveFiles
+from config import IsYoutudeApi,DataDirectory, NumberOfProcesses, IsUpdateViewCounts
 
 def getMonths(currentPublishedDate):
-	now = datetime.now()	
-	m = re.search(re.compile("[0-9]{4}[-][0-9]{2}[-][0-9]{2}"),currentPublishedDate)
-	n = re.search(re.compile("[0-9]{2}[:][0-9]{2}[:][0-9]{2}"),currentPublishedDate)
-	ydate = m.group()+" "+n.group()
-	dd = ydate
-	yy = int(str(dd)[0:4])
-	mm = int(str(dd)[5:7])
-	total = (now.year-yy)*12+(now.month-mm)
-	if total < 1:
-		total = 1
-	return total
+    now = datetime.now()
+    if( IsYoutudeApi == 1):
+        m = re.search(re.compile("[0-9]{4}[-][0-9]{2}[-][0-9]{2}"),currentPublishedDate)
+        n = re.search(re.compile("[0-9]{2}[:][0-9]{2}[:][0-9]{2}"),currentPublishedDate)
+        ydate = m.group()+" "+n.group()
+        dd = ydate
+        yy = int(str(dd)[0:4])
+        mm = int(str(dd)[5:7])
+    else:
+	    pbdate = datetime.strptime(currentPublishedDate, '%Y%m%d')
+	    dd = pbdate.day
+	    yy = pbdate.year
+	    mm = pbdate.month
+    total = (now.year-yy)*12+(now.month-mm)
+    if total < 1:
+        total = 1
+    return total
 
 def getCurrentTime():
 	now = datetime.now()
@@ -44,16 +50,6 @@ def getCurrentTime():
 	hh = now.hours
 	mins = now.mins
 
-
-def movefilestodeleted(filename):
-    moveFiles(filename,'deletedvideos')
-
-def movefilestofailed(filename):
-    moveFiles(filename,'failedvideos')
-
-def movefilestowrong(filename):
-    moveFiles(filename,'wrongvideos')
-
 def getDelta(oldDate,oldViewcount,newViewcount):
 	now = datetime.now()
 	days = (now - oldDate).days
@@ -65,43 +61,24 @@ def getDelta(oldDate,oldViewcount,newViewcount):
 
 def updateXml(filename):
     try:
-        print filename
-        key = manager.getkey()
-        if(key == ""):
-            manager.keys_exhausted()
-            key = manager.getkey()
-            if(key == ""):
-                logger_matrix.error(manager.get_blocked_keys())
-                manager.keys_exhausted()
-                logger_matrix.error('Waking up')
-                key = manager.getkey()
+        print(filename)
+        if( IsYoutudeApi == 1):
+            ytubecalls = youtubecalls(manager)
+        else:
+            ytubecalls = youtubedlcalls()
         try:
             oldsong = api.parse(filename)
             if(is_songname_same_artistname(oldsong.songName,oldsong.artist.artistName[0]) == True):
                 movefilestowrong(filename)
                 return
         except Exception as e:
-			logger_matrix.exception("Error")
-			return
-        
-        videoUrl = "https://www.googleapis.com/youtube/v3/videos?id="+str(oldsong.youtubeId)+"&key="+key+"&part=statistics,snippet,status"
-        
-        try:
-			videoResult = simplejson.load(urllib2.urlopen(videoUrl),"utf-8")
-        except Exception as e:
-            if(e.code == 403 and "Forbidden" in e.reason):
-                logger_matrix.error("Daily Limit Exceeded")
-                logger_matrix.error(manager.get_blocked_keys())
-                manager.removekey(key)
-                manager.add_blockedkey(key)
-                manager.keys_exhausted()    
-            else:
-                print e
-                logger_matrix.exception("Error loading json"+ videoUrl + "\n")
-            movefilestofailed(filename)
-            
+            logger_matrix.exception("Error")
             return
-        print "new values"
+        #videoUrl = "https://www.googleapis.com/youtube/v3/videos?id="+str(oldsong.youtubeId)+"&key="+key+"&part=statistics,snippet,status"
+        videoResult = ytubecalls.getyoutuberesults(oldsong.youtubeId)
+        if(videoResult == None):
+            return
+        print("new values")
         if videoResult.has_key('items'):
             if(len(videoResult['items']) == 0):
                 logger_matrix.exception("Error :No items returned "+ filename + "\n")
@@ -129,23 +106,23 @@ def updateXml(filename):
                 movefilestodeleted(filename)
                 return
             if(int(currentVideolikes) !=0 and int(currentVideodislikes)!=0):
-				currentVideorating = (float(currentVideolikes)*5)/(float(currentVideolikes)+float(currentVideodislikes))
+                currentVideorating = (float(currentVideolikes)*5)/(float(currentVideolikes)+float(currentVideodislikes))
             else:
-				currentVideorating =0
+                currentVideorating =0
         crawlHistoryList = oldsong.crawlHistoryList
         if(crawlHistoryList == None):
-			crawlHistoryList = api.crawlHistoryList()
+            crawlHistoryList = api.crawlHistoryList()
         crawlHistory = api.crawlHistory()
 
 	    #print oldsong.crawlDate.strftime("%Y-%m-%d")
         oldVideoRating = oldsong.rating
         if(oldVideoRating == None):
-			oldVideoRating = 0
+            oldVideoRating = 0
         crawlHistory.set_Views(oldsong.viewcount)
         crawlHistory.set_Date(oldsong.crawlDate.strftime("%Y-%m-%d"))
         currDelta = getDelta(oldsong.crawlDate,oldsong.viewcount,int(currentVideoViewCount))
         if(currDelta == -1):
-			return
+            return
         crawlHistory.set_Delta(int(currDelta))
         crawlHistoryList.add_crawlHistory(crawlHistory)
         oldsong.set_rating(currentVideorating)
@@ -164,11 +141,11 @@ def updateXml(filename):
         oldsong.export(fx,0)
         fx.close()
     except Exception as e:
-		logger_matrix.exception("Error")
-		return
+        logger_matrix.exception("Error")
+        return
 
 def GetgenreTag(oldsong):
-    print 'getting genres tags'
+    print('getting genres tags')
     level1  = oldsong.level1Genres.genreName
     level2 = oldsong.level2Genres.genreName
     current_genres = []
@@ -182,15 +159,16 @@ def GetgenreTag(oldsong):
     combinedgenrestring = '@'.join(genre_tags)
     return combinedgenrestring
 
-def updateGenreTags((filename,cutoff)):
+def updateGenreTags( args ):
     #global connection_genre
     #global connection_artist
     #response = connection.query(q="*:*",fq=[artistName],version=2.2,wt = 'json')
     #intersect = int(response.results.numFound)
+    (filename,cutoff) = args
     try:
         oldsong = api.parse(filename)
 
-        print 'getting genres'
+        print('getting genres')
         '''try:
             genreTag = oldsong.genreTag
             #print genreTag 
@@ -227,15 +205,15 @@ def updateGenreTags((filename,cutoff)):
             logger_matrix.exception('genres writing error')
             logger_matrix.exception(e) '''
 
-        print 'getting artists'
+        print('getting artists')
         try:
             artistId = oldsong.artistId
             artistId = 'artistId:"'+str(artistId)+ '"'
-            print artistId
+            print(artistId)
             response_artist = connection_artist.query(q="*:*",fq=[artistId],version=2.2,wt = 'json')
             intersect = int(response_artist.results.numFound)
             if(intersect > 0):
-                print 'found it'
+                print('found it')
                 similarArtistList = api.similarArtistList()
                 for result in response_artist.results:
                     currList = result['similarartistName']
@@ -255,13 +233,28 @@ def updateGenreTags((filename,cutoff)):
             logger_matrix.exception('artist writing error')
             logger_matrix.exception(e)
         fx = codecs.open(filename,"w","utf-8")
-	fx.write('<?xml version="1.0" ?>\n')
-	oldsong.export(fx,0)
-	fx.close()
-    
+        fx.write('<?xml version="1.0" ?>\n')
+        oldsong.export(fx,0)
+        fx.close()
     except Exception as e:
         logger_matrix.exception(e)
-	return
+    return
+
+
+def updatexmls_youtubedl():
+    try:
+        print(filename)
+        try:
+            oldsong = api.parse(filename)
+            if(is_songname_same_artistname(oldsong.songName,oldsong.artist.artistName[0]) == True):
+                movefilestowrong(filename)
+                return
+        except Exception as e:
+            logger_matrix.exception("Error")
+            return
+        
+    except Exception as e:
+        logger_matrix.exception(e)
 	
 reload(sys)
 sys.setdefaultencoding('utf8')
@@ -271,31 +264,30 @@ if __name__ == '__main__':
     logger_matrix = loggingmodule.initialize_logger('updatexml','updatexmls.log')
     manager = managekeys.ManageKeys(0)
     manager.reset_projkeys()
-    directory = raw_input("Enter directory: ")
+    directory = DataDirectory
     if not os.path.exists(directory):
-        print 'directory doesnt exists'
+        print('directory doesnt exists')
         exit()
-    m = raw_input("Enter m: ")
-    m=int(m)
-    choiceUpdate = int(raw_input("Enter 0 to update views \n 1 to update genretags and simartists\n"))
+    choiceUpdate = IsUpdateViewCounts
+    #int(raw_input("Enter 0 to update views \n 1 to update genretags and simartists\n"))
     filelist = list()
     
     t1=time.time()
     connection_genre = SolrConnection('http://aurora.cs.rutgers.edu:8181/solr/genretags')
     connection_artist = SolrConnection('http://aurora.cs.rutgers.edu:8181/solr/similar_artists1')
-
+    #updateXml('solr_newData11_old/0000aiYfOWu5ZhY.xml')
     try:
         filelist = glob.glob(directory+"/*.xml")
-        p =Pool(processes=int(m))
-        if(choiceUpdate == 0):
+        p =Pool(processes=int(NumberOfProcesses))
+        if(choiceUpdate == 1):
             p.map(updateXml,filelist)
         else:
             cutoff = int(raw_input("Enter the cutoff point\n"))
-            print cutoff
+            print(cutoff)
             p.map(updateGenreTags,zip(filelist,repeat(cutoff)))
         p.close()
         p.join()
     except Exception as e:
         logger_matrix.exception("Error")
-
-    print time.time()-t1
+    
+    print(time.time()-t1)
