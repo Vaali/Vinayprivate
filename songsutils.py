@@ -26,3 +26,12 @@ def moveFiles(filename,movetype):
       os.remove(os.path.join(output_directory, fname))
     dest = output_directory+'/'+fname
     shutil.move(filename,dest)
+
+def movefilestodeleted(filename):
+    moveFiles(filename,'deletedvideos')
+
+def movefilestofailed(filename):
+    moveFiles(filename,'failedvideos')
+
+def movefilestowrong(filename):
+    moveFiles(filename,'wrongvideos')
