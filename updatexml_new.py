@@ -51,12 +51,13 @@ def getCurrentTime():
 	mins = now.mins
 
 def getDelta(oldDate,oldViewcount,newViewcount):
-	now = datetime.now()
-	days = (now - oldDate).days
-	if(days == 0):
+    now = datetime.now()
+    oldDate = datetime.combine(oldDate, datetime.min.time())
+    days = (now - oldDate).days
+    if(days == 0):
 		return -1
-	delta = (newViewcount - oldViewcount)/days
-	return delta
+    delta = (newViewcount - oldViewcount)/days
+    return delta
 
 
 def updateXml(filename):
@@ -67,7 +68,7 @@ def updateXml(filename):
         else:
             ytubecalls = youtubedlcalls()
         try:
-            oldsong = api.parse(filename)
+            oldsong = api.parse(filename,silence=True)
             if(is_songname_same_artistname(oldsong.songName,oldsong.artist.artistName[0]) == True):
                 movefilestowrong(filename)
                 return
@@ -90,6 +91,9 @@ def updateXml(filename):
             currentVideodislikes = 0
             currentVideoStatus = 'public'
             currentVideoEmbedded = 'true'
+            currentYoutubedldata = ''
+            if( 'youtubedldata' in videoEntry ):
+                currentYoutubedldata = videoEntry['youtubedldata']
             if('viewCount' in videoEntry['statistics']):
                 currentVideoViewCount = videoEntry['statistics']['viewCount']
             if('likeCount' in videoEntry['statistics']):
@@ -131,6 +135,8 @@ def updateXml(filename):
         oldsong.crawlDate =  datetime.now()
         oldsong.viewcountRate = float(currentVideoViewCount)/getMonths(currentPublishedDate)
         oldsong.viewcount = int(currentVideoViewCount)
+        oldsong.set_youtubedldata(currentYoutubedldata)
+        print(currentYoutubedldata)
         genreTag = oldsong.genreTag
         if(genreTag == None or genreTag == ''):
             genreTag = GetgenreTag(oldsong)

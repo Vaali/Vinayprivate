@@ -4,6 +4,7 @@ from songsutils import is_songname_same_artistname,moveFiles
 from urllib2 import urlopen, URLError, HTTPError
 import simplejson
 import youtube_dl
+import json
 logger_matrix = loggingmodule.initialize_logger('youtubeapis','youtubeapis.log')
 
 #Base = declarative_base()
@@ -55,6 +56,8 @@ class youtubedlcalls():
         try:
             with youtube_dl.YoutubeDL(ydl_opts) as ydl:
                 meta = ydl.extract_info(url, download=False)
+            meta.pop('formats', None)
+            meta.pop('requested_formats', None)
             videoResult['items'] = []
             videoEntry = {}
             videoEntry['statistics'] = {}
@@ -70,7 +73,9 @@ class youtubedlcalls():
                 videoEntry['snippet']['publishedAt'] = meta['upload_date']
             videoEntry['status']['privacyStatus'] = 'public'
             videoEntry['status']['embeddable'] = True
+            videoEntry['youtubedldata'] = json.dumps(meta)
             videoResult['items'].append(videoEntry)
+            
             return videoResult
         except Exception as e:
             logger_matrix.exception(e)
