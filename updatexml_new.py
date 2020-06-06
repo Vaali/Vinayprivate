@@ -78,6 +78,7 @@ def updateXml(filename):
         #videoUrl = "https://www.googleapis.com/youtube/v3/videos?id="+str(oldsong.youtubeId)+"&key="+key+"&part=statistics,snippet,status"
         videoResult = ytubecalls.getyoutuberesults(oldsong.youtubeId)
         if(videoResult == None):
+            movefilestodeleted(filename)
             return
         print("new values")
         if videoResult.has_key('items'):
