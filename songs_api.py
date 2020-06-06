@@ -2,70 +2,164 @@
 # -*- coding: utf-8 -*-
 
 #
-# Generated Sun Feb 26 19:00:28 2017 by generateDS.py version 2.9a.
+# Generated Thu Jun  4 23:51:16 2020 by generateDS.py version 2.35.17.
+# Python 2.7.17 (v2.7.17:c2f86d86e6, Oct 19 2019, 16:07:15)  [GCC 4.2.1 Compatible Apple LLVM 6.0 (clang-600.0.57)]
+#
+# Command line options:
+#   ('-o', 'songs_api.py')
+#
+# Command line arguments:
+#   /Volumes/Secondone/Apostolos/xml/generateDS-2.9a/schema/songs.xsd
+#
+# Command line:
+#   /Library/Frameworks/Python.framework/Versions/2.7/bin/generateDS -o "songs_api.py" /Volumes/Secondone/Apostolos/xml/generateDS-2.9a/schema/songs.xsd
+#
+# Current working directory (os.getcwd()):
+#   sourcefiles
 #
 
+from six.moves import zip_longest
+import os
 import sys
-import getopt
 import re as re_
 import base64
-from datetime import datetime, tzinfo, timedelta
-
-etree_ = None
-Verbose_import_ = False
-(   XMLParser_import_none, XMLParser_import_lxml,
-    XMLParser_import_elementtree
-    ) = range(3)
-XMLParser_import_library = None
+import datetime as datetime_
+import decimal as decimal_
 try:
-    # lxml
     from lxml import etree as etree_
-    XMLParser_import_library = XMLParser_import_lxml
-    if Verbose_import_:
-        print("running with lxml.etree")
 except ImportError:
-    try:
-        # cElementTree from Python 2.5+
-        import xml.etree.cElementTree as etree_
-        XMLParser_import_library = XMLParser_import_elementtree
-        if Verbose_import_:
-            print("running with cElementTree on Python 2.5+")
-    except ImportError:
-        try:
-            # ElementTree from Python 2.5+
-            import xml.etree.ElementTree as etree_
-            XMLParser_import_library = XMLParser_import_elementtree
-            if Verbose_import_:
-                print("running with ElementTree on Python 2.5+")
-        except ImportError:
-            try:
-                # normal cElementTree install
-                import cElementTree as etree_
-                XMLParser_import_library = XMLParser_import_elementtree
-                if Verbose_import_:
-                    print("running with cElementTree")
-            except ImportError:
-                try:
-                    # normal ElementTree install
-                    import elementtree.ElementTree as etree_
-                    XMLParser_import_library = XMLParser_import_elementtree
-                    if Verbose_import_:
-                        print("running with ElementTree")
-                except ImportError:
-                    raise ImportError(
-                        "Failed to import ElementTree from any known place")
+    from xml.etree import ElementTree as etree_
 
-def parsexml_(*args, **kwargs):
-    if (XMLParser_import_library == XMLParser_import_lxml and
-        'parser' not in kwargs):
+
+Validate_simpletypes_ = True
+SaveElementTreeNode = True
+if sys.version_info.major == 2:
+    BaseStrType_ = basestring
+else:
+    BaseStrType_ = str
+
+
+def parsexml_(infile, parser=None, **kwargs):
+    if parser is None:
         # Use the lxml ElementTree compatible parser so that, e.g.,
         #   we ignore comments.
-        kwargs['parser'] = etree_.ETCompatXMLParser()
-    doc = etree_.parse(*args, **kwargs)
+        try:
+            parser = etree_.ETCompatXMLParser()
+        except AttributeError:
+            # fallback to xml.etree
+            parser = etree_.XMLParser()
+    try:
+        if isinstance(infile, os.PathLike):
+            infile = os.path.join(infile)
+    except AttributeError:
+        pass
+    doc = etree_.parse(infile, parser=parser, **kwargs)
     return doc
 
+def parsexmlstring_(instring, parser=None, **kwargs):
+    if parser is None:
+        # Use the lxml ElementTree compatible parser so that, e.g.,
+        #   we ignore comments.
+        try:
+            parser = etree_.ETCompatXMLParser()
+        except AttributeError:
+            # fallback to xml.etree
+            parser = etree_.XMLParser()
+    element = etree_.fromstring(instring, parser=parser, **kwargs)
+    return element
+
 #
-# User methods
+# Namespace prefix definition table (and other attributes, too)
+#
+# The module generatedsnamespaces, if it is importable, must contain
+# a dictionary named GeneratedsNamespaceDefs.  This Python dictionary
+# should map element type names (strings) to XML schema namespace prefix
+# definitions.  The export method for any class for which there is
+# a namespace prefix definition, will export that definition in the
+# XML representation of that element.  See the export method of
+# any generated element type class for an example of the use of this
+# table.
+# A sample table is:
+#
+#     # File: generatedsnamespaces.py
+#
+#     GenerateDSNamespaceDefs = {
+#         "ElementtypeA": "http://www.xxx.com/namespaceA",
+#         "ElementtypeB": "http://www.xxx.com/namespaceB",
+#     }
+#
+# Additionally, the generatedsnamespaces module can contain a python
+# dictionary named GenerateDSNamespaceTypePrefixes that associates element
+# types with the namespace prefixes that are to be added to the
+# "xsi:type" attribute value.  See the exportAttributes method of
+# any generated element type and the generation of "xsi:type" for an
+# example of the use of this table.
+# An example table:
+#
+#     # File: generatedsnamespaces.py
+#
+#     GenerateDSNamespaceTypePrefixes = {
+#         "ElementtypeC": "aaa:",
+#         "ElementtypeD": "bbb:",
+#     }
+#
+
+try:
+    from generatedsnamespaces import GenerateDSNamespaceDefs as GenerateDSNamespaceDefs_
+except ImportError:
+    GenerateDSNamespaceDefs_ = {}
+try:
+    from generatedsnamespaces import GenerateDSNamespaceTypePrefixes as GenerateDSNamespaceTypePrefixes_
+except ImportError:
+    GenerateDSNamespaceTypePrefixes_ = {}
+
+#
+# You can replace the following class definition by defining an
+# importable module named "generatedscollector" containing a class
+# named "GdsCollector".  See the default class definition below for
+# clues about the possible content of that class.
+#
+try:
+    from generatedscollector import GdsCollector as GdsCollector_
+except ImportError:
+
+    class GdsCollector_(object):
+
+        def __init__(self, messages=None):
+            if messages is None:
+                self.messages = []
+            else:
+                self.messages = messages
+
+        def add_message(self, msg):
+            self.messages.append(msg)
+
+        def get_messages(self):
+            return self.messages
+
+        def clear_messages(self):
+            self.messages = []
+
+        def print_messages(self):
+            for msg in self.messages:
+                print("Warning: {}".format(msg))
+
+        def write_messages(self, outstream):
+            for msg in self.messages:
+                outstream.write("Warning: {}\n".format(msg))
+
+
+#
+# The super-class for enum types
+#
+
+try:
+    from enum import Enum
+except ImportError:
+    Enum = object
+
+#
+# The root super-class for element type classes
 #
 # Calls to the methods in these classes are generated by generateDS.py.
 # You can replace these methods by re-implementing the following class
@@ -73,13 +167,14 @@ def parsexml_(*args, **kwargs):
 
 try:
     from generatedssuper import GeneratedsSuper
-except ImportError, exp:
-
+except ImportError as exp:
+    
     class GeneratedsSuper(object):
+        __hash__ = object.__hash__
         tzoff_pattern = re_.compile(r'(\+|-)((0\d|1[0-3]):[0-5]\d|14:00)$')
-        class _FixedOffsetTZ(tzinfo):
+        class _FixedOffsetTZ(datetime_.tzinfo):
             def __init__(self, offset, name):
-                self.__offset = timedelta(minutes = offset)
+                self.__offset = datetime_.timedelta(minutes=offset)
                 self.__name = name
             def utcoffset(self, dt):
                 return self.__offset
@@ -89,75 +184,169 @@ except ImportError, exp:
                 return None
         def gds_format_string(self, input_data, input_name=''):
             return input_data
-        def gds_validate_string(self, input_data, node, input_name=''):
+        def gds_parse_string(self, input_data, node=None, input_name=''):
             return input_data
+        def gds_validate_string(self, input_data, node=None, input_name=''):
+            if not input_data:
+                return ''
+            else:
+                return input_data
         def gds_format_base64(self, input_data, input_name=''):
             return base64.b64encode(input_data)
-        def gds_validate_base64(self, input_data, node, input_name=''):
+        def gds_validate_base64(self, input_data, node=None, input_name=''):
             return input_data
         def gds_format_integer(self, input_data, input_name=''):
             return '%d' % input_data
-        def gds_validate_integer(self, input_data, node, input_name=''):
-            return input_data
+        def gds_parse_integer(self, input_data, node=None, input_name=''):
+            try:
+                ival = int(input_data)
+            except (TypeError, ValueError) as exp:
+                raise_parse_error(node, 'Requires integer value: %s' % exp)
+            return ival
+        def gds_validate_integer(self, input_data, node=None, input_name=''):
+            try:
+                value = int(input_data)
+            except (TypeError, ValueError):
+                raise_parse_error(node, 'Requires integer value')
+            return value
         def gds_format_integer_list(self, input_data, input_name=''):
-            return '%s' % input_data
-        def gds_validate_integer_list(self, input_data, node, input_name=''):
+            return '%s' % ' '.join(input_data)
+        def gds_validate_integer_list(
+                self, input_data, node=None, input_name=''):
             values = input_data.split()
             for value in values:
                 try:
-                    fvalue = float(value)
-                except (TypeError, ValueError), exp:
-                    raise_parse_error(node, 'Requires sequence of integers')
-            return input_data
+                    int(value)
+                except (TypeError, ValueError):
+                    raise_parse_error(node, 'Requires sequence of integer valuess')
+            return values
         def gds_format_float(self, input_data, input_name=''):
-            return '%f' % input_data
-        def gds_validate_float(self, input_data, node, input_name=''):
-            return input_data
+            return ('%.15f' % input_data).rstrip('0')
+        def gds_parse_float(self, input_data, node=None, input_name=''):
+            try:
+                fval_ = float(input_data)
+            except (TypeError, ValueError) as exp:
+                raise_parse_error(node, 'Requires float or double value: %s' % exp)
+            return fval_
+        def gds_validate_float(self, input_data, node=None, input_name=''):
+            try:
+                value = float(input_data)
+            except (TypeError, ValueError):
+                raise_parse_error(node, 'Requires float value')
+            return value
         def gds_format_float_list(self, input_data, input_name=''):
-            return '%s' % input_data
-        def gds_validate_float_list(self, input_data, node, input_name=''):
+            return '%s' % ' '.join(input_data)
+        def gds_validate_float_list(
+                self, input_data, node=None, input_name=''):
             values = input_data.split()
             for value in values:
                 try:
-                    fvalue = float(value)
-                except (TypeError, ValueError), exp:
-                    raise_parse_error(node, 'Requires sequence of floats')
-            return input_data
+                    float(value)
+                except (TypeError, ValueError):
+                    raise_parse_error(node, 'Requires sequence of float values')
+            return values
+        def gds_format_decimal(self, input_data, input_name=''):
+            return ('%s' % input_data).rstrip('0')
+        def gds_parse_decimal(self, input_data, node=None, input_name=''):
+            try:
+                decimal_value = decimal_.Decimal(input_data)
+            except (TypeError, ValueError):
+                raise_parse_error(node, 'Requires decimal value')
+            return decimal_value
+        def gds_validate_decimal(self, input_data, node=None, input_name=''):
+            try:
+                value = decimal_.Decimal(input_data)
+            except (TypeError, ValueError):
+                raise_parse_error(node, 'Requires decimal value')
+            return value
+        def gds_format_decimal_list(self, input_data, input_name=''):
+            return '%s' % ' '.join(input_data)
+        def gds_validate_decimal_list(
+                self, input_data, node=None, input_name=''):
+            values = input_data.split()
+            for value in values:
+                try:
+                    decimal_.Decimal(value)
+                except (TypeError, ValueError):
+                    raise_parse_error(node, 'Requires sequence of decimal values')
+            return values
         def gds_format_double(self, input_data, input_name=''):
             return '%e' % input_data
-        def gds_validate_double(self, input_data, node, input_name=''):
-            return input_data
+        def gds_parse_double(self, input_data, node=None, input_name=''):
+            try:
+                fval_ = float(input_data)
+            except (TypeError, ValueError) as exp:
+                raise_parse_error(node, 'Requires double or float value: %s' % exp)
+            return fval_
+        def gds_validate_double(self, input_data, node=None, input_name=''):
+            try:
+                value = float(input_data)
+            except (TypeError, ValueError):
+                raise_parse_error(node, 'Requires double or float value')
+            return value
         def gds_format_double_list(self, input_data, input_name=''):
-            return '%s' % input_data
-        def gds_validate_double_list(self, input_data, node, input_name=''):
+            return '%s' % ' '.join(input_data)
+        def gds_validate_double_list(
+                self, input_data, node=None, input_name=''):
             values = input_data.split()
             for value in values:
                 try:
-                    fvalue = float(value)
-                except (TypeError, ValueError), exp:
-                    raise_parse_error(node, 'Requires sequence of doubles')
-            return input_data
+                    float(value)
+                except (TypeError, ValueError):
+                    raise_parse_error(
+                        node, 'Requires sequence of double or float values')
+            return values
         def gds_format_boolean(self, input_data, input_name=''):
             return ('%s' % input_data).lower()
-        def gds_validate_boolean(self, input_data, node, input_name=''):
+        def gds_parse_boolean(self, input_data, node=None, input_name=''):
+            if input_data in ('true', '1'):
+                bval = True
+            elif input_data in ('false', '0'):
+                bval = False
+            else:
+                raise_parse_error(node, 'Requires boolean value')
+            return bval
+        def gds_validate_boolean(self, input_data, node=None, input_name=''):
+            if input_data not in (True, 1, False, 0, ):
+                raise_parse_error(
+                    node,
+                    'Requires boolean value '
+                    '(one of True, 1, False, 0)')
             return input_data
         def gds_format_boolean_list(self, input_data, input_name=''):
-            return '%s' % input_data
-        def gds_validate_boolean_list(self, input_data, node, input_name=''):
+            return '%s' % ' '.join(input_data)
+        def gds_validate_boolean_list(
+                self, input_data, node=None, input_name=''):
             values = input_data.split()
             for value in values:
-                if value not in ('true', '1', 'false', '0', ):
-                    raise_parse_error(node,
-                        'Requires sequence of booleans '
-                        '("true", "1", "false", "0")')
-            return input_data
-        def gds_validate_datetime(self, input_data, node, input_name=''):
+                if value not in (True, 1, False, 0, ):
+                    raise_parse_error(
+                        node,
+                        'Requires sequence of boolean values '
+                        '(one of True, 1, False, 0)')
+            return values
+        def gds_validate_datetime(self, input_data, node=None, input_name=''):
             return input_data
         def gds_format_datetime(self, input_data, input_name=''):
             if input_data.microsecond == 0:
-                _svalue = input_data.strftime('%Y-%m-%dT%H:%M:%S')
+                _svalue = '%04d-%02d-%02dT%02d:%02d:%02d' % (
+                    input_data.year,
+                    input_data.month,
+                    input_data.day,
+                    input_data.hour,
+                    input_data.minute,
+                    input_data.second,
+                )
             else:
-                _svalue = input_data.strftime('%Y-%m-%dT%H:%M:%S.%f')
+                _svalue = '%04d-%02d-%02dT%02d:%02d:%02d.%s' % (
+                    input_data.year,
+                    input_data.month,
+                    input_data.day,
+                    input_data.hour,
+                    input_data.minute,
+                    input_data.second,
+                    ('%f' % (float(input_data.microsecond) / 1000000))[2:],
+                )
             if input_data.tzinfo is not None:
                 tzoff = input_data.tzinfo.utcoffset(input_data)
                 if tzoff is not None:
@@ -174,10 +363,134 @@ except ImportError, exp:
                         minutes = (total_seconds - (hours * 3600)) // 60
                         _svalue += '{0:02d}:{1:02d}'.format(hours, minutes)
             return _svalue
-        def gds_parse_datetime(self, input_data, node, input_name=''):
+        @classmethod
+        def gds_parse_datetime(cls, input_data):
             tz = None
             if input_data[-1] == 'Z':
-                tz = GeneratedsSuper._FixedOffsetTZ(0, 'GMT')
+                tz = GeneratedsSuper._FixedOffsetTZ(0, 'UTC')
+                input_data = input_data[:-1]
+            else:
+                results = GeneratedsSuper.tzoff_pattern.search(input_data)
+                if results is not None:
+                    tzoff_parts = results.group(2).split(':')
+                    tzoff = int(tzoff_parts[0]) * 60 + int(tzoff_parts[1])
+                    if results.group(1) == '-':
+                        tzoff *= -1
+                    tz = GeneratedsSuper._FixedOffsetTZ(
+                        tzoff, results.group(0))
+                    input_data = input_data[:-6]
+            time_parts = input_data.split('.')
+            if len(time_parts) > 1:
+                micro_seconds = int(float('0.' + time_parts[1]) * 1000000)
+                input_data = '%s.%s' % (
+                    time_parts[0], "{}".format(micro_seconds).rjust(6, "0"), )
+                dt = datetime_.datetime.strptime(
+                    input_data, '%Y-%m-%dT%H:%M:%S.%f')
+            else:
+                dt = datetime_.datetime.strptime(
+                    input_data, '%Y-%m-%dT%H:%M:%S')
+            dt = dt.replace(tzinfo=tz)
+            return dt
+        def gds_validate_date(self, input_data, node=None, input_name=''):
+            return input_data
+        def gds_format_date(self, input_data, input_name=''):
+            _svalue = '%04d-%02d-%02d' % (
+                input_data.year,
+                input_data.month,
+                input_data.day,
+            )
+            try:
+                if input_data.tzinfo is not None:
+                    tzoff = input_data.tzinfo.utcoffset(input_data)
+                    if tzoff is not None:
+                        total_seconds = tzoff.seconds + (86400 * tzoff.days)
+                        if total_seconds == 0:
+                            _svalue += 'Z'
+                        else:
+                            if total_seconds < 0:
+                                _svalue += '-'
+                                total_seconds *= -1
+                            else:
+                                _svalue += '+'
+                            hours = total_seconds // 3600
+                            minutes = (total_seconds - (hours * 3600)) // 60
+                            _svalue += '{0:02d}:{1:02d}'.format(
+                                hours, minutes)
+            except AttributeError:
+                pass
+            return _svalue
+        @classmethod
+        def gds_parse_date(cls, input_data):
+            tz = None
+            if input_data[-1] == 'Z':
+                tz = GeneratedsSuper._FixedOffsetTZ(0, 'UTC')
+                input_data = input_data[:-1]
+            else:
+                results = GeneratedsSuper.tzoff_pattern.search(input_data)
+                if results is not None:
+                    tzoff_parts = results.group(2).split(':')
+                    tzoff = int(tzoff_parts[0]) * 60 + int(tzoff_parts[1])
+                    if results.group(1) == '-':
+                        tzoff *= -1
+                    tz = GeneratedsSuper._FixedOffsetTZ(
+                        tzoff, results.group(0))
+                    input_data = input_data[:-6]
+            dt = datetime_.datetime.strptime(input_data, '%Y-%m-%d')
+            dt = dt.replace(tzinfo=tz)
+            return dt.date()
+        def gds_validate_time(self, input_data, node=None, input_name=''):
+            return input_data
+        def gds_format_time(self, input_data, input_name=''):
+            if input_data.microsecond == 0:
+                _svalue = '%02d:%02d:%02d' % (
+                    input_data.hour,
+                    input_data.minute,
+                    input_data.second,
+                )
+            else:
+                _svalue = '%02d:%02d:%02d.%s' % (
+                    input_data.hour,
+                    input_data.minute,
+                    input_data.second,
+                    ('%f' % (float(input_data.microsecond) / 1000000))[2:],
+                )
+            if input_data.tzinfo is not None:
+                tzoff = input_data.tzinfo.utcoffset(input_data)
+                if tzoff is not None:
+                    total_seconds = tzoff.seconds + (86400 * tzoff.days)
+                    if total_seconds == 0:
+                        _svalue += 'Z'
+                    else:
+                        if total_seconds < 0:
+                            _svalue += '-'
+                            total_seconds *= -1
+                        else:
+                            _svalue += '+'
+                        hours = total_seconds // 3600
+                        minutes = (total_seconds - (hours * 3600)) // 60
+                        _svalue += '{0:02d}:{1:02d}'.format(hours, minutes)
+            return _svalue
+        def gds_validate_simple_patterns(self, patterns, target):
+            # pat is a list of lists of strings/patterns.
+            # The target value must match at least one of the patterns
+            # in order for the test to succeed.
+            found1 = True
+            for patterns1 in patterns:
+                found2 = False
+                for patterns2 in patterns1:
+                    mo = re_.search(patterns2, target)
+                    if mo is not None and len(mo.group(0)) == len(target):
+                        found2 = True
+                        break
+                if not found2:
+                    found1 = False
+                    break
+            return found1
+        @classmethod
+        def gds_parse_time(cls, input_data):
+            tz = None
+            if input_data[-1] == 'Z':
+                tz = GeneratedsSuper._FixedOffsetTZ(0, 'UTC')
                 input_data = input_data[:-1]
             else:
                 results = GeneratedsSuper.tzoff_pattern.search(input_data)
@@ -190,50 +503,55 @@ except ImportError, exp:
                         tzoff, results.group(0))
                     input_data = input_data[:-6]
             if len(input_data.split('.')) > 1:
-                dt = datetime.strptime(
-                        input_data, '%Y-%m-%dT%H:%M:%S.%f')
+                dt = datetime_.datetime.strptime(input_data, '%H:%M:%S.%f')
             else:
-                dt = datetime.strptime(
-                        input_data, '%Y-%m-%dT%H:%M:%S')
-            return dt.replace(tzinfo = tz)
-
-        def gds_validate_date(self, input_data, node, input_name=''):
-            return input_data
-        def gds_format_date(self, input_data, input_name=''):
-            _svalue = input_data.strftime('%Y-%m-%d')
-            if input_data.tzinfo is not None:
-                tzoff = input_data.tzinfo.utcoffset(input_data)
-                if tzoff is not None:
-                    total_seconds = tzoff.seconds + (86400 * tzoff.days)
-                    if total_seconds == 0:
-                        _svalue += 'Z'
-                    else:
-                        if total_seconds < 0:
-                            _svalue += '-'
-                            total_seconds *= -1
-                        else:
-                            _svalue += '+'
-                        hours = total_seconds // 3600
-                        minutes = (total_seconds - (hours * 3600)) // 60
-                        _svalue += '{0:02d}:{1:02d}'.format(hours, minutes)
-            return _svalue
-        def gds_parse_date(self, input_data, node, input_name=''):
-            tz = None
-            if input_data[-1] == 'Z':
-                tz = GeneratedsSuper._FixedOffsetTZ(0, 'GMT')
-                input_data = input_data[:-1]
+                dt = datetime_.datetime.strptime(input_data, '%H:%M:%S')
+            dt = dt.replace(tzinfo=tz)
+            return dt.time()
+        def gds_check_cardinality_(
+                self, value, input_name,
+                min_occurs=0, max_occurs=1, required=None):
+            if value is None:
+                length = 0
+            elif isinstance(value, list):
+                length = len(value)
             else:
-                results = GeneratedsSuper.tzoff_pattern.search(input_data)
-                if results is not None:
-                    tzoff_parts = results.group(2).split(':')
-                    tzoff = int(tzoff_parts[0]) * 60 + int(tzoff_parts[1])
-                    if results.group(1) == '-':
-                        tzoff *= -1
-                    tz = GeneratedsSuper._FixedOffsetTZ(
-                        tzoff, results.group(0))
-                    input_data = input_data[:-6]
-            return datetime.strptime(input_data,
-                '%Y-%m-%d').replace(tzinfo = tz)
+                length = 1
+            if required is not None :
+                if required and length < 1:
+                    self.gds_collector_.add_message(
+                        "Required value {}{} is missing".format(
+                            input_name, self.gds_get_node_lineno_()))
+            if length < min_occurs:
+                self.gds_collector_.add_message(
+                    "Number of values for {}{} is below "
+                    "the minimum allowed, "
+                    "expected at least {}, found {}".format(
+                        input_name, self.gds_get_node_lineno_(),
+                        min_occurs, length))
+            elif length > max_occurs:
+                self.gds_collector_.add_message(
+                    "Number of values for {}{} is above "
+                    "the maximum allowed, "
+                    "expected at most {}, found {}".format(
+                        input_name, self.gds_get_node_lineno_(),
+                        max_occurs, length))
+        def gds_validate_builtin_ST_(
+                self, validator, value, input_name,
+                min_occurs=None, max_occurs=None, required=None):
+            if value is not None:
+                try:
+                    validator(value, input_name=input_name)
+                except GDSParseError as parse_error:
+                    self.gds_collector_.add_message(str(parse_error))
+        def gds_validate_defined_ST_(
+                self, validator, value, input_name,
+                min_occurs=None, max_occurs=None, required=None):
+            if value is not None:
+                try:
+                    validator(value)
+                except GDSParseError as parse_error:
+                    self.gds_collector_.add_message(str(parse_error))
         def gds_str_lower(self, instring):
             return instring.lower()
         def get_path_(self, node):
@@ -263,6 +581,68 @@ except ImportError, exp:
                         class_obj1 = class_obj2
             return class_obj1
         def gds_build_any(self, node, type_name=None):
+            # provide default value in case option --disable-xml is used.
+            content = ""
+            content = etree_.tostring(node, encoding="unicode")
+            return content
+        @classmethod
+        def gds_reverse_node_mapping(cls, mapping):
+            return dict(((v, k) for k, v in mapping.items()))
+        @staticmethod
+        def gds_encode(instring):
+            if sys.version_info.major == 2:
+                if ExternalEncoding:
+                    encoding = ExternalEncoding
+                else:
+                    encoding = 'utf-8'
+                return instring.encode(encoding)
+            else:
+                return instring
+        @staticmethod
+        def convert_unicode(instring):
+            if isinstance(instring, str):
+                result = quote_xml(instring)
+            elif sys.version_info.major == 2 and isinstance(instring, unicode):
+                result = quote_xml(instring).encode('utf8')
+            else:
+                result = GeneratedsSuper.gds_encode(str(instring))
+            return result
+        def __eq__(self, other):
+            def excl_select_objs_(obj):
+                return (obj[0] != 'parent_object_' and
+                        obj[0] != 'gds_collector_')
+            if type(self) != type(other):
+                return False
+            return all(x == y for x, y in zip_longest(
+                filter(excl_select_objs_, self.__dict__.items()),
+                filter(excl_select_objs_, other.__dict__.items())))
+        def __ne__(self, other):
+            return not self.__eq__(other)
+        # Django ETL transform hooks.
+        def gds_djo_etl_transform(self):
+            pass
+        def gds_djo_etl_transform_db_obj(self, dbobj):
+            pass
+        # SQLAlchemy ETL transform hooks.
+        def gds_sqa_etl_transform(self):
+            return 0, None
+        def gds_sqa_etl_transform_db_obj(self, dbobj):
+            pass
+        def gds_get_node_lineno_(self):
+            if (hasattr(self, "gds_elementtree_node_") and
+                    self.gds_elementtree_node_ is not None):
+                return ' near line {}'.format(
+                    self.gds_elementtree_node_.sourceline)
+            else:
+                return ""
+    
+    
+    def getSubclassFromModule_(module, class_):
+        '''Get the subclass of a class from a specific module.'''
+        name = class_.__name__ + 'Sub'
+        if hasattr(module, name):
+            return getattr(module, name)
+        else:
             return None
 
 
@@ -285,33 +665,58 @@ except ImportError, exp:
 # Globals
 #
 
-ExternalEncoding = 'utf8'
+ExternalEncoding = ''
+# Set this to false in order to deactivate during export, the use of
+# name space prefixes captured from the input document.
+UseCapturedNS_ = True
+CapturedNsmap_ = {}
 Tag_pattern_ = re_.compile(r'({.*})?(.*)')
 String_cleanup_pat_ = re_.compile(r"[\n\r\s]+")
 Namespace_extract_pat_ = re_.compile(r'{(.*)}(.*)')
+CDATA_pattern_ = re_.compile(r"<!\[CDATA\[.*?\]\]>", re_.DOTALL)
+
+# Change this to redirect the generated superclass module to use a
+# specific subclass module.
+CurrentSubclassModule_ = None
 
 #
 # Support/utility functions.
 #
+
 
 def showIndent(outfile, level, pretty_print=True):
     if pretty_print:
         for idx in range(level):
             outfile.write('    ')
 
+
 def quote_xml(inStr):
+    "Escape markup chars, but do not modify CDATA sections."
     if not inStr:
         return ''
-    s1 = (isinstance(inStr, basestring) and inStr or
-          '%s' % inStr)
-    s1 = s1.replace('&', '&amp;')
+    s1 = (isinstance(inStr, BaseStrType_) and inStr or '%s' % inStr)
+    s2 = ''
+    pos = 0
+    matchobjects = CDATA_pattern_.finditer(s1)
+    for mo in matchobjects:
+        s3 = s1[pos:mo.start()]
+        s2 += quote_xml_aux(s3)
+        s2 += s1[mo.start():mo.end()]
+        pos = mo.end()
+    s3 = s1[pos:]
+    s2 += quote_xml_aux(s3)
+    return s2
+
+
+def quote_xml_aux(inStr):
+    s1 = inStr.replace('&', '&amp;')
     s1 = s1.replace('<', '&lt;')
     s1 = s1.replace('>', '&gt;')
     return s1
 
+
 def quote_attrib(inStr):
-    s1 = (isinstance(inStr, basestring) and inStr or
-          '%s' % inStr)
+    s1 = (isinstance(inStr, BaseStrType_) and inStr or '%s' % inStr)
     s1 = s1.replace('&', '&amp;')
     s1 = s1.replace('<', '&lt;')
     s1 = s1.replace('>', '&gt;')
@@ -323,6 +728,7 @@ def quote_attrib(inStr):
     else:
         s1 = '"%s"' % s1
     return s1
+
 
 def quote_python(inStr):
     s1 = inStr
@@ -339,6 +745,7 @@ def quote_python(inStr):
         else:
             return '"""%s"""' % s1
 
+
 def get_all_text_(node):
     if node.text is not None:
         text = node.text
@@ -348,6 +755,7 @@ def get_all_text_(node):
         if child.tail is not None:
             text += child.tail
     return text
+
 
 def find_attr_value_(attr_name, node):
     attrs = node.attrib
@@ -363,15 +771,17 @@ def find_attr_value_(attr_name, node):
     return value
 
 
+def encode_str_2_3(instr):
+    return instr
+
+
 class GDSParseError(Exception):
     pass
 
+
 def raise_parse_error(node, msg):
-    if XMLParser_import_library == XMLParser_import_lxml:
-        msg = '%s (element %s/line %d)' % (
-            msg, node.tag, node.sourceline, )
-    else:
-        msg = '%s (element %s)' % (msg, node.tag, )
+    if node is not None:
+        msg = '%s (element %s/line %d)' % (msg, node.tag, node.sourceline, )
     raise GDSParseError(msg)
 
 
@@ -404,7 +814,8 @@ class MixedContainer:
         return self.value
     def getName(self):
         return self.name
-    def export(self, outfile, level, name, namespace, pretty_print=True):
+    def export(self, outfile, level, name, namespace,
+               pretty_print=True):
         if self.category == MixedContainer.CategoryText:
             # Prevent exporting empty content as empty lines.
             if self.value.strip():
@@ -412,26 +823,30 @@ class MixedContainer:
         elif self.category == MixedContainer.CategorySimple:
             self.exportSimple(outfile, level, name)
         else:    # category == MixedContainer.CategoryComplex
-            self.value.export(outfile, level, namespace, name, pretty_print)
+            self.value.export(
+                outfile, level, namespace, name_=name,
+                pretty_print=pretty_print)
     def exportSimple(self, outfile, level, name):
         if self.content_type == MixedContainer.TypeString:
-            outfile.write('<%s>%s</%s>' %
-                (self.name, self.value, self.name))
+            outfile.write('<%s>%s</%s>' % (
+                self.name, self.value, self.name))
         elif self.content_type == MixedContainer.TypeInteger or \
                 self.content_type == MixedContainer.TypeBoolean:
-            outfile.write('<%s>%d</%s>' %
-                (self.name, self.value, self.name))
+            outfile.write('<%s>%d</%s>' % (
+                self.name, self.value, self.name))
         elif self.content_type == MixedContainer.TypeFloat or \
                 self.content_type == MixedContainer.TypeDecimal:
-            outfile.write('<%s>%f</%s>' %
-                (self.name, self.value, self.name))
+            outfile.write('<%s>%f</%s>' % (
+                self.name, self.value, self.name))
         elif self.content_type == MixedContainer.TypeDouble:
-            outfile.write('<%s>%g</%s>' %
-                (self.name, self.value, self.name))
+            outfile.write('<%s>%g</%s>' % (
+                self.name, self.value, self.name))
         elif self.content_type == MixedContainer.TypeBase64:
-            outfile.write('<%s>%s</%s>' %
-                (self.name, base64.b64encode(self.value), self.name))
-    def to_etree(self, element):
+            outfile.write('<%s>%s</%s>' % (
+                self.name,
+                base64.b64encode(self.value),
+                self.name))
+    def to_etree(self, element, mapping_=None, nsmap_=None):
         if self.category == MixedContainer.CategoryText:
             # Prevent exporting empty content as empty lines.
             if self.value.strip():
@@ -446,11 +861,12 @@ class MixedContainer:
                     else:
                         element.text += self.value
         elif self.category == MixedContainer.CategorySimple:
-            subelement = etree_.SubElement(element, '%s' % self.name)
+            subelement = etree_.SubElement(
+                element, '%s' % self.name)
             subelement.text = self.to_etree_simple()
         else:    # category == MixedContainer.CategoryComplex
             self.value.to_etree(element)
-    def to_etree_simple(self):
+    def to_etree_simple(self, mapping_=None, nsmap_=None):
         if self.content_type == MixedContainer.TypeString:
             text = self.value
         elif (self.content_type == MixedContainer.TypeInteger or
@@ -467,26 +883,35 @@ class MixedContainer:
     def exportLiteral(self, outfile, level, name):
         if self.category == MixedContainer.CategoryText:
             showIndent(outfile, level)
-            outfile.write('model_.MixedContainer(%d, %d, "%s", "%s"),\n'
-                % (self.category, self.content_type, self.name, self.value))
+            outfile.write(
+                'model_.MixedContainer(%d, %d, "%s", "%s"),\n' % (
+                    self.category, self.content_type,
+                    self.name, self.value))
         elif self.category == MixedContainer.CategorySimple:
             showIndent(outfile, level)
-            outfile.write('model_.MixedContainer(%d, %d, "%s", "%s"),\n'
-                % (self.category, self.content_type, self.name, self.value))
+            outfile.write(
+                'model_.MixedContainer(%d, %d, "%s", "%s"),\n' % (
+                    self.category, self.content_type,
+                    self.name, self.value))
         else:    # category == MixedContainer.CategoryComplex
             showIndent(outfile, level)
-            outfile.write('model_.MixedContainer(%d, %d, "%s",\n' % \
-                (self.category, self.content_type, self.name,))
+            outfile.write(
+                'model_.MixedContainer(%d, %d, "%s",\n' % (
+                    self.category, self.content_type, self.name,))
             self.value.exportLiteral(outfile, level + 1)
             showIndent(outfile, level)
             outfile.write(')\n')
 
 
 class MemberSpec_(object):
-    def __init__(self, name='', data_type='', container=0):
+    def __init__(self, name='', data_type='', container=0,
+            optional=0, child_attrs=None, choice=None):
         self.name = name
         self.data_type = data_type
         self.container = container
+        self.child_attrs = child_attrs
+        self.choice = choice
+        self.optional = optional
     def set_name(self, name): self.name = name
     def get_name(self): return self.name
     def set_data_type(self, data_type): self.data_type = data_type
@@ -501,6 +926,13 @@ class MemberSpec_(object):
             return self.data_type
     def set_container(self, container): self.container = container
     def get_container(self): return self.container
+    def set_child_attrs(self, child_attrs): self.child_attrs = child_attrs
+    def get_child_attrs(self): return self.child_attrs
+    def set_choice(self, choice): self.choice = choice
+    def get_choice(self): return self.choice
+    def set_optional(self, optional): self.optional = optional
+    def get_optional(self): return self.optional
+
 
 def _cast(typ, value):
     if typ is None or value is None:
@@ -511,190 +943,398 @@ def _cast(typ, value):
 # Data representation classes.
 #
 
+
 class songs(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
     subclass = None
     superclass = None
-    def __init__(self, youtubeId=None, artistId=None, overLap=None, songName=None, youtubeName=None, artist=None, ftArtistList=None, indexedftArtistList=None, indexedArtistAliasList=None, connPhraseList=None, indexedArtist=None, url=None, releaseDate=None, decade=None, youtubeDate=None, crawlDate=None, viewcount=None, crawlDelta=None, isCompilation=None, releaseId=None, masterRelease=None, masterGenres=None, masterStyles=None, crawlHistoryList=None, genresCountList=None, rating=None, level1Genres=None, level2Genres=None, level3Genres=None, level4Genres=None, level5Genres=None, level6Genres=None, level7Genres=None, level8Genres=None, level9Genres=None, albumList=None, similarGenresTagList=None, similarArtistList=None, totalGenreCount=None, viewcountRate=None, duration=None, descriptions=None, viewCountGroup=None, decision=None, substring_song=None, substring_artist=None, substring_ftartist=None, songLanguage=None, earliestDate=None, songCountry=None, totalMatch=None, songMatch=None, artistMatch=None, genreTag=None, genreTagId=None, youtubeList=None, genreMatch=None, soundcloudList=None):
+    def __init__(self, youtubeId=None, artistId=None, overLap=None, songName=None, youtubeName=None, youtubedldata=None, artist=None, ftArtistList=None, indexedftArtistList=None, indexedArtistAliasList=None, connPhraseList=None, indexedArtist=None, url=None, releaseDate=None, decade=None, youtubeDate=None, crawlDate=None, viewcount=None, crawlDelta=None, isCompilation=None, releaseId=None, masterRelease=None, masterGenres=None, masterStyles=None, crawlHistoryList=None, genresCountList=None, rating=None, level1Genres=None, level2Genres=None, level3Genres=None, level4Genres=None, level5Genres=None, level6Genres=None, level7Genres=None, level8Genres=None, level9Genres=None, albumList=None, similarGenresTagList=None, similarArtistList=None, totalGenreCount=None, viewcountRate=None, duration=None, descriptions=None, viewCountGroup=None, decision=None, substring_song=None, substring_artist=None, substring_ftartist=None, songLanguage=None, earliestDate=None, songCountry=None, totalMatch=None, songMatch=None, artistMatch=None, genreTag=None, genreTagId=None, youtubeList=None, genreMatch=None, soundcloudList=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = None
         self.youtubeId = youtubeId
+        self.youtubeId_nsprefix_ = None
         self.artistId = artistId
+        self.artistId_nsprefix_ = None
         self.overLap = overLap
+        self.overLap_nsprefix_ = None
         self.songName = songName
+        self.songName_nsprefix_ = None
         self.youtubeName = youtubeName
+        self.youtubeName_nsprefix_ = None
+        self.youtubedldata = youtubedldata
+        self.youtubedldata_nsprefix_ = None
         self.artist = artist
+        self.artist_nsprefix_ = None
         self.ftArtistList = ftArtistList
+        self.ftArtistList_nsprefix_ = None
         self.indexedftArtistList = indexedftArtistList
+        self.indexedftArtistList_nsprefix_ = None
         self.indexedArtistAliasList = indexedArtistAliasList
+        self.indexedArtistAliasList_nsprefix_ = None
         self.connPhraseList = connPhraseList
+        self.connPhraseList_nsprefix_ = None
         self.indexedArtist = indexedArtist
+        self.indexedArtist_nsprefix_ = None
         self.url = url
+        self.url_nsprefix_ = None
         self.releaseDate = releaseDate
+        self.releaseDate_nsprefix_ = None
         self.decade = decade
-        self.youtubeDate = youtubeDate
-        self.crawlDate = crawlDate
+        self.decade_nsprefix_ = None
+        if isinstance(youtubeDate, BaseStrType_):
+            initvalue_ = datetime_.datetime.strptime(youtubeDate, '%Y-%m-%d').date()
+        else:
+            initvalue_ = youtubeDate
+        self.youtubeDate = initvalue_
+        self.youtubeDate_nsprefix_ = None
+        if isinstance(crawlDate, BaseStrType_):
+            initvalue_ = datetime_.datetime.strptime(crawlDate, '%Y-%m-%d').date()
+        else:
+            initvalue_ = crawlDate
+        self.crawlDate = initvalue_
+        self.crawlDate_nsprefix_ = None
         self.viewcount = viewcount
+        self.viewcount_nsprefix_ = None
         self.crawlDelta = crawlDelta
+        self.crawlDelta_nsprefix_ = None
         self.isCompilation = isCompilation
+        self.isCompilation_nsprefix_ = None
         self.releaseId = releaseId
+        self.releaseId_nsprefix_ = None
         self.masterRelease = masterRelease
+        self.masterRelease_nsprefix_ = None
         self.masterGenres = masterGenres
+        self.masterGenres_nsprefix_ = None
         self.masterStyles = masterStyles
+        self.masterStyles_nsprefix_ = None
         self.crawlHistoryList = crawlHistoryList
+        self.crawlHistoryList_nsprefix_ = None
         self.genresCountList = genresCountList
+        self.genresCountList_nsprefix_ = None
         self.rating = rating
+        self.rating_nsprefix_ = None
         self.level1Genres = level1Genres
+        self.level1Genres_nsprefix_ = None
         self.level2Genres = level2Genres
+        self.level2Genres_nsprefix_ = None
         self.level3Genres = level3Genres
+        self.level3Genres_nsprefix_ = None
         self.level4Genres = level4Genres
+        self.level4Genres_nsprefix_ = None
         self.level5Genres = level5Genres
+        self.level5Genres_nsprefix_ = None
         self.level6Genres = level6Genres
+        self.level6Genres_nsprefix_ = None
         self.level7Genres = level7Genres
+        self.level7Genres_nsprefix_ = None
         self.level8Genres = level8Genres
+        self.level8Genres_nsprefix_ = None
         self.level9Genres = level9Genres
+        self.level9Genres_nsprefix_ = None
         self.albumList = albumList
+        self.albumList_nsprefix_ = None
         self.similarGenresTagList = similarGenresTagList
+        self.similarGenresTagList_nsprefix_ = None
         self.similarArtistList = similarArtistList
+        self.similarArtistList_nsprefix_ = None
         self.totalGenreCount = totalGenreCount
+        self.totalGenreCount_nsprefix_ = None
         self.viewcountRate = viewcountRate
-        self.duration = duration
+        self.viewcountRate_nsprefix_ = None
+        if isinstance(duration, BaseStrType_):
+            initvalue_ = datetime_.datetime.strptime(duration, '%H:%M:%S').time()
+        else:
+            initvalue_ = duration
+        self.duration = initvalue_
+        self.duration_nsprefix_ = None
         self.descriptions = descriptions
+        self.descriptions_nsprefix_ = None
         self.viewCountGroup = viewCountGroup
+        self.viewCountGroup_nsprefix_ = None
         self.decision = decision
+        self.decision_nsprefix_ = None
         self.substring_song = substring_song
+        self.substring_song_nsprefix_ = None
         self.substring_artist = substring_artist
+        self.substring_artist_nsprefix_ = None
         self.substring_ftartist = substring_ftartist
+        self.substring_ftartist_nsprefix_ = None
         self.songLanguage = songLanguage
+        self.songLanguage_nsprefix_ = None
         self.earliestDate = earliestDate
+        self.earliestDate_nsprefix_ = None
         self.songCountry = songCountry
+        self.songCountry_nsprefix_ = None
         self.totalMatch = totalMatch
+        self.totalMatch_nsprefix_ = None
         self.songMatch = songMatch
+        self.songMatch_nsprefix_ = None
         self.artistMatch = artistMatch
+        self.artistMatch_nsprefix_ = None
         self.genreTag = genreTag
+        self.genreTag_nsprefix_ = None
         self.genreTagId = genreTagId
+        self.genreTagId_nsprefix_ = None
         self.youtubeList = youtubeList
+        self.youtubeList_nsprefix_ = None
         self.genreMatch = genreMatch
+        self.genreMatch_nsprefix_ = None
         self.soundcloudList = soundcloudList
+        self.soundcloudList_nsprefix_ = None
     def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, songs)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
         if songs.subclass:
             return songs.subclass(*args_, **kwargs_)
         else:
             return songs(*args_, **kwargs_)
     factory = staticmethod(factory)
-    def get_youtubeId(self): return self.youtubeId
-    def set_youtubeId(self, youtubeId): self.youtubeId = youtubeId
-    def get_artistId(self): return self.artistId
-    def set_artistId(self, artistId): self.artistId = artistId
-    def get_overLap(self): return self.overLap
-    def set_overLap(self, overLap): self.overLap = overLap
-    def get_songName(self): return self.songName
-    def set_songName(self, songName): self.songName = songName
-    def get_youtubeName(self): return self.youtubeName
-    def set_youtubeName(self, youtubeName): self.youtubeName = youtubeName
-    def get_artist(self): return self.artist
-    def set_artist(self, artist): self.artist = artist
-    def get_ftArtistList(self): return self.ftArtistList
-    def set_ftArtistList(self, ftArtistList): self.ftArtistList = ftArtistList
-    def get_indexedftArtistList(self): return self.indexedftArtistList
-    def set_indexedftArtistList(self, indexedftArtistList): self.indexedftArtistList = indexedftArtistList
-    def get_indexedArtistAliasList(self): return self.indexedArtistAliasList
-    def set_indexedArtistAliasList(self, indexedArtistAliasList): self.indexedArtistAliasList = indexedArtistAliasList
-    def get_connPhraseList(self): return self.connPhraseList
-    def set_connPhraseList(self, connPhraseList): self.connPhraseList = connPhraseList
-    def get_indexedArtist(self): return self.indexedArtist
-    def set_indexedArtist(self, indexedArtist): self.indexedArtist = indexedArtist
-    def get_url(self): return self.url
-    def set_url(self, url): self.url = url
-    def get_releaseDate(self): return self.releaseDate
-    def set_releaseDate(self, releaseDate): self.releaseDate = releaseDate
-    def get_decade(self): return self.decade
-    def set_decade(self, decade): self.decade = decade
-    def get_youtubeDate(self): return self.youtubeDate
-    def set_youtubeDate(self, youtubeDate): self.youtubeDate = youtubeDate
-    def get_crawlDate(self): return self.crawlDate
-    def set_crawlDate(self, crawlDate): self.crawlDate = crawlDate
-    def get_viewcount(self): return self.viewcount
-    def set_viewcount(self, viewcount): self.viewcount = viewcount
-    def get_crawlDelta(self): return self.crawlDelta
-    def set_crawlDelta(self, crawlDelta): self.crawlDelta = crawlDelta
-    def get_isCompilation(self): return self.isCompilation
-    def set_isCompilation(self, isCompilation): self.isCompilation = isCompilation
-    def get_releaseId(self): return self.releaseId
-    def set_releaseId(self, releaseId): self.releaseId = releaseId
-    def get_masterRelease(self): return self.masterRelease
-    def set_masterRelease(self, masterRelease): self.masterRelease = masterRelease
-    def get_masterGenres(self): return self.masterGenres
-    def set_masterGenres(self, masterGenres): self.masterGenres = masterGenres
-    def get_masterStyles(self): return self.masterStyles
-    def set_masterStyles(self, masterStyles): self.masterStyles = masterStyles
-    def get_crawlHistoryList(self): return self.crawlHistoryList
-    def set_crawlHistoryList(self, crawlHistoryList): self.crawlHistoryList = crawlHistoryList
-    def get_genresCountList(self): return self.genresCountList
-    def set_genresCountList(self, genresCountList): self.genresCountList = genresCountList
-    def get_rating(self): return self.rating
-    def set_rating(self, rating): self.rating = rating
-    def get_level1Genres(self): return self.level1Genres
-    def set_level1Genres(self, level1Genres): self.level1Genres = level1Genres
-    def get_level2Genres(self): return self.level2Genres
-    def set_level2Genres(self, level2Genres): self.level2Genres = level2Genres
-    def get_level3Genres(self): return self.level3Genres
-    def set_level3Genres(self, level3Genres): self.level3Genres = level3Genres
-    def get_level4Genres(self): return self.level4Genres
-    def set_level4Genres(self, level4Genres): self.level4Genres = level4Genres
-    def get_level5Genres(self): return self.level5Genres
-    def set_level5Genres(self, level5Genres): self.level5Genres = level5Genres
-    def get_level6Genres(self): return self.level6Genres
-    def set_level6Genres(self, level6Genres): self.level6Genres = level6Genres
-    def get_level7Genres(self): return self.level7Genres
-    def set_level7Genres(self, level7Genres): self.level7Genres = level7Genres
-    def get_level8Genres(self): return self.level8Genres
-    def set_level8Genres(self, level8Genres): self.level8Genres = level8Genres
-    def get_level9Genres(self): return self.level9Genres
-    def set_level9Genres(self, level9Genres): self.level9Genres = level9Genres
-    def get_albumList(self): return self.albumList
-    def set_albumList(self, albumList): self.albumList = albumList
-    def get_similarGenresTagList(self): return self.similarGenresTagList
-    def set_similarGenresTagList(self, similarGenresTagList): self.similarGenresTagList = similarGenresTagList
-    def get_similarArtistList(self): return self.similarArtistList
-    def set_similarArtistList(self, similarArtistList): self.similarArtistList = similarArtistList
-    def get_totalGenreCount(self): return self.totalGenreCount
-    def set_totalGenreCount(self, totalGenreCount): self.totalGenreCount = totalGenreCount
-    def get_viewcountRate(self): return self.viewcountRate
-    def set_viewcountRate(self, viewcountRate): self.viewcountRate = viewcountRate
-    def get_duration(self): return self.duration
-    def set_duration(self, duration): self.duration = duration
-    def get_descriptions(self): return self.descriptions
-    def set_descriptions(self, descriptions): self.descriptions = descriptions
-    def get_viewCountGroup(self): return self.viewCountGroup
-    def set_viewCountGroup(self, viewCountGroup): self.viewCountGroup = viewCountGroup
-    def get_decision(self): return self.decision
-    def set_decision(self, decision): self.decision = decision
-    def get_substring_song(self): return self.substring_song
-    def set_substring_song(self, substring_song): self.substring_song = substring_song
-    def get_substring_artist(self): return self.substring_artist
-    def set_substring_artist(self, substring_artist): self.substring_artist = substring_artist
-    def get_substring_ftartist(self): return self.substring_ftartist
-    def set_substring_ftartist(self, substring_ftartist): self.substring_ftartist = substring_ftartist
-    def get_songLanguage(self): return self.songLanguage
-    def set_songLanguage(self, songLanguage): self.songLanguage = songLanguage
-    def get_earliestDate(self): return self.earliestDate
-    def set_earliestDate(self, earliestDate): self.earliestDate = earliestDate
-    def get_songCountry(self): return self.songCountry
-    def set_songCountry(self, songCountry): self.songCountry = songCountry
-    def get_totalMatch(self): return self.totalMatch
-    def set_totalMatch(self, totalMatch): self.totalMatch = totalMatch
-    def get_songMatch(self): return self.songMatch
-    def set_songMatch(self, songMatch): self.songMatch = songMatch
-    def get_artistMatch(self): return self.artistMatch
-    def set_artistMatch(self, artistMatch): self.artistMatch = artistMatch
-    def get_genreTag(self): return self.genreTag
-    def set_genreTag(self, genreTag): self.genreTag = genreTag
-    def get_genreTagId(self): return self.genreTagId
-    def set_genreTagId(self, genreTagId): self.genreTagId = genreTagId
-    def get_youtubeList(self): return self.youtubeList
-    def set_youtubeList(self, youtubeList): self.youtubeList = youtubeList
-    def get_genreMatch(self): return self.genreMatch
-    def set_genreMatch(self, genreMatch): self.genreMatch = genreMatch
-    def get_soundcloudList(self): return self.soundcloudList
-    def set_soundcloudList(self, soundcloudList): self.soundcloudList = soundcloudList
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_youtubeId(self):
+        return self.youtubeId
+    def set_youtubeId(self, youtubeId):
+        self.youtubeId = youtubeId
+    def get_artistId(self):
+        return self.artistId
+    def set_artistId(self, artistId):
+        self.artistId = artistId
+    def get_overLap(self):
+        return self.overLap
+    def set_overLap(self, overLap):
+        self.overLap = overLap
+    def get_songName(self):
+        return self.songName
+    def set_songName(self, songName):
+        self.songName = songName
+    def get_youtubeName(self):
+        return self.youtubeName
+    def set_youtubeName(self, youtubeName):
+        self.youtubeName = youtubeName
+    def get_youtubedldata(self):
+        return self.youtubedldata
+    def set_youtubedldata(self, youtubedldata):
+        self.youtubedldata = youtubedldata
+    def get_artist(self):
+        return self.artist
+    def set_artist(self, artist):
+        self.artist = artist
+    def get_ftArtistList(self):
+        return self.ftArtistList
+    def set_ftArtistList(self, ftArtistList):
+        self.ftArtistList = ftArtistList
+    def get_indexedftArtistList(self):
+        return self.indexedftArtistList
+    def set_indexedftArtistList(self, indexedftArtistList):
+        self.indexedftArtistList = indexedftArtistList
+    def get_indexedArtistAliasList(self):
+        return self.indexedArtistAliasList
+    def set_indexedArtistAliasList(self, indexedArtistAliasList):
+        self.indexedArtistAliasList = indexedArtistAliasList
+    def get_connPhraseList(self):
+        return self.connPhraseList
+    def set_connPhraseList(self, connPhraseList):
+        self.connPhraseList = connPhraseList
+    def get_indexedArtist(self):
+        return self.indexedArtist
+    def set_indexedArtist(self, indexedArtist):
+        self.indexedArtist = indexedArtist
+    def get_url(self):
+        return self.url
+    def set_url(self, url):
+        self.url = url
+    def get_releaseDate(self):
+        return self.releaseDate
+    def set_releaseDate(self, releaseDate):
+        self.releaseDate = releaseDate
+    def get_decade(self):
+        return self.decade
+    def set_decade(self, decade):
+        self.decade = decade
+    def get_youtubeDate(self):
+        return self.youtubeDate
+    def set_youtubeDate(self, youtubeDate):
+        self.youtubeDate = youtubeDate
+    def get_crawlDate(self):
+        return self.crawlDate
+    def set_crawlDate(self, crawlDate):
+        self.crawlDate = crawlDate
+    def get_viewcount(self):
+        return self.viewcount
+    def set_viewcount(self, viewcount):
+        self.viewcount = viewcount
+    def get_crawlDelta(self):
+        return self.crawlDelta
+    def set_crawlDelta(self, crawlDelta):
+        self.crawlDelta = crawlDelta
+    def get_isCompilation(self):
+        return self.isCompilation
+    def set_isCompilation(self, isCompilation):
+        self.isCompilation = isCompilation
+    def get_releaseId(self):
+        return self.releaseId
+    def set_releaseId(self, releaseId):
+        self.releaseId = releaseId
+    def get_masterRelease(self):
+        return self.masterRelease
+    def set_masterRelease(self, masterRelease):
+        self.masterRelease = masterRelease
+    def get_masterGenres(self):
+        return self.masterGenres
+    def set_masterGenres(self, masterGenres):
+        self.masterGenres = masterGenres
+    def get_masterStyles(self):
+        return self.masterStyles
+    def set_masterStyles(self, masterStyles):
+        self.masterStyles = masterStyles
+    def get_crawlHistoryList(self):
+        return self.crawlHistoryList
+    def set_crawlHistoryList(self, crawlHistoryList):
+        self.crawlHistoryList = crawlHistoryList
+    def get_genresCountList(self):
+        return self.genresCountList
+    def set_genresCountList(self, genresCountList):
+        self.genresCountList = genresCountList
+    def get_rating(self):
+        return self.rating
+    def set_rating(self, rating):
+        self.rating = rating
+    def get_level1Genres(self):
+        return self.level1Genres
+    def set_level1Genres(self, level1Genres):
+        self.level1Genres = level1Genres
+    def get_level2Genres(self):
+        return self.level2Genres
+    def set_level2Genres(self, level2Genres):
+        self.level2Genres = level2Genres
+    def get_level3Genres(self):
+        return self.level3Genres
+    def set_level3Genres(self, level3Genres):
+        self.level3Genres = level3Genres
+    def get_level4Genres(self):
+        return self.level4Genres
+    def set_level4Genres(self, level4Genres):
+        self.level4Genres = level4Genres
+    def get_level5Genres(self):
+        return self.level5Genres
+    def set_level5Genres(self, level5Genres):
+        self.level5Genres = level5Genres
+    def get_level6Genres(self):
+        return self.level6Genres
+    def set_level6Genres(self, level6Genres):
+        self.level6Genres = level6Genres
+    def get_level7Genres(self):
+        return self.level7Genres
+    def set_level7Genres(self, level7Genres):
+        self.level7Genres = level7Genres
+    def get_level8Genres(self):
+        return self.level8Genres
+    def set_level8Genres(self, level8Genres):
+        self.level8Genres = level8Genres
+    def get_level9Genres(self):
+        return self.level9Genres
+    def set_level9Genres(self, level9Genres):
+        self.level9Genres = level9Genres
+    def get_albumList(self):
+        return self.albumList
+    def set_albumList(self, albumList):
+        self.albumList = albumList
+    def get_similarGenresTagList(self):
+        return self.similarGenresTagList
+    def set_similarGenresTagList(self, similarGenresTagList):
+        self.similarGenresTagList = similarGenresTagList
+    def get_similarArtistList(self):
+        return self.similarArtistList
+    def set_similarArtistList(self, similarArtistList):
+        self.similarArtistList = similarArtistList
+    def get_totalGenreCount(self):
+        return self.totalGenreCount
+    def set_totalGenreCount(self, totalGenreCount):
+        self.totalGenreCount = totalGenreCount
+    def get_viewcountRate(self):
+        return self.viewcountRate
+    def set_viewcountRate(self, viewcountRate):
+        self.viewcountRate = viewcountRate
+    def get_duration(self):
+        return self.duration
+    def set_duration(self, duration):
+        self.duration = duration
+    def get_descriptions(self):
+        return self.descriptions
+    def set_descriptions(self, descriptions):
+        self.descriptions = descriptions
+    def get_viewCountGroup(self):
+        return self.viewCountGroup
+    def set_viewCountGroup(self, viewCountGroup):
+        self.viewCountGroup = viewCountGroup
+    def get_decision(self):
+        return self.decision
+    def set_decision(self, decision):
+        self.decision = decision
+    def get_substring_song(self):
+        return self.substring_song
+    def set_substring_song(self, substring_song):
+        self.substring_song = substring_song
+    def get_substring_artist(self):
+        return self.substring_artist
+    def set_substring_artist(self, substring_artist):
+        self.substring_artist = substring_artist
+    def get_substring_ftartist(self):
+        return self.substring_ftartist
+    def set_substring_ftartist(self, substring_ftartist):
+        self.substring_ftartist = substring_ftartist
+    def get_songLanguage(self):
+        return self.songLanguage
+    def set_songLanguage(self, songLanguage):
+        self.songLanguage = songLanguage
+    def get_earliestDate(self):
+        return self.earliestDate
+    def set_earliestDate(self, earliestDate):
+        self.earliestDate = earliestDate
+    def get_songCountry(self):
+        return self.songCountry
+    def set_songCountry(self, songCountry):
+        self.songCountry = songCountry
+    def get_totalMatch(self):
+        return self.totalMatch
+    def set_totalMatch(self, totalMatch):
+        self.totalMatch = totalMatch
+    def get_songMatch(self):
+        return self.songMatch
+    def set_songMatch(self, songMatch):
+        self.songMatch = songMatch
+    def get_artistMatch(self):
+        return self.artistMatch
+    def set_artistMatch(self, artistMatch):
+        self.artistMatch = artistMatch
+    def get_genreTag(self):
+        return self.genreTag
+    def set_genreTag(self, genreTag):
+        self.genreTag = genreTag
+    def get_genreTagId(self):
+        return self.genreTagId
+    def set_genreTagId(self, genreTagId):
+        self.genreTagId = genreTagId
+    def get_youtubeList(self):
+        return self.youtubeList
+    def set_youtubeList(self, youtubeList):
+        self.youtubeList = youtubeList
+    def get_genreMatch(self):
+        return self.genreMatch
+    def set_genreMatch(self, genreMatch):
+        self.genreMatch = genreMatch
+    def get_soundcloudList(self):
+        return self.soundcloudList
+    def set_soundcloudList(self, soundcloudList):
+        self.soundcloudList = soundcloudList
     def hasContent_(self):
         if (
             self.youtubeId is not None or
@@ -702,6 +1342,7 @@ class songs(GeneratedsSuper):
             self.overLap is not None or
             self.songName is not None or
             self.youtubeName is not None or
+            self.youtubedldata is not None or
             self.artist is not None or
             self.ftArtistList is not None or
             self.indexedftArtistList is not None or
@@ -755,2766 +1396,3055 @@ class songs(GeneratedsSuper):
             self.youtubeList is not None or
             self.genreMatch is not None or
             self.soundcloudList is not None
-            ):
+        ):
             return True
         else:
             return False
-    def export(self, outfile, level, namespace_='', name_='songs', namespacedef_='', pretty_print=True):
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='songs', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('songs')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
         if pretty_print:
             eol_ = '\n'
         else:
             eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'songs':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
         showIndent(outfile, level, pretty_print)
-        outfile.write('<%s%s%s' % (namespace_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
         already_processed = set()
-        self.exportAttributes(outfile, level, already_processed, namespace_, name_='songs')
+        self.exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='songs')
         if self.hasContent_():
             outfile.write('>%s' % (eol_, ))
-            self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+            self.exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='songs', pretty_print=pretty_print)
             showIndent(outfile, level, pretty_print)
-            outfile.write('</%s%s>%s' % (namespace_, name_, eol_))
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
         else:
             outfile.write('/>%s' % (eol_, ))
-    def exportAttributes(self, outfile, level, already_processed, namespace_='', name_='songs'):
+    def exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='songs'):
         pass
-    def exportChildren(self, outfile, level, namespace_='', name_='songs', fromsubclass_=False, pretty_print=True):
+    def exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='songs', fromsubclass_=False, pretty_print=True):
         if pretty_print:
             eol_ = '\n'
         else:
             eol_ = ''
         if self.youtubeId is not None:
+            namespaceprefix_ = self.youtubeId_nsprefix_ + ':' if (UseCapturedNS_ and self.youtubeId_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%syoutubeId>%s</%syoutubeId>%s' % (namespace_, self.gds_format_string(quote_xml(self.youtubeId).encode(ExternalEncoding), input_name='youtubeId'), namespace_, eol_))
+            outfile.write('<%syoutubeId>%s</%syoutubeId>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.youtubeId), input_name='youtubeId')), namespaceprefix_ , eol_))
         if self.artistId is not None:
+            namespaceprefix_ = self.artistId_nsprefix_ + ':' if (UseCapturedNS_ and self.artistId_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%sartistId>%s</%sartistId>%s' % (namespace_, self.gds_format_integer(self.artistId, input_name='artistId'), namespace_, eol_))
+            outfile.write('<%sartistId>%s</%sartistId>%s' % (namespaceprefix_ , self.gds_format_integer(self.artistId, input_name='artistId'), namespaceprefix_ , eol_))
         if self.overLap is not None:
+            namespaceprefix_ = self.overLap_nsprefix_ + ':' if (UseCapturedNS_ and self.overLap_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%soverLap>%s</%soverLap>%s' % (namespace_, self.gds_format_string(quote_xml(self.overLap).encode(ExternalEncoding), input_name='overLap'), namespace_, eol_))
+            outfile.write('<%soverLap>%s</%soverLap>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.overLap), input_name='overLap')), namespaceprefix_ , eol_))
         if self.songName is not None:
+            namespaceprefix_ = self.songName_nsprefix_ + ':' if (UseCapturedNS_ and self.songName_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%ssongName>%s</%ssongName>%s' % (namespace_, self.gds_format_string(quote_xml(self.songName).encode(ExternalEncoding), input_name='songName'), namespace_, eol_))
+            outfile.write('<%ssongName>%s</%ssongName>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.songName), input_name='songName')), namespaceprefix_ , eol_))
         if self.youtubeName is not None:
+            namespaceprefix_ = self.youtubeName_nsprefix_ + ':' if (UseCapturedNS_ and self.youtubeName_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%syoutubeName>%s</%syoutubeName>%s' % (namespace_, self.gds_format_string(quote_xml(self.youtubeName).encode(ExternalEncoding), input_name='youtubeName'), namespace_, eol_))
+            outfile.write('<%syoutubeName>%s</%syoutubeName>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.youtubeName), input_name='youtubeName')), namespaceprefix_ , eol_))
+        if self.youtubedldata is not None:
+            namespaceprefix_ = self.youtubedldata_nsprefix_ + ':' if (UseCapturedNS_ and self.youtubedldata_nsprefix_) else ''
+            showIndent(outfile, level, pretty_print)
+            outfile.write('<%syoutubedldata>%s</%syoutubedldata>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.youtubedldata), input_name='youtubedldata')), namespaceprefix_ , eol_))
         if self.artist is not None:
-            self.artist.export(outfile, level, namespace_, name_='artist', pretty_print=pretty_print)
+            namespaceprefix_ = self.artist_nsprefix_ + ':' if (UseCapturedNS_ and self.artist_nsprefix_) else ''
+            self.artist.export(outfile, level, namespaceprefix_, namespacedef_='', name_='artist', pretty_print=pretty_print)
         if self.ftArtistList is not None:
-            self.ftArtistList.export(outfile, level, namespace_, name_='ftArtistList', pretty_print=pretty_print)
+            namespaceprefix_ = self.ftArtistList_nsprefix_ + ':' if (UseCapturedNS_ and self.ftArtistList_nsprefix_) else ''
+            self.ftArtistList.export(outfile, level, namespaceprefix_, namespacedef_='', name_='ftArtistList', pretty_print=pretty_print)
         if self.indexedftArtistList is not None:
-            self.indexedftArtistList.export(outfile, level, namespace_, name_='indexedftArtistList', pretty_print=pretty_print)
+            namespaceprefix_ = self.indexedftArtistList_nsprefix_ + ':' if (UseCapturedNS_ and self.indexedftArtistList_nsprefix_) else ''
+            self.indexedftArtistList.export(outfile, level, namespaceprefix_, namespacedef_='', name_='indexedftArtistList', pretty_print=pretty_print)
         if self.indexedArtistAliasList is not None:
-            self.indexedArtistAliasList.export(outfile, level, namespace_, name_='indexedArtistAliasList', pretty_print=pretty_print)
+            namespaceprefix_ = self.indexedArtistAliasList_nsprefix_ + ':' if (UseCapturedNS_ and self.indexedArtistAliasList_nsprefix_) else ''
+            self.indexedArtistAliasList.export(outfile, level, namespaceprefix_, namespacedef_='', name_='indexedArtistAliasList', pretty_print=pretty_print)
         if self.connPhraseList is not None:
-            self.connPhraseList.export(outfile, level, namespace_, name_='connPhraseList', pretty_print=pretty_print)
+            namespaceprefix_ = self.connPhraseList_nsprefix_ + ':' if (UseCapturedNS_ and self.connPhraseList_nsprefix_) else ''
+            self.connPhraseList.export(outfile, level, namespaceprefix_, namespacedef_='', name_='connPhraseList', pretty_print=pretty_print)
         if self.indexedArtist is not None:
-            self.indexedArtist.export(outfile, level, namespace_, name_='indexedArtist', pretty_print=pretty_print)
+            namespaceprefix_ = self.indexedArtist_nsprefix_ + ':' if (UseCapturedNS_ and self.indexedArtist_nsprefix_) else ''
+            self.indexedArtist.export(outfile, level, namespaceprefix_, namespacedef_='', name_='indexedArtist', pretty_print=pretty_print)
         if self.url is not None:
+            namespaceprefix_ = self.url_nsprefix_ + ':' if (UseCapturedNS_ and self.url_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%surl>%s</%surl>%s' % (namespace_, self.gds_format_string(quote_xml(self.url).encode(ExternalEncoding), input_name='url'), namespace_, eol_))
+            outfile.write('<%surl>%s</%surl>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.url), input_name='url')), namespaceprefix_ , eol_))
         if self.releaseDate is not None:
+            namespaceprefix_ = self.releaseDate_nsprefix_ + ':' if (UseCapturedNS_ and self.releaseDate_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%sreleaseDate>%s</%sreleaseDate>%s' % (namespace_, self.gds_format_integer(self.releaseDate, input_name='releaseDate'), namespace_, eol_))
+            outfile.write('<%sreleaseDate>%s</%sreleaseDate>%s' % (namespaceprefix_ , self.gds_format_integer(self.releaseDate, input_name='releaseDate'), namespaceprefix_ , eol_))
         if self.decade is not None:
+            namespaceprefix_ = self.decade_nsprefix_ + ':' if (UseCapturedNS_ and self.decade_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%sdecade>%s</%sdecade>%s' % (namespace_, self.gds_format_integer(self.decade, input_name='decade'), namespace_, eol_))
+            outfile.write('<%sdecade>%s</%sdecade>%s' % (namespaceprefix_ , self.gds_format_integer(self.decade, input_name='decade'), namespaceprefix_ , eol_))
         if self.youtubeDate is not None:
+            namespaceprefix_ = self.youtubeDate_nsprefix_ + ':' if (UseCapturedNS_ and self.youtubeDate_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%syoutubeDate>%s</%syoutubeDate>%s' % (namespace_, self.gds_format_date(self.youtubeDate, input_name='youtubeDate'), namespace_, eol_))
+            outfile.write('<%syoutubeDate>%s</%syoutubeDate>%s' % (namespaceprefix_ , self.gds_format_date(self.youtubeDate, input_name='youtubeDate'), namespaceprefix_ , eol_))
         if self.crawlDate is not None:
+            namespaceprefix_ = self.crawlDate_nsprefix_ + ':' if (UseCapturedNS_ and self.crawlDate_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%scrawlDate>%s</%scrawlDate>%s' % (namespace_, self.gds_format_date(self.crawlDate, input_name='crawlDate'), namespace_, eol_))
+            outfile.write('<%scrawlDate>%s</%scrawlDate>%s' % (namespaceprefix_ , self.gds_format_date(self.crawlDate, input_name='crawlDate'), namespaceprefix_ , eol_))
         if self.viewcount is not None:
+            namespaceprefix_ = self.viewcount_nsprefix_ + ':' if (UseCapturedNS_ and self.viewcount_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%sviewcount>%s</%sviewcount>%s' % (namespace_, self.gds_format_integer(self.viewcount, input_name='viewcount'), namespace_, eol_))
+            outfile.write('<%sviewcount>%s</%sviewcount>%s' % (namespaceprefix_ , self.gds_format_integer(self.viewcount, input_name='viewcount'), namespaceprefix_ , eol_))
         if self.crawlDelta is not None:
+            namespaceprefix_ = self.crawlDelta_nsprefix_ + ':' if (UseCapturedNS_ and self.crawlDelta_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%scrawlDelta>%s</%scrawlDelta>%s' % (namespace_, self.gds_format_integer(self.crawlDelta, input_name='crawlDelta'), namespace_, eol_))
+            outfile.write('<%scrawlDelta>%s</%scrawlDelta>%s' % (namespaceprefix_ , self.gds_format_integer(self.crawlDelta, input_name='crawlDelta'), namespaceprefix_ , eol_))
         if self.isCompilation is not None:
+            namespaceprefix_ = self.isCompilation_nsprefix_ + ':' if (UseCapturedNS_ and self.isCompilation_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%sisCompilation>%s</%sisCompilation>%s' % (namespace_, self.gds_format_boolean(self.isCompilation, input_name='isCompilation'), namespace_, eol_))
+            outfile.write('<%sisCompilation>%s</%sisCompilation>%s' % (namespaceprefix_ , self.gds_format_boolean(self.isCompilation, input_name='isCompilation'), namespaceprefix_ , eol_))
         if self.releaseId is not None:
+            namespaceprefix_ = self.releaseId_nsprefix_ + ':' if (UseCapturedNS_ and self.releaseId_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%sreleaseId>%s</%sreleaseId>%s' % (namespace_, self.gds_format_integer(self.releaseId, input_name='releaseId'), namespace_, eol_))
+            outfile.write('<%sreleaseId>%s</%sreleaseId>%s' % (namespaceprefix_ , self.gds_format_integer(self.releaseId, input_name='releaseId'), namespaceprefix_ , eol_))
         if self.masterRelease is not None:
+            namespaceprefix_ = self.masterRelease_nsprefix_ + ':' if (UseCapturedNS_ and self.masterRelease_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%smasterRelease>%s</%smasterRelease>%s' % (namespace_, self.gds_format_integer(self.masterRelease, input_name='masterRelease'), namespace_, eol_))
+            outfile.write('<%smasterRelease>%s</%smasterRelease>%s' % (namespaceprefix_ , self.gds_format_integer(self.masterRelease, input_name='masterRelease'), namespaceprefix_ , eol_))
         if self.masterGenres is not None:
-            self.masterGenres.export(outfile, level, namespace_, name_='masterGenres', pretty_print=pretty_print)
+            namespaceprefix_ = self.masterGenres_nsprefix_ + ':' if (UseCapturedNS_ and self.masterGenres_nsprefix_) else ''
+            self.masterGenres.export(outfile, level, namespaceprefix_, namespacedef_='', name_='masterGenres', pretty_print=pretty_print)
         if self.masterStyles is not None:
-            self.masterStyles.export(outfile, level, namespace_, name_='masterStyles', pretty_print=pretty_print)
+            namespaceprefix_ = self.masterStyles_nsprefix_ + ':' if (UseCapturedNS_ and self.masterStyles_nsprefix_) else ''
+            self.masterStyles.export(outfile, level, namespaceprefix_, namespacedef_='', name_='masterStyles', pretty_print=pretty_print)
         if self.crawlHistoryList is not None:
-            self.crawlHistoryList.export(outfile, level, namespace_, name_='crawlHistoryList', pretty_print=pretty_print)
+            namespaceprefix_ = self.crawlHistoryList_nsprefix_ + ':' if (UseCapturedNS_ and self.crawlHistoryList_nsprefix_) else ''
+            self.crawlHistoryList.export(outfile, level, namespaceprefix_, namespacedef_='', name_='crawlHistoryList', pretty_print=pretty_print)
         if self.genresCountList is not None:
-            self.genresCountList.export(outfile, level, namespace_, name_='genresCountList', pretty_print=pretty_print)
+            namespaceprefix_ = self.genresCountList_nsprefix_ + ':' if (UseCapturedNS_ and self.genresCountList_nsprefix_) else ''
+            self.genresCountList.export(outfile, level, namespaceprefix_, namespacedef_='', name_='genresCountList', pretty_print=pretty_print)
         if self.rating is not None:
+            namespaceprefix_ = self.rating_nsprefix_ + ':' if (UseCapturedNS_ and self.rating_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%srating>%s</%srating>%s' % (namespace_, self.gds_format_float(self.rating, input_name='rating'), namespace_, eol_))
+            outfile.write('<%srating>%s</%srating>%s' % (namespaceprefix_ , self.gds_format_decimal(self.rating, input_name='rating'), namespaceprefix_ , eol_))
         if self.level1Genres is not None:
-            self.level1Genres.export(outfile, level, namespace_, name_='level1Genres', pretty_print=pretty_print)
+            namespaceprefix_ = self.level1Genres_nsprefix_ + ':' if (UseCapturedNS_ and self.level1Genres_nsprefix_) else ''
+            self.level1Genres.export(outfile, level, namespaceprefix_, namespacedef_='', name_='level1Genres', pretty_print=pretty_print)
         if self.level2Genres is not None:
-            self.level2Genres.export(outfile, level, namespace_, name_='level2Genres', pretty_print=pretty_print)
+            namespaceprefix_ = self.level2Genres_nsprefix_ + ':' if (UseCapturedNS_ and self.level2Genres_nsprefix_) else ''
+            self.level2Genres.export(outfile, level, namespaceprefix_, namespacedef_='', name_='level2Genres', pretty_print=pretty_print)
         if self.level3Genres is not None:
-            self.level3Genres.export(outfile, level, namespace_, name_='level3Genres', pretty_print=pretty_print)
+            namespaceprefix_ = self.level3Genres_nsprefix_ + ':' if (UseCapturedNS_ and self.level3Genres_nsprefix_) else ''
+            self.level3Genres.export(outfile, level, namespaceprefix_, namespacedef_='', name_='level3Genres', pretty_print=pretty_print)
         if self.level4Genres is not None:
-            self.level4Genres.export(outfile, level, namespace_, name_='level4Genres', pretty_print=pretty_print)
+            namespaceprefix_ = self.level4Genres_nsprefix_ + ':' if (UseCapturedNS_ and self.level4Genres_nsprefix_) else ''
+            self.level4Genres.export(outfile, level, namespaceprefix_, namespacedef_='', name_='level4Genres', pretty_print=pretty_print)
         if self.level5Genres is not None:
-            self.level5Genres.export(outfile, level, namespace_, name_='level5Genres', pretty_print=pretty_print)
+            namespaceprefix_ = self.level5Genres_nsprefix_ + ':' if (UseCapturedNS_ and self.level5Genres_nsprefix_) else ''
+            self.level5Genres.export(outfile, level, namespaceprefix_, namespacedef_='', name_='level5Genres', pretty_print=pretty_print)
         if self.level6Genres is not None:
-            self.level6Genres.export(outfile, level, namespace_, name_='level6Genres', pretty_print=pretty_print)
+            namespaceprefix_ = self.level6Genres_nsprefix_ + ':' if (UseCapturedNS_ and self.level6Genres_nsprefix_) else ''
+            self.level6Genres.export(outfile, level, namespaceprefix_, namespacedef_='', name_='level6Genres', pretty_print=pretty_print)
         if self.level7Genres is not None:
-            self.level7Genres.export(outfile, level, namespace_, name_='level7Genres', pretty_print=pretty_print)
+            namespaceprefix_ = self.level7Genres_nsprefix_ + ':' if (UseCapturedNS_ and self.level7Genres_nsprefix_) else ''
+            self.level7Genres.export(outfile, level, namespaceprefix_, namespacedef_='', name_='level7Genres', pretty_print=pretty_print)
         if self.level8Genres is not None:
-            self.level8Genres.export(outfile, level, namespace_, name_='level8Genres', pretty_print=pretty_print)
+            namespaceprefix_ = self.level8Genres_nsprefix_ + ':' if (UseCapturedNS_ and self.level8Genres_nsprefix_) else ''
+            self.level8Genres.export(outfile, level, namespaceprefix_, namespacedef_='', name_='level8Genres', pretty_print=pretty_print)
         if self.level9Genres is not None:
-            self.level9Genres.export(outfile, level, namespace_, name_='level9Genres', pretty_print=pretty_print)
+            namespaceprefix_ = self.level9Genres_nsprefix_ + ':' if (UseCapturedNS_ and self.level9Genres_nsprefix_) else ''
+            self.level9Genres.export(outfile, level, namespaceprefix_, namespacedef_='', name_='level9Genres', pretty_print=pretty_print)
         if self.albumList is not None:
-            self.albumList.export(outfile, level, namespace_, name_='albumList', pretty_print=pretty_print)
+            namespaceprefix_ = self.albumList_nsprefix_ + ':' if (UseCapturedNS_ and self.albumList_nsprefix_) else ''
+            self.albumList.export(outfile, level, namespaceprefix_, namespacedef_='', name_='albumList', pretty_print=pretty_print)
         if self.similarGenresTagList is not None:
-            self.similarGenresTagList.export(outfile, level, namespace_, name_='similarGenresTagList', pretty_print=pretty_print)
+            namespaceprefix_ = self.similarGenresTagList_nsprefix_ + ':' if (UseCapturedNS_ and self.similarGenresTagList_nsprefix_) else ''
+            self.similarGenresTagList.export(outfile, level, namespaceprefix_, namespacedef_='', name_='similarGenresTagList', pretty_print=pretty_print)
         if self.similarArtistList is not None:
-            self.similarArtistList.export(outfile, level, namespace_, name_='similarArtistList', pretty_print=pretty_print)
+            namespaceprefix_ = self.similarArtistList_nsprefix_ + ':' if (UseCapturedNS_ and self.similarArtistList_nsprefix_) else ''
+            self.similarArtistList.export(outfile, level, namespaceprefix_, namespacedef_='', name_='similarArtistList', pretty_print=pretty_print)
         if self.totalGenreCount is not None:
+            namespaceprefix_ = self.totalGenreCount_nsprefix_ + ':' if (UseCapturedNS_ and self.totalGenreCount_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%stotalGenreCount>%s</%stotalGenreCount>%s' % (namespace_, self.gds_format_integer(self.totalGenreCount, input_name='totalGenreCount'), namespace_, eol_))
+            outfile.write('<%stotalGenreCount>%s</%stotalGenreCount>%s' % (namespaceprefix_ , self.gds_format_integer(self.totalGenreCount, input_name='totalGenreCount'), namespaceprefix_ , eol_))
         if self.viewcountRate is not None:
+            namespaceprefix_ = self.viewcountRate_nsprefix_ + ':' if (UseCapturedNS_ and self.viewcountRate_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%sviewcountRate>%s</%sviewcountRate>%s' % (namespace_, self.gds_format_float(self.viewcountRate, input_name='viewcountRate'), namespace_, eol_))
+            outfile.write('<%sviewcountRate>%s</%sviewcountRate>%s' % (namespaceprefix_ , self.gds_format_decimal(self.viewcountRate, input_name='viewcountRate'), namespaceprefix_ , eol_))
         if self.duration is not None:
+            namespaceprefix_ = self.duration_nsprefix_ + ':' if (UseCapturedNS_ and self.duration_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%sduration>%s</%sduration>%s' % (namespace_, self.gds_format_string(quote_xml(self.duration).encode(ExternalEncoding), input_name='duration'), namespace_, eol_))
+            outfile.write('<%sduration>%s</%sduration>%s' % (namespaceprefix_ , self.gds_format_time(self.duration, input_name='duration'), namespaceprefix_ , eol_))
         if self.descriptions is not None:
+            namespaceprefix_ = self.descriptions_nsprefix_ + ':' if (UseCapturedNS_ and self.descriptions_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%sdescriptions>%s</%sdescriptions>%s' % (namespace_, self.gds_format_string(quote_xml(self.descriptions).encode(ExternalEncoding), input_name='descriptions'), namespace_, eol_))
+            outfile.write('<%sdescriptions>%s</%sdescriptions>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.descriptions), input_name='descriptions')), namespaceprefix_ , eol_))
         if self.viewCountGroup is not None:
+            namespaceprefix_ = self.viewCountGroup_nsprefix_ + ':' if (UseCapturedNS_ and self.viewCountGroup_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%sviewCountGroup>%s</%sviewCountGroup>%s' % (namespace_, self.gds_format_integer(self.viewCountGroup, input_name='viewCountGroup'), namespace_, eol_))
+            outfile.write('<%sviewCountGroup>%s</%sviewCountGroup>%s' % (namespaceprefix_ , self.gds_format_integer(self.viewCountGroup, input_name='viewCountGroup'), namespaceprefix_ , eol_))
         if self.decision is not None:
+            namespaceprefix_ = self.decision_nsprefix_ + ':' if (UseCapturedNS_ and self.decision_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%sdecision>%s</%sdecision>%s' % (namespace_, self.gds_format_string(quote_xml(self.decision).encode(ExternalEncoding), input_name='decision'), namespace_, eol_))
+            outfile.write('<%sdecision>%s</%sdecision>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.decision), input_name='decision')), namespaceprefix_ , eol_))
         if self.substring_song is not None:
+            namespaceprefix_ = self.substring_song_nsprefix_ + ':' if (UseCapturedNS_ and self.substring_song_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%ssubstring_song>%s</%ssubstring_song>%s' % (namespace_, self.gds_format_string(quote_xml(self.substring_song).encode(ExternalEncoding), input_name='substring_song'), namespace_, eol_))
+            outfile.write('<%ssubstring_song>%s</%ssubstring_song>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.substring_song), input_name='substring_song')), namespaceprefix_ , eol_))
         if self.substring_artist is not None:
+            namespaceprefix_ = self.substring_artist_nsprefix_ + ':' if (UseCapturedNS_ and self.substring_artist_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%ssubstring_artist>%s</%ssubstring_artist>%s' % (namespace_, self.gds_format_string(quote_xml(self.substring_artist).encode(ExternalEncoding), input_name='substring_artist'), namespace_, eol_))
+            outfile.write('<%ssubstring_artist>%s</%ssubstring_artist>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.substring_artist), input_name='substring_artist')), namespaceprefix_ , eol_))
         if self.substring_ftartist is not None:
+            namespaceprefix_ = self.substring_ftartist_nsprefix_ + ':' if (UseCapturedNS_ and self.substring_ftartist_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%ssubstring_ftartist>%s</%ssubstring_ftartist>%s' % (namespace_, self.gds_format_string(quote_xml(self.substring_ftartist).encode(ExternalEncoding), input_name='substring_ftartist'), namespace_, eol_))
+            outfile.write('<%ssubstring_ftartist>%s</%ssubstring_ftartist>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.substring_ftartist), input_name='substring_ftartist')), namespaceprefix_ , eol_))
         if self.songLanguage is not None:
+            namespaceprefix_ = self.songLanguage_nsprefix_ + ':' if (UseCapturedNS_ and self.songLanguage_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%ssongLanguage>%s</%ssongLanguage>%s' % (namespace_, self.gds_format_string(quote_xml(self.songLanguage).encode(ExternalEncoding), input_name='songLanguage'), namespace_, eol_))
+            outfile.write('<%ssongLanguage>%s</%ssongLanguage>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.songLanguage), input_name='songLanguage')), namespaceprefix_ , eol_))
         if self.earliestDate is not None:
+            namespaceprefix_ = self.earliestDate_nsprefix_ + ':' if (UseCapturedNS_ and self.earliestDate_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%searliestDate>%s</%searliestDate>%s' % (namespace_, self.gds_format_string(quote_xml(self.earliestDate).encode(ExternalEncoding), input_name='earliestDate'), namespace_, eol_))
+            outfile.write('<%searliestDate>%s</%searliestDate>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.earliestDate), input_name='earliestDate')), namespaceprefix_ , eol_))
         if self.songCountry is not None:
+            namespaceprefix_ = self.songCountry_nsprefix_ + ':' if (UseCapturedNS_ and self.songCountry_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%ssongCountry>%s</%ssongCountry>%s' % (namespace_, self.gds_format_string(quote_xml(self.songCountry).encode(ExternalEncoding), input_name='songCountry'), namespace_, eol_))
+            outfile.write('<%ssongCountry>%s</%ssongCountry>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.songCountry), input_name='songCountry')), namespaceprefix_ , eol_))
         if self.totalMatch is not None:
+            namespaceprefix_ = self.totalMatch_nsprefix_ + ':' if (UseCapturedNS_ and self.totalMatch_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%stotalMatch>%s</%stotalMatch>%s' % (namespace_, self.gds_format_float(self.totalMatch, input_name='totalMatch'), namespace_, eol_))
+            outfile.write('<%stotalMatch>%s</%stotalMatch>%s' % (namespaceprefix_ , self.gds_format_decimal(self.totalMatch, input_name='totalMatch'), namespaceprefix_ , eol_))
         if self.songMatch is not None:
+            namespaceprefix_ = self.songMatch_nsprefix_ + ':' if (UseCapturedNS_ and self.songMatch_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%ssongMatch>%s</%ssongMatch>%s' % (namespace_, self.gds_format_float(self.songMatch, input_name='songMatch'), namespace_, eol_))
+            outfile.write('<%ssongMatch>%s</%ssongMatch>%s' % (namespaceprefix_ , self.gds_format_decimal(self.songMatch, input_name='songMatch'), namespaceprefix_ , eol_))
         if self.artistMatch is not None:
+            namespaceprefix_ = self.artistMatch_nsprefix_ + ':' if (UseCapturedNS_ and self.artistMatch_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%sartistMatch>%s</%sartistMatch>%s' % (namespace_, self.gds_format_float(self.artistMatch, input_name='artistMatch'), namespace_, eol_))
+            outfile.write('<%sartistMatch>%s</%sartistMatch>%s' % (namespaceprefix_ , self.gds_format_decimal(self.artistMatch, input_name='artistMatch'), namespaceprefix_ , eol_))
         if self.genreTag is not None:
+            namespaceprefix_ = self.genreTag_nsprefix_ + ':' if (UseCapturedNS_ and self.genreTag_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%sgenreTag>%s</%sgenreTag>%s' % (namespace_, self.gds_format_string(quote_xml(self.genreTag).encode(ExternalEncoding), input_name='genreTag'), namespace_, eol_))
+            outfile.write('<%sgenreTag>%s</%sgenreTag>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.genreTag), input_name='genreTag')), namespaceprefix_ , eol_))
         if self.genreTagId is not None:
+            namespaceprefix_ = self.genreTagId_nsprefix_ + ':' if (UseCapturedNS_ and self.genreTagId_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%sgenreTagId>%s</%sgenreTagId>%s' % (namespace_, self.gds_format_integer(self.genreTagId, input_name='genreTagId'), namespace_, eol_))
+            outfile.write('<%sgenreTagId>%s</%sgenreTagId>%s' % (namespaceprefix_ , self.gds_format_integer(self.genreTagId, input_name='genreTagId'), namespaceprefix_ , eol_))
         if self.youtubeList is not None:
-            self.youtubeList.export(outfile, level, namespace_, name_='youtubeList', pretty_print=pretty_print)
+            namespaceprefix_ = self.youtubeList_nsprefix_ + ':' if (UseCapturedNS_ and self.youtubeList_nsprefix_) else ''
+            self.youtubeList.export(outfile, level, namespaceprefix_, namespacedef_='', name_='youtubeList', pretty_print=pretty_print)
         if self.genreMatch is not None:
+            namespaceprefix_ = self.genreMatch_nsprefix_ + ':' if (UseCapturedNS_ and self.genreMatch_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%sgenreMatch>%s</%sgenreMatch>%s' % (namespace_, self.gds_format_string(quote_xml(self.genreMatch).encode(ExternalEncoding), input_name='genreMatch'), namespace_, eol_))
+            outfile.write('<%sgenreMatch>%s</%sgenreMatch>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.genreMatch), input_name='genreMatch')), namespaceprefix_ , eol_))
         if self.soundcloudList is not None:
-            self.soundcloudList.export(outfile, level, namespace_, name_='soundcloudList', pretty_print=pretty_print)
-    def exportLiteral(self, outfile, level, name_='songs'):
-        level += 1
+            namespaceprefix_ = self.soundcloudList_nsprefix_ + ':' if (UseCapturedNS_ and self.soundcloudList_nsprefix_) else ''
+            self.soundcloudList.export(outfile, level, namespaceprefix_, namespacedef_='', name_='soundcloudList', pretty_print=pretty_print)
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
         already_processed = set()
-        self.exportLiteralAttributes(outfile, level, already_processed, name_)
-        if self.hasContent_():
-            self.exportLiteralChildren(outfile, level, name_)
-    def exportLiteralAttributes(self, outfile, level, already_processed, name_):
-        pass
-    def exportLiteralChildren(self, outfile, level, name_):
-        if self.youtubeId is not None:
-            showIndent(outfile, level)
-            outfile.write('youtubeId=%s,\n' % quote_python(self.youtubeId).encode(ExternalEncoding))
-        if self.artistId is not None:
-            showIndent(outfile, level)
-            outfile.write('artistId=%d,\n' % self.artistId)
-        if self.overLap is not None:
-            showIndent(outfile, level)
-            outfile.write('overLap=%s,\n' % quote_python(self.overLap).encode(ExternalEncoding))
-        if self.songName is not None:
-            showIndent(outfile, level)
-            outfile.write('songName=%s,\n' % quote_python(self.songName).encode(ExternalEncoding))
-        if self.youtubeName is not None:
-            showIndent(outfile, level)
-            outfile.write('youtubeName=%s,\n' % quote_python(self.youtubeName).encode(ExternalEncoding))
-        if self.artist is not None:
-            showIndent(outfile, level)
-            outfile.write('artist=model_.artist(\n')
-            self.artist.exportLiteral(outfile, level)
-            showIndent(outfile, level)
-            outfile.write('),\n')
-        if self.ftArtistList is not None:
-            showIndent(outfile, level)
-            outfile.write('ftArtistList=model_.ftArtistList(\n')
-            self.ftArtistList.exportLiteral(outfile, level)
-            showIndent(outfile, level)
-            outfile.write('),\n')
-        if self.indexedftArtistList is not None:
-            showIndent(outfile, level)
-            outfile.write('indexedftArtistList=model_.indexedftArtistList(\n')
-            self.indexedftArtistList.exportLiteral(outfile, level)
-            showIndent(outfile, level)
-            outfile.write('),\n')
-        if self.indexedArtistAliasList is not None:
-            showIndent(outfile, level)
-            outfile.write('indexedArtistAliasList=model_.indexedArtistAliasList(\n')
-            self.indexedArtistAliasList.exportLiteral(outfile, level)
-            showIndent(outfile, level)
-            outfile.write('),\n')
-        if self.connPhraseList is not None:
-            showIndent(outfile, level)
-            outfile.write('connPhraseList=model_.connPhraseList(\n')
-            self.connPhraseList.exportLiteral(outfile, level)
-            showIndent(outfile, level)
-            outfile.write('),\n')
-        if self.indexedArtist is not None:
-            showIndent(outfile, level)
-            outfile.write('indexedArtist=model_.indexedArtist(\n')
-            self.indexedArtist.exportLiteral(outfile, level)
-            showIndent(outfile, level)
-            outfile.write('),\n')
-        if self.url is not None:
-            showIndent(outfile, level)
-            outfile.write('url=%s,\n' % quote_python(self.url).encode(ExternalEncoding))
-        if self.releaseDate is not None:
-            showIndent(outfile, level)
-            outfile.write('releaseDate=%d,\n' % self.releaseDate)
-        if self.decade is not None:
-            showIndent(outfile, level)
-            outfile.write('decade=%d,\n' % self.decade)
-        if self.youtubeDate is not None:
-            showIndent(outfile, level)
-            outfile.write('youtubeDate=datetime_.strptime("%s", "%%Y-%%m-%%d"),\n' % self.gds_format_date(self.youtubeDate, input_name='youtubeDate'))
-        if self.crawlDate is not None:
-            showIndent(outfile, level)
-            outfile.write('crawlDate=datetime_.strptime("%s", "%%Y-%%m-%%d"),\n' % self.gds_format_date(self.crawlDate, input_name='crawlDate'))
-        if self.viewcount is not None:
-            showIndent(outfile, level)
-            outfile.write('viewcount=%d,\n' % self.viewcount)
-        if self.crawlDelta is not None:
-            showIndent(outfile, level)
-            outfile.write('crawlDelta=%d,\n' % self.crawlDelta)
-        if self.isCompilation is not None:
-            showIndent(outfile, level)
-            outfile.write('isCompilation=%s,\n' % self.isCompilation)
-        if self.releaseId is not None:
-            showIndent(outfile, level)
-            outfile.write('releaseId=%d,\n' % self.releaseId)
-        if self.masterRelease is not None:
-            showIndent(outfile, level)
-            outfile.write('masterRelease=%d,\n' % self.masterRelease)
-        if self.masterGenres is not None:
-            showIndent(outfile, level)
-            outfile.write('masterGenres=model_.masterGenres(\n')
-            self.masterGenres.exportLiteral(outfile, level)
-            showIndent(outfile, level)
-            outfile.write('),\n')
-        if self.masterStyles is not None:
-            showIndent(outfile, level)
-            outfile.write('masterStyles=model_.masterStyles(\n')
-            self.masterStyles.exportLiteral(outfile, level)
-            showIndent(outfile, level)
-            outfile.write('),\n')
-        if self.crawlHistoryList is not None:
-            showIndent(outfile, level)
-            outfile.write('crawlHistoryList=model_.crawlHistoryList(\n')
-            self.crawlHistoryList.exportLiteral(outfile, level)
-            showIndent(outfile, level)
-            outfile.write('),\n')
-        if self.genresCountList is not None:
-            showIndent(outfile, level)
-            outfile.write('genresCountList=model_.genresCountList(\n')
-            self.genresCountList.exportLiteral(outfile, level)
-            showIndent(outfile, level)
-            outfile.write('),\n')
-        if self.rating is not None:
-            showIndent(outfile, level)
-            outfile.write('rating=%f,\n' % self.rating)
-        if self.level1Genres is not None:
-            showIndent(outfile, level)
-            outfile.write('level1Genres=model_.level1Genres(\n')
-            self.level1Genres.exportLiteral(outfile, level)
-            showIndent(outfile, level)
-            outfile.write('),\n')
-        if self.level2Genres is not None:
-            showIndent(outfile, level)
-            outfile.write('level2Genres=model_.level2Genres(\n')
-            self.level2Genres.exportLiteral(outfile, level)
-            showIndent(outfile, level)
-            outfile.write('),\n')
-        if self.level3Genres is not None:
-            showIndent(outfile, level)
-            outfile.write('level3Genres=model_.level3Genres(\n')
-            self.level3Genres.exportLiteral(outfile, level)
-            showIndent(outfile, level)
-            outfile.write('),\n')
-        if self.level4Genres is not None:
-            showIndent(outfile, level)
-            outfile.write('level4Genres=model_.level4Genres(\n')
-            self.level4Genres.exportLiteral(outfile, level)
-            showIndent(outfile, level)
-            outfile.write('),\n')
-        if self.level5Genres is not None:
-            showIndent(outfile, level)
-            outfile.write('level5Genres=model_.level5Genres(\n')
-            self.level5Genres.exportLiteral(outfile, level)
-            showIndent(outfile, level)
-            outfile.write('),\n')
-        if self.level6Genres is not None:
-            showIndent(outfile, level)
-            outfile.write('level6Genres=model_.level6Genres(\n')
-            self.level6Genres.exportLiteral(outfile, level)
-            showIndent(outfile, level)
-            outfile.write('),\n')
-        if self.level7Genres is not None:
-            showIndent(outfile, level)
-            outfile.write('level7Genres=model_.level7Genres(\n')
-            self.level7Genres.exportLiteral(outfile, level)
-            showIndent(outfile, level)
-            outfile.write('),\n')
-        if self.level8Genres is not None:
-            showIndent(outfile, level)
-            outfile.write('level8Genres=model_.level8Genres(\n')
-            self.level8Genres.exportLiteral(outfile, level)
-            showIndent(outfile, level)
-            outfile.write('),\n')
-        if self.level9Genres is not None:
-            showIndent(outfile, level)
-            outfile.write('level9Genres=model_.level9Genres(\n')
-            self.level9Genres.exportLiteral(outfile, level)
-            showIndent(outfile, level)
-            outfile.write('),\n')
-        if self.albumList is not None:
-            showIndent(outfile, level)
-            outfile.write('albumList=model_.albumList(\n')
-            self.albumList.exportLiteral(outfile, level)
-            showIndent(outfile, level)
-            outfile.write('),\n')
-        if self.similarGenresTagList is not None:
-            showIndent(outfile, level)
-            outfile.write('similarGenresTagList=model_.similarGenresTagList(\n')
-            self.similarGenresTagList.exportLiteral(outfile, level)
-            showIndent(outfile, level)
-            outfile.write('),\n')
-        if self.similarArtistList is not None:
-            showIndent(outfile, level)
-            outfile.write('similarArtistList=model_.similarArtistList(\n')
-            self.similarArtistList.exportLiteral(outfile, level)
-            showIndent(outfile, level)
-            outfile.write('),\n')
-        if self.totalGenreCount is not None:
-            showIndent(outfile, level)
-            outfile.write('totalGenreCount=%d,\n' % self.totalGenreCount)
-        if self.viewcountRate is not None:
-            showIndent(outfile, level)
-            outfile.write('viewcountRate=%f,\n' % self.viewcountRate)
-        if self.duration is not None:
-            showIndent(outfile, level)
-            outfile.write('duration=%s,\n' % quote_python(self.duration).encode(ExternalEncoding))
-        if self.descriptions is not None:
-            showIndent(outfile, level)
-            outfile.write('descriptions=%s,\n' % quote_python(self.descriptions).encode(ExternalEncoding))
-        if self.viewCountGroup is not None:
-            showIndent(outfile, level)
-            outfile.write('viewCountGroup=%d,\n' % self.viewCountGroup)
-        if self.decision is not None:
-            showIndent(outfile, level)
-            outfile.write('decision=%s,\n' % quote_python(self.decision).encode(ExternalEncoding))
-        if self.substring_song is not None:
-            showIndent(outfile, level)
-            outfile.write('substring_song=%s,\n' % quote_python(self.substring_song).encode(ExternalEncoding))
-        if self.substring_artist is not None:
-            showIndent(outfile, level)
-            outfile.write('substring_artist=%s,\n' % quote_python(self.substring_artist).encode(ExternalEncoding))
-        if self.substring_ftartist is not None:
-            showIndent(outfile, level)
-            outfile.write('substring_ftartist=%s,\n' % quote_python(self.substring_ftartist).encode(ExternalEncoding))
-        if self.songLanguage is not None:
-            showIndent(outfile, level)
-            outfile.write('songLanguage=%s,\n' % quote_python(self.songLanguage).encode(ExternalEncoding))
-        if self.earliestDate is not None:
-            showIndent(outfile, level)
-            outfile.write('earliestDate=%s,\n' % quote_python(self.earliestDate).encode(ExternalEncoding))
-        if self.songCountry is not None:
-            showIndent(outfile, level)
-            outfile.write('songCountry=%s,\n' % quote_python(self.songCountry).encode(ExternalEncoding))
-        if self.totalMatch is not None:
-            showIndent(outfile, level)
-            outfile.write('totalMatch=%f,\n' % self.totalMatch)
-        if self.songMatch is not None:
-            showIndent(outfile, level)
-            outfile.write('songMatch=%f,\n' % self.songMatch)
-        if self.artistMatch is not None:
-            showIndent(outfile, level)
-            outfile.write('artistMatch=%f,\n' % self.artistMatch)
-        if self.genreTag is not None:
-            showIndent(outfile, level)
-            outfile.write('genreTag=%s,\n' % quote_python(self.genreTag).encode(ExternalEncoding))
-        if self.genreTagId is not None:
-            showIndent(outfile, level)
-            outfile.write('genreTagId=%d,\n' % self.genreTagId)
-        if self.youtubeList is not None:
-            showIndent(outfile, level)
-            outfile.write('youtubeList=model_.youtubeList(\n')
-            self.youtubeList.exportLiteral(outfile, level)
-            showIndent(outfile, level)
-            outfile.write('),\n')
-        if self.genreMatch is not None:
-            showIndent(outfile, level)
-            outfile.write('genreMatch=%s,\n' % quote_python(self.genreMatch).encode(ExternalEncoding))
-        if self.soundcloudList is not None:
-            showIndent(outfile, level)
-            outfile.write('soundcloudList=model_.soundcloudList(\n')
-            self.soundcloudList.exportLiteral(outfile, level)
-            showIndent(outfile, level)
-            outfile.write('),\n')
-    def build(self, node):
-        already_processed = set()
+        self.ns_prefix_ = node.prefix
         self.buildAttributes(node, node.attrib, already_processed)
         for child in node:
             nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
-            self.buildChildren(child, node, nodeName_)
+            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
     def buildAttributes(self, node, attrs, already_processed):
         pass
-    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False):
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
         if nodeName_ == 'youtubeId':
-            youtubeId_ = child_.text
-            youtubeId_ = self.gds_validate_string(youtubeId_, node, 'youtubeId')
-            self.youtubeId = youtubeId_
-        elif nodeName_ == 'artistId':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'youtubeId')
+            value_ = self.gds_validate_string(value_, node, 'youtubeId')
+            self.youtubeId = value_
+            self.youtubeId_nsprefix_ = child_.prefix
+        elif nodeName_ == 'artistId' and child_.text:
             sval_ = child_.text
-            try:
-                ival_ = int(sval_)
-            except (TypeError, ValueError), exp:
-                raise_parse_error(child_, 'requires integer: %s' % exp)
+            ival_ = self.gds_parse_integer(sval_, node, 'artistId')
             ival_ = self.gds_validate_integer(ival_, node, 'artistId')
             self.artistId = ival_
+            self.artistId_nsprefix_ = child_.prefix
         elif nodeName_ == 'overLap':
-            overLap_ = child_.text
-            overLap_ = self.gds_validate_string(overLap_, node, 'overLap')
-            self.overLap = overLap_
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'overLap')
+            value_ = self.gds_validate_string(value_, node, 'overLap')
+            self.overLap = value_
+            self.overLap_nsprefix_ = child_.prefix
         elif nodeName_ == 'songName':
-            songName_ = child_.text
-            songName_ = self.gds_validate_string(songName_, node, 'songName')
-            self.songName = songName_
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'songName')
+            value_ = self.gds_validate_string(value_, node, 'songName')
+            self.songName = value_
+            self.songName_nsprefix_ = child_.prefix
         elif nodeName_ == 'youtubeName':
-            youtubeName_ = child_.text
-            youtubeName_ = self.gds_validate_string(youtubeName_, node, 'youtubeName')
-            self.youtubeName = youtubeName_
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'youtubeName')
+            value_ = self.gds_validate_string(value_, node, 'youtubeName')
+            self.youtubeName = value_
+            self.youtubeName_nsprefix_ = child_.prefix
+        elif nodeName_ == 'youtubedldata':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'youtubedldata')
+            value_ = self.gds_validate_string(value_, node, 'youtubedldata')
+            self.youtubedldata = value_
+            self.youtubedldata_nsprefix_ = child_.prefix
         elif nodeName_ == 'artist':
-            obj_ = artist.factory()
-            obj_.build(child_)
-            self.set_artist(obj_)
+            obj_ = artist.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.artist = obj_
+            obj_.original_tagname_ = 'artist'
         elif nodeName_ == 'ftArtistList':
-            obj_ = ftArtistList.factory()
-            obj_.build(child_)
-            self.set_ftArtistList(obj_)
+            obj_ = ftArtistList.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.ftArtistList = obj_
+            obj_.original_tagname_ = 'ftArtistList'
         elif nodeName_ == 'indexedftArtistList':
-            obj_ = indexedftArtistList.factory()
-            obj_.build(child_)
-            self.set_indexedftArtistList(obj_)
+            obj_ = indexedftArtistList.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.indexedftArtistList = obj_
+            obj_.original_tagname_ = 'indexedftArtistList'
         elif nodeName_ == 'indexedArtistAliasList':
-            obj_ = indexedArtistAliasList.factory()
-            obj_.build(child_)
-            self.set_indexedArtistAliasList(obj_)
+            obj_ = indexedArtistAliasList.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.indexedArtistAliasList = obj_
+            obj_.original_tagname_ = 'indexedArtistAliasList'
         elif nodeName_ == 'connPhraseList':
-            obj_ = connPhraseList.factory()
-            obj_.build(child_)
-            self.set_connPhraseList(obj_)
+            obj_ = connPhraseList.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.connPhraseList = obj_
+            obj_.original_tagname_ = 'connPhraseList'
         elif nodeName_ == 'indexedArtist':
-            obj_ = indexedArtist.factory()
-            obj_.build(child_)
-            self.set_indexedArtist(obj_)
+            obj_ = indexedArtist.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.indexedArtist = obj_
+            obj_.original_tagname_ = 'indexedArtist'
         elif nodeName_ == 'url':
-            url_ = child_.text
-            url_ = self.gds_validate_string(url_, node, 'url')
-            self.url = url_
-        elif nodeName_ == 'releaseDate':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'url')
+            value_ = self.gds_validate_string(value_, node, 'url')
+            self.url = value_
+            self.url_nsprefix_ = child_.prefix
+        elif nodeName_ == 'releaseDate' and child_.text:
             sval_ = child_.text
-            try:
-                ival_ = int(sval_)
-            except (TypeError, ValueError), exp:
-                raise_parse_error(child_, 'requires integer: %s' % exp)
+            ival_ = self.gds_parse_integer(sval_, node, 'releaseDate')
             ival_ = self.gds_validate_integer(ival_, node, 'releaseDate')
             self.releaseDate = ival_
-        elif nodeName_ == 'decade':
+            self.releaseDate_nsprefix_ = child_.prefix
+        elif nodeName_ == 'decade' and child_.text:
             sval_ = child_.text
-            try:
-                ival_ = int(sval_)
-            except (TypeError, ValueError), exp:
-                raise_parse_error(child_, 'requires integer: %s' % exp)
+            ival_ = self.gds_parse_integer(sval_, node, 'decade')
             ival_ = self.gds_validate_integer(ival_, node, 'decade')
             self.decade = ival_
+            self.decade_nsprefix_ = child_.prefix
         elif nodeName_ == 'youtubeDate':
             sval_ = child_.text
-            dval_ = self.gds_parse_date(sval_, node, 'youtubeDate')
+            dval_ = self.gds_parse_date(sval_)
             self.youtubeDate = dval_
+            self.youtubeDate_nsprefix_ = child_.prefix
         elif nodeName_ == 'crawlDate':
             sval_ = child_.text
-            dval_ = self.gds_parse_date(sval_, node, 'crawlDate')
+            dval_ = self.gds_parse_date(sval_)
             self.crawlDate = dval_
-        elif nodeName_ == 'viewcount':
+            self.crawlDate_nsprefix_ = child_.prefix
+        elif nodeName_ == 'viewcount' and child_.text:
             sval_ = child_.text
-            try:
-                ival_ = int(sval_)
-            except (TypeError, ValueError), exp:
-                raise_parse_error(child_, 'requires integer: %s' % exp)
+            ival_ = self.gds_parse_integer(sval_, node, 'viewcount')
             ival_ = self.gds_validate_integer(ival_, node, 'viewcount')
             self.viewcount = ival_
-        elif nodeName_ == 'crawlDelta':
+            self.viewcount_nsprefix_ = child_.prefix
+        elif nodeName_ == 'crawlDelta' and child_.text:
             sval_ = child_.text
-            try:
-                ival_ = int(sval_)
-            except (TypeError, ValueError), exp:
-                raise_parse_error(child_, 'requires integer: %s' % exp)
+            ival_ = self.gds_parse_integer(sval_, node, 'crawlDelta')
             ival_ = self.gds_validate_integer(ival_, node, 'crawlDelta')
             self.crawlDelta = ival_
+            self.crawlDelta_nsprefix_ = child_.prefix
         elif nodeName_ == 'isCompilation':
             sval_ = child_.text
-            if sval_ in ('true', '1'):
-                ival_ = True
-            elif sval_ in ('false', '0'):
-                ival_ = False
-            else:
-                raise_parse_error(child_, 'requires boolean')
+            ival_ = self.gds_parse_boolean(sval_, node, 'isCompilation')
             ival_ = self.gds_validate_boolean(ival_, node, 'isCompilation')
             self.isCompilation = ival_
-        elif nodeName_ == 'releaseId':
+            self.isCompilation_nsprefix_ = child_.prefix
+        elif nodeName_ == 'releaseId' and child_.text:
             sval_ = child_.text
-            try:
-                ival_ = int(sval_)
-            except (TypeError, ValueError), exp:
-                raise_parse_error(child_, 'requires integer: %s' % exp)
+            ival_ = self.gds_parse_integer(sval_, node, 'releaseId')
             ival_ = self.gds_validate_integer(ival_, node, 'releaseId')
             self.releaseId = ival_
-        elif nodeName_ == 'masterRelease':
+            self.releaseId_nsprefix_ = child_.prefix
+        elif nodeName_ == 'masterRelease' and child_.text:
             sval_ = child_.text
-            try:
-                ival_ = int(sval_)
-            except (TypeError, ValueError), exp:
-                raise_parse_error(child_, 'requires integer: %s' % exp)
+            ival_ = self.gds_parse_integer(sval_, node, 'masterRelease')
             ival_ = self.gds_validate_integer(ival_, node, 'masterRelease')
             self.masterRelease = ival_
+            self.masterRelease_nsprefix_ = child_.prefix
         elif nodeName_ == 'masterGenres':
-            obj_ = masterGenres.factory()
-            obj_.build(child_)
-            self.set_masterGenres(obj_)
+            obj_ = masterGenres.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.masterGenres = obj_
+            obj_.original_tagname_ = 'masterGenres'
         elif nodeName_ == 'masterStyles':
-            obj_ = masterStyles.factory()
-            obj_.build(child_)
-            self.set_masterStyles(obj_)
+            obj_ = masterStyles.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.masterStyles = obj_
+            obj_.original_tagname_ = 'masterStyles'
         elif nodeName_ == 'crawlHistoryList':
-            obj_ = crawlHistoryList.factory()
-            obj_.build(child_)
-            self.set_crawlHistoryList(obj_)
+            obj_ = crawlHistoryList.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.crawlHistoryList = obj_
+            obj_.original_tagname_ = 'crawlHistoryList'
         elif nodeName_ == 'genresCountList':
-            obj_ = genresCountList.factory()
-            obj_.build(child_)
-            self.set_genresCountList(obj_)
-        elif nodeName_ == 'rating':
+            obj_ = genresCountList.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.genresCountList = obj_
+            obj_.original_tagname_ = 'genresCountList'
+        elif nodeName_ == 'rating' and child_.text:
             sval_ = child_.text
-            try:
-                fval_ = float(sval_)
-            except (TypeError, ValueError), exp:
-                raise_parse_error(child_, 'requires float or double: %s' % exp)
-            fval_ = self.gds_validate_float(fval_, node, 'rating')
+            fval_ = self.gds_parse_decimal(sval_, node, 'rating')
+            fval_ = self.gds_validate_decimal(fval_, node, 'rating')
             self.rating = fval_
+            self.rating_nsprefix_ = child_.prefix
         elif nodeName_ == 'level1Genres':
-            obj_ = level1Genres.factory()
-            obj_.build(child_)
-            self.set_level1Genres(obj_)
+            obj_ = level1Genres.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.level1Genres = obj_
+            obj_.original_tagname_ = 'level1Genres'
         elif nodeName_ == 'level2Genres':
-            obj_ = level2Genres.factory()
-            obj_.build(child_)
-            self.set_level2Genres(obj_)
+            obj_ = level2Genres.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.level2Genres = obj_
+            obj_.original_tagname_ = 'level2Genres'
         elif nodeName_ == 'level3Genres':
-            obj_ = level3Genres.factory()
-            obj_.build(child_)
-            self.set_level3Genres(obj_)
+            obj_ = level3Genres.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.level3Genres = obj_
+            obj_.original_tagname_ = 'level3Genres'
         elif nodeName_ == 'level4Genres':
-            obj_ = level4Genres.factory()
-            obj_.build(child_)
-            self.set_level4Genres(obj_)
+            obj_ = level4Genres.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.level4Genres = obj_
+            obj_.original_tagname_ = 'level4Genres'
         elif nodeName_ == 'level5Genres':
-            obj_ = level5Genres.factory()
-            obj_.build(child_)
-            self.set_level5Genres(obj_)
+            obj_ = level5Genres.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.level5Genres = obj_
+            obj_.original_tagname_ = 'level5Genres'
         elif nodeName_ == 'level6Genres':
-            obj_ = level6Genres.factory()
-            obj_.build(child_)
-            self.set_level6Genres(obj_)
+            obj_ = level6Genres.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.level6Genres = obj_
+            obj_.original_tagname_ = 'level6Genres'
         elif nodeName_ == 'level7Genres':
-            obj_ = level7Genres.factory()
-            obj_.build(child_)
-            self.set_level7Genres(obj_)
+            obj_ = level7Genres.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.level7Genres = obj_
+            obj_.original_tagname_ = 'level7Genres'
         elif nodeName_ == 'level8Genres':
-            obj_ = level8Genres.factory()
-            obj_.build(child_)
-            self.set_level8Genres(obj_)
+            obj_ = level8Genres.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.level8Genres = obj_
+            obj_.original_tagname_ = 'level8Genres'
         elif nodeName_ == 'level9Genres':
-            obj_ = level9Genres.factory()
-            obj_.build(child_)
-            self.set_level9Genres(obj_)
+            obj_ = level9Genres.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.level9Genres = obj_
+            obj_.original_tagname_ = 'level9Genres'
         elif nodeName_ == 'albumList':
-            obj_ = albumList.factory()
-            obj_.build(child_)
-            self.set_albumList(obj_)
+            obj_ = albumList.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.albumList = obj_
+            obj_.original_tagname_ = 'albumList'
         elif nodeName_ == 'similarGenresTagList':
-            obj_ = similarGenresTagList.factory()
-            obj_.build(child_)
-            self.set_similarGenresTagList(obj_)
+            obj_ = similarGenresTagList.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.similarGenresTagList = obj_
+            obj_.original_tagname_ = 'similarGenresTagList'
         elif nodeName_ == 'similarArtistList':
-            obj_ = similarArtistList.factory()
-            obj_.build(child_)
-            self.set_similarArtistList(obj_)
-        elif nodeName_ == 'totalGenreCount':
+            obj_ = similarArtistList.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.similarArtistList = obj_
+            obj_.original_tagname_ = 'similarArtistList'
+        elif nodeName_ == 'totalGenreCount' and child_.text:
             sval_ = child_.text
-            try:
-                ival_ = int(sval_)
-            except (TypeError, ValueError), exp:
-                raise_parse_error(child_, 'requires integer: %s' % exp)
+            ival_ = self.gds_parse_integer(sval_, node, 'totalGenreCount')
             ival_ = self.gds_validate_integer(ival_, node, 'totalGenreCount')
             self.totalGenreCount = ival_
-        elif nodeName_ == 'viewcountRate':
+            self.totalGenreCount_nsprefix_ = child_.prefix
+        elif nodeName_ == 'viewcountRate' and child_.text:
             sval_ = child_.text
-            try:
-                fval_ = float(sval_)
-            except (TypeError, ValueError), exp:
-                raise_parse_error(child_, 'requires float or double: %s' % exp)
-            fval_ = self.gds_validate_float(fval_, node, 'viewcountRate')
+            fval_ = self.gds_parse_decimal(sval_, node, 'viewcountRate')
+            fval_ = self.gds_validate_decimal(fval_, node, 'viewcountRate')
             self.viewcountRate = fval_
+            self.viewcountRate_nsprefix_ = child_.prefix
         elif nodeName_ == 'duration':
-            duration_ = child_.text
-            duration_ = self.gds_validate_string(duration_, node, 'duration')
-            self.duration = duration_
-        elif nodeName_ == 'descriptions':
-            descriptions_ = child_.text
-            descriptions_ = self.gds_validate_string(descriptions_, node, 'descriptions')
-            self.descriptions = descriptions_
-        elif nodeName_ == 'viewCountGroup':
             sval_ = child_.text
-            try:
-                ival_ = int(sval_)
-            except (TypeError, ValueError), exp:
-                raise_parse_error(child_, 'requires integer: %s' % exp)
+            dval_ = self.gds_parse_time(sval_)
+            self.duration = dval_
+            self.duration_nsprefix_ = child_.prefix
+        elif nodeName_ == 'descriptions':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'descriptions')
+            value_ = self.gds_validate_string(value_, node, 'descriptions')
+            self.descriptions = value_
+            self.descriptions_nsprefix_ = child_.prefix
+        elif nodeName_ == 'viewCountGroup' and child_.text:
+            sval_ = child_.text
+            ival_ = self.gds_parse_integer(sval_, node, 'viewCountGroup')
             ival_ = self.gds_validate_integer(ival_, node, 'viewCountGroup')
             self.viewCountGroup = ival_
+            self.viewCountGroup_nsprefix_ = child_.prefix
         elif nodeName_ == 'decision':
-            decision_ = child_.text
-            decision_ = self.gds_validate_string(decision_, node, 'decision')
-            self.decision = decision_
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'decision')
+            value_ = self.gds_validate_string(value_, node, 'decision')
+            self.decision = value_
+            self.decision_nsprefix_ = child_.prefix
         elif nodeName_ == 'substring_song':
-            substring_song_ = child_.text
-            substring_song_ = self.gds_validate_string(substring_song_, node, 'substring_song')
-            self.substring_song = substring_song_
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'substring_song')
+            value_ = self.gds_validate_string(value_, node, 'substring_song')
+            self.substring_song = value_
+            self.substring_song_nsprefix_ = child_.prefix
         elif nodeName_ == 'substring_artist':
-            substring_artist_ = child_.text
-            substring_artist_ = self.gds_validate_string(substring_artist_, node, 'substring_artist')
-            self.substring_artist = substring_artist_
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'substring_artist')
+            value_ = self.gds_validate_string(value_, node, 'substring_artist')
+            self.substring_artist = value_
+            self.substring_artist_nsprefix_ = child_.prefix
         elif nodeName_ == 'substring_ftartist':
-            substring_ftartist_ = child_.text
-            substring_ftartist_ = self.gds_validate_string(substring_ftartist_, node, 'substring_ftartist')
-            self.substring_ftartist = substring_ftartist_
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'substring_ftartist')
+            value_ = self.gds_validate_string(value_, node, 'substring_ftartist')
+            self.substring_ftartist = value_
+            self.substring_ftartist_nsprefix_ = child_.prefix
         elif nodeName_ == 'songLanguage':
-            songLanguage_ = child_.text
-            songLanguage_ = self.gds_validate_string(songLanguage_, node, 'songLanguage')
-            self.songLanguage = songLanguage_
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'songLanguage')
+            value_ = self.gds_validate_string(value_, node, 'songLanguage')
+            self.songLanguage = value_
+            self.songLanguage_nsprefix_ = child_.prefix
         elif nodeName_ == 'earliestDate':
-            earliestDate_ = child_.text
-            earliestDate_ = self.gds_validate_string(earliestDate_, node, 'earliestDate')
-            self.earliestDate = earliestDate_
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'earliestDate')
+            value_ = self.gds_validate_string(value_, node, 'earliestDate')
+            self.earliestDate = value_
+            self.earliestDate_nsprefix_ = child_.prefix
         elif nodeName_ == 'songCountry':
-            songCountry_ = child_.text
-            songCountry_ = self.gds_validate_string(songCountry_, node, 'songCountry')
-            self.songCountry = songCountry_
-        elif nodeName_ == 'totalMatch':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'songCountry')
+            value_ = self.gds_validate_string(value_, node, 'songCountry')
+            self.songCountry = value_
+            self.songCountry_nsprefix_ = child_.prefix
+        elif nodeName_ == 'totalMatch' and child_.text:
             sval_ = child_.text
-            try:
-                fval_ = float(sval_)
-            except (TypeError, ValueError), exp:
-                raise_parse_error(child_, 'requires float or double: %s' % exp)
-            fval_ = self.gds_validate_float(fval_, node, 'totalMatch')
+            fval_ = self.gds_parse_decimal(sval_, node, 'totalMatch')
+            fval_ = self.gds_validate_decimal(fval_, node, 'totalMatch')
             self.totalMatch = fval_
-        elif nodeName_ == 'songMatch':
+            self.totalMatch_nsprefix_ = child_.prefix
+        elif nodeName_ == 'songMatch' and child_.text:
             sval_ = child_.text
-            try:
-                fval_ = float(sval_)
-            except (TypeError, ValueError), exp:
-                raise_parse_error(child_, 'requires float or double: %s' % exp)
-            fval_ = self.gds_validate_float(fval_, node, 'songMatch')
+            fval_ = self.gds_parse_decimal(sval_, node, 'songMatch')
+            fval_ = self.gds_validate_decimal(fval_, node, 'songMatch')
             self.songMatch = fval_
-        elif nodeName_ == 'artistMatch':
+            self.songMatch_nsprefix_ = child_.prefix
+        elif nodeName_ == 'artistMatch' and child_.text:
             sval_ = child_.text
-            try:
-                fval_ = float(sval_)
-            except (TypeError, ValueError), exp:
-                raise_parse_error(child_, 'requires float or double: %s' % exp)
-            fval_ = self.gds_validate_float(fval_, node, 'artistMatch')
+            fval_ = self.gds_parse_decimal(sval_, node, 'artistMatch')
+            fval_ = self.gds_validate_decimal(fval_, node, 'artistMatch')
             self.artistMatch = fval_
+            self.artistMatch_nsprefix_ = child_.prefix
         elif nodeName_ == 'genreTag':
-            genreTag_ = child_.text
-            genreTag_ = self.gds_validate_string(genreTag_, node, 'genreTag')
-            self.genreTag = genreTag_
-        elif nodeName_ == 'genreTagId':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'genreTag')
+            value_ = self.gds_validate_string(value_, node, 'genreTag')
+            self.genreTag = value_
+            self.genreTag_nsprefix_ = child_.prefix
+        elif nodeName_ == 'genreTagId' and child_.text:
             sval_ = child_.text
-            try:
-                ival_ = int(sval_)
-            except (TypeError, ValueError), exp:
-                raise_parse_error(child_, 'requires integer: %s' % exp)
+            ival_ = self.gds_parse_integer(sval_, node, 'genreTagId')
             ival_ = self.gds_validate_integer(ival_, node, 'genreTagId')
             self.genreTagId = ival_
+            self.genreTagId_nsprefix_ = child_.prefix
         elif nodeName_ == 'youtubeList':
-            obj_ = youtubeList.factory()
-            obj_.build(child_)
-            self.set_youtubeList(obj_)
+            obj_ = youtubeList.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.youtubeList = obj_
+            obj_.original_tagname_ = 'youtubeList'
         elif nodeName_ == 'genreMatch':
-            genreMatch_ = child_.text
-            genreMatch_ = self.gds_validate_string(genreMatch_, node, 'genreMatch')
-            self.genreMatch = genreMatch_
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'genreMatch')
+            value_ = self.gds_validate_string(value_, node, 'genreMatch')
+            self.genreMatch = value_
+            self.genreMatch_nsprefix_ = child_.prefix
         elif nodeName_ == 'soundcloudList':
-            obj_ = soundcloudList.factory()
-            obj_.build(child_)
-            self.set_soundcloudList(obj_)
+            obj_ = soundcloudList.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.soundcloudList = obj_
+            obj_.original_tagname_ = 'soundcloudList'
 # end class songs
 
 
 class artist(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
     subclass = None
     superclass = None
-    def __init__(self, artistName=None, artistAlias=None, artistPopularityAll=None, artistPopularityRecent=None):
+    def __init__(self, artistName=None, artistAlias=None, artistPopularityAll=None, artistPopularityRecent=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = None
         if artistName is None:
             self.artistName = []
         else:
             self.artistName = artistName
+        self.artistName_nsprefix_ = None
         if artistAlias is None:
             self.artistAlias = []
         else:
             self.artistAlias = artistAlias
+        self.artistAlias_nsprefix_ = None
         self.artistPopularityAll = artistPopularityAll
+        self.artistPopularityAll_nsprefix_ = None
         self.artistPopularityRecent = artistPopularityRecent
+        self.artistPopularityRecent_nsprefix_ = None
     def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, artist)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
         if artist.subclass:
             return artist.subclass(*args_, **kwargs_)
         else:
             return artist(*args_, **kwargs_)
     factory = staticmethod(factory)
-    def get_artistName(self): return self.artistName
-    def set_artistName(self, artistName): self.artistName = artistName
-    def add_artistName(self, value): self.artistName.append(value)
-    def insert_artistName(self, index, value): self.artistName[index] = value
-    def get_artistAlias(self): return self.artistAlias
-    def set_artistAlias(self, artistAlias): self.artistAlias = artistAlias
-    def add_artistAlias(self, value): self.artistAlias.append(value)
-    def insert_artistAlias(self, index, value): self.artistAlias[index] = value
-    def get_artistPopularityAll(self): return self.artistPopularityAll
-    def set_artistPopularityAll(self, artistPopularityAll): self.artistPopularityAll = artistPopularityAll
-    def get_artistPopularityRecent(self): return self.artistPopularityRecent
-    def set_artistPopularityRecent(self, artistPopularityRecent): self.artistPopularityRecent = artistPopularityRecent
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_artistName(self):
+        return self.artistName
+    def set_artistName(self, artistName):
+        self.artistName = artistName
+    def add_artistName(self, value):
+        self.artistName.append(value)
+    def insert_artistName_at(self, index, value):
+        self.artistName.insert(index, value)
+    def replace_artistName_at(self, index, value):
+        self.artistName[index] = value
+    def get_artistAlias(self):
+        return self.artistAlias
+    def set_artistAlias(self, artistAlias):
+        self.artistAlias = artistAlias
+    def add_artistAlias(self, value):
+        self.artistAlias.append(value)
+    def insert_artistAlias_at(self, index, value):
+        self.artistAlias.insert(index, value)
+    def replace_artistAlias_at(self, index, value):
+        self.artistAlias[index] = value
+    def get_artistPopularityAll(self):
+        return self.artistPopularityAll
+    def set_artistPopularityAll(self, artistPopularityAll):
+        self.artistPopularityAll = artistPopularityAll
+    def get_artistPopularityRecent(self):
+        return self.artistPopularityRecent
+    def set_artistPopularityRecent(self, artistPopularityRecent):
+        self.artistPopularityRecent = artistPopularityRecent
     def hasContent_(self):
         if (
             self.artistName or
             self.artistAlias or
             self.artistPopularityAll is not None or
             self.artistPopularityRecent is not None
-            ):
+        ):
             return True
         else:
             return False
-    def export(self, outfile, level, namespace_='', name_='artist', namespacedef_='', pretty_print=True):
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='artist', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('artist')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
         if pretty_print:
             eol_ = '\n'
         else:
             eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'artist':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
         showIndent(outfile, level, pretty_print)
-        outfile.write('<%s%s%s' % (namespace_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
         already_processed = set()
-        self.exportAttributes(outfile, level, already_processed, namespace_, name_='artist')
+        self.exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='artist')
         if self.hasContent_():
             outfile.write('>%s' % (eol_, ))
-            self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+            self.exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='artist', pretty_print=pretty_print)
             showIndent(outfile, level, pretty_print)
-            outfile.write('</%s%s>%s' % (namespace_, name_, eol_))
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
         else:
             outfile.write('/>%s' % (eol_, ))
-    def exportAttributes(self, outfile, level, already_processed, namespace_='', name_='artist'):
+    def exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='artist'):
         pass
-    def exportChildren(self, outfile, level, namespace_='', name_='artist', fromsubclass_=False, pretty_print=True):
+    def exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='artist', fromsubclass_=False, pretty_print=True):
         if pretty_print:
             eol_ = '\n'
         else:
             eol_ = ''
         for artistName_ in self.artistName:
+            namespaceprefix_ = self.artistName_nsprefix_ + ':' if (UseCapturedNS_ and self.artistName_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%sartistName>%s</%sartistName>%s' % (namespace_, self.gds_format_string(quote_xml(artistName_).encode(ExternalEncoding), input_name='artistName'), namespace_, eol_))
+            outfile.write('<%sartistName>%s</%sartistName>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(artistName_), input_name='artistName')), namespaceprefix_ , eol_))
         for artistAlias_ in self.artistAlias:
+            namespaceprefix_ = self.artistAlias_nsprefix_ + ':' if (UseCapturedNS_ and self.artistAlias_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%sartistAlias>%s</%sartistAlias>%s' % (namespace_, self.gds_format_string(quote_xml(artistAlias_).encode(ExternalEncoding), input_name='artistAlias'), namespace_, eol_))
+            outfile.write('<%sartistAlias>%s</%sartistAlias>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(artistAlias_), input_name='artistAlias')), namespaceprefix_ , eol_))
         if self.artistPopularityAll is not None:
+            namespaceprefix_ = self.artistPopularityAll_nsprefix_ + ':' if (UseCapturedNS_ and self.artistPopularityAll_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%sartistPopularityAll>%s</%sartistPopularityAll>%s' % (namespace_, self.gds_format_integer(self.artistPopularityAll, input_name='artistPopularityAll'), namespace_, eol_))
+            outfile.write('<%sartistPopularityAll>%s</%sartistPopularityAll>%s' % (namespaceprefix_ , self.gds_format_integer(self.artistPopularityAll, input_name='artistPopularityAll'), namespaceprefix_ , eol_))
         if self.artistPopularityRecent is not None:
+            namespaceprefix_ = self.artistPopularityRecent_nsprefix_ + ':' if (UseCapturedNS_ and self.artistPopularityRecent_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%sartistPopularityRecent>%s</%sartistPopularityRecent>%s' % (namespace_, self.gds_format_integer(self.artistPopularityRecent, input_name='artistPopularityRecent'), namespace_, eol_))
-    def exportLiteral(self, outfile, level, name_='artist'):
-        level += 1
+            outfile.write('<%sartistPopularityRecent>%s</%sartistPopularityRecent>%s' % (namespaceprefix_ , self.gds_format_integer(self.artistPopularityRecent, input_name='artistPopularityRecent'), namespaceprefix_ , eol_))
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
         already_processed = set()
-        self.exportLiteralAttributes(outfile, level, already_processed, name_)
-        if self.hasContent_():
-            self.exportLiteralChildren(outfile, level, name_)
-    def exportLiteralAttributes(self, outfile, level, already_processed, name_):
-        pass
-    def exportLiteralChildren(self, outfile, level, name_):
-        showIndent(outfile, level)
-        outfile.write('artistName=[\n')
-        level += 1
-        for artistName_ in self.artistName:
-            showIndent(outfile, level)
-            outfile.write('%s,\n' % quote_python(artistName_).encode(ExternalEncoding))
-        level -= 1
-        showIndent(outfile, level)
-        outfile.write('],\n')
-        showIndent(outfile, level)
-        outfile.write('artistAlias=[\n')
-        level += 1
-        for artistAlias_ in self.artistAlias:
-            showIndent(outfile, level)
-            outfile.write('%s,\n' % quote_python(artistAlias_).encode(ExternalEncoding))
-        level -= 1
-        showIndent(outfile, level)
-        outfile.write('],\n')
-        if self.artistPopularityAll is not None:
-            showIndent(outfile, level)
-            outfile.write('artistPopularityAll=%d,\n' % self.artistPopularityAll)
-        if self.artistPopularityRecent is not None:
-            showIndent(outfile, level)
-            outfile.write('artistPopularityRecent=%d,\n' % self.artistPopularityRecent)
-    def build(self, node):
-        already_processed = set()
+        self.ns_prefix_ = node.prefix
         self.buildAttributes(node, node.attrib, already_processed)
         for child in node:
             nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
-            self.buildChildren(child, node, nodeName_)
+            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
     def buildAttributes(self, node, attrs, already_processed):
         pass
-    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False):
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
         if nodeName_ == 'artistName':
-            artistName_ = child_.text
-            artistName_ = self.gds_validate_string(artistName_, node, 'artistName')
-            self.artistName.append(artistName_)
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'artistName')
+            value_ = self.gds_validate_string(value_, node, 'artistName')
+            self.artistName.append(value_)
+            self.artistName_nsprefix_ = child_.prefix
         elif nodeName_ == 'artistAlias':
-            artistAlias_ = child_.text
-            artistAlias_ = self.gds_validate_string(artistAlias_, node, 'artistAlias')
-            self.artistAlias.append(artistAlias_)
-        elif nodeName_ == 'artistPopularityAll':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'artistAlias')
+            value_ = self.gds_validate_string(value_, node, 'artistAlias')
+            self.artistAlias.append(value_)
+            self.artistAlias_nsprefix_ = child_.prefix
+        elif nodeName_ == 'artistPopularityAll' and child_.text:
             sval_ = child_.text
-            try:
-                ival_ = int(sval_)
-            except (TypeError, ValueError), exp:
-                raise_parse_error(child_, 'requires integer: %s' % exp)
+            ival_ = self.gds_parse_integer(sval_, node, 'artistPopularityAll')
             ival_ = self.gds_validate_integer(ival_, node, 'artistPopularityAll')
             self.artistPopularityAll = ival_
-        elif nodeName_ == 'artistPopularityRecent':
+            self.artistPopularityAll_nsprefix_ = child_.prefix
+        elif nodeName_ == 'artistPopularityRecent' and child_.text:
             sval_ = child_.text
-            try:
-                ival_ = int(sval_)
-            except (TypeError, ValueError), exp:
-                raise_parse_error(child_, 'requires integer: %s' % exp)
+            ival_ = self.gds_parse_integer(sval_, node, 'artistPopularityRecent')
             ival_ = self.gds_validate_integer(ival_, node, 'artistPopularityRecent')
             self.artistPopularityRecent = ival_
+            self.artistPopularityRecent_nsprefix_ = child_.prefix
 # end class artist
 
 
 class ftArtistList(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
     subclass = None
     superclass = None
-    def __init__(self, ftArtistName=None):
+    def __init__(self, ftArtistName=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = None
         if ftArtistName is None:
             self.ftArtistName = []
         else:
             self.ftArtistName = ftArtistName
+        self.ftArtistName_nsprefix_ = None
     def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, ftArtistList)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
         if ftArtistList.subclass:
             return ftArtistList.subclass(*args_, **kwargs_)
         else:
             return ftArtistList(*args_, **kwargs_)
     factory = staticmethod(factory)
-    def get_ftArtistName(self): return self.ftArtistName
-    def set_ftArtistName(self, ftArtistName): self.ftArtistName = ftArtistName
-    def add_ftArtistName(self, value): self.ftArtistName.append(value)
-    def insert_ftArtistName(self, index, value): self.ftArtistName[index] = value
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_ftArtistName(self):
+        return self.ftArtistName
+    def set_ftArtistName(self, ftArtistName):
+        self.ftArtistName = ftArtistName
+    def add_ftArtistName(self, value):
+        self.ftArtistName.append(value)
+    def insert_ftArtistName_at(self, index, value):
+        self.ftArtistName.insert(index, value)
+    def replace_ftArtistName_at(self, index, value):
+        self.ftArtistName[index] = value
     def hasContent_(self):
         if (
             self.ftArtistName
-            ):
+        ):
             return True
         else:
             return False
-    def export(self, outfile, level, namespace_='', name_='ftArtistList', namespacedef_='', pretty_print=True):
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='ftArtistList', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('ftArtistList')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
         if pretty_print:
             eol_ = '\n'
         else:
             eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'ftArtistList':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
         showIndent(outfile, level, pretty_print)
-        outfile.write('<%s%s%s' % (namespace_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
         already_processed = set()
-        self.exportAttributes(outfile, level, already_processed, namespace_, name_='ftArtistList')
+        self.exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='ftArtistList')
         if self.hasContent_():
             outfile.write('>%s' % (eol_, ))
-            self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+            self.exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='ftArtistList', pretty_print=pretty_print)
             showIndent(outfile, level, pretty_print)
-            outfile.write('</%s%s>%s' % (namespace_, name_, eol_))
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
         else:
             outfile.write('/>%s' % (eol_, ))
-    def exportAttributes(self, outfile, level, already_processed, namespace_='', name_='ftArtistList'):
+    def exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='ftArtistList'):
         pass
-    def exportChildren(self, outfile, level, namespace_='', name_='ftArtistList', fromsubclass_=False, pretty_print=True):
+    def exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='ftArtistList', fromsubclass_=False, pretty_print=True):
         if pretty_print:
             eol_ = '\n'
         else:
             eol_ = ''
         for ftArtistName_ in self.ftArtistName:
+            namespaceprefix_ = self.ftArtistName_nsprefix_ + ':' if (UseCapturedNS_ and self.ftArtistName_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%sftArtistName>%s</%sftArtistName>%s' % (namespace_, self.gds_format_string(quote_xml(ftArtistName_).encode(ExternalEncoding), input_name='ftArtistName'), namespace_, eol_))
-    def exportLiteral(self, outfile, level, name_='ftArtistList'):
-        level += 1
+            outfile.write('<%sftArtistName>%s</%sftArtistName>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(ftArtistName_), input_name='ftArtistName')), namespaceprefix_ , eol_))
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
         already_processed = set()
-        self.exportLiteralAttributes(outfile, level, already_processed, name_)
-        if self.hasContent_():
-            self.exportLiteralChildren(outfile, level, name_)
-    def exportLiteralAttributes(self, outfile, level, already_processed, name_):
-        pass
-    def exportLiteralChildren(self, outfile, level, name_):
-        showIndent(outfile, level)
-        outfile.write('ftArtistName=[\n')
-        level += 1
-        for ftArtistName_ in self.ftArtistName:
-            showIndent(outfile, level)
-            outfile.write('%s,\n' % quote_python(ftArtistName_).encode(ExternalEncoding))
-        level -= 1
-        showIndent(outfile, level)
-        outfile.write('],\n')
-    def build(self, node):
-        already_processed = set()
+        self.ns_prefix_ = node.prefix
         self.buildAttributes(node, node.attrib, already_processed)
         for child in node:
             nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
-            self.buildChildren(child, node, nodeName_)
+            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
     def buildAttributes(self, node, attrs, already_processed):
         pass
-    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False):
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
         if nodeName_ == 'ftArtistName':
-            ftArtistName_ = child_.text
-            ftArtistName_ = self.gds_validate_string(ftArtistName_, node, 'ftArtistName')
-            self.ftArtistName.append(ftArtistName_)
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'ftArtistName')
+            value_ = self.gds_validate_string(value_, node, 'ftArtistName')
+            self.ftArtistName.append(value_)
+            self.ftArtistName_nsprefix_ = child_.prefix
 # end class ftArtistList
 
 
 class indexedftArtistList(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
     subclass = None
     superclass = None
-    def __init__(self, indexedftArtistName=None):
+    def __init__(self, indexedftArtistName=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = None
         if indexedftArtistName is None:
             self.indexedftArtistName = []
         else:
             self.indexedftArtistName = indexedftArtistName
+        self.indexedftArtistName_nsprefix_ = None
     def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, indexedftArtistList)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
         if indexedftArtistList.subclass:
             return indexedftArtistList.subclass(*args_, **kwargs_)
         else:
             return indexedftArtistList(*args_, **kwargs_)
     factory = staticmethod(factory)
-    def get_indexedftArtistName(self): return self.indexedftArtistName
-    def set_indexedftArtistName(self, indexedftArtistName): self.indexedftArtistName = indexedftArtistName
-    def add_indexedftArtistName(self, value): self.indexedftArtistName.append(value)
-    def insert_indexedftArtistName(self, index, value): self.indexedftArtistName[index] = value
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_indexedftArtistName(self):
+        return self.indexedftArtistName
+    def set_indexedftArtistName(self, indexedftArtistName):
+        self.indexedftArtistName = indexedftArtistName
+    def add_indexedftArtistName(self, value):
+        self.indexedftArtistName.append(value)
+    def insert_indexedftArtistName_at(self, index, value):
+        self.indexedftArtistName.insert(index, value)
+    def replace_indexedftArtistName_at(self, index, value):
+        self.indexedftArtistName[index] = value
     def hasContent_(self):
         if (
             self.indexedftArtistName
-            ):
+        ):
             return True
         else:
             return False
-    def export(self, outfile, level, namespace_='', name_='indexedftArtistList', namespacedef_='', pretty_print=True):
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='indexedftArtistList', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('indexedftArtistList')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
         if pretty_print:
             eol_ = '\n'
         else:
             eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'indexedftArtistList':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
         showIndent(outfile, level, pretty_print)
-        outfile.write('<%s%s%s' % (namespace_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
         already_processed = set()
-        self.exportAttributes(outfile, level, already_processed, namespace_, name_='indexedftArtistList')
+        self.exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='indexedftArtistList')
         if self.hasContent_():
             outfile.write('>%s' % (eol_, ))
-            self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+            self.exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='indexedftArtistList', pretty_print=pretty_print)
             showIndent(outfile, level, pretty_print)
-            outfile.write('</%s%s>%s' % (namespace_, name_, eol_))
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
         else:
             outfile.write('/>%s' % (eol_, ))
-    def exportAttributes(self, outfile, level, already_processed, namespace_='', name_='indexedftArtistList'):
+    def exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='indexedftArtistList'):
         pass
-    def exportChildren(self, outfile, level, namespace_='', name_='indexedftArtistList', fromsubclass_=False, pretty_print=True):
+    def exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='indexedftArtistList', fromsubclass_=False, pretty_print=True):
         if pretty_print:
             eol_ = '\n'
         else:
             eol_ = ''
         for indexedftArtistName_ in self.indexedftArtistName:
+            namespaceprefix_ = self.indexedftArtistName_nsprefix_ + ':' if (UseCapturedNS_ and self.indexedftArtistName_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%sindexedftArtistName>%s</%sindexedftArtistName>%s' % (namespace_, self.gds_format_string(quote_xml(indexedftArtistName_).encode(ExternalEncoding), input_name='indexedftArtistName'), namespace_, eol_))
-    def exportLiteral(self, outfile, level, name_='indexedftArtistList'):
-        level += 1
+            outfile.write('<%sindexedftArtistName>%s</%sindexedftArtistName>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(indexedftArtistName_), input_name='indexedftArtistName')), namespaceprefix_ , eol_))
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
         already_processed = set()
-        self.exportLiteralAttributes(outfile, level, already_processed, name_)
-        if self.hasContent_():
-            self.exportLiteralChildren(outfile, level, name_)
-    def exportLiteralAttributes(self, outfile, level, already_processed, name_):
-        pass
-    def exportLiteralChildren(self, outfile, level, name_):
-        showIndent(outfile, level)
-        outfile.write('indexedftArtistName=[\n')
-        level += 1
-        for indexedftArtistName_ in self.indexedftArtistName:
-            showIndent(outfile, level)
-            outfile.write('%s,\n' % quote_python(indexedftArtistName_).encode(ExternalEncoding))
-        level -= 1
-        showIndent(outfile, level)
-        outfile.write('],\n')
-    def build(self, node):
-        already_processed = set()
+        self.ns_prefix_ = node.prefix
         self.buildAttributes(node, node.attrib, already_processed)
         for child in node:
             nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
-            self.buildChildren(child, node, nodeName_)
+            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
     def buildAttributes(self, node, attrs, already_processed):
         pass
-    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False):
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
         if nodeName_ == 'indexedftArtistName':
-            indexedftArtistName_ = child_.text
-            indexedftArtistName_ = self.gds_validate_string(indexedftArtistName_, node, 'indexedftArtistName')
-            self.indexedftArtistName.append(indexedftArtistName_)
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'indexedftArtistName')
+            value_ = self.gds_validate_string(value_, node, 'indexedftArtistName')
+            self.indexedftArtistName.append(value_)
+            self.indexedftArtistName_nsprefix_ = child_.prefix
 # end class indexedftArtistList
 
 
 class indexedArtistAliasList(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
     subclass = None
     superclass = None
-    def __init__(self, indexedArtistAliasName=None):
+    def __init__(self, indexedArtistAliasName=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = None
         if indexedArtistAliasName is None:
             self.indexedArtistAliasName = []
         else:
             self.indexedArtistAliasName = indexedArtistAliasName
+        self.indexedArtistAliasName_nsprefix_ = None
     def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, indexedArtistAliasList)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
         if indexedArtistAliasList.subclass:
             return indexedArtistAliasList.subclass(*args_, **kwargs_)
         else:
             return indexedArtistAliasList(*args_, **kwargs_)
     factory = staticmethod(factory)
-    def get_indexedArtistAliasName(self): return self.indexedArtistAliasName
-    def set_indexedArtistAliasName(self, indexedArtistAliasName): self.indexedArtistAliasName = indexedArtistAliasName
-    def add_indexedArtistAliasName(self, value): self.indexedArtistAliasName.append(value)
-    def insert_indexedArtistAliasName(self, index, value): self.indexedArtistAliasName[index] = value
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_indexedArtistAliasName(self):
+        return self.indexedArtistAliasName
+    def set_indexedArtistAliasName(self, indexedArtistAliasName):
+        self.indexedArtistAliasName = indexedArtistAliasName
+    def add_indexedArtistAliasName(self, value):
+        self.indexedArtistAliasName.append(value)
+    def insert_indexedArtistAliasName_at(self, index, value):
+        self.indexedArtistAliasName.insert(index, value)
+    def replace_indexedArtistAliasName_at(self, index, value):
+        self.indexedArtistAliasName[index] = value
     def hasContent_(self):
         if (
             self.indexedArtistAliasName
-            ):
+        ):
             return True
         else:
             return False
-    def export(self, outfile, level, namespace_='', name_='indexedArtistAliasList', namespacedef_='', pretty_print=True):
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='indexedArtistAliasList', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('indexedArtistAliasList')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
         if pretty_print:
             eol_ = '\n'
         else:
             eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'indexedArtistAliasList':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
         showIndent(outfile, level, pretty_print)
-        outfile.write('<%s%s%s' % (namespace_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
         already_processed = set()
-        self.exportAttributes(outfile, level, already_processed, namespace_, name_='indexedArtistAliasList')
+        self.exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='indexedArtistAliasList')
         if self.hasContent_():
             outfile.write('>%s' % (eol_, ))
-            self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+            self.exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='indexedArtistAliasList', pretty_print=pretty_print)
             showIndent(outfile, level, pretty_print)
-            outfile.write('</%s%s>%s' % (namespace_, name_, eol_))
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
         else:
             outfile.write('/>%s' % (eol_, ))
-    def exportAttributes(self, outfile, level, already_processed, namespace_='', name_='indexedArtistAliasList'):
+    def exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='indexedArtistAliasList'):
         pass
-    def exportChildren(self, outfile, level, namespace_='', name_='indexedArtistAliasList', fromsubclass_=False, pretty_print=True):
+    def exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='indexedArtistAliasList', fromsubclass_=False, pretty_print=True):
         if pretty_print:
             eol_ = '\n'
         else:
             eol_ = ''
         for indexedArtistAliasName_ in self.indexedArtistAliasName:
+            namespaceprefix_ = self.indexedArtistAliasName_nsprefix_ + ':' if (UseCapturedNS_ and self.indexedArtistAliasName_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%sindexedArtistAliasName>%s</%sindexedArtistAliasName>%s' % (namespace_, self.gds_format_string(quote_xml(indexedArtistAliasName_).encode(ExternalEncoding), input_name='indexedArtistAliasName'), namespace_, eol_))
-    def exportLiteral(self, outfile, level, name_='indexedArtistAliasList'):
-        level += 1
+            outfile.write('<%sindexedArtistAliasName>%s</%sindexedArtistAliasName>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(indexedArtistAliasName_), input_name='indexedArtistAliasName')), namespaceprefix_ , eol_))
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
         already_processed = set()
-        self.exportLiteralAttributes(outfile, level, already_processed, name_)
-        if self.hasContent_():
-            self.exportLiteralChildren(outfile, level, name_)
-    def exportLiteralAttributes(self, outfile, level, already_processed, name_):
-        pass
-    def exportLiteralChildren(self, outfile, level, name_):
-        showIndent(outfile, level)
-        outfile.write('indexedArtistAliasName=[\n')
-        level += 1
-        for indexedArtistAliasName_ in self.indexedArtistAliasName:
-            showIndent(outfile, level)
-            outfile.write('%s,\n' % quote_python(indexedArtistAliasName_).encode(ExternalEncoding))
-        level -= 1
-        showIndent(outfile, level)
-        outfile.write('],\n')
-    def build(self, node):
-        already_processed = set()
+        self.ns_prefix_ = node.prefix
         self.buildAttributes(node, node.attrib, already_processed)
         for child in node:
             nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
-            self.buildChildren(child, node, nodeName_)
+            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
     def buildAttributes(self, node, attrs, already_processed):
         pass
-    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False):
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
         if nodeName_ == 'indexedArtistAliasName':
-            indexedArtistAliasName_ = child_.text
-            indexedArtistAliasName_ = self.gds_validate_string(indexedArtistAliasName_, node, 'indexedArtistAliasName')
-            self.indexedArtistAliasName.append(indexedArtistAliasName_)
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'indexedArtistAliasName')
+            value_ = self.gds_validate_string(value_, node, 'indexedArtistAliasName')
+            self.indexedArtistAliasName.append(value_)
+            self.indexedArtistAliasName_nsprefix_ = child_.prefix
 # end class indexedArtistAliasList
 
 
 class connPhraseList(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
     subclass = None
     superclass = None
-    def __init__(self, connPhrase=None):
+    def __init__(self, connPhrase=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = None
         if connPhrase is None:
             self.connPhrase = []
         else:
             self.connPhrase = connPhrase
+        self.connPhrase_nsprefix_ = None
     def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, connPhraseList)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
         if connPhraseList.subclass:
             return connPhraseList.subclass(*args_, **kwargs_)
         else:
             return connPhraseList(*args_, **kwargs_)
     factory = staticmethod(factory)
-    def get_connPhrase(self): return self.connPhrase
-    def set_connPhrase(self, connPhrase): self.connPhrase = connPhrase
-    def add_connPhrase(self, value): self.connPhrase.append(value)
-    def insert_connPhrase(self, index, value): self.connPhrase[index] = value
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_connPhrase(self):
+        return self.connPhrase
+    def set_connPhrase(self, connPhrase):
+        self.connPhrase = connPhrase
+    def add_connPhrase(self, value):
+        self.connPhrase.append(value)
+    def insert_connPhrase_at(self, index, value):
+        self.connPhrase.insert(index, value)
+    def replace_connPhrase_at(self, index, value):
+        self.connPhrase[index] = value
     def hasContent_(self):
         if (
             self.connPhrase
-            ):
+        ):
             return True
         else:
             return False
-    def export(self, outfile, level, namespace_='', name_='connPhraseList', namespacedef_='', pretty_print=True):
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='connPhraseList', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('connPhraseList')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
         if pretty_print:
             eol_ = '\n'
         else:
             eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'connPhraseList':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
         showIndent(outfile, level, pretty_print)
-        outfile.write('<%s%s%s' % (namespace_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
         already_processed = set()
-        self.exportAttributes(outfile, level, already_processed, namespace_, name_='connPhraseList')
+        self.exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='connPhraseList')
         if self.hasContent_():
             outfile.write('>%s' % (eol_, ))
-            self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+            self.exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='connPhraseList', pretty_print=pretty_print)
             showIndent(outfile, level, pretty_print)
-            outfile.write('</%s%s>%s' % (namespace_, name_, eol_))
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
         else:
             outfile.write('/>%s' % (eol_, ))
-    def exportAttributes(self, outfile, level, already_processed, namespace_='', name_='connPhraseList'):
+    def exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='connPhraseList'):
         pass
-    def exportChildren(self, outfile, level, namespace_='', name_='connPhraseList', fromsubclass_=False, pretty_print=True):
+    def exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='connPhraseList', fromsubclass_=False, pretty_print=True):
         if pretty_print:
             eol_ = '\n'
         else:
             eol_ = ''
         for connPhrase_ in self.connPhrase:
+            namespaceprefix_ = self.connPhrase_nsprefix_ + ':' if (UseCapturedNS_ and self.connPhrase_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%sconnPhrase>%s</%sconnPhrase>%s' % (namespace_, self.gds_format_string(quote_xml(connPhrase_).encode(ExternalEncoding), input_name='connPhrase'), namespace_, eol_))
-    def exportLiteral(self, outfile, level, name_='connPhraseList'):
-        level += 1
+            outfile.write('<%sconnPhrase>%s</%sconnPhrase>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(connPhrase_), input_name='connPhrase')), namespaceprefix_ , eol_))
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
         already_processed = set()
-        self.exportLiteralAttributes(outfile, level, already_processed, name_)
-        if self.hasContent_():
-            self.exportLiteralChildren(outfile, level, name_)
-    def exportLiteralAttributes(self, outfile, level, already_processed, name_):
-        pass
-    def exportLiteralChildren(self, outfile, level, name_):
-        showIndent(outfile, level)
-        outfile.write('connPhrase=[\n')
-        level += 1
-        for connPhrase_ in self.connPhrase:
-            showIndent(outfile, level)
-            outfile.write('%s,\n' % quote_python(connPhrase_).encode(ExternalEncoding))
-        level -= 1
-        showIndent(outfile, level)
-        outfile.write('],\n')
-    def build(self, node):
-        already_processed = set()
+        self.ns_prefix_ = node.prefix
         self.buildAttributes(node, node.attrib, already_processed)
         for child in node:
             nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
-            self.buildChildren(child, node, nodeName_)
+            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
     def buildAttributes(self, node, attrs, already_processed):
         pass
-    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False):
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
         if nodeName_ == 'connPhrase':
-            connPhrase_ = child_.text
-            connPhrase_ = self.gds_validate_string(connPhrase_, node, 'connPhrase')
-            self.connPhrase.append(connPhrase_)
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'connPhrase')
+            value_ = self.gds_validate_string(value_, node, 'connPhrase')
+            self.connPhrase.append(value_)
+            self.connPhrase_nsprefix_ = child_.prefix
 # end class connPhraseList
 
 
 class indexedArtist(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
     subclass = None
     superclass = None
-    def __init__(self, indexedArtistName=None):
+    def __init__(self, indexedArtistName=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = None
         if indexedArtistName is None:
             self.indexedArtistName = []
         else:
             self.indexedArtistName = indexedArtistName
+        self.indexedArtistName_nsprefix_ = None
     def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, indexedArtist)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
         if indexedArtist.subclass:
             return indexedArtist.subclass(*args_, **kwargs_)
         else:
             return indexedArtist(*args_, **kwargs_)
     factory = staticmethod(factory)
-    def get_indexedArtistName(self): return self.indexedArtistName
-    def set_indexedArtistName(self, indexedArtistName): self.indexedArtistName = indexedArtistName
-    def add_indexedArtistName(self, value): self.indexedArtistName.append(value)
-    def insert_indexedArtistName(self, index, value): self.indexedArtistName[index] = value
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_indexedArtistName(self):
+        return self.indexedArtistName
+    def set_indexedArtistName(self, indexedArtistName):
+        self.indexedArtistName = indexedArtistName
+    def add_indexedArtistName(self, value):
+        self.indexedArtistName.append(value)
+    def insert_indexedArtistName_at(self, index, value):
+        self.indexedArtistName.insert(index, value)
+    def replace_indexedArtistName_at(self, index, value):
+        self.indexedArtistName[index] = value
     def hasContent_(self):
         if (
             self.indexedArtistName
-            ):
+        ):
             return True
         else:
             return False
-    def export(self, outfile, level, namespace_='', name_='indexedArtist', namespacedef_='', pretty_print=True):
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='indexedArtist', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('indexedArtist')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
         if pretty_print:
             eol_ = '\n'
         else:
             eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'indexedArtist':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
         showIndent(outfile, level, pretty_print)
-        outfile.write('<%s%s%s' % (namespace_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
         already_processed = set()
-        self.exportAttributes(outfile, level, already_processed, namespace_, name_='indexedArtist')
+        self.exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='indexedArtist')
         if self.hasContent_():
             outfile.write('>%s' % (eol_, ))
-            self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+            self.exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='indexedArtist', pretty_print=pretty_print)
             showIndent(outfile, level, pretty_print)
-            outfile.write('</%s%s>%s' % (namespace_, name_, eol_))
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
         else:
             outfile.write('/>%s' % (eol_, ))
-    def exportAttributes(self, outfile, level, already_processed, namespace_='', name_='indexedArtist'):
+    def exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='indexedArtist'):
         pass
-    def exportChildren(self, outfile, level, namespace_='', name_='indexedArtist', fromsubclass_=False, pretty_print=True):
+    def exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='indexedArtist', fromsubclass_=False, pretty_print=True):
         if pretty_print:
             eol_ = '\n'
         else:
             eol_ = ''
         for indexedArtistName_ in self.indexedArtistName:
+            namespaceprefix_ = self.indexedArtistName_nsprefix_ + ':' if (UseCapturedNS_ and self.indexedArtistName_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%sindexedArtistName>%s</%sindexedArtistName>%s' % (namespace_, self.gds_format_string(quote_xml(indexedArtistName_).encode(ExternalEncoding), input_name='indexedArtistName'), namespace_, eol_))
-    def exportLiteral(self, outfile, level, name_='indexedArtist'):
-        level += 1
+            outfile.write('<%sindexedArtistName>%s</%sindexedArtistName>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(indexedArtistName_), input_name='indexedArtistName')), namespaceprefix_ , eol_))
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
         already_processed = set()
-        self.exportLiteralAttributes(outfile, level, already_processed, name_)
-        if self.hasContent_():
-            self.exportLiteralChildren(outfile, level, name_)
-    def exportLiteralAttributes(self, outfile, level, already_processed, name_):
-        pass
-    def exportLiteralChildren(self, outfile, level, name_):
-        showIndent(outfile, level)
-        outfile.write('indexedArtistName=[\n')
-        level += 1
-        for indexedArtistName_ in self.indexedArtistName:
-            showIndent(outfile, level)
-            outfile.write('%s,\n' % quote_python(indexedArtistName_).encode(ExternalEncoding))
-        level -= 1
-        showIndent(outfile, level)
-        outfile.write('],\n')
-    def build(self, node):
-        already_processed = set()
+        self.ns_prefix_ = node.prefix
         self.buildAttributes(node, node.attrib, already_processed)
         for child in node:
             nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
-            self.buildChildren(child, node, nodeName_)
+            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
     def buildAttributes(self, node, attrs, already_processed):
         pass
-    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False):
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
         if nodeName_ == 'indexedArtistName':
-            indexedArtistName_ = child_.text
-            indexedArtistName_ = self.gds_validate_string(indexedArtistName_, node, 'indexedArtistName')
-            self.indexedArtistName.append(indexedArtistName_)
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'indexedArtistName')
+            value_ = self.gds_validate_string(value_, node, 'indexedArtistName')
+            self.indexedArtistName.append(value_)
+            self.indexedArtistName_nsprefix_ = child_.prefix
 # end class indexedArtist
 
 
 class masterGenres(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
     subclass = None
     superclass = None
-    def __init__(self, genreName=None):
+    def __init__(self, genreName=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = None
         if genreName is None:
             self.genreName = []
         else:
             self.genreName = genreName
+        self.genreName_nsprefix_ = None
     def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, masterGenres)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
         if masterGenres.subclass:
             return masterGenres.subclass(*args_, **kwargs_)
         else:
             return masterGenres(*args_, **kwargs_)
     factory = staticmethod(factory)
-    def get_genreName(self): return self.genreName
-    def set_genreName(self, genreName): self.genreName = genreName
-    def add_genreName(self, value): self.genreName.append(value)
-    def insert_genreName(self, index, value): self.genreName[index] = value
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_genreName(self):
+        return self.genreName
+    def set_genreName(self, genreName):
+        self.genreName = genreName
+    def add_genreName(self, value):
+        self.genreName.append(value)
+    def insert_genreName_at(self, index, value):
+        self.genreName.insert(index, value)
+    def replace_genreName_at(self, index, value):
+        self.genreName[index] = value
     def hasContent_(self):
         if (
             self.genreName
-            ):
+        ):
             return True
         else:
             return False
-    def export(self, outfile, level, namespace_='', name_='masterGenres', namespacedef_='', pretty_print=True):
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='masterGenres', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('masterGenres')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
         if pretty_print:
             eol_ = '\n'
         else:
             eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'masterGenres':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
         showIndent(outfile, level, pretty_print)
-        outfile.write('<%s%s%s' % (namespace_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
         already_processed = set()
-        self.exportAttributes(outfile, level, already_processed, namespace_, name_='masterGenres')
+        self.exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='masterGenres')
         if self.hasContent_():
             outfile.write('>%s' % (eol_, ))
-            self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+            self.exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='masterGenres', pretty_print=pretty_print)
             showIndent(outfile, level, pretty_print)
-            outfile.write('</%s%s>%s' % (namespace_, name_, eol_))
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
         else:
             outfile.write('/>%s' % (eol_, ))
-    def exportAttributes(self, outfile, level, already_processed, namespace_='', name_='masterGenres'):
+    def exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='masterGenres'):
         pass
-    def exportChildren(self, outfile, level, namespace_='', name_='masterGenres', fromsubclass_=False, pretty_print=True):
+    def exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='masterGenres', fromsubclass_=False, pretty_print=True):
         if pretty_print:
             eol_ = '\n'
         else:
             eol_ = ''
         for genreName_ in self.genreName:
+            namespaceprefix_ = self.genreName_nsprefix_ + ':' if (UseCapturedNS_ and self.genreName_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%sgenreName>%s</%sgenreName>%s' % (namespace_, self.gds_format_string(quote_xml(genreName_).encode(ExternalEncoding), input_name='genreName'), namespace_, eol_))
-    def exportLiteral(self, outfile, level, name_='masterGenres'):
-        level += 1
+            outfile.write('<%sgenreName>%s</%sgenreName>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(genreName_), input_name='genreName')), namespaceprefix_ , eol_))
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
         already_processed = set()
-        self.exportLiteralAttributes(outfile, level, already_processed, name_)
-        if self.hasContent_():
-            self.exportLiteralChildren(outfile, level, name_)
-    def exportLiteralAttributes(self, outfile, level, already_processed, name_):
-        pass
-    def exportLiteralChildren(self, outfile, level, name_):
-        showIndent(outfile, level)
-        outfile.write('genreName=[\n')
-        level += 1
-        for genreName_ in self.genreName:
-            showIndent(outfile, level)
-            outfile.write('%s,\n' % quote_python(genreName_).encode(ExternalEncoding))
-        level -= 1
-        showIndent(outfile, level)
-        outfile.write('],\n')
-    def build(self, node):
-        already_processed = set()
+        self.ns_prefix_ = node.prefix
         self.buildAttributes(node, node.attrib, already_processed)
         for child in node:
             nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
-            self.buildChildren(child, node, nodeName_)
+            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
     def buildAttributes(self, node, attrs, already_processed):
         pass
-    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False):
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
         if nodeName_ == 'genreName':
-            genreName_ = child_.text
-            genreName_ = self.gds_validate_string(genreName_, node, 'genreName')
-            self.genreName.append(genreName_)
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'genreName')
+            value_ = self.gds_validate_string(value_, node, 'genreName')
+            self.genreName.append(value_)
+            self.genreName_nsprefix_ = child_.prefix
 # end class masterGenres
 
 
 class masterStyles(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
     subclass = None
     superclass = None
-    def __init__(self, genreName=None):
+    def __init__(self, genreName=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = None
         if genreName is None:
             self.genreName = []
         else:
             self.genreName = genreName
+        self.genreName_nsprefix_ = None
     def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, masterStyles)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
         if masterStyles.subclass:
             return masterStyles.subclass(*args_, **kwargs_)
         else:
             return masterStyles(*args_, **kwargs_)
     factory = staticmethod(factory)
-    def get_genreName(self): return self.genreName
-    def set_genreName(self, genreName): self.genreName = genreName
-    def add_genreName(self, value): self.genreName.append(value)
-    def insert_genreName(self, index, value): self.genreName[index] = value
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_genreName(self):
+        return self.genreName
+    def set_genreName(self, genreName):
+        self.genreName = genreName
+    def add_genreName(self, value):
+        self.genreName.append(value)
+    def insert_genreName_at(self, index, value):
+        self.genreName.insert(index, value)
+    def replace_genreName_at(self, index, value):
+        self.genreName[index] = value
     def hasContent_(self):
         if (
             self.genreName
-            ):
+        ):
             return True
         else:
             return False
-    def export(self, outfile, level, namespace_='', name_='masterStyles', namespacedef_='', pretty_print=True):
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='masterStyles', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('masterStyles')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
         if pretty_print:
             eol_ = '\n'
         else:
             eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'masterStyles':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
         showIndent(outfile, level, pretty_print)
-        outfile.write('<%s%s%s' % (namespace_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
         already_processed = set()
-        self.exportAttributes(outfile, level, already_processed, namespace_, name_='masterStyles')
+        self.exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='masterStyles')
         if self.hasContent_():
             outfile.write('>%s' % (eol_, ))
-            self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+            self.exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='masterStyles', pretty_print=pretty_print)
             showIndent(outfile, level, pretty_print)
-            outfile.write('</%s%s>%s' % (namespace_, name_, eol_))
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
         else:
             outfile.write('/>%s' % (eol_, ))
-    def exportAttributes(self, outfile, level, already_processed, namespace_='', name_='masterStyles'):
+    def exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='masterStyles'):
         pass
-    def exportChildren(self, outfile, level, namespace_='', name_='masterStyles', fromsubclass_=False, pretty_print=True):
+    def exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='masterStyles', fromsubclass_=False, pretty_print=True):
         if pretty_print:
             eol_ = '\n'
         else:
             eol_ = ''
         for genreName_ in self.genreName:
+            namespaceprefix_ = self.genreName_nsprefix_ + ':' if (UseCapturedNS_ and self.genreName_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%sgenreName>%s</%sgenreName>%s' % (namespace_, self.gds_format_string(quote_xml(genreName_).encode(ExternalEncoding), input_name='genreName'), namespace_, eol_))
-    def exportLiteral(self, outfile, level, name_='masterStyles'):
-        level += 1
+            outfile.write('<%sgenreName>%s</%sgenreName>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(genreName_), input_name='genreName')), namespaceprefix_ , eol_))
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
         already_processed = set()
-        self.exportLiteralAttributes(outfile, level, already_processed, name_)
-        if self.hasContent_():
-            self.exportLiteralChildren(outfile, level, name_)
-    def exportLiteralAttributes(self, outfile, level, already_processed, name_):
-        pass
-    def exportLiteralChildren(self, outfile, level, name_):
-        showIndent(outfile, level)
-        outfile.write('genreName=[\n')
-        level += 1
-        for genreName_ in self.genreName:
-            showIndent(outfile, level)
-            outfile.write('%s,\n' % quote_python(genreName_).encode(ExternalEncoding))
-        level -= 1
-        showIndent(outfile, level)
-        outfile.write('],\n')
-    def build(self, node):
-        already_processed = set()
+        self.ns_prefix_ = node.prefix
         self.buildAttributes(node, node.attrib, already_processed)
         for child in node:
             nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
-            self.buildChildren(child, node, nodeName_)
+            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
     def buildAttributes(self, node, attrs, already_processed):
         pass
-    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False):
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
         if nodeName_ == 'genreName':
-            genreName_ = child_.text
-            genreName_ = self.gds_validate_string(genreName_, node, 'genreName')
-            self.genreName.append(genreName_)
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'genreName')
+            value_ = self.gds_validate_string(value_, node, 'genreName')
+            self.genreName.append(value_)
+            self.genreName_nsprefix_ = child_.prefix
 # end class masterStyles
 
 
 class crawlHistoryList(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
     subclass = None
     superclass = None
-    def __init__(self, crawlHistory=None):
+    def __init__(self, crawlHistory=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = None
         if crawlHistory is None:
             self.crawlHistory = []
         else:
             self.crawlHistory = crawlHistory
+        self.crawlHistory_nsprefix_ = None
     def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, crawlHistoryList)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
         if crawlHistoryList.subclass:
             return crawlHistoryList.subclass(*args_, **kwargs_)
         else:
             return crawlHistoryList(*args_, **kwargs_)
     factory = staticmethod(factory)
-    def get_crawlHistory(self): return self.crawlHistory
-    def set_crawlHistory(self, crawlHistory): self.crawlHistory = crawlHistory
-    def add_crawlHistory(self, value): self.crawlHistory.append(value)
-    def insert_crawlHistory(self, index, value): self.crawlHistory[index] = value
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_crawlHistory(self):
+        return self.crawlHistory
+    def set_crawlHistory(self, crawlHistory):
+        self.crawlHistory = crawlHistory
+    def add_crawlHistory(self, value):
+        self.crawlHistory.append(value)
+    def insert_crawlHistory_at(self, index, value):
+        self.crawlHistory.insert(index, value)
+    def replace_crawlHistory_at(self, index, value):
+        self.crawlHistory[index] = value
     def hasContent_(self):
         if (
             self.crawlHistory
-            ):
+        ):
             return True
         else:
             return False
-    def export(self, outfile, level, namespace_='', name_='crawlHistoryList', namespacedef_='', pretty_print=True):
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='crawlHistoryList', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('crawlHistoryList')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
         if pretty_print:
             eol_ = '\n'
         else:
             eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'crawlHistoryList':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
         showIndent(outfile, level, pretty_print)
-        outfile.write('<%s%s%s' % (namespace_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
         already_processed = set()
-        self.exportAttributes(outfile, level, already_processed, namespace_, name_='crawlHistoryList')
+        self.exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='crawlHistoryList')
         if self.hasContent_():
             outfile.write('>%s' % (eol_, ))
-            self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+            self.exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='crawlHistoryList', pretty_print=pretty_print)
             showIndent(outfile, level, pretty_print)
-            outfile.write('</%s%s>%s' % (namespace_, name_, eol_))
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
         else:
             outfile.write('/>%s' % (eol_, ))
-    def exportAttributes(self, outfile, level, already_processed, namespace_='', name_='crawlHistoryList'):
+    def exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='crawlHistoryList'):
         pass
-    def exportChildren(self, outfile, level, namespace_='', name_='crawlHistoryList', fromsubclass_=False, pretty_print=True):
+    def exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='crawlHistoryList', fromsubclass_=False, pretty_print=True):
         if pretty_print:
             eol_ = '\n'
         else:
             eol_ = ''
         for crawlHistory_ in self.crawlHistory:
-            crawlHistory_.export(outfile, level, namespace_, name_='crawlHistory', pretty_print=pretty_print)
-    def exportLiteral(self, outfile, level, name_='crawlHistoryList'):
-        level += 1
+            namespaceprefix_ = self.crawlHistory_nsprefix_ + ':' if (UseCapturedNS_ and self.crawlHistory_nsprefix_) else ''
+            crawlHistory_.export(outfile, level, namespaceprefix_, namespacedef_='', name_='crawlHistory', pretty_print=pretty_print)
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
         already_processed = set()
-        self.exportLiteralAttributes(outfile, level, already_processed, name_)
-        if self.hasContent_():
-            self.exportLiteralChildren(outfile, level, name_)
-    def exportLiteralAttributes(self, outfile, level, already_processed, name_):
-        pass
-    def exportLiteralChildren(self, outfile, level, name_):
-        showIndent(outfile, level)
-        outfile.write('crawlHistory=[\n')
-        level += 1
-        for crawlHistory_ in self.crawlHistory:
-            showIndent(outfile, level)
-            outfile.write('model_.crawlHistory(\n')
-            crawlHistory_.exportLiteral(outfile, level)
-            showIndent(outfile, level)
-            outfile.write('),\n')
-        level -= 1
-        showIndent(outfile, level)
-        outfile.write('],\n')
-    def build(self, node):
-        already_processed = set()
+        self.ns_prefix_ = node.prefix
         self.buildAttributes(node, node.attrib, already_processed)
         for child in node:
             nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
-            self.buildChildren(child, node, nodeName_)
+            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
     def buildAttributes(self, node, attrs, already_processed):
         pass
-    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False):
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
         if nodeName_ == 'crawlHistory':
-            obj_ = crawlHistory.factory()
-            obj_.build(child_)
+            obj_ = crawlHistory.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
             self.crawlHistory.append(obj_)
+            obj_.original_tagname_ = 'crawlHistory'
 # end class crawlHistoryList
 
 
 class crawlHistory(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
     subclass = None
     superclass = None
-    def __init__(self, Views=None, Date=None, Delta=None):
+    def __init__(self, Views=None, Date=None, Delta=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = None
         self.Views = Views
+        self.Views_nsprefix_ = None
         self.Date = Date
+        self.Date_nsprefix_ = None
         self.Delta = Delta
+        self.Delta_nsprefix_ = None
     def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, crawlHistory)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
         if crawlHistory.subclass:
             return crawlHistory.subclass(*args_, **kwargs_)
         else:
             return crawlHistory(*args_, **kwargs_)
     factory = staticmethod(factory)
-    def get_Views(self): return self.Views
-    def set_Views(self, Views): self.Views = Views
-    def get_Date(self): return self.Date
-    def set_Date(self, Date): self.Date = Date
-    def get_Delta(self): return self.Delta
-    def set_Delta(self, Delta): self.Delta = Delta
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_Views(self):
+        return self.Views
+    def set_Views(self, Views):
+        self.Views = Views
+    def get_Date(self):
+        return self.Date
+    def set_Date(self, Date):
+        self.Date = Date
+    def get_Delta(self):
+        return self.Delta
+    def set_Delta(self, Delta):
+        self.Delta = Delta
     def hasContent_(self):
         if (
             self.Views is not None or
             self.Date is not None or
             self.Delta is not None
-            ):
+        ):
             return True
         else:
             return False
-    def export(self, outfile, level, namespace_='', name_='crawlHistory', namespacedef_='', pretty_print=True):
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='crawlHistory', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('crawlHistory')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
         if pretty_print:
             eol_ = '\n'
         else:
             eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'crawlHistory':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
         showIndent(outfile, level, pretty_print)
-        outfile.write('<%s%s%s' % (namespace_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
         already_processed = set()
-        self.exportAttributes(outfile, level, already_processed, namespace_, name_='crawlHistory')
+        self.exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='crawlHistory')
         if self.hasContent_():
             outfile.write('>%s' % (eol_, ))
-            self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+            self.exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='crawlHistory', pretty_print=pretty_print)
             showIndent(outfile, level, pretty_print)
-            outfile.write('</%s%s>%s' % (namespace_, name_, eol_))
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
         else:
             outfile.write('/>%s' % (eol_, ))
-    def exportAttributes(self, outfile, level, already_processed, namespace_='', name_='crawlHistory'):
+    def exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='crawlHistory'):
         pass
-    def exportChildren(self, outfile, level, namespace_='', name_='crawlHistory', fromsubclass_=False, pretty_print=True):
+    def exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='crawlHistory', fromsubclass_=False, pretty_print=True):
         if pretty_print:
             eol_ = '\n'
         else:
             eol_ = ''
         if self.Views is not None:
+            namespaceprefix_ = self.Views_nsprefix_ + ':' if (UseCapturedNS_ and self.Views_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%sViews>%s</%sViews>%s' % (namespace_, self.gds_format_integer(self.Views, input_name='Views'), namespace_, eol_))
+            outfile.write('<%sViews>%s</%sViews>%s' % (namespaceprefix_ , self.gds_format_integer(self.Views, input_name='Views'), namespaceprefix_ , eol_))
         if self.Date is not None:
+            namespaceprefix_ = self.Date_nsprefix_ + ':' if (UseCapturedNS_ and self.Date_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%sDate>%s</%sDate>%s' % (namespace_, self.gds_format_string(quote_xml(self.Date).encode(ExternalEncoding), input_name='Date'), namespace_, eol_))
+            outfile.write('<%sDate>%s</%sDate>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.Date), input_name='Date')), namespaceprefix_ , eol_))
         if self.Delta is not None:
+            namespaceprefix_ = self.Delta_nsprefix_ + ':' if (UseCapturedNS_ and self.Delta_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%sDelta>%s</%sDelta>%s' % (namespace_, self.gds_format_integer(self.Delta, input_name='Delta'), namespace_, eol_))
-    def exportLiteral(self, outfile, level, name_='crawlHistory'):
-        level += 1
+            outfile.write('<%sDelta>%s</%sDelta>%s' % (namespaceprefix_ , self.gds_format_integer(self.Delta, input_name='Delta'), namespaceprefix_ , eol_))
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
         already_processed = set()
-        self.exportLiteralAttributes(outfile, level, already_processed, name_)
-        if self.hasContent_():
-            self.exportLiteralChildren(outfile, level, name_)
-    def exportLiteralAttributes(self, outfile, level, already_processed, name_):
-        pass
-    def exportLiteralChildren(self, outfile, level, name_):
-        if self.Views is not None:
-            showIndent(outfile, level)
-            outfile.write('Views=%d,\n' % self.Views)
-        if self.Date is not None:
-            showIndent(outfile, level)
-            outfile.write('Date=%s,\n' % quote_python(self.Date).encode(ExternalEncoding))
-        if self.Delta is not None:
-            showIndent(outfile, level)
-            outfile.write('Delta=%d,\n' % self.Delta)
-    def build(self, node):
-        already_processed = set()
+        self.ns_prefix_ = node.prefix
         self.buildAttributes(node, node.attrib, already_processed)
         for child in node:
             nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
-            self.buildChildren(child, node, nodeName_)
+            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
     def buildAttributes(self, node, attrs, already_processed):
         pass
-    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False):
-        if nodeName_ == 'Views':
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'Views' and child_.text:
             sval_ = child_.text
-            try:
-                ival_ = int(sval_)
-            except (TypeError, ValueError), exp:
-                raise_parse_error(child_, 'requires integer: %s' % exp)
+            ival_ = self.gds_parse_integer(sval_, node, 'Views')
             ival_ = self.gds_validate_integer(ival_, node, 'Views')
             self.Views = ival_
+            self.Views_nsprefix_ = child_.prefix
         elif nodeName_ == 'Date':
-            Date_ = child_.text
-            Date_ = self.gds_validate_string(Date_, node, 'Date')
-            self.Date = Date_
-        elif nodeName_ == 'Delta':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'Date')
+            value_ = self.gds_validate_string(value_, node, 'Date')
+            self.Date = value_
+            self.Date_nsprefix_ = child_.prefix
+        elif nodeName_ == 'Delta' and child_.text:
             sval_ = child_.text
-            try:
-                ival_ = int(sval_)
-            except (TypeError, ValueError), exp:
-                raise_parse_error(child_, 'requires integer: %s' % exp)
+            ival_ = self.gds_parse_integer(sval_, node, 'Delta')
             ival_ = self.gds_validate_integer(ival_, node, 'Delta')
             self.Delta = ival_
+            self.Delta_nsprefix_ = child_.prefix
 # end class crawlHistory
 
 
 class genresCountList(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
     subclass = None
     superclass = None
-    def __init__(self, genresCount=None):
+    def __init__(self, genresCount=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = None
         if genresCount is None:
             self.genresCount = []
         else:
             self.genresCount = genresCount
+        self.genresCount_nsprefix_ = None
     def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, genresCountList)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
         if genresCountList.subclass:
             return genresCountList.subclass(*args_, **kwargs_)
         else:
             return genresCountList(*args_, **kwargs_)
     factory = staticmethod(factory)
-    def get_genresCount(self): return self.genresCount
-    def set_genresCount(self, genresCount): self.genresCount = genresCount
-    def add_genresCount(self, value): self.genresCount.append(value)
-    def insert_genresCount(self, index, value): self.genresCount[index] = value
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_genresCount(self):
+        return self.genresCount
+    def set_genresCount(self, genresCount):
+        self.genresCount = genresCount
+    def add_genresCount(self, value):
+        self.genresCount.append(value)
+    def insert_genresCount_at(self, index, value):
+        self.genresCount.insert(index, value)
+    def replace_genresCount_at(self, index, value):
+        self.genresCount[index] = value
     def hasContent_(self):
         if (
             self.genresCount
-            ):
+        ):
             return True
         else:
             return False
-    def export(self, outfile, level, namespace_='', name_='genresCountList', namespacedef_='', pretty_print=True):
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='genresCountList', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('genresCountList')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
         if pretty_print:
             eol_ = '\n'
         else:
             eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'genresCountList':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
         showIndent(outfile, level, pretty_print)
-        outfile.write('<%s%s%s' % (namespace_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
         already_processed = set()
-        self.exportAttributes(outfile, level, already_processed, namespace_, name_='genresCountList')
+        self.exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='genresCountList')
         if self.hasContent_():
             outfile.write('>%s' % (eol_, ))
-            self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+            self.exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='genresCountList', pretty_print=pretty_print)
             showIndent(outfile, level, pretty_print)
-            outfile.write('</%s%s>%s' % (namespace_, name_, eol_))
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
         else:
             outfile.write('/>%s' % (eol_, ))
-    def exportAttributes(self, outfile, level, already_processed, namespace_='', name_='genresCountList'):
+    def exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='genresCountList'):
         pass
-    def exportChildren(self, outfile, level, namespace_='', name_='genresCountList', fromsubclass_=False, pretty_print=True):
+    def exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='genresCountList', fromsubclass_=False, pretty_print=True):
         if pretty_print:
             eol_ = '\n'
         else:
             eol_ = ''
         for genresCount_ in self.genresCount:
-            genresCount_.export(outfile, level, namespace_, name_='genresCount', pretty_print=pretty_print)
-    def exportLiteral(self, outfile, level, name_='genresCountList'):
-        level += 1
+            namespaceprefix_ = self.genresCount_nsprefix_ + ':' if (UseCapturedNS_ and self.genresCount_nsprefix_) else ''
+            genresCount_.export(outfile, level, namespaceprefix_, namespacedef_='', name_='genresCount', pretty_print=pretty_print)
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
         already_processed = set()
-        self.exportLiteralAttributes(outfile, level, already_processed, name_)
-        if self.hasContent_():
-            self.exportLiteralChildren(outfile, level, name_)
-    def exportLiteralAttributes(self, outfile, level, already_processed, name_):
-        pass
-    def exportLiteralChildren(self, outfile, level, name_):
-        showIndent(outfile, level)
-        outfile.write('genresCount=[\n')
-        level += 1
-        for genresCount_ in self.genresCount:
-            showIndent(outfile, level)
-            outfile.write('model_.genresCount(\n')
-            genresCount_.exportLiteral(outfile, level)
-            showIndent(outfile, level)
-            outfile.write('),\n')
-        level -= 1
-        showIndent(outfile, level)
-        outfile.write('],\n')
-    def build(self, node):
-        already_processed = set()
+        self.ns_prefix_ = node.prefix
         self.buildAttributes(node, node.attrib, already_processed)
         for child in node:
             nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
-            self.buildChildren(child, node, nodeName_)
+            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
     def buildAttributes(self, node, attrs, already_processed):
         pass
-    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False):
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
         if nodeName_ == 'genresCount':
-            obj_ = genresCount.factory()
-            obj_.build(child_)
+            obj_ = genresCount.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
             self.genresCount.append(obj_)
+            obj_.original_tagname_ = 'genresCount'
 # end class genresCountList
 
 
 class genresCount(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
     subclass = None
     superclass = None
-    def __init__(self, Percentage=None, Count=None, Genre=None):
+    def __init__(self, Percentage=None, Count=None, Genre=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = None
         self.Percentage = Percentage
+        self.Percentage_nsprefix_ = None
         self.Count = Count
+        self.Count_nsprefix_ = None
         self.Genre = Genre
+        self.Genre_nsprefix_ = None
     def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, genresCount)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
         if genresCount.subclass:
             return genresCount.subclass(*args_, **kwargs_)
         else:
             return genresCount(*args_, **kwargs_)
     factory = staticmethod(factory)
-    def get_Percentage(self): return self.Percentage
-    def set_Percentage(self, Percentage): self.Percentage = Percentage
-    def get_Count(self): return self.Count
-    def set_Count(self, Count): self.Count = Count
-    def get_Genre(self): return self.Genre
-    def set_Genre(self, Genre): self.Genre = Genre
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_Percentage(self):
+        return self.Percentage
+    def set_Percentage(self, Percentage):
+        self.Percentage = Percentage
+    def get_Count(self):
+        return self.Count
+    def set_Count(self, Count):
+        self.Count = Count
+    def get_Genre(self):
+        return self.Genre
+    def set_Genre(self, Genre):
+        self.Genre = Genre
     def hasContent_(self):
         if (
             self.Percentage is not None or
             self.Count is not None or
             self.Genre is not None
-            ):
+        ):
             return True
         else:
             return False
-    def export(self, outfile, level, namespace_='', name_='genresCount', namespacedef_='', pretty_print=True):
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='genresCount', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('genresCount')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
         if pretty_print:
             eol_ = '\n'
         else:
             eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'genresCount':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
         showIndent(outfile, level, pretty_print)
-        outfile.write('<%s%s%s' % (namespace_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
         already_processed = set()
-        self.exportAttributes(outfile, level, already_processed, namespace_, name_='genresCount')
+        self.exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='genresCount')
         if self.hasContent_():
             outfile.write('>%s' % (eol_, ))
-            self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+            self.exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='genresCount', pretty_print=pretty_print)
             showIndent(outfile, level, pretty_print)
-            outfile.write('</%s%s>%s' % (namespace_, name_, eol_))
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
         else:
             outfile.write('/>%s' % (eol_, ))
-    def exportAttributes(self, outfile, level, already_processed, namespace_='', name_='genresCount'):
+    def exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='genresCount'):
         pass
-    def exportChildren(self, outfile, level, namespace_='', name_='genresCount', fromsubclass_=False, pretty_print=True):
+    def exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='genresCount', fromsubclass_=False, pretty_print=True):
         if pretty_print:
             eol_ = '\n'
         else:
             eol_ = ''
         if self.Percentage is not None:
+            namespaceprefix_ = self.Percentage_nsprefix_ + ':' if (UseCapturedNS_ and self.Percentage_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%sPercentage>%s</%sPercentage>%s' % (namespace_, self.gds_format_float(self.Percentage, input_name='Percentage'), namespace_, eol_))
+            outfile.write('<%sPercentage>%s</%sPercentage>%s' % (namespaceprefix_ , self.gds_format_decimal(self.Percentage, input_name='Percentage'), namespaceprefix_ , eol_))
         if self.Count is not None:
+            namespaceprefix_ = self.Count_nsprefix_ + ':' if (UseCapturedNS_ and self.Count_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%sCount>%s</%sCount>%s' % (namespace_, self.gds_format_integer(self.Count, input_name='Count'), namespace_, eol_))
+            outfile.write('<%sCount>%s</%sCount>%s' % (namespaceprefix_ , self.gds_format_integer(self.Count, input_name='Count'), namespaceprefix_ , eol_))
         if self.Genre is not None:
+            namespaceprefix_ = self.Genre_nsprefix_ + ':' if (UseCapturedNS_ and self.Genre_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%sGenre>%s</%sGenre>%s' % (namespace_, self.gds_format_string(quote_xml(self.Genre).encode(ExternalEncoding), input_name='Genre'), namespace_, eol_))
-    def exportLiteral(self, outfile, level, name_='genresCount'):
-        level += 1
+            outfile.write('<%sGenre>%s</%sGenre>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.Genre), input_name='Genre')), namespaceprefix_ , eol_))
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
         already_processed = set()
-        self.exportLiteralAttributes(outfile, level, already_processed, name_)
-        if self.hasContent_():
-            self.exportLiteralChildren(outfile, level, name_)
-    def exportLiteralAttributes(self, outfile, level, already_processed, name_):
-        pass
-    def exportLiteralChildren(self, outfile, level, name_):
-        if self.Percentage is not None:
-            showIndent(outfile, level)
-            outfile.write('Percentage=%f,\n' % self.Percentage)
-        if self.Count is not None:
-            showIndent(outfile, level)
-            outfile.write('Count=%d,\n' % self.Count)
-        if self.Genre is not None:
-            showIndent(outfile, level)
-            outfile.write('Genre=%s,\n' % quote_python(self.Genre).encode(ExternalEncoding))
-    def build(self, node):
-        already_processed = set()
+        self.ns_prefix_ = node.prefix
         self.buildAttributes(node, node.attrib, already_processed)
         for child in node:
             nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
-            self.buildChildren(child, node, nodeName_)
+            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
     def buildAttributes(self, node, attrs, already_processed):
         pass
-    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False):
-        if nodeName_ == 'Percentage':
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
+        if nodeName_ == 'Percentage' and child_.text:
             sval_ = child_.text
-            try:
-                fval_ = float(sval_)
-            except (TypeError, ValueError), exp:
-                raise_parse_error(child_, 'requires float or double: %s' % exp)
-            fval_ = self.gds_validate_float(fval_, node, 'Percentage')
+            fval_ = self.gds_parse_decimal(sval_, node, 'Percentage')
+            fval_ = self.gds_validate_decimal(fval_, node, 'Percentage')
             self.Percentage = fval_
-        elif nodeName_ == 'Count':
+            self.Percentage_nsprefix_ = child_.prefix
+        elif nodeName_ == 'Count' and child_.text:
             sval_ = child_.text
-            try:
-                ival_ = int(sval_)
-            except (TypeError, ValueError), exp:
-                raise_parse_error(child_, 'requires integer: %s' % exp)
+            ival_ = self.gds_parse_integer(sval_, node, 'Count')
             ival_ = self.gds_validate_integer(ival_, node, 'Count')
             self.Count = ival_
+            self.Count_nsprefix_ = child_.prefix
         elif nodeName_ == 'Genre':
-            Genre_ = child_.text
-            Genre_ = self.gds_validate_string(Genre_, node, 'Genre')
-            self.Genre = Genre_
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'Genre')
+            value_ = self.gds_validate_string(value_, node, 'Genre')
+            self.Genre = value_
+            self.Genre_nsprefix_ = child_.prefix
 # end class genresCount
 
 
 class level1Genres(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
     subclass = None
     superclass = None
-    def __init__(self, genreName=None):
+    def __init__(self, genreName=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = None
         if genreName is None:
             self.genreName = []
         else:
             self.genreName = genreName
+        self.genreName_nsprefix_ = None
     def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, level1Genres)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
         if level1Genres.subclass:
             return level1Genres.subclass(*args_, **kwargs_)
         else:
             return level1Genres(*args_, **kwargs_)
     factory = staticmethod(factory)
-    def get_genreName(self): return self.genreName
-    def set_genreName(self, genreName): self.genreName = genreName
-    def add_genreName(self, value): self.genreName.append(value)
-    def insert_genreName(self, index, value): self.genreName[index] = value
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_genreName(self):
+        return self.genreName
+    def set_genreName(self, genreName):
+        self.genreName = genreName
+    def add_genreName(self, value):
+        self.genreName.append(value)
+    def insert_genreName_at(self, index, value):
+        self.genreName.insert(index, value)
+    def replace_genreName_at(self, index, value):
+        self.genreName[index] = value
     def hasContent_(self):
         if (
             self.genreName
-            ):
+        ):
             return True
         else:
             return False
-    def export(self, outfile, level, namespace_='', name_='level1Genres', namespacedef_='', pretty_print=True):
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='level1Genres', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('level1Genres')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
         if pretty_print:
             eol_ = '\n'
         else:
             eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'level1Genres':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
         showIndent(outfile, level, pretty_print)
-        outfile.write('<%s%s%s' % (namespace_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
         already_processed = set()
-        self.exportAttributes(outfile, level, already_processed, namespace_, name_='level1Genres')
+        self.exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='level1Genres')
         if self.hasContent_():
             outfile.write('>%s' % (eol_, ))
-            self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+            self.exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='level1Genres', pretty_print=pretty_print)
             showIndent(outfile, level, pretty_print)
-            outfile.write('</%s%s>%s' % (namespace_, name_, eol_))
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
         else:
             outfile.write('/>%s' % (eol_, ))
-    def exportAttributes(self, outfile, level, already_processed, namespace_='', name_='level1Genres'):
+    def exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='level1Genres'):
         pass
-    def exportChildren(self, outfile, level, namespace_='', name_='level1Genres', fromsubclass_=False, pretty_print=True):
+    def exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='level1Genres', fromsubclass_=False, pretty_print=True):
         if pretty_print:
             eol_ = '\n'
         else:
             eol_ = ''
         for genreName_ in self.genreName:
+            namespaceprefix_ = self.genreName_nsprefix_ + ':' if (UseCapturedNS_ and self.genreName_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%sgenreName>%s</%sgenreName>%s' % (namespace_, self.gds_format_string(quote_xml(genreName_).encode(ExternalEncoding), input_name='genreName'), namespace_, eol_))
-    def exportLiteral(self, outfile, level, name_='level1Genres'):
-        level += 1
+            outfile.write('<%sgenreName>%s</%sgenreName>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(genreName_), input_name='genreName')), namespaceprefix_ , eol_))
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
         already_processed = set()
-        self.exportLiteralAttributes(outfile, level, already_processed, name_)
-        if self.hasContent_():
-            self.exportLiteralChildren(outfile, level, name_)
-    def exportLiteralAttributes(self, outfile, level, already_processed, name_):
-        pass
-    def exportLiteralChildren(self, outfile, level, name_):
-        showIndent(outfile, level)
-        outfile.write('genreName=[\n')
-        level += 1
-        for genreName_ in self.genreName:
-            showIndent(outfile, level)
-            outfile.write('%s,\n' % quote_python(genreName_).encode(ExternalEncoding))
-        level -= 1
-        showIndent(outfile, level)
-        outfile.write('],\n')
-    def build(self, node):
-        already_processed = set()
+        self.ns_prefix_ = node.prefix
         self.buildAttributes(node, node.attrib, already_processed)
         for child in node:
             nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
-            self.buildChildren(child, node, nodeName_)
+            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
     def buildAttributes(self, node, attrs, already_processed):
         pass
-    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False):
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
         if nodeName_ == 'genreName':
-            genreName_ = child_.text
-            genreName_ = self.gds_validate_string(genreName_, node, 'genreName')
-            self.genreName.append(genreName_)
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'genreName')
+            value_ = self.gds_validate_string(value_, node, 'genreName')
+            self.genreName.append(value_)
+            self.genreName_nsprefix_ = child_.prefix
 # end class level1Genres
 
 
 class level2Genres(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
     subclass = None
     superclass = None
-    def __init__(self, genreName=None):
+    def __init__(self, genreName=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = None
         if genreName is None:
             self.genreName = []
         else:
             self.genreName = genreName
+        self.genreName_nsprefix_ = None
     def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, level2Genres)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
         if level2Genres.subclass:
             return level2Genres.subclass(*args_, **kwargs_)
         else:
             return level2Genres(*args_, **kwargs_)
     factory = staticmethod(factory)
-    def get_genreName(self): return self.genreName
-    def set_genreName(self, genreName): self.genreName = genreName
-    def add_genreName(self, value): self.genreName.append(value)
-    def insert_genreName(self, index, value): self.genreName[index] = value
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_genreName(self):
+        return self.genreName
+    def set_genreName(self, genreName):
+        self.genreName = genreName
+    def add_genreName(self, value):
+        self.genreName.append(value)
+    def insert_genreName_at(self, index, value):
+        self.genreName.insert(index, value)
+    def replace_genreName_at(self, index, value):
+        self.genreName[index] = value
     def hasContent_(self):
         if (
             self.genreName
-            ):
+        ):
             return True
         else:
             return False
-    def export(self, outfile, level, namespace_='', name_='level2Genres', namespacedef_='', pretty_print=True):
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='level2Genres', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('level2Genres')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
         if pretty_print:
             eol_ = '\n'
         else:
             eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'level2Genres':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
         showIndent(outfile, level, pretty_print)
-        outfile.write('<%s%s%s' % (namespace_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
         already_processed = set()
-        self.exportAttributes(outfile, level, already_processed, namespace_, name_='level2Genres')
+        self.exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='level2Genres')
         if self.hasContent_():
             outfile.write('>%s' % (eol_, ))
-            self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+            self.exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='level2Genres', pretty_print=pretty_print)
             showIndent(outfile, level, pretty_print)
-            outfile.write('</%s%s>%s' % (namespace_, name_, eol_))
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
         else:
             outfile.write('/>%s' % (eol_, ))
-    def exportAttributes(self, outfile, level, already_processed, namespace_='', name_='level2Genres'):
+    def exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='level2Genres'):
         pass
-    def exportChildren(self, outfile, level, namespace_='', name_='level2Genres', fromsubclass_=False, pretty_print=True):
+    def exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='level2Genres', fromsubclass_=False, pretty_print=True):
         if pretty_print:
             eol_ = '\n'
         else:
             eol_ = ''
         for genreName_ in self.genreName:
+            namespaceprefix_ = self.genreName_nsprefix_ + ':' if (UseCapturedNS_ and self.genreName_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%sgenreName>%s</%sgenreName>%s' % (namespace_, self.gds_format_string(quote_xml(genreName_).encode(ExternalEncoding), input_name='genreName'), namespace_, eol_))
-    def exportLiteral(self, outfile, level, name_='level2Genres'):
-        level += 1
+            outfile.write('<%sgenreName>%s</%sgenreName>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(genreName_), input_name='genreName')), namespaceprefix_ , eol_))
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
         already_processed = set()
-        self.exportLiteralAttributes(outfile, level, already_processed, name_)
-        if self.hasContent_():
-            self.exportLiteralChildren(outfile, level, name_)
-    def exportLiteralAttributes(self, outfile, level, already_processed, name_):
-        pass
-    def exportLiteralChildren(self, outfile, level, name_):
-        showIndent(outfile, level)
-        outfile.write('genreName=[\n')
-        level += 1
-        for genreName_ in self.genreName:
-            showIndent(outfile, level)
-            outfile.write('%s,\n' % quote_python(genreName_).encode(ExternalEncoding))
-        level -= 1
-        showIndent(outfile, level)
-        outfile.write('],\n')
-    def build(self, node):
-        already_processed = set()
+        self.ns_prefix_ = node.prefix
         self.buildAttributes(node, node.attrib, already_processed)
         for child in node:
             nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
-            self.buildChildren(child, node, nodeName_)
+            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
     def buildAttributes(self, node, attrs, already_processed):
         pass
-    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False):
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
         if nodeName_ == 'genreName':
-            genreName_ = child_.text
-            genreName_ = self.gds_validate_string(genreName_, node, 'genreName')
-            self.genreName.append(genreName_)
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'genreName')
+            value_ = self.gds_validate_string(value_, node, 'genreName')
+            self.genreName.append(value_)
+            self.genreName_nsprefix_ = child_.prefix
 # end class level2Genres
 
 
 class level3Genres(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
     subclass = None
     superclass = None
-    def __init__(self, genreName=None):
+    def __init__(self, genreName=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = None
         if genreName is None:
             self.genreName = []
         else:
             self.genreName = genreName
+        self.genreName_nsprefix_ = None
     def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, level3Genres)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
         if level3Genres.subclass:
             return level3Genres.subclass(*args_, **kwargs_)
         else:
             return level3Genres(*args_, **kwargs_)
     factory = staticmethod(factory)
-    def get_genreName(self): return self.genreName
-    def set_genreName(self, genreName): self.genreName = genreName
-    def add_genreName(self, value): self.genreName.append(value)
-    def insert_genreName(self, index, value): self.genreName[index] = value
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_genreName(self):
+        return self.genreName
+    def set_genreName(self, genreName):
+        self.genreName = genreName
+    def add_genreName(self, value):
+        self.genreName.append(value)
+    def insert_genreName_at(self, index, value):
+        self.genreName.insert(index, value)
+    def replace_genreName_at(self, index, value):
+        self.genreName[index] = value
     def hasContent_(self):
         if (
             self.genreName
-            ):
+        ):
             return True
         else:
             return False
-    def export(self, outfile, level, namespace_='', name_='level3Genres', namespacedef_='', pretty_print=True):
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='level3Genres', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('level3Genres')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
         if pretty_print:
             eol_ = '\n'
         else:
             eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'level3Genres':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
         showIndent(outfile, level, pretty_print)
-        outfile.write('<%s%s%s' % (namespace_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
         already_processed = set()
-        self.exportAttributes(outfile, level, already_processed, namespace_, name_='level3Genres')
+        self.exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='level3Genres')
         if self.hasContent_():
             outfile.write('>%s' % (eol_, ))
-            self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+            self.exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='level3Genres', pretty_print=pretty_print)
             showIndent(outfile, level, pretty_print)
-            outfile.write('</%s%s>%s' % (namespace_, name_, eol_))
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
         else:
             outfile.write('/>%s' % (eol_, ))
-    def exportAttributes(self, outfile, level, already_processed, namespace_='', name_='level3Genres'):
+    def exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='level3Genres'):
         pass
-    def exportChildren(self, outfile, level, namespace_='', name_='level3Genres', fromsubclass_=False, pretty_print=True):
+    def exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='level3Genres', fromsubclass_=False, pretty_print=True):
         if pretty_print:
             eol_ = '\n'
         else:
             eol_ = ''
         for genreName_ in self.genreName:
+            namespaceprefix_ = self.genreName_nsprefix_ + ':' if (UseCapturedNS_ and self.genreName_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%sgenreName>%s</%sgenreName>%s' % (namespace_, self.gds_format_string(quote_xml(genreName_).encode(ExternalEncoding), input_name='genreName'), namespace_, eol_))
-    def exportLiteral(self, outfile, level, name_='level3Genres'):
-        level += 1
+            outfile.write('<%sgenreName>%s</%sgenreName>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(genreName_), input_name='genreName')), namespaceprefix_ , eol_))
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
         already_processed = set()
-        self.exportLiteralAttributes(outfile, level, already_processed, name_)
-        if self.hasContent_():
-            self.exportLiteralChildren(outfile, level, name_)
-    def exportLiteralAttributes(self, outfile, level, already_processed, name_):
-        pass
-    def exportLiteralChildren(self, outfile, level, name_):
-        showIndent(outfile, level)
-        outfile.write('genreName=[\n')
-        level += 1
-        for genreName_ in self.genreName:
-            showIndent(outfile, level)
-            outfile.write('%s,\n' % quote_python(genreName_).encode(ExternalEncoding))
-        level -= 1
-        showIndent(outfile, level)
-        outfile.write('],\n')
-    def build(self, node):
-        already_processed = set()
+        self.ns_prefix_ = node.prefix
         self.buildAttributes(node, node.attrib, already_processed)
         for child in node:
             nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
-            self.buildChildren(child, node, nodeName_)
+            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
     def buildAttributes(self, node, attrs, already_processed):
         pass
-    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False):
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
         if nodeName_ == 'genreName':
-            genreName_ = child_.text
-            genreName_ = self.gds_validate_string(genreName_, node, 'genreName')
-            self.genreName.append(genreName_)
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'genreName')
+            value_ = self.gds_validate_string(value_, node, 'genreName')
+            self.genreName.append(value_)
+            self.genreName_nsprefix_ = child_.prefix
 # end class level3Genres
 
 
 class level4Genres(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
     subclass = None
     superclass = None
-    def __init__(self, genreName=None):
+    def __init__(self, genreName=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = None
         if genreName is None:
             self.genreName = []
         else:
             self.genreName = genreName
+        self.genreName_nsprefix_ = None
     def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, level4Genres)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
         if level4Genres.subclass:
             return level4Genres.subclass(*args_, **kwargs_)
         else:
             return level4Genres(*args_, **kwargs_)
     factory = staticmethod(factory)
-    def get_genreName(self): return self.genreName
-    def set_genreName(self, genreName): self.genreName = genreName
-    def add_genreName(self, value): self.genreName.append(value)
-    def insert_genreName(self, index, value): self.genreName[index] = value
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_genreName(self):
+        return self.genreName
+    def set_genreName(self, genreName):
+        self.genreName = genreName
+    def add_genreName(self, value):
+        self.genreName.append(value)
+    def insert_genreName_at(self, index, value):
+        self.genreName.insert(index, value)
+    def replace_genreName_at(self, index, value):
+        self.genreName[index] = value
     def hasContent_(self):
         if (
             self.genreName
-            ):
+        ):
             return True
         else:
             return False
-    def export(self, outfile, level, namespace_='', name_='level4Genres', namespacedef_='', pretty_print=True):
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='level4Genres', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('level4Genres')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
         if pretty_print:
             eol_ = '\n'
         else:
             eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'level4Genres':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
         showIndent(outfile, level, pretty_print)
-        outfile.write('<%s%s%s' % (namespace_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
         already_processed = set()
-        self.exportAttributes(outfile, level, already_processed, namespace_, name_='level4Genres')
+        self.exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='level4Genres')
         if self.hasContent_():
             outfile.write('>%s' % (eol_, ))
-            self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+            self.exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='level4Genres', pretty_print=pretty_print)
             showIndent(outfile, level, pretty_print)
-            outfile.write('</%s%s>%s' % (namespace_, name_, eol_))
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
         else:
             outfile.write('/>%s' % (eol_, ))
-    def exportAttributes(self, outfile, level, already_processed, namespace_='', name_='level4Genres'):
+    def exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='level4Genres'):
         pass
-    def exportChildren(self, outfile, level, namespace_='', name_='level4Genres', fromsubclass_=False, pretty_print=True):
+    def exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='level4Genres', fromsubclass_=False, pretty_print=True):
         if pretty_print:
             eol_ = '\n'
         else:
             eol_ = ''
         for genreName_ in self.genreName:
+            namespaceprefix_ = self.genreName_nsprefix_ + ':' if (UseCapturedNS_ and self.genreName_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%sgenreName>%s</%sgenreName>%s' % (namespace_, self.gds_format_string(quote_xml(genreName_).encode(ExternalEncoding), input_name='genreName'), namespace_, eol_))
-    def exportLiteral(self, outfile, level, name_='level4Genres'):
-        level += 1
+            outfile.write('<%sgenreName>%s</%sgenreName>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(genreName_), input_name='genreName')), namespaceprefix_ , eol_))
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
         already_processed = set()
-        self.exportLiteralAttributes(outfile, level, already_processed, name_)
-        if self.hasContent_():
-            self.exportLiteralChildren(outfile, level, name_)
-    def exportLiteralAttributes(self, outfile, level, already_processed, name_):
-        pass
-    def exportLiteralChildren(self, outfile, level, name_):
-        showIndent(outfile, level)
-        outfile.write('genreName=[\n')
-        level += 1
-        for genreName_ in self.genreName:
-            showIndent(outfile, level)
-            outfile.write('%s,\n' % quote_python(genreName_).encode(ExternalEncoding))
-        level -= 1
-        showIndent(outfile, level)
-        outfile.write('],\n')
-    def build(self, node):
-        already_processed = set()
+        self.ns_prefix_ = node.prefix
         self.buildAttributes(node, node.attrib, already_processed)
         for child in node:
             nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
-            self.buildChildren(child, node, nodeName_)
+            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
     def buildAttributes(self, node, attrs, already_processed):
         pass
-    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False):
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
         if nodeName_ == 'genreName':
-            genreName_ = child_.text
-            genreName_ = self.gds_validate_string(genreName_, node, 'genreName')
-            self.genreName.append(genreName_)
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'genreName')
+            value_ = self.gds_validate_string(value_, node, 'genreName')
+            self.genreName.append(value_)
+            self.genreName_nsprefix_ = child_.prefix
 # end class level4Genres
 
 
 class level5Genres(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
     subclass = None
     superclass = None
-    def __init__(self, genreName=None):
+    def __init__(self, genreName=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = None
         if genreName is None:
             self.genreName = []
         else:
             self.genreName = genreName
+        self.genreName_nsprefix_ = None
     def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, level5Genres)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
         if level5Genres.subclass:
             return level5Genres.subclass(*args_, **kwargs_)
         else:
             return level5Genres(*args_, **kwargs_)
     factory = staticmethod(factory)
-    def get_genreName(self): return self.genreName
-    def set_genreName(self, genreName): self.genreName = genreName
-    def add_genreName(self, value): self.genreName.append(value)
-    def insert_genreName(self, index, value): self.genreName[index] = value
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_genreName(self):
+        return self.genreName
+    def set_genreName(self, genreName):
+        self.genreName = genreName
+    def add_genreName(self, value):
+        self.genreName.append(value)
+    def insert_genreName_at(self, index, value):
+        self.genreName.insert(index, value)
+    def replace_genreName_at(self, index, value):
+        self.genreName[index] = value
     def hasContent_(self):
         if (
             self.genreName
-            ):
+        ):
             return True
         else:
             return False
-    def export(self, outfile, level, namespace_='', name_='level5Genres', namespacedef_='', pretty_print=True):
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='level5Genres', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('level5Genres')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
         if pretty_print:
             eol_ = '\n'
         else:
             eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'level5Genres':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
         showIndent(outfile, level, pretty_print)
-        outfile.write('<%s%s%s' % (namespace_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
         already_processed = set()
-        self.exportAttributes(outfile, level, already_processed, namespace_, name_='level5Genres')
+        self.exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='level5Genres')
         if self.hasContent_():
             outfile.write('>%s' % (eol_, ))
-            self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+            self.exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='level5Genres', pretty_print=pretty_print)
             showIndent(outfile, level, pretty_print)
-            outfile.write('</%s%s>%s' % (namespace_, name_, eol_))
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
         else:
             outfile.write('/>%s' % (eol_, ))
-    def exportAttributes(self, outfile, level, already_processed, namespace_='', name_='level5Genres'):
+    def exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='level5Genres'):
         pass
-    def exportChildren(self, outfile, level, namespace_='', name_='level5Genres', fromsubclass_=False, pretty_print=True):
+    def exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='level5Genres', fromsubclass_=False, pretty_print=True):
         if pretty_print:
             eol_ = '\n'
         else:
             eol_ = ''
         for genreName_ in self.genreName:
+            namespaceprefix_ = self.genreName_nsprefix_ + ':' if (UseCapturedNS_ and self.genreName_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%sgenreName>%s</%sgenreName>%s' % (namespace_, self.gds_format_string(quote_xml(genreName_).encode(ExternalEncoding), input_name='genreName'), namespace_, eol_))
-    def exportLiteral(self, outfile, level, name_='level5Genres'):
-        level += 1
+            outfile.write('<%sgenreName>%s</%sgenreName>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(genreName_), input_name='genreName')), namespaceprefix_ , eol_))
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
         already_processed = set()
-        self.exportLiteralAttributes(outfile, level, already_processed, name_)
-        if self.hasContent_():
-            self.exportLiteralChildren(outfile, level, name_)
-    def exportLiteralAttributes(self, outfile, level, already_processed, name_):
-        pass
-    def exportLiteralChildren(self, outfile, level, name_):
-        showIndent(outfile, level)
-        outfile.write('genreName=[\n')
-        level += 1
-        for genreName_ in self.genreName:
-            showIndent(outfile, level)
-            outfile.write('%s,\n' % quote_python(genreName_).encode(ExternalEncoding))
-        level -= 1
-        showIndent(outfile, level)
-        outfile.write('],\n')
-    def build(self, node):
-        already_processed = set()
+        self.ns_prefix_ = node.prefix
         self.buildAttributes(node, node.attrib, already_processed)
         for child in node:
             nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
-            self.buildChildren(child, node, nodeName_)
+            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
     def buildAttributes(self, node, attrs, already_processed):
         pass
-    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False):
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
         if nodeName_ == 'genreName':
-            genreName_ = child_.text
-            genreName_ = self.gds_validate_string(genreName_, node, 'genreName')
-            self.genreName.append(genreName_)
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'genreName')
+            value_ = self.gds_validate_string(value_, node, 'genreName')
+            self.genreName.append(value_)
+            self.genreName_nsprefix_ = child_.prefix
 # end class level5Genres
 
 
 class level6Genres(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
     subclass = None
     superclass = None
-    def __init__(self, genreName=None):
+    def __init__(self, genreName=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = None
         if genreName is None:
             self.genreName = []
         else:
             self.genreName = genreName
+        self.genreName_nsprefix_ = None
     def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, level6Genres)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
         if level6Genres.subclass:
             return level6Genres.subclass(*args_, **kwargs_)
         else:
             return level6Genres(*args_, **kwargs_)
     factory = staticmethod(factory)
-    def get_genreName(self): return self.genreName
-    def set_genreName(self, genreName): self.genreName = genreName
-    def add_genreName(self, value): self.genreName.append(value)
-    def insert_genreName(self, index, value): self.genreName[index] = value
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_genreName(self):
+        return self.genreName
+    def set_genreName(self, genreName):
+        self.genreName = genreName
+    def add_genreName(self, value):
+        self.genreName.append(value)
+    def insert_genreName_at(self, index, value):
+        self.genreName.insert(index, value)
+    def replace_genreName_at(self, index, value):
+        self.genreName[index] = value
     def hasContent_(self):
         if (
             self.genreName
-            ):
+        ):
             return True
         else:
             return False
-    def export(self, outfile, level, namespace_='', name_='level6Genres', namespacedef_='', pretty_print=True):
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='level6Genres', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('level6Genres')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
         if pretty_print:
             eol_ = '\n'
         else:
             eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'level6Genres':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
         showIndent(outfile, level, pretty_print)
-        outfile.write('<%s%s%s' % (namespace_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
         already_processed = set()
-        self.exportAttributes(outfile, level, already_processed, namespace_, name_='level6Genres')
+        self.exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='level6Genres')
         if self.hasContent_():
             outfile.write('>%s' % (eol_, ))
-            self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+            self.exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='level6Genres', pretty_print=pretty_print)
             showIndent(outfile, level, pretty_print)
-            outfile.write('</%s%s>%s' % (namespace_, name_, eol_))
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
         else:
             outfile.write('/>%s' % (eol_, ))
-    def exportAttributes(self, outfile, level, already_processed, namespace_='', name_='level6Genres'):
+    def exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='level6Genres'):
         pass
-    def exportChildren(self, outfile, level, namespace_='', name_='level6Genres', fromsubclass_=False, pretty_print=True):
+    def exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='level6Genres', fromsubclass_=False, pretty_print=True):
         if pretty_print:
             eol_ = '\n'
         else:
             eol_ = ''
         for genreName_ in self.genreName:
+            namespaceprefix_ = self.genreName_nsprefix_ + ':' if (UseCapturedNS_ and self.genreName_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%sgenreName>%s</%sgenreName>%s' % (namespace_, self.gds_format_string(quote_xml(genreName_).encode(ExternalEncoding), input_name='genreName'), namespace_, eol_))
-    def exportLiteral(self, outfile, level, name_='level6Genres'):
-        level += 1
+            outfile.write('<%sgenreName>%s</%sgenreName>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(genreName_), input_name='genreName')), namespaceprefix_ , eol_))
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
         already_processed = set()
-        self.exportLiteralAttributes(outfile, level, already_processed, name_)
-        if self.hasContent_():
-            self.exportLiteralChildren(outfile, level, name_)
-    def exportLiteralAttributes(self, outfile, level, already_processed, name_):
-        pass
-    def exportLiteralChildren(self, outfile, level, name_):
-        showIndent(outfile, level)
-        outfile.write('genreName=[\n')
-        level += 1
-        for genreName_ in self.genreName:
-            showIndent(outfile, level)
-            outfile.write('%s,\n' % quote_python(genreName_).encode(ExternalEncoding))
-        level -= 1
-        showIndent(outfile, level)
-        outfile.write('],\n')
-    def build(self, node):
-        already_processed = set()
+        self.ns_prefix_ = node.prefix
         self.buildAttributes(node, node.attrib, already_processed)
         for child in node:
             nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
-            self.buildChildren(child, node, nodeName_)
+            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
     def buildAttributes(self, node, attrs, already_processed):
         pass
-    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False):
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
         if nodeName_ == 'genreName':
-            genreName_ = child_.text
-            genreName_ = self.gds_validate_string(genreName_, node, 'genreName')
-            self.genreName.append(genreName_)
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'genreName')
+            value_ = self.gds_validate_string(value_, node, 'genreName')
+            self.genreName.append(value_)
+            self.genreName_nsprefix_ = child_.prefix
 # end class level6Genres
 
 
 class level7Genres(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
     subclass = None
     superclass = None
-    def __init__(self, genreName=None):
+    def __init__(self, genreName=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = None
         if genreName is None:
             self.genreName = []
         else:
             self.genreName = genreName
+        self.genreName_nsprefix_ = None
     def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, level7Genres)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
         if level7Genres.subclass:
             return level7Genres.subclass(*args_, **kwargs_)
         else:
             return level7Genres(*args_, **kwargs_)
     factory = staticmethod(factory)
-    def get_genreName(self): return self.genreName
-    def set_genreName(self, genreName): self.genreName = genreName
-    def add_genreName(self, value): self.genreName.append(value)
-    def insert_genreName(self, index, value): self.genreName[index] = value
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_genreName(self):
+        return self.genreName
+    def set_genreName(self, genreName):
+        self.genreName = genreName
+    def add_genreName(self, value):
+        self.genreName.append(value)
+    def insert_genreName_at(self, index, value):
+        self.genreName.insert(index, value)
+    def replace_genreName_at(self, index, value):
+        self.genreName[index] = value
     def hasContent_(self):
         if (
             self.genreName
-            ):
+        ):
             return True
         else:
             return False
-    def export(self, outfile, level, namespace_='', name_='level7Genres', namespacedef_='', pretty_print=True):
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='level7Genres', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('level7Genres')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
         if pretty_print:
             eol_ = '\n'
         else:
             eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'level7Genres':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
         showIndent(outfile, level, pretty_print)
-        outfile.write('<%s%s%s' % (namespace_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
         already_processed = set()
-        self.exportAttributes(outfile, level, already_processed, namespace_, name_='level7Genres')
+        self.exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='level7Genres')
         if self.hasContent_():
             outfile.write('>%s' % (eol_, ))
-            self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+            self.exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='level7Genres', pretty_print=pretty_print)
             showIndent(outfile, level, pretty_print)
-            outfile.write('</%s%s>%s' % (namespace_, name_, eol_))
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
         else:
             outfile.write('/>%s' % (eol_, ))
-    def exportAttributes(self, outfile, level, already_processed, namespace_='', name_='level7Genres'):
+    def exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='level7Genres'):
         pass
-    def exportChildren(self, outfile, level, namespace_='', name_='level7Genres', fromsubclass_=False, pretty_print=True):
+    def exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='level7Genres', fromsubclass_=False, pretty_print=True):
         if pretty_print:
             eol_ = '\n'
         else:
             eol_ = ''
         for genreName_ in self.genreName:
+            namespaceprefix_ = self.genreName_nsprefix_ + ':' if (UseCapturedNS_ and self.genreName_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%sgenreName>%s</%sgenreName>%s' % (namespace_, self.gds_format_string(quote_xml(genreName_).encode(ExternalEncoding), input_name='genreName'), namespace_, eol_))
-    def exportLiteral(self, outfile, level, name_='level7Genres'):
-        level += 1
+            outfile.write('<%sgenreName>%s</%sgenreName>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(genreName_), input_name='genreName')), namespaceprefix_ , eol_))
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
         already_processed = set()
-        self.exportLiteralAttributes(outfile, level, already_processed, name_)
-        if self.hasContent_():
-            self.exportLiteralChildren(outfile, level, name_)
-    def exportLiteralAttributes(self, outfile, level, already_processed, name_):
-        pass
-    def exportLiteralChildren(self, outfile, level, name_):
-        showIndent(outfile, level)
-        outfile.write('genreName=[\n')
-        level += 1
-        for genreName_ in self.genreName:
-            showIndent(outfile, level)
-            outfile.write('%s,\n' % quote_python(genreName_).encode(ExternalEncoding))
-        level -= 1
-        showIndent(outfile, level)
-        outfile.write('],\n')
-    def build(self, node):
-        already_processed = set()
+        self.ns_prefix_ = node.prefix
         self.buildAttributes(node, node.attrib, already_processed)
         for child in node:
             nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
-            self.buildChildren(child, node, nodeName_)
+            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
     def buildAttributes(self, node, attrs, already_processed):
         pass
-    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False):
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
         if nodeName_ == 'genreName':
-            genreName_ = child_.text
-            genreName_ = self.gds_validate_string(genreName_, node, 'genreName')
-            self.genreName.append(genreName_)
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'genreName')
+            value_ = self.gds_validate_string(value_, node, 'genreName')
+            self.genreName.append(value_)
+            self.genreName_nsprefix_ = child_.prefix
 # end class level7Genres
 
 
 class level8Genres(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
     subclass = None
     superclass = None
-    def __init__(self, genreName=None):
+    def __init__(self, genreName=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = None
         if genreName is None:
             self.genreName = []
         else:
             self.genreName = genreName
+        self.genreName_nsprefix_ = None
     def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, level8Genres)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
         if level8Genres.subclass:
             return level8Genres.subclass(*args_, **kwargs_)
         else:
             return level8Genres(*args_, **kwargs_)
     factory = staticmethod(factory)
-    def get_genreName(self): return self.genreName
-    def set_genreName(self, genreName): self.genreName = genreName
-    def add_genreName(self, value): self.genreName.append(value)
-    def insert_genreName(self, index, value): self.genreName[index] = value
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_genreName(self):
+        return self.genreName
+    def set_genreName(self, genreName):
+        self.genreName = genreName
+    def add_genreName(self, value):
+        self.genreName.append(value)
+    def insert_genreName_at(self, index, value):
+        self.genreName.insert(index, value)
+    def replace_genreName_at(self, index, value):
+        self.genreName[index] = value
     def hasContent_(self):
         if (
             self.genreName
-            ):
+        ):
             return True
         else:
             return False
-    def export(self, outfile, level, namespace_='', name_='level8Genres', namespacedef_='', pretty_print=True):
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='level8Genres', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('level8Genres')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
         if pretty_print:
             eol_ = '\n'
         else:
             eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'level8Genres':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
         showIndent(outfile, level, pretty_print)
-        outfile.write('<%s%s%s' % (namespace_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
         already_processed = set()
-        self.exportAttributes(outfile, level, already_processed, namespace_, name_='level8Genres')
+        self.exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='level8Genres')
         if self.hasContent_():
             outfile.write('>%s' % (eol_, ))
-            self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+            self.exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='level8Genres', pretty_print=pretty_print)
             showIndent(outfile, level, pretty_print)
-            outfile.write('</%s%s>%s' % (namespace_, name_, eol_))
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
         else:
             outfile.write('/>%s' % (eol_, ))
-    def exportAttributes(self, outfile, level, already_processed, namespace_='', name_='level8Genres'):
+    def exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='level8Genres'):
         pass
-    def exportChildren(self, outfile, level, namespace_='', name_='level8Genres', fromsubclass_=False, pretty_print=True):
+    def exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='level8Genres', fromsubclass_=False, pretty_print=True):
         if pretty_print:
             eol_ = '\n'
         else:
             eol_ = ''
         for genreName_ in self.genreName:
+            namespaceprefix_ = self.genreName_nsprefix_ + ':' if (UseCapturedNS_ and self.genreName_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%sgenreName>%s</%sgenreName>%s' % (namespace_, self.gds_format_string(quote_xml(genreName_).encode(ExternalEncoding), input_name='genreName'), namespace_, eol_))
-    def exportLiteral(self, outfile, level, name_='level8Genres'):
-        level += 1
+            outfile.write('<%sgenreName>%s</%sgenreName>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(genreName_), input_name='genreName')), namespaceprefix_ , eol_))
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
         already_processed = set()
-        self.exportLiteralAttributes(outfile, level, already_processed, name_)
-        if self.hasContent_():
-            self.exportLiteralChildren(outfile, level, name_)
-    def exportLiteralAttributes(self, outfile, level, already_processed, name_):
-        pass
-    def exportLiteralChildren(self, outfile, level, name_):
-        showIndent(outfile, level)
-        outfile.write('genreName=[\n')
-        level += 1
-        for genreName_ in self.genreName:
-            showIndent(outfile, level)
-            outfile.write('%s,\n' % quote_python(genreName_).encode(ExternalEncoding))
-        level -= 1
-        showIndent(outfile, level)
-        outfile.write('],\n')
-    def build(self, node):
-        already_processed = set()
+        self.ns_prefix_ = node.prefix
         self.buildAttributes(node, node.attrib, already_processed)
         for child in node:
             nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
-            self.buildChildren(child, node, nodeName_)
+            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
     def buildAttributes(self, node, attrs, already_processed):
         pass
-    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False):
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
         if nodeName_ == 'genreName':
-            genreName_ = child_.text
-            genreName_ = self.gds_validate_string(genreName_, node, 'genreName')
-            self.genreName.append(genreName_)
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'genreName')
+            value_ = self.gds_validate_string(value_, node, 'genreName')
+            self.genreName.append(value_)
+            self.genreName_nsprefix_ = child_.prefix
 # end class level8Genres
 
 
 class level9Genres(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
     subclass = None
     superclass = None
-    def __init__(self, genreName=None):
+    def __init__(self, genreName=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = None
         if genreName is None:
             self.genreName = []
         else:
             self.genreName = genreName
+        self.genreName_nsprefix_ = None
     def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, level9Genres)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
         if level9Genres.subclass:
             return level9Genres.subclass(*args_, **kwargs_)
         else:
             return level9Genres(*args_, **kwargs_)
     factory = staticmethod(factory)
-    def get_genreName(self): return self.genreName
-    def set_genreName(self, genreName): self.genreName = genreName
-    def add_genreName(self, value): self.genreName.append(value)
-    def insert_genreName(self, index, value): self.genreName[index] = value
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_genreName(self):
+        return self.genreName
+    def set_genreName(self, genreName):
+        self.genreName = genreName
+    def add_genreName(self, value):
+        self.genreName.append(value)
+    def insert_genreName_at(self, index, value):
+        self.genreName.insert(index, value)
+    def replace_genreName_at(self, index, value):
+        self.genreName[index] = value
     def hasContent_(self):
         if (
             self.genreName
-            ):
+        ):
             return True
         else:
             return False
-    def export(self, outfile, level, namespace_='', name_='level9Genres', namespacedef_='', pretty_print=True):
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='level9Genres', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('level9Genres')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
         if pretty_print:
             eol_ = '\n'
         else:
             eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'level9Genres':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
         showIndent(outfile, level, pretty_print)
-        outfile.write('<%s%s%s' % (namespace_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
         already_processed = set()
-        self.exportAttributes(outfile, level, already_processed, namespace_, name_='level9Genres')
+        self.exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='level9Genres')
         if self.hasContent_():
             outfile.write('>%s' % (eol_, ))
-            self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+            self.exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='level9Genres', pretty_print=pretty_print)
             showIndent(outfile, level, pretty_print)
-            outfile.write('</%s%s>%s' % (namespace_, name_, eol_))
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
         else:
             outfile.write('/>%s' % (eol_, ))
-    def exportAttributes(self, outfile, level, already_processed, namespace_='', name_='level9Genres'):
+    def exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='level9Genres'):
         pass
-    def exportChildren(self, outfile, level, namespace_='', name_='level9Genres', fromsubclass_=False, pretty_print=True):
+    def exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='level9Genres', fromsubclass_=False, pretty_print=True):
         if pretty_print:
             eol_ = '\n'
         else:
             eol_ = ''
         for genreName_ in self.genreName:
+            namespaceprefix_ = self.genreName_nsprefix_ + ':' if (UseCapturedNS_ and self.genreName_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%sgenreName>%s</%sgenreName>%s' % (namespace_, self.gds_format_string(quote_xml(genreName_).encode(ExternalEncoding), input_name='genreName'), namespace_, eol_))
-    def exportLiteral(self, outfile, level, name_='level9Genres'):
-        level += 1
+            outfile.write('<%sgenreName>%s</%sgenreName>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(genreName_), input_name='genreName')), namespaceprefix_ , eol_))
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
         already_processed = set()
-        self.exportLiteralAttributes(outfile, level, already_processed, name_)
-        if self.hasContent_():
-            self.exportLiteralChildren(outfile, level, name_)
-    def exportLiteralAttributes(self, outfile, level, already_processed, name_):
-        pass
-    def exportLiteralChildren(self, outfile, level, name_):
-        showIndent(outfile, level)
-        outfile.write('genreName=[\n')
-        level += 1
-        for genreName_ in self.genreName:
-            showIndent(outfile, level)
-            outfile.write('%s,\n' % quote_python(genreName_).encode(ExternalEncoding))
-        level -= 1
-        showIndent(outfile, level)
-        outfile.write('],\n')
-    def build(self, node):
-        already_processed = set()
+        self.ns_prefix_ = node.prefix
         self.buildAttributes(node, node.attrib, already_processed)
         for child in node:
             nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
-            self.buildChildren(child, node, nodeName_)
+            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
     def buildAttributes(self, node, attrs, already_processed):
         pass
-    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False):
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
         if nodeName_ == 'genreName':
-            genreName_ = child_.text
-            genreName_ = self.gds_validate_string(genreName_, node, 'genreName')
-            self.genreName.append(genreName_)
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'genreName')
+            value_ = self.gds_validate_string(value_, node, 'genreName')
+            self.genreName.append(value_)
+            self.genreName_nsprefix_ = child_.prefix
 # end class level9Genres
 
 
 class albumList(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
     subclass = None
     superclass = None
-    def __init__(self, album=None):
+    def __init__(self, album=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = None
         if album is None:
             self.album = []
         else:
             self.album = album
+        self.album_nsprefix_ = None
     def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, albumList)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
         if albumList.subclass:
             return albumList.subclass(*args_, **kwargs_)
         else:
             return albumList(*args_, **kwargs_)
     factory = staticmethod(factory)
-    def get_album(self): return self.album
-    def set_album(self, album): self.album = album
-    def add_album(self, value): self.album.append(value)
-    def insert_album(self, index, value): self.album[index] = value
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_album(self):
+        return self.album
+    def set_album(self, album):
+        self.album = album
+    def add_album(self, value):
+        self.album.append(value)
+    def insert_album_at(self, index, value):
+        self.album.insert(index, value)
+    def replace_album_at(self, index, value):
+        self.album[index] = value
     def hasContent_(self):
         if (
             self.album
-            ):
+        ):
             return True
         else:
             return False
-    def export(self, outfile, level, namespace_='', name_='albumList', namespacedef_='', pretty_print=True):
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='albumList', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('albumList')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
         if pretty_print:
             eol_ = '\n'
         else:
             eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'albumList':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
         showIndent(outfile, level, pretty_print)
-        outfile.write('<%s%s%s' % (namespace_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
         already_processed = set()
-        self.exportAttributes(outfile, level, already_processed, namespace_, name_='albumList')
+        self.exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='albumList')
         if self.hasContent_():
             outfile.write('>%s' % (eol_, ))
-            self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+            self.exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='albumList', pretty_print=pretty_print)
             showIndent(outfile, level, pretty_print)
-            outfile.write('</%s%s>%s' % (namespace_, name_, eol_))
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
         else:
             outfile.write('/>%s' % (eol_, ))
-    def exportAttributes(self, outfile, level, already_processed, namespace_='', name_='albumList'):
+    def exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='albumList'):
         pass
-    def exportChildren(self, outfile, level, namespace_='', name_='albumList', fromsubclass_=False, pretty_print=True):
+    def exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='albumList', fromsubclass_=False, pretty_print=True):
         if pretty_print:
             eol_ = '\n'
         else:
             eol_ = ''
         for album_ in self.album:
-            album_.export(outfile, level, namespace_, name_='album', pretty_print=pretty_print)
-    def exportLiteral(self, outfile, level, name_='albumList'):
-        level += 1
+            namespaceprefix_ = self.album_nsprefix_ + ':' if (UseCapturedNS_ and self.album_nsprefix_) else ''
+            album_.export(outfile, level, namespaceprefix_, namespacedef_='', name_='album', pretty_print=pretty_print)
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
         already_processed = set()
-        self.exportLiteralAttributes(outfile, level, already_processed, name_)
-        if self.hasContent_():
-            self.exportLiteralChildren(outfile, level, name_)
-    def exportLiteralAttributes(self, outfile, level, already_processed, name_):
-        pass
-    def exportLiteralChildren(self, outfile, level, name_):
-        showIndent(outfile, level)
-        outfile.write('album=[\n')
-        level += 1
-        for album_ in self.album:
-            showIndent(outfile, level)
-            outfile.write('model_.album(\n')
-            album_.exportLiteral(outfile, level)
-            showIndent(outfile, level)
-            outfile.write('),\n')
-        level -= 1
-        showIndent(outfile, level)
-        outfile.write('],\n')
-    def build(self, node):
-        already_processed = set()
+        self.ns_prefix_ = node.prefix
         self.buildAttributes(node, node.attrib, already_processed)
         for child in node:
             nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
-            self.buildChildren(child, node, nodeName_)
+            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
     def buildAttributes(self, node, attrs, already_processed):
         pass
-    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False):
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
         if nodeName_ == 'album':
-            obj_ = album.factory()
-            obj_.build(child_)
+            obj_ = album.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
             self.album.append(obj_)
+            obj_.original_tagname_ = 'album'
 # end class albumList
 
 
 class album(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
     subclass = None
     superclass = None
-    def __init__(self, albumName=None, albumReleasedate=None, country=None, language=None, barCode=None, catalogue=None, label=None):
+    def __init__(self, albumName=None, albumReleasedate=None, country=None, language=None, barCode=None, catalogue=None, label=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = None
         self.albumName = albumName
+        self.albumName_nsprefix_ = None
         self.albumReleasedate = albumReleasedate
+        self.albumReleasedate_nsprefix_ = None
         self.country = country
+        self.country_nsprefix_ = None
         self.language = language
+        self.language_nsprefix_ = None
         self.barCode = barCode
+        self.barCode_nsprefix_ = None
         self.catalogue = catalogue
+        self.catalogue_nsprefix_ = None
         self.label = label
+        self.label_nsprefix_ = None
     def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, album)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
         if album.subclass:
             return album.subclass(*args_, **kwargs_)
         else:
             return album(*args_, **kwargs_)
     factory = staticmethod(factory)
-    def get_albumName(self): return self.albumName
-    def set_albumName(self, albumName): self.albumName = albumName
-    def get_albumReleasedate(self): return self.albumReleasedate
-    def set_albumReleasedate(self, albumReleasedate): self.albumReleasedate = albumReleasedate
-    def get_country(self): return self.country
-    def set_country(self, country): self.country = country
-    def get_language(self): return self.language
-    def set_language(self, language): self.language = language
-    def get_barCode(self): return self.barCode
-    def set_barCode(self, barCode): self.barCode = barCode
-    def get_catalogue(self): return self.catalogue
-    def set_catalogue(self, catalogue): self.catalogue = catalogue
-    def get_label(self): return self.label
-    def set_label(self, label): self.label = label
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_albumName(self):
+        return self.albumName
+    def set_albumName(self, albumName):
+        self.albumName = albumName
+    def get_albumReleasedate(self):
+        return self.albumReleasedate
+    def set_albumReleasedate(self, albumReleasedate):
+        self.albumReleasedate = albumReleasedate
+    def get_country(self):
+        return self.country
+    def set_country(self, country):
+        self.country = country
+    def get_language(self):
+        return self.language
+    def set_language(self, language):
+        self.language = language
+    def get_barCode(self):
+        return self.barCode
+    def set_barCode(self, barCode):
+        self.barCode = barCode
+    def get_catalogue(self):
+        return self.catalogue
+    def set_catalogue(self, catalogue):
+        self.catalogue = catalogue
+    def get_label(self):
+        return self.label
+    def set_label(self, label):
+        self.label = label
     def hasContent_(self):
         if (
             self.albumName is not None or
@@ -3524,640 +4454,758 @@ class album(GeneratedsSuper):
             self.barCode is not None or
             self.catalogue is not None or
             self.label is not None
-            ):
+        ):
             return True
         else:
             return False
-    def export(self, outfile, level, namespace_='', name_='album', namespacedef_='', pretty_print=True):
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='album', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('album')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
         if pretty_print:
             eol_ = '\n'
         else:
             eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'album':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
         showIndent(outfile, level, pretty_print)
-        outfile.write('<%s%s%s' % (namespace_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
         already_processed = set()
-        self.exportAttributes(outfile, level, already_processed, namespace_, name_='album')
+        self.exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='album')
         if self.hasContent_():
             outfile.write('>%s' % (eol_, ))
-            self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+            self.exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='album', pretty_print=pretty_print)
             showIndent(outfile, level, pretty_print)
-            outfile.write('</%s%s>%s' % (namespace_, name_, eol_))
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
         else:
             outfile.write('/>%s' % (eol_, ))
-    def exportAttributes(self, outfile, level, already_processed, namespace_='', name_='album'):
+    def exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='album'):
         pass
-    def exportChildren(self, outfile, level, namespace_='', name_='album', fromsubclass_=False, pretty_print=True):
+    def exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='album', fromsubclass_=False, pretty_print=True):
         if pretty_print:
             eol_ = '\n'
         else:
             eol_ = ''
         if self.albumName is not None:
+            namespaceprefix_ = self.albumName_nsprefix_ + ':' if (UseCapturedNS_ and self.albumName_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%salbumName>%s</%salbumName>%s' % (namespace_, self.gds_format_string(quote_xml(self.albumName).encode(ExternalEncoding), input_name='albumName'), namespace_, eol_))
+            outfile.write('<%salbumName>%s</%salbumName>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.albumName), input_name='albumName')), namespaceprefix_ , eol_))
         if self.albumReleasedate is not None:
+            namespaceprefix_ = self.albumReleasedate_nsprefix_ + ':' if (UseCapturedNS_ and self.albumReleasedate_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%salbumReleasedate>%s</%salbumReleasedate>%s' % (namespace_, self.gds_format_integer(self.albumReleasedate, input_name='albumReleasedate'), namespace_, eol_))
+            outfile.write('<%salbumReleasedate>%s</%salbumReleasedate>%s' % (namespaceprefix_ , self.gds_format_integer(self.albumReleasedate, input_name='albumReleasedate'), namespaceprefix_ , eol_))
         if self.country is not None:
+            namespaceprefix_ = self.country_nsprefix_ + ':' if (UseCapturedNS_ and self.country_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%scountry>%s</%scountry>%s' % (namespace_, self.gds_format_string(quote_xml(self.country).encode(ExternalEncoding), input_name='country'), namespace_, eol_))
+            outfile.write('<%scountry>%s</%scountry>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.country), input_name='country')), namespaceprefix_ , eol_))
         if self.language is not None:
+            namespaceprefix_ = self.language_nsprefix_ + ':' if (UseCapturedNS_ and self.language_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%slanguage>%s</%slanguage>%s' % (namespace_, self.gds_format_string(quote_xml(self.language).encode(ExternalEncoding), input_name='language'), namespace_, eol_))
+            outfile.write('<%slanguage>%s</%slanguage>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.language), input_name='language')), namespaceprefix_ , eol_))
         if self.barCode is not None:
+            namespaceprefix_ = self.barCode_nsprefix_ + ':' if (UseCapturedNS_ and self.barCode_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%sbarCode>%s</%sbarCode>%s' % (namespace_, self.gds_format_string(quote_xml(self.barCode).encode(ExternalEncoding), input_name='barCode'), namespace_, eol_))
+            outfile.write('<%sbarCode>%s</%sbarCode>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.barCode), input_name='barCode')), namespaceprefix_ , eol_))
         if self.catalogue is not None:
+            namespaceprefix_ = self.catalogue_nsprefix_ + ':' if (UseCapturedNS_ and self.catalogue_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%scatalogue>%s</%scatalogue>%s' % (namespace_, self.gds_format_string(quote_xml(self.catalogue).encode(ExternalEncoding), input_name='catalogue'), namespace_, eol_))
+            outfile.write('<%scatalogue>%s</%scatalogue>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.catalogue), input_name='catalogue')), namespaceprefix_ , eol_))
         if self.label is not None:
+            namespaceprefix_ = self.label_nsprefix_ + ':' if (UseCapturedNS_ and self.label_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%slabel>%s</%slabel>%s' % (namespace_, self.gds_format_string(quote_xml(self.label).encode(ExternalEncoding), input_name='label'), namespace_, eol_))
-    def exportLiteral(self, outfile, level, name_='album'):
-        level += 1
+            outfile.write('<%slabel>%s</%slabel>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.label), input_name='label')), namespaceprefix_ , eol_))
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
         already_processed = set()
-        self.exportLiteralAttributes(outfile, level, already_processed, name_)
-        if self.hasContent_():
-            self.exportLiteralChildren(outfile, level, name_)
-    def exportLiteralAttributes(self, outfile, level, already_processed, name_):
-        pass
-    def exportLiteralChildren(self, outfile, level, name_):
-        if self.albumName is not None:
-            showIndent(outfile, level)
-            outfile.write('albumName=%s,\n' % quote_python(self.albumName).encode(ExternalEncoding))
-        if self.albumReleasedate is not None:
-            showIndent(outfile, level)
-            outfile.write('albumReleasedate=%d,\n' % self.albumReleasedate)
-        if self.country is not None:
-            showIndent(outfile, level)
-            outfile.write('country=%s,\n' % quote_python(self.country).encode(ExternalEncoding))
-        if self.language is not None:
-            showIndent(outfile, level)
-            outfile.write('language=%s,\n' % quote_python(self.language).encode(ExternalEncoding))
-        if self.barCode is not None:
-            showIndent(outfile, level)
-            outfile.write('barCode=%s,\n' % quote_python(self.barCode).encode(ExternalEncoding))
-        if self.catalogue is not None:
-            showIndent(outfile, level)
-            outfile.write('catalogue=%s,\n' % quote_python(self.catalogue).encode(ExternalEncoding))
-        if self.label is not None:
-            showIndent(outfile, level)
-            outfile.write('label=%s,\n' % quote_python(self.label).encode(ExternalEncoding))
-    def build(self, node):
-        already_processed = set()
+        self.ns_prefix_ = node.prefix
         self.buildAttributes(node, node.attrib, already_processed)
         for child in node:
             nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
-            self.buildChildren(child, node, nodeName_)
+            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
     def buildAttributes(self, node, attrs, already_processed):
         pass
-    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False):
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
         if nodeName_ == 'albumName':
-            albumName_ = child_.text
-            albumName_ = self.gds_validate_string(albumName_, node, 'albumName')
-            self.albumName = albumName_
-        elif nodeName_ == 'albumReleasedate':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'albumName')
+            value_ = self.gds_validate_string(value_, node, 'albumName')
+            self.albumName = value_
+            self.albumName_nsprefix_ = child_.prefix
+        elif nodeName_ == 'albumReleasedate' and child_.text:
             sval_ = child_.text
-            try:
-                ival_ = int(sval_)
-            except (TypeError, ValueError), exp:
-                raise_parse_error(child_, 'requires integer: %s' % exp)
+            ival_ = self.gds_parse_integer(sval_, node, 'albumReleasedate')
             ival_ = self.gds_validate_integer(ival_, node, 'albumReleasedate')
             self.albumReleasedate = ival_
+            self.albumReleasedate_nsprefix_ = child_.prefix
         elif nodeName_ == 'country':
-            country_ = child_.text
-            country_ = self.gds_validate_string(country_, node, 'country')
-            self.country = country_
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'country')
+            value_ = self.gds_validate_string(value_, node, 'country')
+            self.country = value_
+            self.country_nsprefix_ = child_.prefix
         elif nodeName_ == 'language':
-            language_ = child_.text
-            language_ = self.gds_validate_string(language_, node, 'language')
-            self.language = language_
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'language')
+            value_ = self.gds_validate_string(value_, node, 'language')
+            self.language = value_
+            self.language_nsprefix_ = child_.prefix
         elif nodeName_ == 'barCode':
-            barCode_ = child_.text
-            barCode_ = self.gds_validate_string(barCode_, node, 'barCode')
-            self.barCode = barCode_
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'barCode')
+            value_ = self.gds_validate_string(value_, node, 'barCode')
+            self.barCode = value_
+            self.barCode_nsprefix_ = child_.prefix
         elif nodeName_ == 'catalogue':
-            catalogue_ = child_.text
-            catalogue_ = self.gds_validate_string(catalogue_, node, 'catalogue')
-            self.catalogue = catalogue_
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'catalogue')
+            value_ = self.gds_validate_string(value_, node, 'catalogue')
+            self.catalogue = value_
+            self.catalogue_nsprefix_ = child_.prefix
         elif nodeName_ == 'label':
-            label_ = child_.text
-            label_ = self.gds_validate_string(label_, node, 'label')
-            self.label = label_
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'label')
+            value_ = self.gds_validate_string(value_, node, 'label')
+            self.label = value_
+            self.label_nsprefix_ = child_.prefix
 # end class album
 
 
 class similarGenresTagList(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
     subclass = None
     superclass = None
-    def __init__(self, similarGenreTag=None):
+    def __init__(self, similarGenreTag=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = None
         if similarGenreTag is None:
             self.similarGenreTag = []
         else:
             self.similarGenreTag = similarGenreTag
+        self.similarGenreTag_nsprefix_ = None
     def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, similarGenresTagList)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
         if similarGenresTagList.subclass:
             return similarGenresTagList.subclass(*args_, **kwargs_)
         else:
             return similarGenresTagList(*args_, **kwargs_)
     factory = staticmethod(factory)
-    def get_similarGenreTag(self): return self.similarGenreTag
-    def set_similarGenreTag(self, similarGenreTag): self.similarGenreTag = similarGenreTag
-    def add_similarGenreTag(self, value): self.similarGenreTag.append(value)
-    def insert_similarGenreTag(self, index, value): self.similarGenreTag[index] = value
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_similarGenreTag(self):
+        return self.similarGenreTag
+    def set_similarGenreTag(self, similarGenreTag):
+        self.similarGenreTag = similarGenreTag
+    def add_similarGenreTag(self, value):
+        self.similarGenreTag.append(value)
+    def insert_similarGenreTag_at(self, index, value):
+        self.similarGenreTag.insert(index, value)
+    def replace_similarGenreTag_at(self, index, value):
+        self.similarGenreTag[index] = value
     def hasContent_(self):
         if (
             self.similarGenreTag
-            ):
+        ):
             return True
         else:
             return False
-    def export(self, outfile, level, namespace_='', name_='similarGenresTagList', namespacedef_='', pretty_print=True):
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='similarGenresTagList', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('similarGenresTagList')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
         if pretty_print:
             eol_ = '\n'
         else:
             eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'similarGenresTagList':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
         showIndent(outfile, level, pretty_print)
-        outfile.write('<%s%s%s' % (namespace_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
         already_processed = set()
-        self.exportAttributes(outfile, level, already_processed, namespace_, name_='similarGenresTagList')
+        self.exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='similarGenresTagList')
         if self.hasContent_():
             outfile.write('>%s' % (eol_, ))
-            self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+            self.exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='similarGenresTagList', pretty_print=pretty_print)
             showIndent(outfile, level, pretty_print)
-            outfile.write('</%s%s>%s' % (namespace_, name_, eol_))
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
         else:
             outfile.write('/>%s' % (eol_, ))
-    def exportAttributes(self, outfile, level, already_processed, namespace_='', name_='similarGenresTagList'):
+    def exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='similarGenresTagList'):
         pass
-    def exportChildren(self, outfile, level, namespace_='', name_='similarGenresTagList', fromsubclass_=False, pretty_print=True):
+    def exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='similarGenresTagList', fromsubclass_=False, pretty_print=True):
         if pretty_print:
             eol_ = '\n'
         else:
             eol_ = ''
         for similarGenreTag_ in self.similarGenreTag:
-            similarGenreTag_.export(outfile, level, namespace_, name_='similarGenreTag', pretty_print=pretty_print)
-    def exportLiteral(self, outfile, level, name_='similarGenresTagList'):
-        level += 1
+            namespaceprefix_ = self.similarGenreTag_nsprefix_ + ':' if (UseCapturedNS_ and self.similarGenreTag_nsprefix_) else ''
+            similarGenreTag_.export(outfile, level, namespaceprefix_, namespacedef_='', name_='similarGenreTag', pretty_print=pretty_print)
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
         already_processed = set()
-        self.exportLiteralAttributes(outfile, level, already_processed, name_)
-        if self.hasContent_():
-            self.exportLiteralChildren(outfile, level, name_)
-    def exportLiteralAttributes(self, outfile, level, already_processed, name_):
-        pass
-    def exportLiteralChildren(self, outfile, level, name_):
-        showIndent(outfile, level)
-        outfile.write('similarGenreTag=[\n')
-        level += 1
-        for similarGenreTag_ in self.similarGenreTag:
-            showIndent(outfile, level)
-            outfile.write('model_.similarGenreTag(\n')
-            similarGenreTag_.exportLiteral(outfile, level)
-            showIndent(outfile, level)
-            outfile.write('),\n')
-        level -= 1
-        showIndent(outfile, level)
-        outfile.write('],\n')
-    def build(self, node):
-        already_processed = set()
+        self.ns_prefix_ = node.prefix
         self.buildAttributes(node, node.attrib, already_processed)
         for child in node:
             nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
-            self.buildChildren(child, node, nodeName_)
+            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
     def buildAttributes(self, node, attrs, already_processed):
         pass
-    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False):
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
         if nodeName_ == 'similarGenreTag':
-            obj_ = similarGenreTag.factory()
-            obj_.build(child_)
+            obj_ = similarGenreTag.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
             self.similarGenreTag.append(obj_)
+            obj_.original_tagname_ = 'similarGenreTag'
 # end class similarGenresTagList
 
 
 class similarGenreTag(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
     subclass = None
     superclass = None
-    def __init__(self, genreTagName=None, genreTagScore=None, genreTagId=None):
+    def __init__(self, genreTagName=None, genreTagScore=None, genreTagId=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = None
         self.genreTagName = genreTagName
+        self.genreTagName_nsprefix_ = None
         self.genreTagScore = genreTagScore
+        self.genreTagScore_nsprefix_ = None
         self.genreTagId = genreTagId
+        self.genreTagId_nsprefix_ = None
     def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, similarGenreTag)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
         if similarGenreTag.subclass:
             return similarGenreTag.subclass(*args_, **kwargs_)
         else:
             return similarGenreTag(*args_, **kwargs_)
     factory = staticmethod(factory)
-    def get_genreTagName(self): return self.genreTagName
-    def set_genreTagName(self, genreTagName): self.genreTagName = genreTagName
-    def get_genreTagScore(self): return self.genreTagScore
-    def set_genreTagScore(self, genreTagScore): self.genreTagScore = genreTagScore
-    def get_genreTagId(self): return self.genreTagId
-    def set_genreTagId(self, genreTagId): self.genreTagId = genreTagId
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_genreTagName(self):
+        return self.genreTagName
+    def set_genreTagName(self, genreTagName):
+        self.genreTagName = genreTagName
+    def get_genreTagScore(self):
+        return self.genreTagScore
+    def set_genreTagScore(self, genreTagScore):
+        self.genreTagScore = genreTagScore
+    def get_genreTagId(self):
+        return self.genreTagId
+    def set_genreTagId(self, genreTagId):
+        self.genreTagId = genreTagId
     def hasContent_(self):
         if (
             self.genreTagName is not None or
             self.genreTagScore is not None or
             self.genreTagId is not None
-            ):
+        ):
             return True
         else:
             return False
-    def export(self, outfile, level, namespace_='', name_='similarGenreTag', namespacedef_='', pretty_print=True):
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='similarGenreTag', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('similarGenreTag')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
         if pretty_print:
             eol_ = '\n'
         else:
             eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'similarGenreTag':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
         showIndent(outfile, level, pretty_print)
-        outfile.write('<%s%s%s' % (namespace_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
         already_processed = set()
-        self.exportAttributes(outfile, level, already_processed, namespace_, name_='similarGenreTag')
+        self.exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='similarGenreTag')
         if self.hasContent_():
             outfile.write('>%s' % (eol_, ))
-            self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+            self.exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='similarGenreTag', pretty_print=pretty_print)
             showIndent(outfile, level, pretty_print)
-            outfile.write('</%s%s>%s' % (namespace_, name_, eol_))
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
         else:
             outfile.write('/>%s' % (eol_, ))
-    def exportAttributes(self, outfile, level, already_processed, namespace_='', name_='similarGenreTag'):
+    def exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='similarGenreTag'):
         pass
-    def exportChildren(self, outfile, level, namespace_='', name_='similarGenreTag', fromsubclass_=False, pretty_print=True):
+    def exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='similarGenreTag', fromsubclass_=False, pretty_print=True):
         if pretty_print:
             eol_ = '\n'
         else:
             eol_ = ''
         if self.genreTagName is not None:
+            namespaceprefix_ = self.genreTagName_nsprefix_ + ':' if (UseCapturedNS_ and self.genreTagName_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%sgenreTagName>%s</%sgenreTagName>%s' % (namespace_, self.gds_format_string(quote_xml(self.genreTagName).encode(ExternalEncoding), input_name='genreTagName'), namespace_, eol_))
+            outfile.write('<%sgenreTagName>%s</%sgenreTagName>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.genreTagName), input_name='genreTagName')), namespaceprefix_ , eol_))
         if self.genreTagScore is not None:
+            namespaceprefix_ = self.genreTagScore_nsprefix_ + ':' if (UseCapturedNS_ and self.genreTagScore_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%sgenreTagScore>%s</%sgenreTagScore>%s' % (namespace_, self.gds_format_float(self.genreTagScore, input_name='genreTagScore'), namespace_, eol_))
+            outfile.write('<%sgenreTagScore>%s</%sgenreTagScore>%s' % (namespaceprefix_ , self.gds_format_decimal(self.genreTagScore, input_name='genreTagScore'), namespaceprefix_ , eol_))
         if self.genreTagId is not None:
+            namespaceprefix_ = self.genreTagId_nsprefix_ + ':' if (UseCapturedNS_ and self.genreTagId_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%sgenreTagId>%s</%sgenreTagId>%s' % (namespace_, self.gds_format_integer(self.genreTagId, input_name='genreTagId'), namespace_, eol_))
-    def exportLiteral(self, outfile, level, name_='similarGenreTag'):
-        level += 1
+            outfile.write('<%sgenreTagId>%s</%sgenreTagId>%s' % (namespaceprefix_ , self.gds_format_integer(self.genreTagId, input_name='genreTagId'), namespaceprefix_ , eol_))
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
         already_processed = set()
-        self.exportLiteralAttributes(outfile, level, already_processed, name_)
-        if self.hasContent_():
-            self.exportLiteralChildren(outfile, level, name_)
-    def exportLiteralAttributes(self, outfile, level, already_processed, name_):
-        pass
-    def exportLiteralChildren(self, outfile, level, name_):
-        if self.genreTagName is not None:
-            showIndent(outfile, level)
-            outfile.write('genreTagName=%s,\n' % quote_python(self.genreTagName).encode(ExternalEncoding))
-        if self.genreTagScore is not None:
-            showIndent(outfile, level)
-            outfile.write('genreTagScore=%f,\n' % self.genreTagScore)
-        if self.genreTagId is not None:
-            showIndent(outfile, level)
-            outfile.write('genreTagId=%d,\n' % self.genreTagId)
-    def build(self, node):
-        already_processed = set()
+        self.ns_prefix_ = node.prefix
         self.buildAttributes(node, node.attrib, already_processed)
         for child in node:
             nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
-            self.buildChildren(child, node, nodeName_)
+            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
     def buildAttributes(self, node, attrs, already_processed):
         pass
-    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False):
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
         if nodeName_ == 'genreTagName':
-            genreTagName_ = child_.text
-            genreTagName_ = self.gds_validate_string(genreTagName_, node, 'genreTagName')
-            self.genreTagName = genreTagName_
-        elif nodeName_ == 'genreTagScore':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'genreTagName')
+            value_ = self.gds_validate_string(value_, node, 'genreTagName')
+            self.genreTagName = value_
+            self.genreTagName_nsprefix_ = child_.prefix
+        elif nodeName_ == 'genreTagScore' and child_.text:
             sval_ = child_.text
-            try:
-                fval_ = float(sval_)
-            except (TypeError, ValueError), exp:
-                raise_parse_error(child_, 'requires float or double: %s' % exp)
-            fval_ = self.gds_validate_float(fval_, node, 'genreTagScore')
+            fval_ = self.gds_parse_decimal(sval_, node, 'genreTagScore')
+            fval_ = self.gds_validate_decimal(fval_, node, 'genreTagScore')
             self.genreTagScore = fval_
-        elif nodeName_ == 'genreTagId':
+            self.genreTagScore_nsprefix_ = child_.prefix
+        elif nodeName_ == 'genreTagId' and child_.text:
             sval_ = child_.text
-            try:
-                ival_ = int(sval_)
-            except (TypeError, ValueError), exp:
-                raise_parse_error(child_, 'requires integer: %s' % exp)
+            ival_ = self.gds_parse_integer(sval_, node, 'genreTagId')
             ival_ = self.gds_validate_integer(ival_, node, 'genreTagId')
             self.genreTagId = ival_
+            self.genreTagId_nsprefix_ = child_.prefix
 # end class similarGenreTag
 
 
 class similarArtistList(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
     subclass = None
     superclass = None
-    def __init__(self, similarArtist=None):
+    def __init__(self, similarArtist=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = None
         if similarArtist is None:
             self.similarArtist = []
         else:
             self.similarArtist = similarArtist
+        self.similarArtist_nsprefix_ = None
     def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, similarArtistList)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
         if similarArtistList.subclass:
             return similarArtistList.subclass(*args_, **kwargs_)
         else:
             return similarArtistList(*args_, **kwargs_)
     factory = staticmethod(factory)
-    def get_similarArtist(self): return self.similarArtist
-    def set_similarArtist(self, similarArtist): self.similarArtist = similarArtist
-    def add_similarArtist(self, value): self.similarArtist.append(value)
-    def insert_similarArtist(self, index, value): self.similarArtist[index] = value
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_similarArtist(self):
+        return self.similarArtist
+    def set_similarArtist(self, similarArtist):
+        self.similarArtist = similarArtist
+    def add_similarArtist(self, value):
+        self.similarArtist.append(value)
+    def insert_similarArtist_at(self, index, value):
+        self.similarArtist.insert(index, value)
+    def replace_similarArtist_at(self, index, value):
+        self.similarArtist[index] = value
     def hasContent_(self):
         if (
             self.similarArtist
-            ):
+        ):
             return True
         else:
             return False
-    def export(self, outfile, level, namespace_='', name_='similarArtistList', namespacedef_='', pretty_print=True):
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='similarArtistList', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('similarArtistList')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
         if pretty_print:
             eol_ = '\n'
         else:
             eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'similarArtistList':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
         showIndent(outfile, level, pretty_print)
-        outfile.write('<%s%s%s' % (namespace_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
         already_processed = set()
-        self.exportAttributes(outfile, level, already_processed, namespace_, name_='similarArtistList')
+        self.exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='similarArtistList')
         if self.hasContent_():
             outfile.write('>%s' % (eol_, ))
-            self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+            self.exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='similarArtistList', pretty_print=pretty_print)
             showIndent(outfile, level, pretty_print)
-            outfile.write('</%s%s>%s' % (namespace_, name_, eol_))
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
         else:
             outfile.write('/>%s' % (eol_, ))
-    def exportAttributes(self, outfile, level, already_processed, namespace_='', name_='similarArtistList'):
+    def exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='similarArtistList'):
         pass
-    def exportChildren(self, outfile, level, namespace_='', name_='similarArtistList', fromsubclass_=False, pretty_print=True):
+    def exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='similarArtistList', fromsubclass_=False, pretty_print=True):
         if pretty_print:
             eol_ = '\n'
         else:
             eol_ = ''
         for similarArtist_ in self.similarArtist:
-            similarArtist_.export(outfile, level, namespace_, name_='similarArtist', pretty_print=pretty_print)
-    def exportLiteral(self, outfile, level, name_='similarArtistList'):
-        level += 1
+            namespaceprefix_ = self.similarArtist_nsprefix_ + ':' if (UseCapturedNS_ and self.similarArtist_nsprefix_) else ''
+            similarArtist_.export(outfile, level, namespaceprefix_, namespacedef_='', name_='similarArtist', pretty_print=pretty_print)
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
         already_processed = set()
-        self.exportLiteralAttributes(outfile, level, already_processed, name_)
-        if self.hasContent_():
-            self.exportLiteralChildren(outfile, level, name_)
-    def exportLiteralAttributes(self, outfile, level, already_processed, name_):
-        pass
-    def exportLiteralChildren(self, outfile, level, name_):
-        showIndent(outfile, level)
-        outfile.write('similarArtist=[\n')
-        level += 1
-        for similarArtist_ in self.similarArtist:
-            showIndent(outfile, level)
-            outfile.write('model_.similarArtist(\n')
-            similarArtist_.exportLiteral(outfile, level)
-            showIndent(outfile, level)
-            outfile.write('),\n')
-        level -= 1
-        showIndent(outfile, level)
-        outfile.write('],\n')
-    def build(self, node):
-        already_processed = set()
+        self.ns_prefix_ = node.prefix
         self.buildAttributes(node, node.attrib, already_processed)
         for child in node:
             nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
-            self.buildChildren(child, node, nodeName_)
+            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
     def buildAttributes(self, node, attrs, already_processed):
         pass
-    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False):
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
         if nodeName_ == 'similarArtist':
-            obj_ = similarArtist.factory()
-            obj_.build(child_)
+            obj_ = similarArtist.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
             self.similarArtist.append(obj_)
+            obj_.original_tagname_ = 'similarArtist'
 # end class similarArtistList
 
 
 class similarArtist(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
     subclass = None
     superclass = None
-    def __init__(self, similarArtistName=None, similarArtistScore=None, similarArtistId=None):
+    def __init__(self, similarArtistName=None, similarArtistScore=None, similarArtistId=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = None
         self.similarArtistName = similarArtistName
+        self.similarArtistName_nsprefix_ = None
         self.similarArtistScore = similarArtistScore
+        self.similarArtistScore_nsprefix_ = None
         self.similarArtistId = similarArtistId
+        self.similarArtistId_nsprefix_ = None
     def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, similarArtist)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
         if similarArtist.subclass:
             return similarArtist.subclass(*args_, **kwargs_)
         else:
             return similarArtist(*args_, **kwargs_)
     factory = staticmethod(factory)
-    def get_similarArtistName(self): return self.similarArtistName
-    def set_similarArtistName(self, similarArtistName): self.similarArtistName = similarArtistName
-    def get_similarArtistScore(self): return self.similarArtistScore
-    def set_similarArtistScore(self, similarArtistScore): self.similarArtistScore = similarArtistScore
-    def get_similarArtistId(self): return self.similarArtistId
-    def set_similarArtistId(self, similarArtistId): self.similarArtistId = similarArtistId
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_similarArtistName(self):
+        return self.similarArtistName
+    def set_similarArtistName(self, similarArtistName):
+        self.similarArtistName = similarArtistName
+    def get_similarArtistScore(self):
+        return self.similarArtistScore
+    def set_similarArtistScore(self, similarArtistScore):
+        self.similarArtistScore = similarArtistScore
+    def get_similarArtistId(self):
+        return self.similarArtistId
+    def set_similarArtistId(self, similarArtistId):
+        self.similarArtistId = similarArtistId
     def hasContent_(self):
         if (
             self.similarArtistName is not None or
             self.similarArtistScore is not None or
             self.similarArtistId is not None
-            ):
+        ):
             return True
         else:
             return False
-    def export(self, outfile, level, namespace_='', name_='similarArtist', namespacedef_='', pretty_print=True):
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='similarArtist', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('similarArtist')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
         if pretty_print:
             eol_ = '\n'
         else:
             eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'similarArtist':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
         showIndent(outfile, level, pretty_print)
-        outfile.write('<%s%s%s' % (namespace_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
         already_processed = set()
-        self.exportAttributes(outfile, level, already_processed, namespace_, name_='similarArtist')
+        self.exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='similarArtist')
         if self.hasContent_():
             outfile.write('>%s' % (eol_, ))
-            self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+            self.exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='similarArtist', pretty_print=pretty_print)
             showIndent(outfile, level, pretty_print)
-            outfile.write('</%s%s>%s' % (namespace_, name_, eol_))
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
         else:
             outfile.write('/>%s' % (eol_, ))
-    def exportAttributes(self, outfile, level, already_processed, namespace_='', name_='similarArtist'):
+    def exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='similarArtist'):
         pass
-    def exportChildren(self, outfile, level, namespace_='', name_='similarArtist', fromsubclass_=False, pretty_print=True):
+    def exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='similarArtist', fromsubclass_=False, pretty_print=True):
         if pretty_print:
             eol_ = '\n'
         else:
             eol_ = ''
         if self.similarArtistName is not None:
+            namespaceprefix_ = self.similarArtistName_nsprefix_ + ':' if (UseCapturedNS_ and self.similarArtistName_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%ssimilarArtistName>%s</%ssimilarArtistName>%s' % (namespace_, self.gds_format_string(quote_xml(self.similarArtistName).encode(ExternalEncoding), input_name='similarArtistName'), namespace_, eol_))
+            outfile.write('<%ssimilarArtistName>%s</%ssimilarArtistName>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.similarArtistName), input_name='similarArtistName')), namespaceprefix_ , eol_))
         if self.similarArtistScore is not None:
+            namespaceprefix_ = self.similarArtistScore_nsprefix_ + ':' if (UseCapturedNS_ and self.similarArtistScore_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%ssimilarArtistScore>%s</%ssimilarArtistScore>%s' % (namespace_, self.gds_format_float(self.similarArtistScore, input_name='similarArtistScore'), namespace_, eol_))
+            outfile.write('<%ssimilarArtistScore>%s</%ssimilarArtistScore>%s' % (namespaceprefix_ , self.gds_format_decimal(self.similarArtistScore, input_name='similarArtistScore'), namespaceprefix_ , eol_))
         if self.similarArtistId is not None:
+            namespaceprefix_ = self.similarArtistId_nsprefix_ + ':' if (UseCapturedNS_ and self.similarArtistId_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%ssimilarArtistId>%s</%ssimilarArtistId>%s' % (namespace_, self.gds_format_integer(self.similarArtistId, input_name='similarArtistId'), namespace_, eol_))
-    def exportLiteral(self, outfile, level, name_='similarArtist'):
-        level += 1
+            outfile.write('<%ssimilarArtistId>%s</%ssimilarArtistId>%s' % (namespaceprefix_ , self.gds_format_integer(self.similarArtistId, input_name='similarArtistId'), namespaceprefix_ , eol_))
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
         already_processed = set()
-        self.exportLiteralAttributes(outfile, level, already_processed, name_)
-        if self.hasContent_():
-            self.exportLiteralChildren(outfile, level, name_)
-    def exportLiteralAttributes(self, outfile, level, already_processed, name_):
-        pass
-    def exportLiteralChildren(self, outfile, level, name_):
-        if self.similarArtistName is not None:
-            showIndent(outfile, level)
-            outfile.write('similarArtistName=%s,\n' % quote_python(self.similarArtistName).encode(ExternalEncoding))
-        if self.similarArtistScore is not None:
-            showIndent(outfile, level)
-            outfile.write('similarArtistScore=%f,\n' % self.similarArtistScore)
-        if self.similarArtistId is not None:
-            showIndent(outfile, level)
-            outfile.write('similarArtistId=%d,\n' % self.similarArtistId)
-    def build(self, node):
-        already_processed = set()
+        self.ns_prefix_ = node.prefix
         self.buildAttributes(node, node.attrib, already_processed)
         for child in node:
             nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
-            self.buildChildren(child, node, nodeName_)
+            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
     def buildAttributes(self, node, attrs, already_processed):
         pass
-    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False):
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
         if nodeName_ == 'similarArtistName':
-            similarArtistName_ = child_.text
-            similarArtistName_ = self.gds_validate_string(similarArtistName_, node, 'similarArtistName')
-            self.similarArtistName = similarArtistName_
-        elif nodeName_ == 'similarArtistScore':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'similarArtistName')
+            value_ = self.gds_validate_string(value_, node, 'similarArtistName')
+            self.similarArtistName = value_
+            self.similarArtistName_nsprefix_ = child_.prefix
+        elif nodeName_ == 'similarArtistScore' and child_.text:
             sval_ = child_.text
-            try:
-                fval_ = float(sval_)
-            except (TypeError, ValueError), exp:
-                raise_parse_error(child_, 'requires float or double: %s' % exp)
-            fval_ = self.gds_validate_float(fval_, node, 'similarArtistScore')
+            fval_ = self.gds_parse_decimal(sval_, node, 'similarArtistScore')
+            fval_ = self.gds_validate_decimal(fval_, node, 'similarArtistScore')
             self.similarArtistScore = fval_
-        elif nodeName_ == 'similarArtistId':
+            self.similarArtistScore_nsprefix_ = child_.prefix
+        elif nodeName_ == 'similarArtistId' and child_.text:
             sval_ = child_.text
-            try:
-                ival_ = int(sval_)
-            except (TypeError, ValueError), exp:
-                raise_parse_error(child_, 'requires integer: %s' % exp)
+            ival_ = self.gds_parse_integer(sval_, node, 'similarArtistId')
             ival_ = self.gds_validate_integer(ival_, node, 'similarArtistId')
             self.similarArtistId = ival_
+            self.similarArtistId_nsprefix_ = child_.prefix
 # end class similarArtist
 
 
 class youtubeList(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
     subclass = None
     superclass = None
-    def __init__(self, video=None):
+    def __init__(self, video=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = None
         if video is None:
             self.video = []
         else:
             self.video = video
+        self.video_nsprefix_ = None
     def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, youtubeList)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
         if youtubeList.subclass:
             return youtubeList.subclass(*args_, **kwargs_)
         else:
             return youtubeList(*args_, **kwargs_)
     factory = staticmethod(factory)
-    def get_video(self): return self.video
-    def set_video(self, video): self.video = video
-    def add_video(self, value): self.video.append(value)
-    def insert_video(self, index, value): self.video[index] = value
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_video(self):
+        return self.video
+    def set_video(self, video):
+        self.video = video
+    def add_video(self, value):
+        self.video.append(value)
+    def insert_video_at(self, index, value):
+        self.video.insert(index, value)
+    def replace_video_at(self, index, value):
+        self.video[index] = value
     def hasContent_(self):
         if (
             self.video
-            ):
+        ):
             return True
         else:
             return False
-    def export(self, outfile, level, namespace_='', name_='youtubeList', namespacedef_='', pretty_print=True):
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='youtubeList', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('youtubeList')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
         if pretty_print:
             eol_ = '\n'
         else:
             eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'youtubeList':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
         showIndent(outfile, level, pretty_print)
-        outfile.write('<%s%s%s' % (namespace_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
         already_processed = set()
-        self.exportAttributes(outfile, level, already_processed, namespace_, name_='youtubeList')
+        self.exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='youtubeList')
         if self.hasContent_():
             outfile.write('>%s' % (eol_, ))
-            self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+            self.exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='youtubeList', pretty_print=pretty_print)
             showIndent(outfile, level, pretty_print)
-            outfile.write('</%s%s>%s' % (namespace_, name_, eol_))
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
         else:
             outfile.write('/>%s' % (eol_, ))
-    def exportAttributes(self, outfile, level, already_processed, namespace_='', name_='youtubeList'):
+    def exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='youtubeList'):
         pass
-    def exportChildren(self, outfile, level, namespace_='', name_='youtubeList', fromsubclass_=False, pretty_print=True):
+    def exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='youtubeList', fromsubclass_=False, pretty_print=True):
         if pretty_print:
             eol_ = '\n'
         else:
             eol_ = ''
         for video_ in self.video:
-            video_.export(outfile, level, namespace_, name_='video', pretty_print=pretty_print)
-    def exportLiteral(self, outfile, level, name_='youtubeList'):
-        level += 1
+            namespaceprefix_ = self.video_nsprefix_ + ':' if (UseCapturedNS_ and self.video_nsprefix_) else ''
+            video_.export(outfile, level, namespaceprefix_, namespacedef_='', name_='video', pretty_print=pretty_print)
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
         already_processed = set()
-        self.exportLiteralAttributes(outfile, level, already_processed, name_)
-        if self.hasContent_():
-            self.exportLiteralChildren(outfile, level, name_)
-    def exportLiteralAttributes(self, outfile, level, already_processed, name_):
-        pass
-    def exportLiteralChildren(self, outfile, level, name_):
-        showIndent(outfile, level)
-        outfile.write('video=[\n')
-        level += 1
-        for video_ in self.video:
-            showIndent(outfile, level)
-            outfile.write('model_.video(\n')
-            video_.exportLiteral(outfile, level)
-            showIndent(outfile, level)
-            outfile.write('),\n')
-        level -= 1
-        showIndent(outfile, level)
-        outfile.write('],\n')
-    def build(self, node):
-        already_processed = set()
+        self.ns_prefix_ = node.prefix
         self.buildAttributes(node, node.attrib, already_processed)
         for child in node:
             nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
-            self.buildChildren(child, node, nodeName_)
+            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
     def buildAttributes(self, node, attrs, already_processed):
         pass
-    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False):
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
         if nodeName_ == 'video':
-            obj_ = video.factory()
-            obj_.build(child_)
+            obj_ = video.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
             self.video.append(obj_)
+            obj_.original_tagname_ = 'video'
 # end class youtubeList
 
 
 class video(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
     subclass = None
     superclass = None
-    def __init__(self, Id=None, startTime=None, endTime=None, totalTime=None, viewcountRate=None, viewcount=None, rating=None):
+    def __init__(self, Id=None, startTime=None, endTime=None, totalTime=None, viewcountRate=None, viewcount=None, rating=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = None
         self.Id = Id
+        self.Id_nsprefix_ = None
         self.startTime = startTime
+        self.startTime_nsprefix_ = None
         self.endTime = endTime
+        self.endTime_nsprefix_ = None
         self.totalTime = totalTime
+        self.totalTime_nsprefix_ = None
         self.viewcountRate = viewcountRate
+        self.viewcountRate_nsprefix_ = None
         self.viewcount = viewcount
+        self.viewcount_nsprefix_ = None
         self.rating = rating
+        self.rating_nsprefix_ = None
     def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, video)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
         if video.subclass:
             return video.subclass(*args_, **kwargs_)
         else:
             return video(*args_, **kwargs_)
     factory = staticmethod(factory)
-    def get_Id(self): return self.Id
-    def set_Id(self, Id): self.Id = Id
-    def get_startTime(self): return self.startTime
-    def set_startTime(self, startTime): self.startTime = startTime
-    def get_endTime(self): return self.endTime
-    def set_endTime(self, endTime): self.endTime = endTime
-    def get_totalTime(self): return self.totalTime
-    def set_totalTime(self, totalTime): self.totalTime = totalTime
-    def get_viewcountRate(self): return self.viewcountRate
-    def set_viewcountRate(self, viewcountRate): self.viewcountRate = viewcountRate
-    def get_viewcount(self): return self.viewcount
-    def set_viewcount(self, viewcount): self.viewcount = viewcount
-    def get_rating(self): return self.rating
-    def set_rating(self, rating): self.rating = rating
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_Id(self):
+        return self.Id
+    def set_Id(self, Id):
+        self.Id = Id
+    def get_startTime(self):
+        return self.startTime
+    def set_startTime(self, startTime):
+        self.startTime = startTime
+    def get_endTime(self):
+        return self.endTime
+    def set_endTime(self, endTime):
+        self.endTime = endTime
+    def get_totalTime(self):
+        return self.totalTime
+    def set_totalTime(self, totalTime):
+        self.totalTime = totalTime
+    def get_viewcountRate(self):
+        return self.viewcountRate
+    def set_viewcountRate(self, viewcountRate):
+        self.viewcountRate = viewcountRate
+    def get_viewcount(self):
+        return self.viewcount
+    def set_viewcount(self, viewcount):
+        self.viewcount = viewcount
+    def get_rating(self):
+        return self.rating
+    def set_rating(self, rating):
+        self.rating = rating
     def hasContent_(self):
         if (
             self.Id is not None or
@@ -4167,443 +5215,474 @@ class video(GeneratedsSuper):
             self.viewcountRate is not None or
             self.viewcount is not None or
             self.rating is not None
-            ):
+        ):
             return True
         else:
             return False
-    def export(self, outfile, level, namespace_='', name_='video', namespacedef_='', pretty_print=True):
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='video', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('video')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
         if pretty_print:
             eol_ = '\n'
         else:
             eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'video':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
         showIndent(outfile, level, pretty_print)
-        outfile.write('<%s%s%s' % (namespace_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
         already_processed = set()
-        self.exportAttributes(outfile, level, already_processed, namespace_, name_='video')
+        self.exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='video')
         if self.hasContent_():
             outfile.write('>%s' % (eol_, ))
-            self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+            self.exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='video', pretty_print=pretty_print)
             showIndent(outfile, level, pretty_print)
-            outfile.write('</%s%s>%s' % (namespace_, name_, eol_))
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
         else:
             outfile.write('/>%s' % (eol_, ))
-    def exportAttributes(self, outfile, level, already_processed, namespace_='', name_='video'):
+    def exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='video'):
         pass
-    def exportChildren(self, outfile, level, namespace_='', name_='video', fromsubclass_=False, pretty_print=True):
+    def exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='video', fromsubclass_=False, pretty_print=True):
         if pretty_print:
             eol_ = '\n'
         else:
             eol_ = ''
         if self.Id is not None:
+            namespaceprefix_ = self.Id_nsprefix_ + ':' if (UseCapturedNS_ and self.Id_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%sId>%s</%sId>%s' % (namespace_, self.gds_format_string(quote_xml(self.Id).encode(ExternalEncoding), input_name='Id'), namespace_, eol_))
+            outfile.write('<%sId>%s</%sId>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.Id), input_name='Id')), namespaceprefix_ , eol_))
         if self.startTime is not None:
+            namespaceprefix_ = self.startTime_nsprefix_ + ':' if (UseCapturedNS_ and self.startTime_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%sstartTime>%s</%sstartTime>%s' % (namespace_, self.gds_format_integer(self.startTime, input_name='startTime'), namespace_, eol_))
+            outfile.write('<%sstartTime>%s</%sstartTime>%s' % (namespaceprefix_ , self.gds_format_integer(self.startTime, input_name='startTime'), namespaceprefix_ , eol_))
         if self.endTime is not None:
+            namespaceprefix_ = self.endTime_nsprefix_ + ':' if (UseCapturedNS_ and self.endTime_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%sendTime>%s</%sendTime>%s' % (namespace_, self.gds_format_integer(self.endTime, input_name='endTime'), namespace_, eol_))
+            outfile.write('<%sendTime>%s</%sendTime>%s' % (namespaceprefix_ , self.gds_format_integer(self.endTime, input_name='endTime'), namespaceprefix_ , eol_))
         if self.totalTime is not None:
+            namespaceprefix_ = self.totalTime_nsprefix_ + ':' if (UseCapturedNS_ and self.totalTime_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%stotalTime>%s</%stotalTime>%s' % (namespace_, self.gds_format_integer(self.totalTime, input_name='totalTime'), namespace_, eol_))
+            outfile.write('<%stotalTime>%s</%stotalTime>%s' % (namespaceprefix_ , self.gds_format_integer(self.totalTime, input_name='totalTime'), namespaceprefix_ , eol_))
         if self.viewcountRate is not None:
+            namespaceprefix_ = self.viewcountRate_nsprefix_ + ':' if (UseCapturedNS_ and self.viewcountRate_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%sviewcountRate>%s</%sviewcountRate>%s' % (namespace_, self.gds_format_float(self.viewcountRate, input_name='viewcountRate'), namespace_, eol_))
+            outfile.write('<%sviewcountRate>%s</%sviewcountRate>%s' % (namespaceprefix_ , self.gds_format_decimal(self.viewcountRate, input_name='viewcountRate'), namespaceprefix_ , eol_))
         if self.viewcount is not None:
+            namespaceprefix_ = self.viewcount_nsprefix_ + ':' if (UseCapturedNS_ and self.viewcount_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%sviewcount>%s</%sviewcount>%s' % (namespace_, self.gds_format_integer(self.viewcount, input_name='viewcount'), namespace_, eol_))
+            outfile.write('<%sviewcount>%s</%sviewcount>%s' % (namespaceprefix_ , self.gds_format_integer(self.viewcount, input_name='viewcount'), namespaceprefix_ , eol_))
         if self.rating is not None:
+            namespaceprefix_ = self.rating_nsprefix_ + ':' if (UseCapturedNS_ and self.rating_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%srating>%s</%srating>%s' % (namespace_, self.gds_format_float(self.rating, input_name='rating'), namespace_, eol_))
-    def exportLiteral(self, outfile, level, name_='video'):
-        level += 1
+            outfile.write('<%srating>%s</%srating>%s' % (namespaceprefix_ , self.gds_format_decimal(self.rating, input_name='rating'), namespaceprefix_ , eol_))
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
         already_processed = set()
-        self.exportLiteralAttributes(outfile, level, already_processed, name_)
-        if self.hasContent_():
-            self.exportLiteralChildren(outfile, level, name_)
-    def exportLiteralAttributes(self, outfile, level, already_processed, name_):
-        pass
-    def exportLiteralChildren(self, outfile, level, name_):
-        if self.Id is not None:
-            showIndent(outfile, level)
-            outfile.write('Id=%s,\n' % quote_python(self.Id).encode(ExternalEncoding))
-        if self.startTime is not None:
-            showIndent(outfile, level)
-            outfile.write('startTime=%d,\n' % self.startTime)
-        if self.endTime is not None:
-            showIndent(outfile, level)
-            outfile.write('endTime=%d,\n' % self.endTime)
-        if self.totalTime is not None:
-            showIndent(outfile, level)
-            outfile.write('totalTime=%d,\n' % self.totalTime)
-        if self.viewcountRate is not None:
-            showIndent(outfile, level)
-            outfile.write('viewcountRate=%f,\n' % self.viewcountRate)
-        if self.viewcount is not None:
-            showIndent(outfile, level)
-            outfile.write('viewcount=%d,\n' % self.viewcount)
-        if self.rating is not None:
-            showIndent(outfile, level)
-            outfile.write('rating=%f,\n' % self.rating)
-    def build(self, node):
-        already_processed = set()
+        self.ns_prefix_ = node.prefix
         self.buildAttributes(node, node.attrib, already_processed)
         for child in node:
             nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
-            self.buildChildren(child, node, nodeName_)
+            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
     def buildAttributes(self, node, attrs, already_processed):
         pass
-    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False):
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
         if nodeName_ == 'Id':
-            Id_ = child_.text
-            Id_ = self.gds_validate_string(Id_, node, 'Id')
-            self.Id = Id_
-        elif nodeName_ == 'startTime':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'Id')
+            value_ = self.gds_validate_string(value_, node, 'Id')
+            self.Id = value_
+            self.Id_nsprefix_ = child_.prefix
+        elif nodeName_ == 'startTime' and child_.text:
             sval_ = child_.text
-            try:
-                ival_ = int(sval_)
-            except (TypeError, ValueError), exp:
-                raise_parse_error(child_, 'requires integer: %s' % exp)
+            ival_ = self.gds_parse_integer(sval_, node, 'startTime')
             ival_ = self.gds_validate_integer(ival_, node, 'startTime')
             self.startTime = ival_
-        elif nodeName_ == 'endTime':
+            self.startTime_nsprefix_ = child_.prefix
+        elif nodeName_ == 'endTime' and child_.text:
             sval_ = child_.text
-            try:
-                ival_ = int(sval_)
-            except (TypeError, ValueError), exp:
-                raise_parse_error(child_, 'requires integer: %s' % exp)
+            ival_ = self.gds_parse_integer(sval_, node, 'endTime')
             ival_ = self.gds_validate_integer(ival_, node, 'endTime')
             self.endTime = ival_
-        elif nodeName_ == 'totalTime':
+            self.endTime_nsprefix_ = child_.prefix
+        elif nodeName_ == 'totalTime' and child_.text:
             sval_ = child_.text
-            try:
-                ival_ = int(sval_)
-            except (TypeError, ValueError), exp:
-                raise_parse_error(child_, 'requires integer: %s' % exp)
+            ival_ = self.gds_parse_integer(sval_, node, 'totalTime')
             ival_ = self.gds_validate_integer(ival_, node, 'totalTime')
             self.totalTime = ival_
-        elif nodeName_ == 'viewcountRate':
+            self.totalTime_nsprefix_ = child_.prefix
+        elif nodeName_ == 'viewcountRate' and child_.text:
             sval_ = child_.text
-            try:
-                fval_ = float(sval_)
-            except (TypeError, ValueError), exp:
-                raise_parse_error(child_, 'requires float or double: %s' % exp)
-            fval_ = self.gds_validate_float(fval_, node, 'viewcountRate')
+            fval_ = self.gds_parse_decimal(sval_, node, 'viewcountRate')
+            fval_ = self.gds_validate_decimal(fval_, node, 'viewcountRate')
             self.viewcountRate = fval_
-        elif nodeName_ == 'viewcount':
+            self.viewcountRate_nsprefix_ = child_.prefix
+        elif nodeName_ == 'viewcount' and child_.text:
             sval_ = child_.text
-            try:
-                ival_ = int(sval_)
-            except (TypeError, ValueError), exp:
-                raise_parse_error(child_, 'requires integer: %s' % exp)
+            ival_ = self.gds_parse_integer(sval_, node, 'viewcount')
             ival_ = self.gds_validate_integer(ival_, node, 'viewcount')
             self.viewcount = ival_
-        elif nodeName_ == 'rating':
+            self.viewcount_nsprefix_ = child_.prefix
+        elif nodeName_ == 'rating' and child_.text:
             sval_ = child_.text
-            try:
-                fval_ = float(sval_)
-            except (TypeError, ValueError), exp:
-                raise_parse_error(child_, 'requires float or double: %s' % exp)
-            fval_ = self.gds_validate_float(fval_, node, 'rating')
+            fval_ = self.gds_parse_decimal(sval_, node, 'rating')
+            fval_ = self.gds_validate_decimal(fval_, node, 'rating')
             self.rating = fval_
+            self.rating_nsprefix_ = child_.prefix
 # end class video
 
 
 class soundcloudList(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
     subclass = None
     superclass = None
-    def __init__(self, audio=None):
+    def __init__(self, audio=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = None
         if audio is None:
             self.audio = []
         else:
             self.audio = audio
+        self.audio_nsprefix_ = None
     def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, soundcloudList)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
         if soundcloudList.subclass:
             return soundcloudList.subclass(*args_, **kwargs_)
         else:
             return soundcloudList(*args_, **kwargs_)
     factory = staticmethod(factory)
-    def get_audio(self): return self.audio
-    def set_audio(self, audio): self.audio = audio
-    def add_audio(self, value): self.audio.append(value)
-    def insert_audio(self, index, value): self.audio[index] = value
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_audio(self):
+        return self.audio
+    def set_audio(self, audio):
+        self.audio = audio
+    def add_audio(self, value):
+        self.audio.append(value)
+    def insert_audio_at(self, index, value):
+        self.audio.insert(index, value)
+    def replace_audio_at(self, index, value):
+        self.audio[index] = value
     def hasContent_(self):
         if (
             self.audio
-            ):
+        ):
             return True
         else:
             return False
-    def export(self, outfile, level, namespace_='', name_='soundcloudList', namespacedef_='', pretty_print=True):
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='soundcloudList', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('soundcloudList')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
         if pretty_print:
             eol_ = '\n'
         else:
             eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'soundcloudList':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
         showIndent(outfile, level, pretty_print)
-        outfile.write('<%s%s%s' % (namespace_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
         already_processed = set()
-        self.exportAttributes(outfile, level, already_processed, namespace_, name_='soundcloudList')
+        self.exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='soundcloudList')
         if self.hasContent_():
             outfile.write('>%s' % (eol_, ))
-            self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+            self.exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='soundcloudList', pretty_print=pretty_print)
             showIndent(outfile, level, pretty_print)
-            outfile.write('</%s%s>%s' % (namespace_, name_, eol_))
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
         else:
             outfile.write('/>%s' % (eol_, ))
-    def exportAttributes(self, outfile, level, already_processed, namespace_='', name_='soundcloudList'):
+    def exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='soundcloudList'):
         pass
-    def exportChildren(self, outfile, level, namespace_='', name_='soundcloudList', fromsubclass_=False, pretty_print=True):
+    def exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='soundcloudList', fromsubclass_=False, pretty_print=True):
         if pretty_print:
             eol_ = '\n'
         else:
             eol_ = ''
         for audio_ in self.audio:
-            audio_.export(outfile, level, namespace_, name_='audio', pretty_print=pretty_print)
-    def exportLiteral(self, outfile, level, name_='soundcloudList'):
-        level += 1
+            namespaceprefix_ = self.audio_nsprefix_ + ':' if (UseCapturedNS_ and self.audio_nsprefix_) else ''
+            audio_.export(outfile, level, namespaceprefix_, namespacedef_='', name_='audio', pretty_print=pretty_print)
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
         already_processed = set()
-        self.exportLiteralAttributes(outfile, level, already_processed, name_)
-        if self.hasContent_():
-            self.exportLiteralChildren(outfile, level, name_)
-    def exportLiteralAttributes(self, outfile, level, already_processed, name_):
-        pass
-    def exportLiteralChildren(self, outfile, level, name_):
-        showIndent(outfile, level)
-        outfile.write('audio=[\n')
-        level += 1
-        for audio_ in self.audio:
-            showIndent(outfile, level)
-            outfile.write('model_.audio(\n')
-            audio_.exportLiteral(outfile, level)
-            showIndent(outfile, level)
-            outfile.write('),\n')
-        level -= 1
-        showIndent(outfile, level)
-        outfile.write('],\n')
-    def build(self, node):
-        already_processed = set()
+        self.ns_prefix_ = node.prefix
         self.buildAttributes(node, node.attrib, already_processed)
         for child in node:
             nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
-            self.buildChildren(child, node, nodeName_)
+            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
     def buildAttributes(self, node, attrs, already_processed):
         pass
-    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False):
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
         if nodeName_ == 'audio':
-            obj_ = audio.factory()
-            obj_.build(child_)
+            obj_ = audio.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
             self.audio.append(obj_)
+            obj_.original_tagname_ = 'audio'
 # end class soundcloudList
 
 
 class audio(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
     subclass = None
     superclass = None
-    def __init__(self, soundcloudUrl=None, soundcloudViewcount=None, soundcloudLikes=None, soundcloudGenres=None):
+    def __init__(self, soundcloudUrl=None, soundcloudViewcount=None, soundcloudLikes=None, soundcloudGenres=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = None
         self.soundcloudUrl = soundcloudUrl
+        self.soundcloudUrl_nsprefix_ = None
         self.soundcloudViewcount = soundcloudViewcount
+        self.soundcloudViewcount_nsprefix_ = None
         self.soundcloudLikes = soundcloudLikes
+        self.soundcloudLikes_nsprefix_ = None
         self.soundcloudGenres = soundcloudGenres
+        self.soundcloudGenres_nsprefix_ = None
     def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, audio)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
         if audio.subclass:
             return audio.subclass(*args_, **kwargs_)
         else:
             return audio(*args_, **kwargs_)
     factory = staticmethod(factory)
-    def get_soundcloudUrl(self): return self.soundcloudUrl
-    def set_soundcloudUrl(self, soundcloudUrl): self.soundcloudUrl = soundcloudUrl
-    def get_soundcloudViewcount(self): return self.soundcloudViewcount
-    def set_soundcloudViewcount(self, soundcloudViewcount): self.soundcloudViewcount = soundcloudViewcount
-    def get_soundcloudLikes(self): return self.soundcloudLikes
-    def set_soundcloudLikes(self, soundcloudLikes): self.soundcloudLikes = soundcloudLikes
-    def get_soundcloudGenres(self): return self.soundcloudGenres
-    def set_soundcloudGenres(self, soundcloudGenres): self.soundcloudGenres = soundcloudGenres
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_soundcloudUrl(self):
+        return self.soundcloudUrl
+    def set_soundcloudUrl(self, soundcloudUrl):
+        self.soundcloudUrl = soundcloudUrl
+    def get_soundcloudViewcount(self):
+        return self.soundcloudViewcount
+    def set_soundcloudViewcount(self, soundcloudViewcount):
+        self.soundcloudViewcount = soundcloudViewcount
+    def get_soundcloudLikes(self):
+        return self.soundcloudLikes
+    def set_soundcloudLikes(self, soundcloudLikes):
+        self.soundcloudLikes = soundcloudLikes
+    def get_soundcloudGenres(self):
+        return self.soundcloudGenres
+    def set_soundcloudGenres(self, soundcloudGenres):
+        self.soundcloudGenres = soundcloudGenres
     def hasContent_(self):
         if (
             self.soundcloudUrl is not None or
             self.soundcloudViewcount is not None or
             self.soundcloudLikes is not None or
             self.soundcloudGenres is not None
-            ):
+        ):
             return True
         else:
             return False
-    def export(self, outfile, level, namespace_='', name_='audio', namespacedef_='', pretty_print=True):
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='audio', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('audio')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
         if pretty_print:
             eol_ = '\n'
         else:
             eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'audio':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
         showIndent(outfile, level, pretty_print)
-        outfile.write('<%s%s%s' % (namespace_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
         already_processed = set()
-        self.exportAttributes(outfile, level, already_processed, namespace_, name_='audio')
+        self.exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='audio')
         if self.hasContent_():
             outfile.write('>%s' % (eol_, ))
-            self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+            self.exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='audio', pretty_print=pretty_print)
             showIndent(outfile, level, pretty_print)
-            outfile.write('</%s%s>%s' % (namespace_, name_, eol_))
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
         else:
             outfile.write('/>%s' % (eol_, ))
-    def exportAttributes(self, outfile, level, already_processed, namespace_='', name_='audio'):
+    def exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='audio'):
         pass
-    def exportChildren(self, outfile, level, namespace_='', name_='audio', fromsubclass_=False, pretty_print=True):
+    def exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='audio', fromsubclass_=False, pretty_print=True):
         if pretty_print:
             eol_ = '\n'
         else:
             eol_ = ''
         if self.soundcloudUrl is not None:
+            namespaceprefix_ = self.soundcloudUrl_nsprefix_ + ':' if (UseCapturedNS_ and self.soundcloudUrl_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%ssoundcloudUrl>%s</%ssoundcloudUrl>%s' % (namespace_, self.gds_format_string(quote_xml(self.soundcloudUrl).encode(ExternalEncoding), input_name='soundcloudUrl'), namespace_, eol_))
+            outfile.write('<%ssoundcloudUrl>%s</%ssoundcloudUrl>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(self.soundcloudUrl), input_name='soundcloudUrl')), namespaceprefix_ , eol_))
         if self.soundcloudViewcount is not None:
+            namespaceprefix_ = self.soundcloudViewcount_nsprefix_ + ':' if (UseCapturedNS_ and self.soundcloudViewcount_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%ssoundcloudViewcount>%s</%ssoundcloudViewcount>%s' % (namespace_, self.gds_format_integer(self.soundcloudViewcount, input_name='soundcloudViewcount'), namespace_, eol_))
+            outfile.write('<%ssoundcloudViewcount>%s</%ssoundcloudViewcount>%s' % (namespaceprefix_ , self.gds_format_integer(self.soundcloudViewcount, input_name='soundcloudViewcount'), namespaceprefix_ , eol_))
         if self.soundcloudLikes is not None:
+            namespaceprefix_ = self.soundcloudLikes_nsprefix_ + ':' if (UseCapturedNS_ and self.soundcloudLikes_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%ssoundcloudLikes>%s</%ssoundcloudLikes>%s' % (namespace_, self.gds_format_integer(self.soundcloudLikes, input_name='soundcloudLikes'), namespace_, eol_))
+            outfile.write('<%ssoundcloudLikes>%s</%ssoundcloudLikes>%s' % (namespaceprefix_ , self.gds_format_integer(self.soundcloudLikes, input_name='soundcloudLikes'), namespaceprefix_ , eol_))
         if self.soundcloudGenres is not None:
-            self.soundcloudGenres.export(outfile, level, namespace_, name_='soundcloudGenres', pretty_print=pretty_print)
-    def exportLiteral(self, outfile, level, name_='audio'):
-        level += 1
+            namespaceprefix_ = self.soundcloudGenres_nsprefix_ + ':' if (UseCapturedNS_ and self.soundcloudGenres_nsprefix_) else ''
+            self.soundcloudGenres.export(outfile, level, namespaceprefix_, namespacedef_='', name_='soundcloudGenres', pretty_print=pretty_print)
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
         already_processed = set()
-        self.exportLiteralAttributes(outfile, level, already_processed, name_)
-        if self.hasContent_():
-            self.exportLiteralChildren(outfile, level, name_)
-    def exportLiteralAttributes(self, outfile, level, already_processed, name_):
-        pass
-    def exportLiteralChildren(self, outfile, level, name_):
-        if self.soundcloudUrl is not None:
-            showIndent(outfile, level)
-            outfile.write('soundcloudUrl=%s,\n' % quote_python(self.soundcloudUrl).encode(ExternalEncoding))
-        if self.soundcloudViewcount is not None:
-            showIndent(outfile, level)
-            outfile.write('soundcloudViewcount=%d,\n' % self.soundcloudViewcount)
-        if self.soundcloudLikes is not None:
-            showIndent(outfile, level)
-            outfile.write('soundcloudLikes=%d,\n' % self.soundcloudLikes)
-        if self.soundcloudGenres is not None:
-            showIndent(outfile, level)
-            outfile.write('soundcloudGenres=model_.soundcloudGenres(\n')
-            self.soundcloudGenres.exportLiteral(outfile, level)
-            showIndent(outfile, level)
-            outfile.write('),\n')
-    def build(self, node):
-        already_processed = set()
+        self.ns_prefix_ = node.prefix
         self.buildAttributes(node, node.attrib, already_processed)
         for child in node:
             nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
-            self.buildChildren(child, node, nodeName_)
+            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
     def buildAttributes(self, node, attrs, already_processed):
         pass
-    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False):
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
         if nodeName_ == 'soundcloudUrl':
-            soundcloudUrl_ = child_.text
-            soundcloudUrl_ = self.gds_validate_string(soundcloudUrl_, node, 'soundcloudUrl')
-            self.soundcloudUrl = soundcloudUrl_
-        elif nodeName_ == 'soundcloudViewcount':
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'soundcloudUrl')
+            value_ = self.gds_validate_string(value_, node, 'soundcloudUrl')
+            self.soundcloudUrl = value_
+            self.soundcloudUrl_nsprefix_ = child_.prefix
+        elif nodeName_ == 'soundcloudViewcount' and child_.text:
             sval_ = child_.text
-            try:
-                ival_ = int(sval_)
-            except (TypeError, ValueError), exp:
-                raise_parse_error(child_, 'requires integer: %s' % exp)
+            ival_ = self.gds_parse_integer(sval_, node, 'soundcloudViewcount')
             ival_ = self.gds_validate_integer(ival_, node, 'soundcloudViewcount')
             self.soundcloudViewcount = ival_
-        elif nodeName_ == 'soundcloudLikes':
+            self.soundcloudViewcount_nsprefix_ = child_.prefix
+        elif nodeName_ == 'soundcloudLikes' and child_.text:
             sval_ = child_.text
-            try:
-                ival_ = int(sval_)
-            except (TypeError, ValueError), exp:
-                raise_parse_error(child_, 'requires integer: %s' % exp)
+            ival_ = self.gds_parse_integer(sval_, node, 'soundcloudLikes')
             ival_ = self.gds_validate_integer(ival_, node, 'soundcloudLikes')
             self.soundcloudLikes = ival_
+            self.soundcloudLikes_nsprefix_ = child_.prefix
         elif nodeName_ == 'soundcloudGenres':
-            obj_ = soundcloudGenres.factory()
-            obj_.build(child_)
-            self.set_soundcloudGenres(obj_)
+            obj_ = soundcloudGenres.factory(parent_object_=self)
+            obj_.build(child_, gds_collector_=gds_collector_)
+            self.soundcloudGenres = obj_
+            obj_.original_tagname_ = 'soundcloudGenres'
 # end class audio
 
 
 class soundcloudGenres(GeneratedsSuper):
+    __hash__ = GeneratedsSuper.__hash__
     subclass = None
     superclass = None
-    def __init__(self, genreName=None):
+    def __init__(self, genreName=None, gds_collector_=None, **kwargs_):
+        self.gds_collector_ = gds_collector_
+        self.gds_elementtree_node_ = None
+        self.original_tagname_ = None
+        self.parent_object_ = kwargs_.get('parent_object_')
+        self.ns_prefix_ = None
         if genreName is None:
             self.genreName = []
         else:
             self.genreName = genreName
+        self.genreName_nsprefix_ = None
     def factory(*args_, **kwargs_):
+        if CurrentSubclassModule_ is not None:
+            subclass = getSubclassFromModule_(
+                CurrentSubclassModule_, soundcloudGenres)
+            if subclass is not None:
+                return subclass(*args_, **kwargs_)
         if soundcloudGenres.subclass:
             return soundcloudGenres.subclass(*args_, **kwargs_)
         else:
             return soundcloudGenres(*args_, **kwargs_)
     factory = staticmethod(factory)
-    def get_genreName(self): return self.genreName
-    def set_genreName(self, genreName): self.genreName = genreName
-    def add_genreName(self, value): self.genreName.append(value)
-    def insert_genreName(self, index, value): self.genreName[index] = value
+    def get_ns_prefix_(self):
+        return self.ns_prefix_
+    def set_ns_prefix_(self, ns_prefix):
+        self.ns_prefix_ = ns_prefix
+    def get_genreName(self):
+        return self.genreName
+    def set_genreName(self, genreName):
+        self.genreName = genreName
+    def add_genreName(self, value):
+        self.genreName.append(value)
+    def insert_genreName_at(self, index, value):
+        self.genreName.insert(index, value)
+    def replace_genreName_at(self, index, value):
+        self.genreName[index] = value
     def hasContent_(self):
         if (
             self.genreName
-            ):
+        ):
             return True
         else:
             return False
-    def export(self, outfile, level, namespace_='', name_='soundcloudGenres', namespacedef_='', pretty_print=True):
+    def export(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='soundcloudGenres', pretty_print=True):
+        imported_ns_def_ = GenerateDSNamespaceDefs_.get('soundcloudGenres')
+        if imported_ns_def_ is not None:
+            namespacedef_ = imported_ns_def_
         if pretty_print:
             eol_ = '\n'
         else:
             eol_ = ''
+        if self.original_tagname_ is not None and name_ == 'soundcloudGenres':
+            name_ = self.original_tagname_
+        if UseCapturedNS_ and self.ns_prefix_:
+            namespaceprefix_ = self.ns_prefix_ + ':'
         showIndent(outfile, level, pretty_print)
-        outfile.write('<%s%s%s' % (namespace_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        outfile.write('<%s%s%s' % (namespaceprefix_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
         already_processed = set()
-        self.exportAttributes(outfile, level, already_processed, namespace_, name_='soundcloudGenres')
+        self.exportAttributes(outfile, level, already_processed, namespaceprefix_, name_='soundcloudGenres')
         if self.hasContent_():
             outfile.write('>%s' % (eol_, ))
-            self.exportChildren(outfile, level + 1, namespace_, name_, pretty_print=pretty_print)
+            self.exportChildren(outfile, level + 1, namespaceprefix_, namespacedef_, name_='soundcloudGenres', pretty_print=pretty_print)
             showIndent(outfile, level, pretty_print)
-            outfile.write('</%s%s>%s' % (namespace_, name_, eol_))
+            outfile.write('</%s%s>%s' % (namespaceprefix_, name_, eol_))
         else:
             outfile.write('/>%s' % (eol_, ))
-    def exportAttributes(self, outfile, level, already_processed, namespace_='', name_='soundcloudGenres'):
+    def exportAttributes(self, outfile, level, already_processed, namespaceprefix_='', name_='soundcloudGenres'):
         pass
-    def exportChildren(self, outfile, level, namespace_='', name_='soundcloudGenres', fromsubclass_=False, pretty_print=True):
+    def exportChildren(self, outfile, level, namespaceprefix_='', namespacedef_='', name_='soundcloudGenres', fromsubclass_=False, pretty_print=True):
         if pretty_print:
             eol_ = '\n'
         else:
             eol_ = ''
         for genreName_ in self.genreName:
+            namespaceprefix_ = self.genreName_nsprefix_ + ':' if (UseCapturedNS_ and self.genreName_nsprefix_) else ''
             showIndent(outfile, level, pretty_print)
-            outfile.write('<%sgenreName>%s</%sgenreName>%s' % (namespace_, self.gds_format_string(quote_xml(genreName_).encode(ExternalEncoding), input_name='genreName'), namespace_, eol_))
-    def exportLiteral(self, outfile, level, name_='soundcloudGenres'):
-        level += 1
+            outfile.write('<%sgenreName>%s</%sgenreName>%s' % (namespaceprefix_ , self.gds_encode(self.gds_format_string(quote_xml(genreName_), input_name='genreName')), namespaceprefix_ , eol_))
+    def build(self, node, gds_collector_=None):
+        self.gds_collector_ = gds_collector_
+        if SaveElementTreeNode:
+            self.gds_elementtree_node_ = node
         already_processed = set()
-        self.exportLiteralAttributes(outfile, level, already_processed, name_)
-        if self.hasContent_():
-            self.exportLiteralChildren(outfile, level, name_)
-    def exportLiteralAttributes(self, outfile, level, already_processed, name_):
-        pass
-    def exportLiteralChildren(self, outfile, level, name_):
-        showIndent(outfile, level)
-        outfile.write('genreName=[\n')
-        level += 1
-        for genreName_ in self.genreName:
-            showIndent(outfile, level)
-            outfile.write('%s,\n' % quote_python(genreName_).encode(ExternalEncoding))
-        level -= 1
-        showIndent(outfile, level)
-        outfile.write('],\n')
-    def build(self, node):
-        already_processed = set()
+        self.ns_prefix_ = node.prefix
         self.buildAttributes(node, node.attrib, already_processed)
         for child in node:
             nodeName_ = Tag_pattern_.match(child.tag).groups()[-1]
-            self.buildChildren(child, node, nodeName_)
+            self.buildChildren(child, node, nodeName_, gds_collector_=gds_collector_)
+        return self
     def buildAttributes(self, node, attrs, already_processed):
         pass
-    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False):
+    def buildChildren(self, child_, node, nodeName_, fromsubclass_=False, gds_collector_=None):
         if nodeName_ == 'genreName':
-            genreName_ = child_.text
-            genreName_ = self.gds_validate_string(genreName_, node, 'genreName')
-            self.genreName.append(genreName_)
+            value_ = child_.text
+            value_ = self.gds_parse_string(value_, node, 'genreName')
+            value_ = self.gds_validate_string(value_, node, 'genreName')
+            self.genreName.append(value_)
+            self.genreName_nsprefix_ = child_.prefix
 # end class soundcloudGenres
 
 
@@ -4615,8 +5694,9 @@ USAGE_TEXT = """
 Usage: python <Parser>.py [ -s ] <in_xml_file>
 """
 
+
 def usage():
-    print USAGE_TEXT
+    print(USAGE_TEXT)
     sys.exit(1)
 
 
@@ -4628,78 +5708,155 @@ def get_root_tag(node):
     return tag, rootClass
 
 
-def parse(inFileName):
-    doc = parsexml_(inFileName)
+def get_required_ns_prefix_defs(rootNode):
+    '''Get all name space prefix definitions required in this XML doc.
+    Return a dictionary of definitions and a char string of definitions.
+    '''
+    nsmap = {
+        prefix: uri
+        for node in rootNode.iter()
+        for (prefix, uri) in node.nsmap.items()
+        if prefix is not None
+    }
+    namespacedefs = ' '.join([
+        'xmlns:{}="{}"'.format(prefix, uri)
+        for prefix, uri in nsmap.items()
+    ])
+    return nsmap, namespacedefs
+
+
+def parse(inFileName, silence=False, print_warnings=True):
+    global CapturedNsmap_
+    gds_collector = GdsCollector_()
+    parser = None
+    doc = parsexml_(inFileName, parser)
     rootNode = doc.getroot()
     rootTag, rootClass = get_root_tag(rootNode)
     if rootClass is None:
         rootTag = 'songs'
         rootClass = songs
     rootObj = rootClass.factory()
-    rootObj.build(rootNode)
-    # Enable Python to collect the space used by the DOM.
-    doc = None
-    '''sys.stdout.write('<?xml version="1.0" ?>\n')
-    rootObj.export(sys.stdout, 0, name_=rootTag,
-        namespacedef_='',
-        pretty_print=True)'''
+    rootObj.build(rootNode, gds_collector_=gds_collector)
+    CapturedNsmap_, namespacedefs = get_required_ns_prefix_defs(rootNode)
+    if not SaveElementTreeNode:
+        doc = None
+        rootNode = None
+    if not silence:
+        sys.stdout.write('<?xml version="1.0" ?>\n')
+        rootObj.export(
+            sys.stdout, 0, name_=rootTag,
+            namespacedef_=namespacedefs,
+            pretty_print=True)
+    if print_warnings and len(gds_collector.get_messages()) > 0:
+        separator = ('-' * 50) + '\n'
+        sys.stderr.write(separator)
+        sys.stderr.write('----- Warnings -- count: {} -----\n'.format(
+            len(gds_collector.get_messages()), ))
+        gds_collector.write_messages(sys.stderr)
+        sys.stderr.write(separator)
     return rootObj
 
 
-def parseEtree(inFileName):
-    doc = parsexml_(inFileName)
+def parseEtree(inFileName, silence=False, print_warnings=True,
+               mapping=None, nsmap=None):
+    parser = None
+    doc = parsexml_(inFileName, parser)
+    gds_collector = GdsCollector_()
     rootNode = doc.getroot()
     rootTag, rootClass = get_root_tag(rootNode)
     if rootClass is None:
         rootTag = 'songs'
         rootClass = songs
     rootObj = rootClass.factory()
-    rootObj.build(rootNode)
+    rootObj.build(rootNode, gds_collector_=gds_collector)
     # Enable Python to collect the space used by the DOM.
-    doc = None
-    rootElement = rootObj.to_etree(None, name_=rootTag)
-    content = etree_.tostring(rootElement, pretty_print=True,
-        xml_declaration=True, encoding="utf-8")
-    sys.stdout.write(content)
-    sys.stdout.write('\n')
-    return rootObj, rootElement
+    if mapping is None:
+        mapping = {}
+    rootElement = rootObj.to_etree(
+        None, name_=rootTag, mapping_=mapping, nsmap_=nsmap)
+    reverse_mapping = rootObj.gds_reverse_node_mapping(mapping)
+    if not SaveElementTreeNode:
+        doc = None
+        rootNode = None
+    if not silence:
+        content = etree_.tostring(
+            rootElement, pretty_print=True,
+            xml_declaration=True, encoding="utf-8")
+        sys.stdout.write(str(content))
+        sys.stdout.write('\n')
+    if print_warnings and len(gds_collector.get_messages()) > 0:
+        separator = ('-' * 50) + '\n'
+        sys.stderr.write(separator)
+        sys.stderr.write('----- Warnings -- count: {} -----\n'.format(
+            len(gds_collector.get_messages()), ))
+        gds_collector.write_messages(sys.stderr)
+        sys.stderr.write(separator)
+    return rootObj, rootElement, mapping, reverse_mapping
 
 
-def parseString(inString):
-    from StringIO import StringIO
-    doc = parsexml_(StringIO(inString))
-    rootNode = doc.getroot()
+def parseString(inString, silence=False, print_warnings=True):
+    '''Parse a string, create the object tree, and export it.
+
+    Arguments:
+    - inString -- A string.  This XML fragment should not start
+      with an XML declaration containing an encoding.
+    - silence -- A boolean.  If False, export the object.
+    Returns -- The root object in the tree.
+    '''
+    parser = None
+    rootNode= parsexmlstring_(inString, parser)
+    gds_collector = GdsCollector_()
     rootTag, rootClass = get_root_tag(rootNode)
     if rootClass is None:
         rootTag = 'songs'
         rootClass = songs
     rootObj = rootClass.factory()
-    rootObj.build(rootNode)
-    # Enable Python to collect the space used by the DOM.
-    doc = None
-    sys.stdout.write('<?xml version="1.0" ?>\n')
-    rootObj.export(sys.stdout, 0, name_="songs",
-        namespacedef_='')
+    rootObj.build(rootNode, gds_collector_=gds_collector)
+    if not SaveElementTreeNode:
+        rootNode = None
+    if not silence:
+        sys.stdout.write('<?xml version="1.0" ?>\n')
+        rootObj.export(
+            sys.stdout, 0, name_=rootTag,
+            namespacedef_='')
+    if print_warnings and len(gds_collector.get_messages()) > 0:
+        separator = ('-' * 50) + '\n'
+        sys.stderr.write(separator)
+        sys.stderr.write('----- Warnings -- count: {} -----\n'.format(
+            len(gds_collector.get_messages()), ))
+        gds_collector.write_messages(sys.stderr)
+        sys.stderr.write(separator)
     return rootObj
 
 
-def parseLiteral(inFileName):
-    doc = parsexml_(inFileName)
+def parseLiteral(inFileName, silence=False, print_warnings=True):
+    parser = None
+    doc = parsexml_(inFileName, parser)
+    gds_collector = GdsCollector_()
     rootNode = doc.getroot()
     rootTag, rootClass = get_root_tag(rootNode)
     if rootClass is None:
         rootTag = 'songs'
         rootClass = songs
     rootObj = rootClass.factory()
-    rootObj.build(rootNode)
+    rootObj.build(rootNode, gds_collector_=gds_collector)
     # Enable Python to collect the space used by the DOM.
-    doc = None
-    sys.stdout.write('#from songs_api import *\n\n')
-    sys.stdout.write('from datetime import datetime as datetime_\n\n')
-    sys.stdout.write('import songs_api as model_\n\n')
-    sys.stdout.write('rootObj = model_.rootTag(\n')
-    rootObj.exportLiteral(sys.stdout, 0, name_=rootTag)
-    sys.stdout.write(')\n')
+    if not SaveElementTreeNode:
+        doc = None
+        rootNode = None
+    if not silence:
+        sys.stdout.write('#from songs_api import *\n\n')
+        sys.stdout.write('import songs_api as model_\n\n')
+        sys.stdout.write('rootObj = model_.rootClass(\n')
+        rootObj.exportLiteral(sys.stdout, 0, name_=rootTag)
+        sys.stdout.write(')\n')
+    if print_warnings and len(gds_collector.get_messages()) > 0:
+        separator = ('-' * 50) + '\n'
+        sys.stderr.write(separator)
+        sys.stderr.write('----- Warnings -- count: {} -----\n'.format(
+            len(gds_collector.get_messages()), ))
+        gds_collector.write_messages(sys.stderr)
+        sys.stderr.write(separator)
     return rootObj
 
 
@@ -4715,39 +5872,9 @@ if __name__ == '__main__':
     #import pdb; pdb.set_trace()
     main()
 
+RenameMappings_ = {
+}
 
 __all__ = [
-    "album",
-    "albumList",
-    "artist",
-    "audio",
-    "connPhraseList",
-    "crawlHistory",
-    "crawlHistoryList",
-    "ftArtistList",
-    "genresCount",
-    "genresCountList",
-    "indexedArtist",
-    "indexedArtistAliasList",
-    "indexedftArtistList",
-    "level1Genres",
-    "level2Genres",
-    "level3Genres",
-    "level4Genres",
-    "level5Genres",
-    "level6Genres",
-    "level7Genres",
-    "level8Genres",
-    "level9Genres",
-    "masterGenres",
-    "masterStyles",
-    "similarArtist",
-    "similarArtistList",
-    "similarGenreTag",
-    "similarGenresTagList",
-    "songs",
-    "soundcloudGenres",
-    "soundcloudList",
-    "video",
-    "youtubeList"
-    ]
+    "songs"
+]
