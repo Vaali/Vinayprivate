@@ -51,10 +51,13 @@ class youtubedlcalls():
 
     def getyoutuberesults(self,videoid):
         url = self.__youtubebaseurl__+str(videoid)
-        ydl_opts = {}
+        ydl_opts = {
+            'noplaylist': True
+        }
         videoResult = {}
         try:
             with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+                ydl.cache.remove()
                 meta = ydl.extract_info(url, download=False)
             meta.pop('formats', None)
             meta.pop('requested_formats', None)
