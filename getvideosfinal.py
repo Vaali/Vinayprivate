@@ -28,6 +28,7 @@ from functools import partial
 import managekeys
 from songsutils import is_songname_same_artistname
 import soundcloud
+from config import IsSoundCloud
 
 
 reload(sys)
@@ -520,7 +521,7 @@ def get_song_list(directory,songs_list,full_country_list,aliases,ear_count,ear_y
                     full_country_list[curr_album['country']] = full_country_list[curr_album['country']] + 1'''
                 albumInfo['language'] = "English"
                 song['albumInfo'] = [albumInfo]
-                if(CheckifSongsExistsinSolr(song['name'],song['artistName'],song['featArtists']) == False):
+                if( IsSoundCloud == 1 or CheckifSongsExistsinSolr(song['name'],song['artistName'],song['featArtists']) == False):
                     songs_list.append(song)
                 if(song['isCompilation'] == True):
                     earlier_year_skip = True
@@ -718,7 +719,7 @@ def get_song_list_master(directory,songs_list,full_country_list,aliases,ear_coun
                             full_country_list[curr_album['country']] = full_country_list[curr_album['country']] + 1'''
                     albumInfo['language'] = "English"
                     song['albumInfo'] = [albumInfo]
-                    if(CheckifSongsExistsinSolr(song['name'],song['artistName'],song['featArtists']) == False):
+                    if( IsSoundCloud == 1 or CheckifSongsExistsinSolr(song['name'],song['artistName'],song['featArtists']) == False):
                         if(curr_rel == True):
                             release_song_list.append(song)
                         else:
@@ -844,6 +845,7 @@ def crawlArtist(directory):
     except Exception, e:
         logger_error.exception(e)
         return
+    logger_decisions.error(" -- Completed with time -- ")
     try:
         curr_time = "2020-14-33"
         curr_language = ""
@@ -920,6 +922,7 @@ def crawlArtist(directory):
     else:
         with open(directory + '/getyoutubelist_incr.txt', 'wb') as f:
 			pickle.dump(parallel_songs_list, f)
+    
     #runYoutubeApi(directory)
 
 
@@ -1249,7 +1252,10 @@ def getVideo(curr_elem,flag):
                 video1.artistalias = curr_elem['artistalias']
             video1.genres = curr_elem['genres']
             video1.styles = curr_elem['styles']
-            video1,bret = getYoutubeUrl(video1,flag,0)
+            if( IsSoundCloud == 1):
+                video1,bret = getsoundcloudId(video1,flag,0)
+            else:
+                video1,bret = getYoutubeUrl(video1,flag,0)
             if(video1 != None):
                 video1.artist_id = curr_elem['artist_id']
             #print curr_elem['artist_id']
@@ -1280,7 +1286,6 @@ class Audio(object):
 	pass
 
 
-
 def GetYearFromTitle(vid_title,song_name):
     returnYear = 0
     yearList = re.findall(r'\d\d\d\d+',vid_title)
@@ -1305,10 +1310,16 @@ def CalculateMatch(video,vid_title,vid_description,oldsong = False):
             connectorList = video.connectors
             songName = video.name
         else:
-            artistName = video.artist.artistName[0]
-            ftArtistName = video.ftArtistList.ftArtistName
-            connectorList = video.connPhraseList.connPhrase
-            songName = video.songName
+            if(IsSoundCloud == 0):
+                artistName = video['artist'].artistName[0]
+                ftArtistName = video['ftArtistList'].ftArtistName
+                connectorList = video['connPhraseList'].connPhrase
+                songName = video['songName']
+            else:
+                artistName = video.artist.artistName[0]
+                ftArtistName = video.ftArtistList.ftArtistName
+                connectorList = video.connPhraseList.connPhrase
+                songName = video.songName
 
         fList = ""
         albumname = ""
@@ -1593,10 +1604,7 @@ hq','band','audio','album','world','instrumental','intro','house','acoustic','so
         for f in ftArtistName:
             ftartist_partial.append(fuzz.partial_ratio(RemoveStemCharactersforComparison(youtubematch.lower()),RemoveStemCharactersforComparison(f.lower())))
             ftartist_setratio.append(fuzz.token_set_ratio(RemoveStemCharactersforComparison(youtubematch.lower()),RemoveStemCharactersforComparison(f.lower())))
-
-
-
-
+        
         decision = "Incorrect"
         condition = 0
         # if all substraing match is true for all and the number of words is greater than 1 for atleast one.
@@ -1756,6 +1764,186 @@ def GetArtist(artistObj):
         if(artist['join_relation'] != None):
             connList.append(artist['join_relation'])
     return artistName,artist_id,ftArtistList,connList
+
+
+def getsoundcloudId(video,flag,mostpopular):
+    global request_count
+    bret = False
+    try:
+        flist = ""
+        yearfromName = 0
+        for f in video.ftArtist:
+            ttt=f.strip("-")
+            flist = flist+" "+ttt
+        ftartists = flist
+        allArtists = video.artist.strip("-")+" "+ftartists
+        key = "MMajjeox7VxGUdf7Audm3eQuwx1oPhGY"
+        client = soundcloud.Client(client_id=key)
+        searchUrl = urllib.quote_plus(str(allArtists))+"+"+urllib.quote_plus(str(video.name))
+        print searchUrl
+        try:
+            tracks = client.get('/tracks', q=searchUrl , limit = 6);
+        except HTTPError as e:            
+            if( e.response.status_code == 403 ):
+                logger_error.error("Daily Limit Exceeded")
+            else:
+                logger_error.exception(e.message)
+            return video,bret
+        except URLError as e:
+            logger_error.exception(e.message)
+            return video,bret
+        except Exception as e:
+            logger_error.exception(e)
+            return video,bret
+        now = datetime.now()
+        try:
+            if len(tracks)!= 0:
+                i = 0
+                selectedVideoViewCount=0
+                currentVideoViewCount=0
+                iindex=-1
+                earliestindex = 9
+                selectedVideoMatch = ""
+                selectedVideoTotalMatch = 0
+                selectedVideoSongMatch = 0
+                selectedVideoArtistMatch = 0
+                selectedVideoTitle = ""
+                selectedVideoUrl = ""
+                selectedVideoDuration = 0
+                selectedVideolikes = 0
+                selectedVideodislikes = 0
+                selectedVideoPublishedDate = ""
+                selectedVideoYear = 0
+                selectedVideoid = "";
+                video.sclist=[]
+                for track in tracks:
+                    if(track.description == None):
+                        description = ""
+                    else:
+                        description = track.description
+                    [currentVideoDecision,currentVideoMatch,currentVideoTotalMatch,currentVideoSongMatch,currentVideoArtistMatch,error_str] = CalculateMatch(video,track.title,description)
+                    if( currentVideoDecision == "Incorrect" ):
+                        [ currentVideoDecision, currentVideoMatch, currentVideoTotalMatch, currentVideoSongMatch, currentVideoArtistMatch, error_str ] = CalculateMatch(video,track.title + " "+ track.user["username"], description )
+                    #print track.title
+                    #print currentVideoDecision
+                    video.errorstr = error_str
+                    if(currentVideoDecision == "correct"):# || currentVideoDecision == "Incorrect"):
+                        
+                        currentVideoYear = GetYearFromTitle(track.title,video.name)
+                        currentVideoid = track.id
+                        currentVideoViewCount = track.playback_count
+                        currentVideolikes = track.favoritings_count
+                        currentVideodislikes = 0
+                        currentVideoEmbedded = track.embeddable_by
+                        currentVideoStatus = track.streamable
+                        currentVideoTags = track.track_type
+                        currentVideoHashTags = track.tag_list
+                        currentVideoGenres = track.genre
+                        print currentVideoHashTags
+                        if(currentVideoEmbedded != 'all' or currentVideoStatus == False):
+                            continue
+                        
+                        currsc = {}
+                        selectedVideoViewCount = currentVideoViewCount
+                        selectedVideoMatch = currentVideoMatch
+                        selectedVideoTotalMatch = currentVideoTotalMatch
+                        selectedVideoSongMatch = currentVideoSongMatch
+                        selectedVideoArtistMatch = currentVideoArtistMatch
+                        selectedVideoTitle = track.title
+                        selectedVideoYear = currentVideoYear
+                        selectedVideoUrl = track.permalink_url
+                        selectedVideoPublishedDate = track.created_at.replace('/','-')
+                        selectedVideoDuration = track.duration
+                        selectedVideolikes = currentVideolikes
+                        selectedVideodislikes = currentVideodislikes
+                        selectedVideoId = currentVideoid
+
+                        currsc['ViewCount'] = selectedVideoViewCount
+                        currsc['url'] = selectedVideoUrl
+                        currsc['title'] = selectedVideoTitle
+                        currsc['id'] = selectedVideoId
+                        currsc['published'] = selectedVideoPublishedDate
+                        currsc['match'] = selectedVideoMatch
+                        currsc['tm'] = selectedVideoTotalMatch
+                        currsc['sm'] = selectedVideoSongMatch
+                        currsc['am'] = selectedVideoArtistMatch
+                        currsc['tags'] = currentVideoTags
+                        currsc['hash_tags'] = currentVideoHashTags
+                        currsc['genre'] = currentVideoGenres
+                        video.sclist.append(currsc)
+                        if (int(selectedVideoViewCount) <= int(currentVideoViewCount) and (mostpopular == 0)):
+                            iindex=i
+                        if (mostpopular == 1):
+                            iindex=i
+                            break
+                        if (selectedVideoTotalMatch == currentVideoTotalMatch and (mostpopular == 1) and int(selectedVideoViewCount) <= int(currentVideoViewCount)):
+                            iindex=i
+                    i = i + 1
+                #get the videos
+                if(iindex != -1):
+                        bret = True
+                        if(int(selectedVideolikes) !=0 and int(selectedVideodislikes)!=0):
+                            video.rating = (float(selectedVideolikes)*5)/(float(selectedVideolikes)+float(selectedVideodislikes))
+
+                        video.url = selectedVideoUrl
+                        video.match = selectedVideoMatch
+                        video.tm = selectedVideoTotalMatch
+                        video.sm = selectedVideoSongMatch
+                        video.am = selectedVideoArtistMatch
+                        video.title = selectedVideoTitle
+                        video.id = selectedVideoId
+                        #check if the earliest year present in the name of the song from youtube
+                        if(selectedVideoYear != 0):
+                            video.videoYear = selectedVideoYear
+                            if(str(video.year).split('-')[0] != ''):
+                                curr_year = int(str(video.year).split('-')[0])
+                            else:
+                                curr_year = 1001
+                            if(curr_year == 1001 or (curr_year > int(video.videoYear))):
+                                video.year = video.videoYear
+                        #check if the earliest year present in the title of the song from discogs
+                        if(yearfromName != 0):
+                            video.videoYearName = yearfromName
+                            if(str(video.year).split('-')[0] != ''):
+                                curr_year = int(str(video.year).split('-')[0])
+                            else:
+                                curr_year = 1001
+                            if(curr_year == 1001 or (curr_year > int(video.videoYearName))):
+                                video.year = video.videoYearName
+                        video.published = selectedVideoPublishedDate
+                        m = re.search(re.compile("[0-9]{4}[-][0-9]{2}[-][0-9]{2}"),video.published)
+                        n = re.search(re.compile("[0-9]{2}[:][0-9]{2}[:][0-9]{2}"),video.published)
+                        ydate = m.group()+" "+n.group()
+                        print ydate
+                        dd = ydate
+                        yy = int(str(dd)[0:4])
+                        mm = int(str(dd)[5:7])
+                        total = (now.year-yy)*12+(now.month-mm)
+                        if total < 1:
+                            total = 1
+                        video.length = selectedVideoDuration
+                        if(now.month<10):
+                            mm = '0'+str(now.month)
+                        else:
+                            mm = str(now.month)
+                        if(now.day<10):
+                            dd = '0'+str(now.day)
+                        else:
+                            dd = str(now.day)
+                        video.crawldate = str(now.year)+"-"+mm+"-"+dd
+                        video.viewcount = selectedVideoViewCount
+                        if(total != 0):
+                            video.viewcountRate = float(video.viewcount)/total
+                        
+                else:
+                        misses = 1
+        except Exception as e:
+            logger_error.exception('getsoundcloudId')
+            logger_error.exception(e)
+    except Exception as e:
+        logger_error.exception('getsoundcloudId')
+        logger_error.exception(e)
+    return video,bret
 
 
 def getYoutubeUrl(video,flag,mostpopular):
@@ -1936,6 +2124,7 @@ def getYoutubeUrl(video,flag,mostpopular):
                         video.sm = selectedVideoSongMatch
                         video.am = selectedVideoArtistMatch
                         video.title = selectedVideoTitle
+                        video.id = youtubeVideoId
                         #check if the earliest year present in the name of the song from youtube
                         if(selectedVideoYear != 0):
                             video.videoYear = selectedVideoYear
