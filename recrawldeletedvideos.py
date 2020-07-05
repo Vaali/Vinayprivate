@@ -27,7 +27,9 @@ from getvideosfinal import CalculateMatch
 import loggingmodule
 import random
 import managekeys
-from songsutils import moveFiles
+from songsutils import moveFiles,movefilestodeleted
+from youtubeapis import youtubecalls,youtubedlcalls
+from config import IsYoutudeApi,RecrawlDirectory, NumberOfProcesses, RecrawlOutputDirectory
 
 reload(sys)
 sys.setdefaultencoding('utf8')
@@ -38,25 +40,6 @@ logger_crawl = loggingmodule.initialize_logger('crawlerrors','errors_recrawldele
 '''
 Utility functions
 '''
-def movefilestodeleted(filename):
-    moveFiles(filename,'deletedvideos')
-
-
-def ParseTime(time):
-	time = time.replace('PT','')
-	hours = 0
-	minutes = 0
-	seconds = 0
-	if(time.find('H') != -1):
-		hours = time[:time.find('H')]
-		time = time[time.find('H')+1:]
-	if(time.find('M')!= -1): 
-		minutes = time[:time.find('M')]
-		time = time[time.find('M')+1:]
-	if(time.find('S')!= -1):
-		seconds = time[:time.find('S')]
-		time = time[time.find('S')+1:]
-	return (((int(hours)*60)+int(minutes))*60 + int(seconds))
 	
 def getVideo(oldsong):
 	flist = ""
@@ -67,14 +50,26 @@ def getVideo(oldsong):
 		flist = flist+" "+ttt
 	ftartists = flist[1:]
 	allArtists = oldsong.artist.artistName[0].strip("-")+" "+ftartists
-	#key = "AIzaSyB34POCUa53BcFsdPURNsvm0i6AX4kqjWo"
-	key = manager.getkey()
+	oldsongdetails = {}
+	oldsongdetails['artist'] = oldsong.artist
+	oldsongdetails['ftArtistList'] = oldsong.ftArtistList
+	oldsongdetails['connPhraseList'] = oldsong.connPhraseList
+	oldsongdetails['songName'] = oldsong.songName
+	#oldsongdetails['album'] = oldsong.album
+	if(IsYoutudeApi == 1):
+		ytapi = youtubecalls(manager)
+		Video = ytapi.searchYoutube(allArtists, songName, oldsongdetails )
+	else: 
+		ytubecalls = youtubedlcalls()
+		Video = ytubecalls.searchYoutube(allArtists, songName, oldsongdetails)
+	key = "AIzaSyBTTnptHRDud60a-h3buMcPwzKhdrGZ1S0"
+	'''key = manager.getkey()
 	#print key
 	if(key == ""):
 			logger_crawl.error(manager.get_blocked_keys())
 			manager.keys_exhausted()
-			key = manager.getkey()
-	if('cover' not in songName.lower()):
+			key = manager.getkey()'''
+	'''if('cover' not in songName.lower()):
 		search_url = "https://www.googleapis.com/youtube/v3/search?part=snippet&q=allintitle%3A"+urllib.quote_plus(str(allArtists))+"+"+urllib.quote_plus(str(songName))+"+-cover&alt=json&type=video&maxResults=5&key="+key+"&videoCategoryId=10"
 		#"https://www.googleapis.com/youtube/v3/search?part=snippet&q=allintitle%3A"+urllib.quote_plus(str(allArtists))+"+"+urllib.quote_plus(str(songName))+"+-cover"+"&alt=json&type=video&channelID=UC-9-kyTW8ZkZNDHQJ6FgpwQ&maxResults=5&key="+
 	else:
@@ -94,10 +89,11 @@ def getVideo(oldsong):
 		return
 	except Exception as e:
 		logger_crawl.error(e)
-		return
+		return'''
 	now = datetime.now()
-	if searchResult.has_key('items') and len(searchResult['items'])!= 0:
-		i = 0
+	#if searchResult.has_key('items') and len(searchResult['items'])!= 0:
+	if( Video != None ):
+		'''i = 0
 		selectedVideoViewCount=0
 		currentVideoViewCount=0
 		iindex=-1	
@@ -149,30 +145,34 @@ def getVideo(oldsong):
 						selectedVideolikes = currentVideolikes
 						selectedVideodislikes = currentVideodislikes
 						iindex=i
-			i = i + 1
-		if(iindex == -1):
-			return						
-		if(int(selectedVideolikes) !=0 and int(selectedVideodislikes)!=0):
+			i = i + 1'''
+		'''if(iindex == -1):
+			return	'''					
+		'''if(int(selectedVideolikes) !=0 and int(selectedVideodislikes)!=0):
 			oldsong.rating = (float(selectedVideolikes)*5)/(float(selectedVideolikes)+float(selectedVideodislikes))
-			print oldsong.rating
-		oldsong.url = selectedVideoUrl
-		oldsong.match = selectedVideoMatch
-		oldsong.tm = selectedVideoTotalMatch
-		oldsong.sm = selectedVideoSongMatch
-		oldsong.am = selectedVideoArtistMatch
-		oldsong.title = selectedVideoTitle
-		oldsong.published = selectedVideoPublishedDate
-		oldsong.videoId = selectedVideoId
-		m = re.search(re.compile("[0-9]{4}[-][0-9]{2}[-][0-9]{2}"),oldsong.published)
-		n = re.search(re.compile("[0-9]{2}[:][0-9]{2}[:][0-9]{2}"),oldsong.published)
-		ydate = m.group()+" "+n.group()
-		dd = ydate
-		yy = int(str(dd)[0:4])
-		mm = int(str(dd)[5:7])
-		total = (now.year-yy)*12+(now.month-mm)
-		if total < 1:
-			total = 1	
-		oldsong.length = selectedVideoDuration
+			print oldsong.rating'''
+		oldsong.rating = Video['rating']
+		oldsong.url = Video['Url']
+		oldsong.match = Video['Match']
+		oldsong.tm = Video['TotalMatch']
+		oldsong.sm = Video['SongMatch']
+		oldsong.am = Video['ArtistMatch']
+		oldsong.title = Video['Title']
+		oldsong.published = Video['PublishedDate']
+		oldsong.videoId = Video['VideoId']
+		oldsong.length = Video['Duration']
+		if( IsYoutudeApi == 1):
+			m = re.search(re.compile("[0-9]{4}[-][0-9]{2}[-][0-9]{2}"),oldsong.published)
+			n = re.search(re.compile("[0-9]{2}[:][0-9]{2}[:][0-9]{2}"),oldsong.published)
+			ydate = m.group()+" "+n.group()
+			dd = ydate
+			yy = int(str(dd)[0:4])
+			mm = int(str(dd)[5:7])
+			total = (now.year-yy)*12+(now.month-mm)
+			if total < 1:
+				total = 1	
+		if('youtubedldata' in Video):
+			oldsong.set_youtubedldata(Video['youtubedldata'])
 		if(now.month<10):
 			mm = '0'+str(now.month)
 		else:
@@ -182,8 +182,12 @@ def getVideo(oldsong):
 		else:
 			dd = str(now.day)
 		oldsong.crawldate = str(now.year)+"-"+mm+"-"+dd
-		oldsong.viewcount = int(selectedVideoViewCount)
-	return oldsong
+		oldsong.viewcount = int(Video['ViewCount'])
+		return oldsong
+	else:
+		return None
+
+
 def getNewVideo(filename):
 	try:
 		print filename
@@ -208,11 +212,11 @@ def getNewVideo(filename):
 if __name__ == '__main__':
 	manager = managekeys.ManageKeys(0)
 	manager.reset_projkeys()
-	directory = raw_input("Enter directory: ")
-	outputdirectory = raw_input("Enter output directory: ")
+	directory = RecrawlDirectory
+	outputdirectory = RecrawlOutputDirectory
 	if(not os.path.exists(outputdirectory)):
 		os.mkdir(outputdirectory)
-	m = raw_input("Enter m: ")
+	m = NumberOfProcesses
 	m=int(m)
 	try:
 		filelist = glob.glob(directory+"/*.xml")
