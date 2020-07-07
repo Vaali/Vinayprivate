@@ -23,7 +23,6 @@ import os
 import logging
 from multiprocessing import Pool
 import glob
-from getvideosfinal import CalculateMatch
 import loggingmodule
 import random
 import managekeys
@@ -191,7 +190,6 @@ def getVideo(oldsong):
 def getNewVideo(filename):
 	try:
 		print filename
-		global outputdirectory
 		oldsong = api.parse(filename)
 		newsong = getVideo(oldsong)
 		if(newsong == None):
@@ -199,12 +197,12 @@ def getNewVideo(filename):
 			movefilestodeleted(filename)
 			return
 		url = newsong.url
-		filename1 = outputdirectory + "/0000" +url[-11:] + ".xml"
+		filename1 = RecrawlOutputDirectory + "/0000" +url[-11:] + ".xml"
 		fx = codecs.open(filename1,"w","utf-8")
 		fx.write('<?xml version="1.0" ?>\n')
 		newsong.export(fx,0)
 		fx.close()
-	except Exception ,e:
+	except Exception as e:
 		logger_crawl.exception(e)	
 
 #output_directory = foldername+'/deletedvideos'
