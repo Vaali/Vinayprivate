@@ -221,12 +221,16 @@ def genXML(vid,avgcnt,avgcntrece,artistId,genreCountList,artistTopGenres,country
         url = vid['url'].replace('https','http',1)
         #print url[-11:]
         if vid.has_key('published'):
-			m = re.search(re.compile("[0-9]{4}[-][0-9]{2}[-][0-9]{2}"),vid['published'])
-			n = re.search(re.compile("[0-9]{2}[:][0-9]{2}[:][0-9]{2}"),vid['published'])
-			ydate = m.group()+" "+n.group()
+            m = re.search(re.compile("[0-9]{4}[-][0-9]{2}[-][0-9]{2}"),vid['published'])
+            n = re.search(re.compile("[0-9]{2}[:][0-9]{2}[:][0-9]{2}"),vid['published'])
+            if(m != None):
+                ydate = m.group()+" "+n.group()
+            else:
+                ydate = '2001-01-01 00:00:00'
         else:
-			ydate = '0001-01-01 00:00:00'
-        mysong.set_youtubeId(url[-11:])
+			ydate = '2001-01-01 00:00:00'
+        #mysong.set_youtubeId(url[-11:])
+        mysong.set_youtubeId(str(vid['id']))
         mysong.set_artistId(int(curr_artist_id))
         mysong.set_songName(songName)	
         mysong.set_youtubeName(vid['title'])
@@ -683,13 +687,14 @@ def genXML(vid,avgcnt,avgcntrece,artistId,genreCountList,artistTopGenres,country
         for ch in [' ','/','&','.','\\',"'",'(',')','!']:
             combinedgenrestring = combinedgenrestring.replace(ch,'')
         mysong.set_genreMatch(combinedgenrestring)
-        mysong.set_duration(timedelta(seconds=int(vid['length'])))
+        '''if('length' in vid):
+            mysong.set_duration(timedelta(seconds=int(vid['length'])))'''
         if vid.has_key('viewcountRate'):
             mysong.set_viewcountRate(vid['viewcountRate'])
         path = opdir
         if not os.path.exists(path):
 			os.mkdir(path)
-        fname = path + "/0000" +url[-11:] + ".xml"
+        fname = path + "/0000" + str(vid['id']) + ".xml"
             
         if os.path.exists(fname):
             fr = codecs.open(fname,'r','utf-8')
@@ -782,7 +787,7 @@ def genXML(vid,avgcnt,avgcntrece,artistId,genreCountList,artistTopGenres,country
 	    	os.remove(fname)
 	    if not os.path.exists(failedxmls):
 		os.mkdir(failedxmls)
-	    fname = failedxmls + "/0000" +url[-11:] + ".xml"
+	    fname = failedxmls + "/0000" + str(vid['id']) + ".xml"
 	    fx = codecs.open(fname,"w","utf-8")
 	    fx.write('<?xml version="1.0" ?>\n')
 	    #mysong.export(fx,0) Apostolos Changed 0 to 1
@@ -791,7 +796,7 @@ def genXML(vid,avgcnt,avgcntrece,artistId,genreCountList,artistTopGenres,country
 	    fx.close()
     except Exception as ex:
         logger_errors.exception(ex)
-        print 'rror'
+        print ex
 
 
 
