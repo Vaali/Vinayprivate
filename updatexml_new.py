@@ -76,7 +76,7 @@ def updateXml(filename):
             logger_matrix.exception("Error")
             return
         #videoUrl = "https://www.googleapis.com/youtube/v3/videos?id="+str(oldsong.youtubeId)+"&key="+key+"&part=statistics,snippet,status"
-        videoResult = ytubecalls.getyoutuberesults(oldsong.youtubeId)
+        videoResult = ytubecalls.getyoutubevideodetails(oldsong.youtubeId)
         if(videoResult == None):
             movefilestodeleted(filename)
             return
