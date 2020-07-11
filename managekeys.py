@@ -13,7 +13,8 @@ class ManageKeys():
     proj_keys = []
     logger_managedkeys = loggingmodule.initialize_logger1('Managedkeyslog','errorkeys.log')
     def __init__(self,mode =1):
-        if(mode ==0):
+        self.proj_keys = [ "AIzaSyBTTnptHRDud60a-h3buMcPwzKhdrGZ1S0" ]
+        '''if(mode ==0):
             self.logger_managedkeys.error("Adding for recrawling")
             self.proj_keys = ["AIzaSyB34POCUa53BcFsdPURNsvm0i6AX4kqjWo","AIzaSyBA-UrozRMFbVqrBxivh5IqXzt1H9jwYSY","AIzaSyAfeaQZyCpnxmBpwIfa-DbZ1Ny9pw_rFvI","AIzaSyDz04gJUsb_9sX6CLsxiaS-AeX_toUOnhM","AIzaSyC-AJNub7xhMGFcSTcJ7IXOrQZuqfZOW00","AIzaSyCAxLZzH-AvClkqRJ5JM4WR-odnmdpFH2o","AIzaSyBXs075Y10IAhH4rlqeHYBmVuEzOeLz4xo","AIzaSyCgp8XEQfhDMFM9BoFHr8H2BSrAbBfb5U0","AIzaSyBTTnptHRDud60a-h3buMcPwzKhdrGZ1S0"] #vinay
         elif(mode ==1):
@@ -35,6 +36,7 @@ class ManageKeys():
             self.proj_keys +=['AIzaSyAqsXTQOYgI0SGevfRAfTEHndvoCPxww7E','AIzaSyBT5q85eGjeGq2oLmqv1bC3BsiwEP6Qy0Q','AIzaSyDxVtwdd-haNfcyH0-nDC_DYkq-S2Xzm9o']
             self.proj_keys +=['AIzaSyA7WqbUwpqHrEGvBlAgXNNrQtOgoyA7IP4','AIzaSyCms9Fn_Q1rv7NiW7FgBGKOdp7IAzch3b4','AIzaSyApp-IVzlwtW6GrhLu-IBq8KB-Ov4czDo4']
             self.proj_keys +=['AIzaSyCO4m_lwJpXyeT78c6s5XQV2KmOm3LAd9g','AIzaSyAJjo0VYRPgvX4GGYwpRcWoQSXzSW3j9gM','AIzaSyDV9VsHzcZeQEPqKFQEIhiPVrQdFN9SuyM']
+        '''    
 
 
 

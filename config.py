@@ -8,7 +8,7 @@ IsUpdateViewCounts = 1
 DataDirectory = 'solr_newData11_old'
 # 1 for using youtubeapi 0 for using youtube dl
 IsSoundCloud = 0
-IsYoutudeApi = 1
+IsYoutudeApi = 0
 CacheDir = '/Volumes/Secondone/sourcefiles/solr_newData11_old/newdir/cache'
 
 #recrawling

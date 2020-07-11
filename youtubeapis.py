@@ -169,7 +169,7 @@ class youtubecalls():
             selectedVideo['PublishedDate'] = ""
             selectedVideo['Year'] = 0
             selectedVideo['errorstr'] = ""
-            selectedVideo['id'] = ""
+            selectedVideo['VideoId'] = ""
             for videoresult in searchResult['items']:
                 currentVideo = {}
                 currentVideo['ViewCount']=0
@@ -208,7 +208,7 @@ class youtubecalls():
                             selectedVideo['likes'] = currentVideo['likes']
                             selectedVideo['dislikes'] = currentVideo['dislikes']
                             selectedVideo['errorstr'] = currentVideo['errorstr']
-                            selectedVideo['id'] = youtubeVideoId
+                            selectedVideo['VideoId'] = youtubeVideoId
                             iindex=i
                         if (mostpopular == 1):
                             selectedVideo['ViewCount'] = currentVideo['ViewCount']
@@ -224,7 +224,7 @@ class youtubecalls():
                             selectedVideo['likes'] = currentVideo['likes']
                             selectedVideo['dislikes'] = currentVideo['dislikes']
                             selectedVideo['errorstr'] = currentVideo['errorstr']
-                            selectedVideo['id'] = youtubeVideoId
+                            selectedVideo['VideoId'] = youtubeVideoId
                             iindex=i
                             break
                         if (selectedVideo['TotalMatch'] == currentVideo['TotalMatch'] and (mostpopular == 1) and int(selectedVideo['ViewCount']) < int(currentVideo['ViewCount'])):
@@ -241,7 +241,7 @@ class youtubecalls():
                             selectedVideo['likes'] = currentVideo['likes']
                             selectedVideo['dislikes'] = currentVideo['dislikes']
                             selectedVideo['errorstr'] = currentVideo['errorstr']
-                            selectedVideo['id'] = youtubeVideoId
+                            selectedVideo['VideoId'] = youtubeVideoId
                             iindex=i
                 i = i + 1   
         return selectedVideo
@@ -330,28 +330,98 @@ class youtubedlcalls():
             with youtube_dl.YoutubeDL(ydl_opts) as ydl:
                 meta = ydl.extract_info(url, download=False)
                 ydl.cache.remove()
-            meta.pop('formats', None)
-            meta.pop('requested_formats', None)
-            videoResult['items'] = []
-            videoEntry = {}
-            videoEntry['statistics'] = {}
-            videoEntry['snippet'] = {}
-            videoEntry['status'] = {}
-            if('view_count' in meta):
-                videoEntry['statistics']['viewCount'] = meta['view_count']
-            if('like_count' in meta):
-                videoEntry['statistics']['likeCount'] = meta['like_count']
-            if('dislike_count' in meta):
-                videoEntry['statistics']['dislikeCount'] = meta['dislike_count']
-            if('upload_date' in meta):
-                videoEntry['snippet']['publishedAt'] = meta['upload_date']
-            videoEntry['status']['privacyStatus'] = 'public'
-            videoEntry['status']['embeddable'] = True
-            videoEntry['youtubedldata'] = json.dumps(meta)
-            videoResult['items'].append(videoEntry)
-            
-            return videoResult
+                meta.pop('formats', None)
+                meta.pop('requested_formats', None)
+                videoResult['items'] = []
+                videoEntry = {}
+                videoEntry['statistics'] = {}
+                videoEntry['snippet'] = {}
+                videoEntry['status'] = {}
+                if('view_count' in meta):
+                    videoEntry['statistics']['viewCount'] = meta['view_count']
+                if('like_count' in meta):
+                    videoEntry['statistics']['likeCount'] = meta['like_count']
+                if('dislike_count' in meta):
+                    videoEntry['statistics']['dislikeCount'] = meta['dislike_count']
+                if('upload_date' in meta):
+                    videoEntry['snippet']['publishedAt'] = meta['upload_date']
+                videoEntry['status']['privacyStatus'] = 'public'
+                videoEntry['status']['embeddable'] = True
+                videoEntry['youtubedldata'] = json.dumps(meta)
+                videoResult['items'].append(videoEntry)
+                
+                return videoResult
         except Exception as e:
             logger_youtube.exception(e)
             return None
+        return None
+    
+    def crawlyoutube(self, allArtists, songName, flag,mostpopular, oldvideodetails):
+        try:    
+            searchUrl = urllib.quote_plus(str(allArtists))+"+"+urllib.quote_plus(str(songName))
+            
+            print searchUrl
+            ydl_opts = {
+                    'noplaylist': True,
+                    'cachedir': CacheDir
+                    }
+            url = 'ytsearch10:{}'.format(searchUrl)
+            Video =None
+            with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+                meta = ydl.extract_info(url, download=False)
+                if( 'entries' in meta and len(meta['entries']) > 0 ):
+                    currentVideo = {}
+                    iindex = -1
+                    i = 0
+                    Video = {}
+                    matchedVideoList = {}
+                    Video['ViewCount'] = 0
+                    for entry in meta['entries']:
+                        searchEntry = entry
+                        searchEntry.pop('formats', None)
+                        searchEntry.pop('requested_formats', None)
+                        [currentVideo['Decision'],currentVideo['Match'],currentVideo['TotalMatch'],currentVideo['SongMatch'],currentVideo['ArtistMatch'],error_str] = CalculateMatch(oldvideodetails, searchEntry['title'],searchEntry['description'],True)
+                        if(currentVideo['Decision'] == "correct"):
+                            currentVideo['Year'] = GetYearFromTitle(searchEntry['title'],songName)
+                            matchedVideoList[i] = searchEntry
+                            youtubeVideoId = searchEntry['id']
+                            currentVideo['ViewCount'] = searchEntry['view_count']
+                            if('like_count' in searchEntry):
+                                currentVideo['likes'] = searchEntry['like_count']
+                                currentVideo['dislikes'] = searchEntry['dislike_count']
+                            else:
+                                currentVideo['likes'] = 0
+                                currentVideo['dislikes'] = 0
+                            currentVideoEmbedded = True
+                            currentVideoStatus = 'public'
+                            if (int(Video['ViewCount']) < int(currentVideo['ViewCount'])):
+                                    Video['ViewCount'] = currentVideo['ViewCount']
+                                    Video['Match'] = currentVideo['Match']
+                                    Video['TotalMatch'] = currentVideo['TotalMatch']
+                                    Video['SongMatch'] = currentVideo['SongMatch']
+                                    Video['ArtistMatch'] = currentVideo['ArtistMatch']
+                                    Video['Title'] = searchEntry['title']
+                                    Video['Url'] = "https://www.youtube.com/watch?v="+str(youtubeVideoId)
+                                    Video['VideoId'] = youtubeVideoId
+                                    Video['PublishedDate'] = searchEntry['upload_date']
+                                    Video['Duration'] = searchEntry['duration']
+                                    Video['likes'] = currentVideo['likes']
+                                    Video['dislikes'] = currentVideo['dislikes']
+                                    Video['errorstr'] = error_str
+                                    Video['Year'] = currentVideo['Year']
+                                    if(int( Video['likes'] ) !=0 and int( Video['dislikes'] )!=0):
+                                        Video['rating'] = (float(Video['likes'])*5)/(float(Video['likes'])+float(Video['dislikes']))
+                                    iindex=i
+                        i = i + 1
+            ydl.cache.remove()
+            if(iindex == -1):
+                return None
+            else:
+                matchedVideoList.pop(iindex)
+                Video['youtubedldata'] = list(matchedVideoList.values())
+                return Video
+        except Exception as e:
+            logger_youtube.exception(e)
+            return None
+
         

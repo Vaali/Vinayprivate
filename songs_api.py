@@ -5725,7 +5725,7 @@ def get_required_ns_prefix_defs(rootNode):
     return nsmap, namespacedefs
 
 
-def parse(inFileName, silence=False, print_warnings=True):
+def parse(inFileName, silence=True, print_warnings=True):
     global CapturedNsmap_
     gds_collector = GdsCollector_()
     parser = None

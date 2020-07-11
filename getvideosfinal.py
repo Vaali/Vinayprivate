@@ -1529,7 +1529,9 @@ def getYoutubeUrl(video,flag,mostpopular):
                     video.sm = selectedVideo['SongMatch']
                     video.am = selectedVideo['ArtistMatch']
                     video.title = selectedVideo['Title']
-                    video.id = selectedVideo['id']
+                    video.id = selectedVideo['VideoId']
+                    if('youtubedldata' in selectedVideo):
+                        video.youtubedldata = selectedVideo['youtubedldata']
                     #check if the earliest year present in the name of the song from youtube
                     if(selectedVideo['Year'] != 0):
                         video.videoYear = selectedVideo['Year']
@@ -1549,15 +1551,21 @@ def getYoutubeUrl(video,flag,mostpopular):
                         if(curr_year == 1001 or (curr_year > int(video.videoYearName))):
                             video.year = video.videoYearName
                     video.published = selectedVideo['PublishedDate']
-                    m = re.search(re.compile("[0-9]{4}[-][0-9]{2}[-][0-9]{2}"),video.published)
-                    n = re.search(re.compile("[0-9]{2}[:][0-9]{2}[:][0-9]{2}"),video.published)
-                    ydate = m.group()+" "+n.group()
-                    dd = ydate
+                    video.viewcount = selectedVideo['ViewCount']
+                    if( IsYoutudeApi == 1):
+                        m = re.search(re.compile("[0-9]{4}[-][0-9]{2}[-][0-9]{2}"),video.published)
+                        n = re.search(re.compile("[0-9]{2}[:][0-9]{2}[:][0-9]{2}"),video.published)
+                        ydate = m.group()+n.group()
+                        dd = ydate
+                    else:
+                        dd = video.published
                     yy = int(str(dd)[0:4])
-                    mm = int(str(dd)[5:7])
+                    mm = int(str(dd)[4:6])
                     total = (now.year-yy)*12+(now.month-mm)
                     if total < 1:
                         total = 1
+                    if(total != 0):
+                        video.viewcountRate = float(video.viewcount)/total
                     video.length = selectedVideo['Duration']
                     if(now.month<10):
                         mm = '0'+str(now.month)
@@ -1568,9 +1576,8 @@ def getYoutubeUrl(video,flag,mostpopular):
                     else:
                         dd = str(now.day)
                     video.crawldate = str(now.year)+"-"+mm+"-"+dd
-                    video.viewcount = selectedVideo['ViewCount']
-                    if(total != 0):
-                        video.viewcountRate = float(video.viewcount)/total
+                    
+                    
             else:
                     misses = 1
         except Exception as e:
