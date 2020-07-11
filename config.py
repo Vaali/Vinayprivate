@@ -16,7 +16,7 @@ RecrawlDirectory = '/Volumes/Secondone/sourcefiles/solr_newData11_old/deletedvid
 RecrawlOutputDirectory = '/Volumes/Secondone/sourcefiles/solr_newData11_old/newdir/tt'
 
 #datacrawling
-DataDirectory = 'fhiphop1'
+DiscogsDataDirectory = 'fhiphop1'
 NumberofFolders = 2
 IsCrawlingYoutube = 1
 IsIncremental = 0

@@ -274,6 +274,9 @@ class youtubedlcalls():
                     Video = {}
                     matchedVideoList = {}
                     Video['ViewCount'] = 0
+                    Video['rating'] = 0
+                    Video['likes'] = 0
+                    Video['dislikes'] = 0
                     for entry in meta['entries']:
                         searchEntry = entry
                         searchEntry.pop('formats', None)
@@ -283,11 +286,13 @@ class youtubedlcalls():
                             matchedVideoList[i] = searchEntry
                             youtubeVideoId = searchEntry['id']
                             currentVideo['ViewCount'] = searchEntry['view_count']
-                            if('like_count' in searchEntry):
+                            if('like_count' in searchEntry and searchEntry['like_count'] != None):
                                 currentVideo['likes'] = searchEntry['like_count']
-                                currentVideo['dislikes'] = searchEntry['dislike_count']
                             else:
                                 currentVideo['likes'] = 0
+                            if('dislike_count' in searchEntry and searchEntry['dislike_count'] != None):
+                                currentVideo['dislikes'] = searchEntry['dislike_count']
+                            else:
                                 currentVideo['dislikes'] = 0
                             currentVideoEmbedded = True
                             currentVideoStatus = 'public'

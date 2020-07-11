@@ -29,7 +29,7 @@ import managekeys
 from songsutils import is_songname_same_artistname, CalculateMatch, GetYearFromTitle
 import soundcloud
 from config import IsYoutudeApi,IsSoundCloud
-from config import DataDirectory, NumberOfProcesses, NumberofFolders, IsIncremental, IsCrawlingYoutube
+from config import DiscogsDataDirectory, NumberOfProcesses, NumberofFolders, IsIncremental, IsCrawlingYoutube
 from youtubeapis import youtubecalls,youtubedlcalls
 
 
@@ -1608,7 +1608,7 @@ if __name__ == '__main__':
     try:
         lastdirectory = 0
         logger_error.debug("Discogs Main Program Starting")
-        directory = DataDirectory
+        directory = DiscogsDataDirectory
         m1 = NumberOfProcesses
         folders = NumberofFolders
         folders = int(folders)
