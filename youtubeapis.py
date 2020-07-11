@@ -278,7 +278,7 @@ class youtubedlcalls():
                         searchEntry = entry
                         searchEntry.pop('formats', None)
                         searchEntry.pop('requested_formats', None)
-                        [currentVideo['Decision'],currentVideo['Match'],currentVideo['TotalMatch'],currentVideo['SongMatch'],currentVideo['ArtistMatch'],error_str] = CalculateMatch(oldvideodetails, searchEntry['title'],searchEntry['description'],True)
+                        [currentVideo['Decision'],currentVideo['Match'],currentVideo['TotalMatch'],currentVideo['SongMatch'],currentVideo['ArtistMatch'],error_str] = CalculateMatch(oldvideodetails, searchEntry['title'],searchEntry['description'],logger_youtube,True)
                         if(currentVideo['Decision'] == "correct"):
                             matchedVideoList[i] = searchEntry
                             youtubeVideoId = searchEntry['id']
@@ -380,7 +380,7 @@ class youtubedlcalls():
                         searchEntry = entry
                         searchEntry.pop('formats', None)
                         searchEntry.pop('requested_formats', None)
-                        [currentVideo['Decision'],currentVideo['Match'],currentVideo['TotalMatch'],currentVideo['SongMatch'],currentVideo['ArtistMatch'],error_str] = CalculateMatch(oldvideodetails, searchEntry['title'],searchEntry['description'],True)
+                        [currentVideo['Decision'],currentVideo['Match'],currentVideo['TotalMatch'],currentVideo['SongMatch'],currentVideo['ArtistMatch'],error_str] = CalculateMatch(oldvideodetails, searchEntry['title'],searchEntry['description'],logger_youtube, True)
                         if(currentVideo['Decision'] == "correct"):
                             currentVideo['Year'] = GetYearFromTitle(searchEntry['title'],songName)
                             matchedVideoList[i] = searchEntry
