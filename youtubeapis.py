@@ -254,16 +254,17 @@ class youtubedlcalls():
         videoResult = []
         try:
             if('cover' not in songName.lower()):
-                url = urllib.quote_plus(str(allArtists))+"+"+urllib.quote_plus(str(songName))+"+-cover"
+                url = (str(allArtists))+" "+(str(songName))+" -cover"
             else:
-                url = urllib.quote_plus(str(allArtists))+"+"+urllib.quote_plus(str(songName))
+                url = "allintitle:"+(str(allArtists))+" "+(str(songName))
 
             ydl_opts = {
                 'noplaylist': True,
-                'cachedir': CacheDir
+                'cachedir': CacheDir,
+                'ignoreerrors': True
                 }
             url = 'ytsearch5:{}'.format(url)
-            
+            print url
             with youtube_dl.YoutubeDL(ydl_opts) as ydl:
                 meta = ydl.extract_info(url, download=False)
                 ydl.cache.remove()
@@ -328,7 +329,8 @@ class youtubedlcalls():
         url = self.__youtubebaseurl__+str(videoid)
         ydl_opts = {
             'noplaylist': True,
-            'cachedir': CacheDir
+            'cachedir': CacheDir,
+            'ignoreerrors': True
         }
         videoResult = {}
         try:
@@ -363,12 +365,13 @@ class youtubedlcalls():
     
     def crawlyoutube(self, allArtists, songName, flag,mostpopular, oldvideodetails):
         try:    
-            searchUrl = urllib.quote_plus(str(allArtists))+"+"+urllib.quote_plus(str(songName))
+            searchUrl = "allintitle:"+(str(allArtists))+" "+(str(songName))
             
             print searchUrl
             ydl_opts = {
                     'noplaylist': True,
-                    'cachedir': CacheDir
+                    'cachedir': CacheDir,
+                    'ignoreerrors': True
                     }
             url = 'ytsearch10:{}'.format(searchUrl)
             Video =None
@@ -385,18 +388,21 @@ class youtubedlcalls():
                         searchEntry = entry
                         searchEntry.pop('formats', None)
                         searchEntry.pop('requested_formats', None)
-                        [currentVideo['Decision'],currentVideo['Match'],currentVideo['TotalMatch'],currentVideo['SongMatch'],currentVideo['ArtistMatch'],error_str] = CalculateMatch(oldvideodetails, searchEntry['title'],searchEntry['description'],logger_youtube, True)
+                        [currentVideo['Decision'],currentVideo['Match'],currentVideo['TotalMatch'],currentVideo['SongMatch'],currentVideo['ArtistMatch'],error_str] = CalculateMatch(oldvideodetails, searchEntry['title'],searchEntry['description'],logger_youtube)
                         if(currentVideo['Decision'] == "correct"):
                             currentVideo['Year'] = GetYearFromTitle(searchEntry['title'],songName)
                             matchedVideoList[i] = searchEntry
                             youtubeVideoId = searchEntry['id']
                             currentVideo['ViewCount'] = searchEntry['view_count']
-                            if('like_count' in searchEntry):
+                            if('like_count' in searchEntry and searchEntry['like_count'] != None):
                                 currentVideo['likes'] = searchEntry['like_count']
-                                currentVideo['dislikes'] = searchEntry['dislike_count']
                             else:
                                 currentVideo['likes'] = 0
+                            if('dislike_count' in searchEntry and searchEntry['dislike_count'] != None):
+                                currentVideo['dislikes'] = searchEntry['dislike_count']
+                            else:
                                 currentVideo['dislikes'] = 0
+                            
                             currentVideoEmbedded = True
                             currentVideoStatus = 'public'
                             if (int(Video['ViewCount']) < int(currentVideo['ViewCount'])):

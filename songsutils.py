@@ -92,6 +92,14 @@ def CalculateMatch(video,vid_title,vid_description, logger_error, oldsong = Fals
     try:
         list = ""
         conlist = ""
+        fList = ""
+        albumname = ""
+        error_str = ""
+        match =""
+        tm=0.0
+        sm=0.0
+        am=0.0
+        decision = "Incorrect"
         if(oldsong == False):
             artistName = video['artist']
             ftArtistName = video['ftArtistList']
@@ -109,14 +117,7 @@ def CalculateMatch(video,vid_title,vid_description, logger_error, oldsong = Fals
                 connectorList = video.connPhraseList.connPhrase
                 songName = video.songName
 
-        fList = ""
-        albumname = ""
-        error_str = ""
-        match =""
-        tm=0.0
-        sm=0.0
-        am=0.0
-        decision = "Incorrect"
+        
         stemwords = [ 'screen','m/v','artist','ft','featuring','live','hd','1080P','video','mix','feat','official','lyrics','music','cover','version','original','\
 hq','band','audio','album','world','instrumental','intro','house','acoustic','sound','orchestra','vs','track','project','records','extended','01','02','03','04','05','06','07','08','09','2008','prod','piano','town','disco','solo','festival','vivo','vocal','featuring','name','london','1995','soundtrack','tv','em','ti','quartet','system','single','official','top','low','special','trance','circle','stereo','videoclip','lp','quality','underground','espanol','vinyl','tribute','master','step','uk','eu','voice','promo','choir','outro','au','anthem','songs','song','digital','hour','nature','motion','sounds','sound','ballad','unplugged','singers','singer','legend','legends', 'french','strings','string','classic','cast','act','full','screen','radio','remix','song','edit','tracks','remaster','reissue','review','re-issue','trailer','studio','improvization','solo','download','tour','dvd','festival','remastered']
         '''stemwords = ['video','mix','feat','official','lyrics','music','cover','version','original','hq','band','audio','album','world','instrumental', 'intro','house','acoustic','sound','orchestra','vs','track','project','records','extended','01','02','03','04','05','06','07','08','09','2008','prod', 'piano','town','disco','solo','festival','vivo','vocal','featuring','name','london','1995','soundtrack','tv','em','ti','quartet','system','single', 'official','top','low','special','trance','circle','stereo','videoclip','lp','quality','underground','espanol','vinyl','tribute','master','step','uk','eu','voice','promo','choir','outro','au','anthem','songs','digital','hour','nature','motion','sounds','ballad','unplugged','singers','legend', 'french','strings','classic','cast','act','full','screen','radio','remix','song','edit','tracks']'''

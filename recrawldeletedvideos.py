@@ -87,7 +87,7 @@ def getVideo(oldsong):
 		if total < 1:
 			total = 1
 		if(total != 0):
-            oldsong.viewcountRate = float(oldsong.viewcount)/total	
+			oldsong.viewcountRate = float(oldsong.viewcount)/total	
 		if('youtubedldata' in Video):
 			oldsong.set_youtubedldata(Video['youtubedldata'])
 		if(now.month<10):
