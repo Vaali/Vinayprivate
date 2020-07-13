@@ -250,13 +250,16 @@ class youtubecalls():
 class youtubedlcalls():
     youtubebaseurl = 'https://www.youtube.com/watch?v='
 
-    def searchYoutube( self, allArtists, songName, oldvideodetails ):
+    def searchYoutube( self, allArtists, songName, oldvideodetails, IsAllintitle = True ):
         videoResult = []
         try:
-            if('cover' not in songName.lower()):
-                url = (str(allArtists))+" "+(str(songName))+" -cover"
-            else:
+            if( IsAllintitle ):
                 url = "allintitle:"+(str(allArtists))+" "+(str(songName))
+            else:
+                url = (str(allArtists))+" "+(str(songName))
+            
+            if('cover' not in songName.lower()):
+                url += " -cover"
 
             ydl_opts = {
                 'noplaylist': True,
@@ -363,9 +366,12 @@ class youtubedlcalls():
             return None
         return None
     
-    def crawlyoutube(self, allArtists, songName, flag,mostpopular, oldvideodetails):
-        try:    
-            searchUrl = "allintitle:"+(str(allArtists))+" "+(str(songName))
+    def crawlyoutube(self, allArtists, songName, flag,mostpopular, oldvideodetails, IsAllintitle = True ):
+        try:
+            if( IsAllintitle ):
+                searchUrl = "allintitle:"+(str(allArtists))+" "+(str(songName))
+            else:
+                searchUrl = (str(allArtists))+" "+(str(songName))
             
             print searchUrl
             ydl_opts = {

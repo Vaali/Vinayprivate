@@ -61,6 +61,10 @@ def getVideo(oldsong):
 	else: 
 		ytubecalls = youtubedlcalls()
 		Video = ytubecalls.searchYoutube(allArtists, songName, oldsongdetails)
+		if( Video == None):
+			Video = ytubecalls.searchYoutube(allArtists, songName, oldsongdetails, False)
+
+
 	now = datetime.now()
 	#if searchResult.has_key('items') and len(searchResult['items'])!= 0:
 	if( Video != None ):
