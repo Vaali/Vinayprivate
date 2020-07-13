@@ -131,6 +131,7 @@ def getNewVideo(filename):
 #getNewVideo(str(sys.argv[1]))
 if __name__ == '__main__':
 	manager = managekeys.ManageKeys(0)
+	t1=datetime.now()
 	manager.reset_projkeys()
 	directory = RecrawlDirectory
 	outputdirectory = RecrawlOutputDirectory
@@ -146,5 +147,6 @@ if __name__ == '__main__':
 		p.close()
 		p.join()
 	except Exception as e:
-		logger_crawl.exception("Error")	
-
+		logger_crawl.exception("Error")
+	t2=datetime.now()
+	print "time=" +str(t2-t1)
