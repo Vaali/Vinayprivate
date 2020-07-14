@@ -329,7 +329,7 @@ class youtubedlcalls():
 
 
     def getyoutubevideodetails(self,videoid):
-        url = self.__youtubebaseurl__+str(videoid)
+        url = self.youtubebaseurl+str(videoid)
         ydl_opts = {
             'noplaylist': True,
             'cachedir': CacheDir,
@@ -340,6 +340,8 @@ class youtubedlcalls():
             with youtube_dl.YoutubeDL(ydl_opts) as ydl:
                 meta = ydl.extract_info(url, download=False)
                 ydl.cache.remove()
+                if( meta == None ):
+                    return None
                 meta.pop('formats', None)
                 meta.pop('requested_formats', None)
                 videoResult['items'] = []
@@ -347,12 +349,16 @@ class youtubedlcalls():
                 videoEntry['statistics'] = {}
                 videoEntry['snippet'] = {}
                 videoEntry['status'] = {}
-                if('view_count' in meta):
+                if('view_count' in meta ):
                     videoEntry['statistics']['viewCount'] = meta['view_count']
-                if('like_count' in meta):
+                if('like_count' in meta and meta['like_count'] != None):
                     videoEntry['statistics']['likeCount'] = meta['like_count']
-                if('dislike_count' in meta):
+                else:
+                    videoEntry['statistics']['likeCount'] = 0
+                if('dislike_count' in meta and meta['dislike_count'] != None):
                     videoEntry['statistics']['dislikeCount'] = meta['dislike_count']
+                else:
+                    videoEntry['statistics']['dislikeCount'] = 0
                 if('upload_date' in meta):
                     videoEntry['snippet']['publishedAt'] = meta['upload_date']
                 videoEntry['status']['privacyStatus'] = 'public'
