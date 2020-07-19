@@ -271,7 +271,7 @@ class youtubedlcalls():
             with youtube_dl.YoutubeDL(ydl_opts) as ydl:
                 meta = ydl.extract_info(url, download=False)
                 ydl.cache.remove()
-                if( 'entries' in meta and len(meta['entries']) > 0 ):
+                if( meta!= None and 'entries' in meta and len(meta['entries']) > 0 ):
                     currentVideo = {}
                     iindex = -1
                     i = 0
@@ -286,6 +286,11 @@ class youtubedlcalls():
                         searchEntry.pop('formats', None)
                         searchEntry.pop('requested_formats', None)
                         [currentVideo['Decision'],currentVideo['Match'],currentVideo['TotalMatch'],currentVideo['SongMatch'],currentVideo['ArtistMatch'],error_str] = CalculateMatch(oldvideodetails, searchEntry['title'],searchEntry['description'],logger_youtube,True)
+                        if( currentVideo['Decision'] == "Incorrect" and '- Topic' in searchEntry['uploader'] ):
+                            title = searchEntry['title'] + ' - ' +  str(searchEntry['uploader'].replace('- Topic',''))
+                            print title
+                            [currentVideo['Decision'],currentVideo['Match'],currentVideo['TotalMatch'],currentVideo['SongMatch'],currentVideo['ArtistMatch'],error_str] = CalculateMatch(oldvideodetails, title,searchEntry['description'],logger_youtube,True)
+                        
                         if(currentVideo['Decision'] == "correct"):
                             matchedVideoList[i] = searchEntry
                             youtubeVideoId = searchEntry['id']
@@ -401,6 +406,12 @@ class youtubedlcalls():
                         searchEntry.pop('formats', None)
                         searchEntry.pop('requested_formats', None)
                         [currentVideo['Decision'],currentVideo['Match'],currentVideo['TotalMatch'],currentVideo['SongMatch'],currentVideo['ArtistMatch'],error_str] = CalculateMatch(oldvideodetails, searchEntry['title'],searchEntry['description'],logger_youtube)
+                        if( currentVideo['Decision'] == "Incorrect" and '- Topic' in searchEntry['uploader'] ):
+                            title = searchEntry['title'] + ' - ' +  str(searchEntry['uploader'].replace('- Topic',''))
+                            print title
+                            [currentVideo['Decision'],currentVideo['Match'],currentVideo['TotalMatch'],currentVideo['SongMatch'],currentVideo['ArtistMatch'],error_str] = CalculateMatch(oldvideodetails, title,searchEntry['description'],logger_youtube)
+                        
+
                         if(currentVideo['Decision'] == "correct"):
                             currentVideo['Year'] = GetYearFromTitle(searchEntry['title'],songName)
                             matchedVideoList[i] = searchEntry
