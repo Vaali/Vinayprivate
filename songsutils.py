@@ -521,3 +521,26 @@ hq','band','audio','album','world','instrumental','intro','house','acoustic','so
             logger_error.exception(e)
     #print error_str
     return decision,match,tm,sm,am,error_str
+
+
+def CombineAlbums(oldsong,mysong):
+	print 'CombineAlbums'
+	print oldsong.artistId
+	destList = mysong.albumList
+	sourceList = oldsong.albumList.album
+	#print sourceList
+	#print len(sourceList)
+	#albList = api.albumList()
+	#album = api.album()
+	try:
+            for album in sourceList:
+			destList.add_album(album)
+			print album.albumName
+			print album.country
+			print album.language
+			print album.barCode
+			print '-----'
+            mysong.set_albumList(destList)
+	except Exception as e:
+		print e
+	return mysong

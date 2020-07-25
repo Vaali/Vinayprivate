@@ -19,6 +19,7 @@ import time
 import operator
 from solr import SolrConnection
 from solr.core import SolrException
+from songsutils import CombineAlbums
 import loggingmodule
 
 
@@ -832,29 +833,6 @@ def GetAlias(directory):
 	for l in lines:
 		aliases.append(l.strip())
 	return aliases
-
-def CombineAlbums(oldsong,mysong):
-	print 'CombineAlbums'
-	print oldsong.artistId
-	destList = mysong.albumList
-	sourceList = oldsong.albumList.album
-	#print sourceList
-	#print len(sourceList)
-	#albList = api.albumList()
-	#album = api.album()
-	try:
-            for album in sourceList:
-			destList.add_album(album)
-			print album.albumName
-			print album.country
-			print album.language
-			print album.barCode
-			print '-----'
-            mysong.set_albumList(destList)
-	except Exception as e:
-		print e
-	return mysong
-	#print len(mysong.albumList.album)
 		
 
 def CalculateAverages(directory,topnsongs):
