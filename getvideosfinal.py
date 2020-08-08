@@ -1491,7 +1491,7 @@ def getsoundcloudId(video,flag,mostpopular):
     return video,bret
 
 
-def getYoutubeUrl(video,flag,mostpopular):
+def getYoutubeUrl(video,flag,mostpopular, IsAllintitle = True):
     global request_count
     bret = False
     try:
@@ -1579,7 +1579,7 @@ def getYoutubeUrl(video,flag,mostpopular):
             else:
                 misses = 1
                 if( flag == 0):
-                    return getYoutubeUrl(video,1,mostpopular)
+                    return getYoutubeUrl(video,1,mostpopular, False)
         except Exception as e:
             logger_error.exception('getYoutubeUrl')
             logger_error.exception(e)
