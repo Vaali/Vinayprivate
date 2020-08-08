@@ -1576,10 +1576,10 @@ def getYoutubeUrl(video,flag,mostpopular):
                     else:
                         dd = str(now.day)
                     video.crawldate = str(now.year)+"-"+mm+"-"+dd
-                    
-                    
             else:
-                    misses = 1
+                misses = 1
+                if( flag == 0):
+                    return getYoutubeUrl(video,1,mostpopular)
         except Exception as e:
             logger_error.exception('getYoutubeUrl')
             logger_error.exception(e)
