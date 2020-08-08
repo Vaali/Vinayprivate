@@ -1518,7 +1518,7 @@ def getYoutubeUrl(video,flag,mostpopular, IsAllintitle = True):
         now = datetime.now()
         try:
             #get the videos
-            selectedVideo = ytapi.crawlyoutube(allArtists, video.name, flag,mostpopular, oldsongdetails)
+            selectedVideo = ytapi.crawlyoutube(allArtists, video.name, flag,mostpopular, oldsongdetails, IsAllintitle)
             if(selectedVideo != None):
                     bret = True
                     if(int(selectedVideo['likes']) !=0 and int(selectedVideo['dislikes'])!=0):
