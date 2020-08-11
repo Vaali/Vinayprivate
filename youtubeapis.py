@@ -390,11 +390,11 @@ class youtubedlcalls():
                     'cachedir': CacheDir,
                     'ignoreerrors': True
                     }
-            url = 'ytsearch10:{}'.format(searchUrl)
+            url = 'ytsearch5:{}'.format(searchUrl)
             Video =None
             with youtube_dl.YoutubeDL(ydl_opts) as ydl:
                 meta = ydl.extract_info(url, download=False)
-                if( 'entries' in meta and len(meta['entries']) > 0 ):
+                if( meta != None and 'entries' in meta and len(meta['entries']) > 0 ):
                     currentVideo = {}
                     iindex = -1
                     i = 0
