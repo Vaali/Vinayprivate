@@ -21,7 +21,7 @@ from solr import SolrConnection
 from solr.core import SolrException
 from songsutils import CombineAlbums
 import loggingmodule
-
+from config import DiscogsDataDirectory, NumberOfProcesses, IsIncremental, TopSongs
 
 config = ConfigParser.ConfigParser()
 reload(sys)
@@ -171,7 +171,15 @@ def changeName(artName):
     for artword in artNamewords:
          retNamewords.append(artword[0].upper()+ artword[1:])
     return " ".join(retNamewords)
-     
+
+'''
+This is to set the song match to 0 whenits empty. Songs_api skips writing zeroes to te xml. so while reading ew need to fix it
+'''
+def getMatch(match): 
+    if( match == None):
+        return 0.0
+    else:
+        return round(match)
     
 def genXML(vid,avgcnt,avgcntrece,artistId,genreCountList,artistTopGenres,country_name):
     xmlpath = ""
@@ -420,9 +428,11 @@ def genXML(vid,avgcnt,avgcntrece,artistId,genreCountList,artistTopGenres,country
         mysong.set_viewcount(vc)
         mysong.set_viewCountGroup(CalculateScale(vc))
         if vid.has_key('rating'):
-			rating = vid['rating']
+            rating = vid['rating']
         else:
 			rating = 0.0
+        if( rating == 0 ):
+            rating = 0.0
         mysong.set_rating(rating)
         genres_levels = {0:[],1:[]}
         
@@ -704,61 +714,24 @@ def genXML(vid,avgcnt,avgcntrece,artistId,genreCountList,artistTopGenres,country
             except Exception as ex:
                 logger_errors.exception(ex)
                 logger_errors.exception(fname)
-                
-
-            '''if(url[-11:].lower() == "aVIA1n5ng4Y".lower()):
-                print 'hit'
-                print mysong.overLap
-                print mysong.releaseDate
-                print mysong.songName
-                print mysong.artist.artistPopularityAll
-                print oldsong.overLap
-                print oldsong.releaseDate
-                print oldsong.songName
-                print oldsong.artist.artistPopularityAll
-                print 'done'
-            '''
             if(oldsong.isCompilation == True and mysong.isCompilation == False):
-                                if(url[-11:] == '6rgStv12dwA'):
-                                    print 'print "With this :"  fisrt'
 				print "With this :"
 				mysong = CombineAlbums(oldsong,mysong)
-            elif(round(oldsong.totalMatch) < round(mysong.totalMatch)):
-				#print "overwriting :"
-				#print oldsong.overLap
-				#print oldsong.totalMatch
-                                #if(url[-11:] == '6rgStv12dwA'):
-                                #    print 'print "With this :" second'
+            elif(getMatch(oldsong.totalMatch) < getMatch(mysong.totalMatch)):
 				print "With this :"
 				mysong = CombineAlbums(oldsong,mysong)
 				#print mysong.overLap
-            elif ((round(oldsong.totalMatch) == round(mysong.totalMatch)) and (round(oldsong.songMatch) < round(mysong.songMatch))):
-				#print "overwriting :"
-				#print oldsong.totalMatch
-				#print oldsong.songMatch
-                                #if(url[-11:] == '6rgStv12dwA'):
-                                #    print 'print "With this :" third'
+            elif ((getMatch(oldsong.totalMatch) == getMatch(mysong.totalMatch)) and (getMatch(oldsong.songMatch) < getMatch(mysong.songMatch))):
 				print "With this :"
 				mysong = CombineAlbums(oldsong,mysong)
 				#print mysong.match
-            elif ((round(oldsong.songMatch) == round(mysong.songMatch)) and (round(oldsong.artistMatch) < round(mysong.artistMatch))):
-				#print "overwriting :"
-				#print oldsong.totalMatch
-                                #if(url[-11:] == '6rgStv12dwA'):
-                                #    print 'print "With this :" fourth'
+            elif ((getMatch(oldsong.songMatch) == getMatch(mysong.songMatch)) and (getMatch(oldsong.artistMatch) < getMatch(mysong.artistMatch))):
 				print "With this :"
 				mysong = CombineAlbums(oldsong,mysong)
 				#print mysong.totalMatch
-            elif(round(oldsong.totalMatch) == round(mysong.totalMatch) and round(oldsong.songMatch) == round(mysong.songMatch) and round(oldsong.artistMatch) == round(mysong.artistMatch)):
-                #if(artistPopularityAll in oldsong):
-                #if(oldsong.artist.artistPopularityAll > mysong.artist.artistPopularityAll):
-                #        mysong = oldsong
-                
+            elif(getMatch(oldsong.totalMatch) == getMatch(mysong.totalMatch) and getMatch(oldsong.songMatch) == getMatch(mysong.songMatch) and getMatch(oldsong.artistMatch) == getMatch(mysong.artistMatch)):
                 if(mysong.releaseDate != 1001 and int(oldsong.releaseDate) > int(mysong.releaseDate)):
-                    #if(url[-11:] == '6rgStv12dwA'):
-                    #    print 'print "With this :" sixth'
-
-		    print "With this :"
+                    print "With this :"
                     mysong = CombineAlbums(oldsong,mysong)
                 elif(oldsong.decision == False):
                     mysong = CombineAlbums(oldsong,mysong)
@@ -771,9 +744,10 @@ def genXML(vid,avgcnt,avgcntrece,artistId,genreCountList,artistTopGenres,country
                 #print "With this :"
                 #print mysong.totalMatch
             else:
-                #if(url[-11:] == '6rgStv12dwA'):
-                #    print 'print "With this :" seventh'
                 mysong = oldsong
+            if(mysong.rating == None or mysong.rating == 0):
+                mysong.rating = 0.0
+        logger_errors.exception(mysong.rating)
         fx = codecs.open(fname,"w","utf-8")
         fx.write('<?xml version="1.0" ?>\n')
         #mysong.export(fx,0) Apostolos changed 0 to 1
@@ -1058,21 +1032,9 @@ def getCountry(vids,artistId,directory):
 
 #Main starts here
 t1=datetime.now()
-#myfile = codecs.open('levels.xml','r','utf8');
-#doc_str = myfile.read()
-#doc_str = doc_str.encode("UTF-8")
-#doc = etree.parse(open('discogs_genres.xml'))
-#hparser = etree.HTMLParser(encoding='utf-8')
-#htree   = etree.parse(fname, hparser)
-#doc = etree.parse(codecs.open('Rock.xml'))
 genres_list = {}
 with codecs.open('rock.json', 'r','utf-8') as f:
     genres_list = json.load(f)
-#doc = libxml2.parseFile('genres_manual.xml')
-#doc = libxml2.xmlReadFile("levels.xml","utf8")
-#doc = libxml2.parseDoc(doc_str)
-#print "Working on this Artist Now: "
-#print artistId
 genreMat = {}
 genre = list()
 style = list()
@@ -1081,19 +1043,10 @@ stylelist = list()
 level1Gen = list()
 slist = list()
 lev1 = list()
-config.read('test.ini')
-try:
-	opdir = config.get('Paths','opdir')
-except:
-	opdir = "solr_newData11"
-try:
-	errordir = config.get('Paths','errordir')
-except:
-	errordir="ERRORS"
-try:
-	failedxmls = config.get('Paths','failedxmls')
-except:
-	failedxmls = "failedxml"
+
+opdir = "solr_newData11"
+errordir="ERRORS"
+failedxmls = "failedxml"
 
 genres_levels = {}
 if(os.path.exists(opdir) == False):
@@ -1165,14 +1118,9 @@ if __name__ == '__main__':
     connection_genre = SolrConnection('http://aurora.cs.rutgers.edu:8181/solr/similar_genres')    
     with codecs.open('rock.json', 'r','utf-8') as f:
         genres_list_dict = json.load(f)
-
-    directory = raw_input("Enter directory: ")
-    m = raw_input("Enter m: ")
-    m=int(m)
-    IsIncremental = raw_input("Isincremental : ")
-    IsIncremental = int(IsIncremental)
-    topnsongs = raw_input("Enter n for top songs: ")
-    topnsongs = int(topnsongs)
+    directory = DiscogsDataDirectory
+    m = NumberOfProcesses
+    topnsongs = int(TopSongs)
 
     foldlist = list()
     jobs=[]

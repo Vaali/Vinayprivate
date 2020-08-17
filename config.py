@@ -12,14 +12,16 @@ IsYoutudeApi = 0
 CacheDir = '/Volumes/Secondone/sourcefiles/solr_newData11_old/newdir/cache'
 
 #recrawling
-RecrawlDirectory = '/Volumes/Secondone/sourcefiles/solr_newData11_old/deletedvideos'
-RecrawlOutputDirectory = '/Volumes/Secondone/sourcefiles/solr_newData11_old/newdir/tt'
-
+#RecrawlDirectory = '/Volumes/Secondone/sourcefiles/solr_newData11_old/deletedvideos'
+#RecrawlOutputDirectory = '/Volumes/Secondone/sourcefiles/solr_newData11_old/newdir/tt'
+RecrawlDirectory = 'test1'
+RecrawlOutputDirectory = 'test1/xxxx'
 #datacrawling
-DiscogsDataDirectory = 'fhiphop1'
+DiscogsDataDirectory = 'testcrawl'
 NumberofFolders = 2
 IsCrawlingYoutube = 1
 IsIncremental = 0
+TopSongs = 10 # used to calculat averages of counts etc
 
 
 
