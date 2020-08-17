@@ -113,16 +113,13 @@ def updateXml(filename):
             if(int(currentVideolikes) !=0 and int(currentVideodislikes)!=0):
                 currentVideorating = (float(currentVideolikes)*5)/(float(currentVideolikes)+float(currentVideodislikes))
             else:
-                currentVideorating =0
+                currentVideorating =0.0
         crawlHistoryList = oldsong.crawlHistoryList
         if(crawlHistoryList == None):
             crawlHistoryList = api.crawlHistoryList()
         crawlHistory = api.crawlHistory()
 
 	    #print oldsong.crawlDate.strftime("%Y-%m-%d")
-        oldVideoRating = oldsong.rating
-        if(oldVideoRating == None):
-            oldVideoRating = 0
         crawlHistory.set_Views(oldsong.viewcount)
         crawlHistory.set_Date(oldsong.crawlDate.strftime("%Y-%m-%d"))
         currDelta = getDelta(oldsong.crawlDate,oldsong.viewcount,int(currentVideoViewCount))
