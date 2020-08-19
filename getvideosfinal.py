@@ -913,6 +913,37 @@ def crawlArtist(directory):
     #runYoutubeApi(directory)
 
 
+def IsCrawlingDone(directory):
+    try:
+        prev_time = 0
+        if(IsIncremental == 0 or IsIncremental ==2):
+            with open(directory + '/last_full_part2.txt', 'r') as f:
+                prev_time = int(f.read())
+        else:
+            with open(directory + '/last_incr_part2.txt', 'r') as f:
+                prev_time = int(f.read())
+        curr_time = datetime.now()
+        old_time = datetime.fromtimestamp(prev_time)
+        if( curr_time - timedelta(30) < old_time ):
+            return True
+        else:
+            return False
+    except Exception, e:
+        logger_error.exception(e)
+        return False
+
+def IsDumpFileExists(directory):
+    size = 0
+    if(IsIncremental == 0 or IsIncremental ==2):
+        filename = os.path.join(directory,'dump')
+    else:
+        filename = os.path.join(directory,'dump_incr')
+    if( os.path.exists(filename) ):
+        size = os.path.getsize(filename)
+    
+    if( size > 1000 ):
+        return True
+    return False
 
 def runYoutubeApi(directory):
     try:
@@ -924,6 +955,10 @@ def runYoutubeApi(directory):
         global misses
         global hits
         request_count = 0
+        if( IsCrawlingDone(directory) == True and  IsDumpFileExists(directory) ):
+            logger_decisions.error(directory + " -- runYoutubeApi already Completed with time -- " + str(datetime.now() - start_time))
+            return
+
         curr_artist_dir = os.path.basename(directory)
         if(IsIncremental == 0 or IsIncremental ==2):
             lastrunfile = directory + '/lastrun.txt'
