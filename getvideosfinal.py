@@ -29,7 +29,7 @@ import managekeys
 from songsutils import is_songname_same_artistname, CalculateMatch, GetYearFromTitle
 import soundcloud
 from config import IsYoutudeApi,IsSoundCloud
-from config import DiscogsDataDirectory, NumberOfProcesses, NumberofFolders, IsIncremental, IsCrawlingYoutube
+from config import DiscogsDataDirectory, NumberOfProcesses, NumberofFolders, IsIncremental, IsCrawlingYoutube, SkipRecentlyCrawledDirectories
 from youtubeapis import youtubecalls,youtubedlcalls
 
 
@@ -955,7 +955,7 @@ def runYoutubeApi(directory):
         global misses
         global hits
         request_count = 0
-        if( IsCrawlingDone(directory) == True and  IsDumpFileExists(directory) ):
+        if( SkipRecentlyCrawledDirectories == True and IsCrawlingDone(directory) == True and  IsDumpFileExists(directory) ):
             logger_decisions.error(directory + " -- runYoutubeApi already Completed with time -- " + str(datetime.now() - start_time))
             return
 
