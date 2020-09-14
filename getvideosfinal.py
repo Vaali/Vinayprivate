@@ -26,7 +26,7 @@ import loggingmodule
 import random
 from functools import partial
 import managekeys
-from songsutils import is_songname_same_artistname, CalculateMatch, GetYearFromTitle
+from songsutils import is_songname_same_artistname, CalculateMatch, GetYearFromTitle, GetSize
 import soundcloud
 from config import IsYoutudeApi,IsSoundCloud
 from config import DiscogsDataDirectory, NumberOfProcesses, NumberofFolders, IsIncremental, IsCrawlingYoutube, SkipRecentlyCrawledDirectories
@@ -769,11 +769,10 @@ def CheckifSongsExistsinSolr(sname,aname,fname):
     return False
 
 
-def crawlArtist(directory):
+def crawlArtist(directorylist):
     start_time = datetime.now()
+    directory,count = directorylist
     logger_decisions.error(directory + " ---- started ---")
-    #print os.path.basename(directory)
-    
     if(os.path.basename(directory) == '194' or os.path.basename(directory) == '355'):
         logger_decisions.error('skipping ' +directory)
         return
@@ -802,6 +801,7 @@ def crawlArtist(directory):
                 fread = open(infile,'r')
             except IOError as e:
                 logger_error.exception(e)
+
             parallel_songs_list = pickle.load(fread)
             full_song_list = GetSongsFromFullList(parallel_songs_list)
         songs_list,full_country_list,aliases,ear_count,ear_year,ear_rel,ear_conflict,final_song_list = get_song_list_master(directory,songs_list,full_country_list,aliases,ear_count,ear_year,ear_rel,full_song_list)
@@ -831,8 +831,8 @@ def crawlArtist(directory):
             return
     except Exception, e:
         logger_error.exception(e)
+        logger_decisions.error(directory + " -- Completed with time -- " + str(datetime.now() - start_time))
         return
-    logger_decisions.error(" -- Completed with time -- ")
     try:
         curr_time = "2020-14-33"
         curr_language = ""
@@ -945,9 +945,10 @@ def IsDumpFileExists(directory):
         return True
     return False
 
-def runYoutubeApi(directory):
+def runYoutubeApi(directorycount):
     try:
         #print fl
+        directory,cc = directorycount
         start_time = datetime.now()
         logger_decisions.error(directory + " ---- runYoutubeApi started ---")
         global IsIncremental
@@ -987,6 +988,7 @@ def runYoutubeApi(directory):
             fread = open(infile,'r')
         except IOError as e:
             logger_error.error(e)
+            logger_decisions.error(directory + " -- runYoutubeApi Completed with time -- " + str(datetime.now() - start_time))
             return
         parallel_songs_list = pickle.load(fread)
         vid = list()
@@ -1051,10 +1053,10 @@ def runYoutubeApi(directory):
         with open(lastrunfile, 'wb') as f2:
             print 'dumping '+str(int(time.time()))
             pickle.dump(str(int(time.time())),f2)
-        logger_decisions.error(directory + " -- runYoutubeApi Completed with time -- " + str(datetime.now() - start_time))
     except Exception as e:
         print e
         logger_error.exception(e)
+    logger_decisions.error(directory + " -- runYoutubeApi Completed with time -- " + str(datetime.now() - start_time))
     
 
 def checkIfSongExists(curr_song,songs_list):
@@ -1682,7 +1684,8 @@ if __name__ == '__main__':
         splitlist = list(itertools.izip_longest(*(iter(directorylist),) * folders))
         logger_error.debug(splitlist)
         for split in splitlist:
-            foldlist = list()
+            #foldlist = list()
+            foldlist = {}
             #t1=time.time()
             foldercompletelist = {}
             folderstartedlist = {}
@@ -1692,16 +1695,17 @@ if __name__ == '__main__':
                     continue
                 for curr_dir, sub_dir, filenames in os.walk(directory+'/'+str(dirs)):
                             strg = curr_dir
-                            foldlist.append(strg)
+                            foldlist[strg] = GetSize(strg)
+            sortedfolders = sorted(foldlist.iteritems(), key=lambda (k,v): (v,k),reverse = True)
             logger_error.debug("Folders List:")
-            n = len(foldlist)
+            n = len(sortedfolders)
             logger_error.debug("Starting Processes:")
             songs_pool = Pool()
             songs_pool =Pool(processes=m1)
             if(crawlyoutube == 0):
-                songs_pool.imap(crawlArtist,foldlist)
+                songs_pool.imap(crawlArtist,sortedfolders)
             else:
-                songs_pool.imap(runYoutubeApi,foldlist)
+                songs_pool.imap(runYoutubeApi,sortedfolders)
                 
             songs_pool.close()
             songs_pool.join()

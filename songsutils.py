@@ -201,11 +201,11 @@ hq','band','audio','album','world','instrumental','intro','house','acoustic','so
             ftartists = fList[0:]
         allArtists = artistName+" "+ftartists
         ftArtistSet = re.findall("\w+",ftartists.lower(),re.U)
-        ftAMatch = 0
-        ftMatch = 0
-        songMatch = 0
-        leftMatch = 0
-        rightMatch = 0
+        ftAMatch = 0.0
+        ftMatch = 0.0
+        songMatch = 0.0
+        leftMatch = 0.0
+        rightMatch = 0.0
 
         yfullset = re.findall("\w+",youtubematch.lower(),re.U)
         ydiffset = set(yfullset) - set(diffset)
@@ -282,14 +282,6 @@ hq','band','audio','album','world','instrumental','intro','house','acoustic','so
             am = artistMatch
             lam = leftMatch
             ram = rightMatch
-            '''if('hero' in songName.lower()):
-                print youtubematch
-                print vid_title.lower()
-                print leftMatch
-                print rightMatch
-                print artistMatch
-                print songMatch
-                print 'xxx--xxx-xxxxx-xxx--xxx' '''
         if(((y1 != -1) or (y2 != -1)) and (leftMatch != 100.0 and am != 100.0 and sm!= 100.0)): # right match if left match is zero.
             bhiphen = True
             #print "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
@@ -334,15 +326,6 @@ hq','band','audio','album','world','instrumental','intro','house','acoustic','so
             am = artistMatch
             lam = leftMatch
             ram = rightMatch
-            '''if('hero' in songName.lower()):
-                print youtubematch
-                print vid_title.lower()
-                print songset
-                print common1
-                print snameset
-                print songMatch
-                print songName
-                print 'xxx--xxx-xxxxx-xxx--xxx' '''
         else:
             if(ram == 100):
                 ram =0.0
@@ -493,35 +476,20 @@ hq','band','audio','album','world','instrumental','intro','house','acoustic','so
             error_str += str(f)
         error_str += "##setratio total match:"
         error_str += str(setratio_totalmatch)
-        #logger_decisions.error(error_str)
-        '''logger_decisions.error(decision)
-        logger_decisions.error(condition)
-        logger_decisions.error(match)
-        logger_decisions.error(artistName)
-        logger_decisions.error(songName)
-        logger_decisions.error(ftArtistName)
-        logger_decisions.error("substring_album:")
-        logger_decisions.error(substring_album)
-        logger_decisions.error(vid_title)
-        logger_decisions.error(comparestring)
-        logger_decisions.error("substring_song : ")
-        logger_decisions.error(substring_song)
-        logger_decisions.error("substring_artist : ")
-        logger_decisions.error(substring_artist)
-        logger_decisions.error("ftartistmatch : ")
-        logger_decisions.error(ftartistmatch)
-        logger_decisions.error("Total match : ")
-        logger_decisions.error(percentMatch)
-        logger_decisions.error(youtubematch)
-        #logger_decisions.error(fuzz.ratio(youtubematch.lower(),comparestring.lower()))
-        logger_decisions.error("phonetic distance : ")'''
-        #logger_decisions.error(fuzz.ratio(soundex(youtubematch.lower()),soundex(comparestring.lower())))
-        #logger_decisions.error('-----------------')
     except Exception, e:
             logger_error.exception(e)
     #print error_str
     return decision,match,tm,sm,am,error_str
 
+def GetSize(start_path = '.'):
+    total_size = 0
+    for dirpath, dirnames, filenames in os.walk(start_path):
+        for f in filenames:
+            fp = os.path.join(dirpath, f)
+            # skip if it is symbolic link
+            if not os.path.islink(fp):
+                total_size += os.path.getsize(fp)
+    return total_size
 
 def CombineAlbums(oldsong,mysong):
 	print 'CombineAlbums'
