@@ -18,7 +18,9 @@ import concurrent.futures
 from multiprocessing import Pool
 import operator
 from itertools import repeat
-#from songsutils import is_songname_same_artistname
+from config import DiscogsDataDirectory, NumberOfProcesses, NumberofFolders, IsIncremental, SkipRecentlyCrawledDirectories
+from config import IsSoundCloud
+from songsutils import GetSize,stemwords_uniquelist
 
 
 
@@ -29,7 +31,6 @@ logger_decisions = loggingmodule.initialize_logger1('decisions_songs','decisions
 logger_error = loggingmodule.initialize_logger('errors','errors_getsongs.log')
 
 
-stemwords_uniquelist = ["(Edited Short Version)","(Alternate Early Version)","(Alternate Version)","(Mono)","(Radio Edit)","(Original Album Version)","(Different Mix)","(Music Film)","(Stereo)","(Single Version)","Stereo","Mono","(Album Version)","Demo","(Demo Version)"]
 solrConnection = SolrConnection('http://aurora.cs.rutgers.edu:8181/solr/discogs_artists')
 
 
@@ -893,8 +894,9 @@ def GetUniquesongs(songs_list,final_song_list,isMaster,same_album,ear_count,full
 
 
 
-def crawlArtist(directory):
+def crawlArtist(directorylist):
     start_time = datetime.now()
+    directory,count = directorylist
     logger_decisions.error(directory + " ---- started ---")
     #print os.path.basename(directory)
     
@@ -1047,25 +1049,20 @@ def crawlArtist(directory):
 
 
 
-
-
-
 if __name__ == '__main__':
     reload(sys)
     sys.setdefaultencoding('utf8')
-    filenameList = []
     t1 = datetime.now()
     try:
         lastdirectory = 0
         logger_error.debug("Discogs Main Program Starting")
-        directory = raw_input("Enter directory: ")
-        m1 = raw_input("Enter m: ")
-        folders = raw_input("Enter number of folders: ")
+        directory = DiscogsDataDirectory
+        m1 = NumberOfProcesses
+        folders = NumberofFolders
         folders = int(folders)
         m1=int(m1)
-        incr = raw_input("Isincremental : ")
+        incr = IsIncremental
         incr = int(incr)
-        IsIncremental = incr
         prev_time = 0
         timeFile = directory + "/timelog.txt"
         if(IsIncremental == 1 or IsIncremental == 3):
@@ -1075,29 +1072,27 @@ if __name__ == '__main__':
             except IOError as e:
                 print e
         directorylist = list()
-        if(os.path.exists(directory+'/lastdirectory_songs.txt')):
-            fread = codecs.open(directory+'/lastdirectory_songs.txt','r','utf-8')
+        if(os.path.exists(directory+'/lastdirectory.txt')):
+            fread = codecs.open(directory+'/lastdirectory.txt','r','utf-8')
             lines = fread.readlines()
             if(len(lines) > 0):
                 if(lines[-1].strip() != ""):
                     lastdirectory = int(lines[-1])
             fread.close()
-            fwrite = codecs.open(directory+'/lastdirectory_songs.txt','a','utf-8')
+            fwrite = codecs.open(directory+'/lastdirectory.txt','a','utf-8')
         else:
-            fwrite = codecs.open(directory+'/lastdirectory_songs.txt','w','utf-8')
-
+            fwrite = codecs.open(directory+'/lastdirectory.txt','w','utf-8')
         ''' Folders list count to control the numebr of folders done'''
         for dirs in os.listdir(directory):
             found = re.search(r'[0-9]+',str(dirs),0)
             if (found and (lastdirectory <= int(dirs))):
                 directorylist.append(int(dirs))
         directorylist = sorted(directorylist)
-        splitlist = [directorylist]
-        #splitlist = list(itertools.izip_longest(*(iter(directorylist),) * folders))
+        splitlist = list(itertools.izip_longest(*(iter(directorylist),) * folders))
         logger_error.debug(splitlist)
+        print splitlist
         for split in splitlist:
-            foldlist = list()
-            #t1=time.time()
+            foldlist = {}
             foldercompletelist = {}
             folderstartedlist = {}
             logger_error.debug("Getting the Folders List")
@@ -1106,14 +1101,15 @@ if __name__ == '__main__':
                     continue
                 for curr_dir, sub_dir, filenames in os.walk(directory+'/'+str(dirs)):
                             strg = curr_dir
-                            foldlist.append(strg)
+                            foldlist[strg] = GetSize(strg)
+            sortedfolders = sorted(foldlist.iteritems(), key=lambda (k,v): (v,k),reverse = True)
+            print sortedfolders
             logger_error.debug("Folders List:")
-            n = len(foldlist)
+            n = len(sortedfolders)
             logger_error.debug("Starting Processes:")
             songs_pool = Pool()
             songs_pool =Pool(processes=m1)
-            songs_pool.imap(crawlArtist,foldlist)
-            
+            songs_pool.imap(crawlArtist,sortedfolders)
             songs_pool.close()
             songs_pool.join()
             print datetime.now()-t1
@@ -1127,5 +1123,6 @@ if __name__ == '__main__':
         fwrite.close()
     except Exception as e:
         logger_error.exception(e)
+        print e
     t2=datetime.now()
     print "time=" +str(t2-t1)
