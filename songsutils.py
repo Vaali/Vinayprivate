@@ -12,6 +12,9 @@ from config import IsSoundCloud
 reload(sys)
 sys.setdefaultencoding('utf8')
 
+stemwords_uniquelist = ["(Edited Short Version)","(Alternate Early Version)","(Alternate Version)","(Mono)","(Radio Edit)","(Original Album Version)","(Different Mix)","(Music Film)","(Stereo)","(Single Version)","Stereo","Mono","(Album Version)","Demo","(Demo Version)"]
+
+
 def is_songname_same_artistname(songname,artistname):
     return (songname.lower() == artistname.lower())
 
