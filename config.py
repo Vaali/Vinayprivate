@@ -1,5 +1,6 @@
 #number of proceses
 NumberOfProcesses = 10
+NumberofThreads = 4
 
 #updatexml_new.py
 # 1 for updating viewcounts , 0 for updating genre tags
@@ -17,12 +18,15 @@ CacheDir = '/Volumes/Secondone/sourcefiles/solr_newData11_old/newdir/cache'
 RecrawlDirectory = 'test1'
 RecrawlOutputDirectory = 'test1/xxxx'
 #datacrawling
+#DiscogsDataDirectory = 'test_discogs1'
 DiscogsDataDirectory = 'fhiphop1'
 NumberofFolders = 2
-IsCrawlingYoutube = 1
+IsCrawlingYoutube = 0
 SkipRecentlyCrawledDirectories = 0
+CrawlDaysWindow = 45
 IsIncremental = 0
 TopSongs = 10 # used to calculat averages of counts etc
+
 
 
 

@@ -19,7 +19,7 @@ from multiprocessing import Pool
 import operator
 from itertools import repeat
 from config import DiscogsDataDirectory, NumberOfProcesses, NumberofFolders, IsIncremental, SkipRecentlyCrawledDirectories
-from config import IsSoundCloud
+from config import IsSoundCloud,NumberofThreads
 from songsutils import GetSize,stemwords_uniquelist
 
 
@@ -331,7 +331,7 @@ def get_song_list_normal_new(directory,songs_list,full_country_list,aliases,ear_
                         releases_list.append(curr_album)'''
                 releases_list.append(filename)
         print len(releases_list)
-        with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
+        with concurrent.futures.ThreadPoolExecutor(max_workers=NumberofThreads) as executor:
             return_pool = executor.map(get_list_from_normal_release,zip(releases_list,repeat(ear_count),repeat(ear_year),repeat(ear_rel)))
         #print len(releases_list)
         

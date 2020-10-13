@@ -27,9 +27,11 @@ import random
 from functools import partial
 import managekeys
 from songsutils import is_songname_same_artistname, CalculateMatch, GetYearFromTitle, GetSize
+from songsutils import stemwords_uniquelist
 import soundcloud
-from config import IsYoutudeApi,IsSoundCloud
-from config import DiscogsDataDirectory, NumberOfProcesses, NumberofFolders, IsIncremental, IsCrawlingYoutube, SkipRecentlyCrawledDirectories
+from config import IsYoutudeApi,IsSoundCloud, NumberofThreads
+from config import DiscogsDataDirectory, NumberOfProcesses, NumberofFolders, IsIncremental, IsCrawlingYoutube
+from config import SkipRecentlyCrawledDirectories, CrawlDaysWindow
 from youtubeapis import youtubecalls,youtubedlcalls
 
 
@@ -44,7 +46,6 @@ logger_decisions = loggingmodule.initialize_logger1('decisions','decisions_new.l
 logger_error = loggingmodule.initialize_logger('errors','errors_getVideos.log')
 
 
-stemwords_uniquelist = ["(Edited Short Version)","(Alternate Early Version)","(Alternate Version)","(Mono)","(Radio Edit)","(Original Album Version)","(Different Mix)","(Music Film)","(Stereo)","(Single Version)","Stereo","Mono","(Album Version)","Demo","(Demo Version)"]
 solrConnection = SolrConnection('http://aurora.cs.rutgers.edu:8181/solr/discogs_artists')
 
 #class
@@ -828,6 +829,7 @@ def crawlArtist(directorylist):
         hits = 0
         misses = 0
         if(len(sorted_list) == 0):
+            logger_decisions.error(directory + " -- Completed with time -- " + str(datetime.now() - start_time))
             return
     except Exception, e:
         logger_error.exception(e)
@@ -924,7 +926,7 @@ def IsCrawlingDone(directory):
                 prev_time = int(f.read())
         curr_time = datetime.now()
         old_time = datetime.fromtimestamp(prev_time)
-        if( curr_time - timedelta(30) < old_time ):
+        if( curr_time - timedelta(CrawlDaysWindow) < old_time ):
             return True
         else:
             return False
@@ -1011,7 +1013,7 @@ def runYoutubeApi(directorycount):
         #songs_pool =ThreadPool(processes=5)
         print len(parallel_songs_list)
         #print parallel_songs_list
-        with concurrent.futures.ThreadPoolExecutor(max_workers=4) as executor:
+        with concurrent.futures.ThreadPoolExecutor(max_workers=NumberofThreads) as executor:
                 return_pool = executor.map(getVideoFromYoutube,parallel_songs_list)
         #print len(return_pool)
         for ret_val in return_pool:
