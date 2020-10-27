@@ -143,7 +143,7 @@ class youtubecalls():
                 return Video
         return None
     
-    def crawlyoutube(self, allArtists, songName, flag,mostpopular, oldvideodetails):
+    def crawlyoutube(self, allArtists, songName, flag,mostpopular, oldvideodetails, IsAllintitle = True ):
         if(flag == 0):
             searchUrl = "&part=snippet&q=allintitle%3A"+urllib.quote_plus(str(allArtists))+"+"+urllib.quote_plus(str(songName))+"&alt=json&type=video&max-results=5&videoCategoryId=10"
         else:
@@ -377,9 +377,9 @@ class youtubedlcalls():
             return None
         return None
     
-    def crawlyoutube(self, allArtists, songName, flag,mostpopular, oldvideodetails, IsAllintitle = True ):
+    def crawlyoutube(self, allArtists, songName, flag,mostpopular, oldvideodetails ):
         try:
-            if( IsAllintitle ):
+            if( flag == 0 ):
                 searchUrl = "allintitle:"+(str(allArtists))+" "+(str(songName))
             else:
                 searchUrl = (str(allArtists))+" "+(str(songName))

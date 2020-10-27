@@ -1530,7 +1530,7 @@ def getsoundcloudId(video,flag,mostpopular):
     return video,bret
 
 
-def getYoutubeUrl(video,flag,mostpopular, IsAllintitle = True):
+def getYoutubeUrl(video,flag,mostpopular):
     global request_count
     bret = False
     try:
@@ -1557,7 +1557,7 @@ def getYoutubeUrl(video,flag,mostpopular, IsAllintitle = True):
         now = datetime.now()
         try:
             #get the videos
-            selectedVideo = ytapi.crawlyoutube(allArtists, video.name, flag,mostpopular, oldsongdetails, IsAllintitle)
+            selectedVideo = ytapi.crawlyoutube(allArtists, video.name, flag,mostpopular, oldsongdetails)
             if(selectedVideo != None):
                     bret = True
                     if(int(selectedVideo['likes']) !=0 and int(selectedVideo['dislikes'])!=0):
@@ -1592,6 +1592,8 @@ def getYoutubeUrl(video,flag,mostpopular, IsAllintitle = True):
                     video.published = selectedVideo['PublishedDate']
                     video.viewcount = selectedVideo['ViewCount']
                     if( IsYoutudeApi == 1):
+                        if( video.published == None or ( not video.published.strip() ) ):
+                            video.published = now.strftime("%Y-%m-%d%H:%M:%S")
                         m = re.search(re.compile("[0-9]{4}[-][0-9]{2}[-][0-9]{2}"),video.published)
                         n = re.search(re.compile("[0-9]{2}[:][0-9]{2}[:][0-9]{2}"),video.published)
                         ydate = m.group()+n.group()
@@ -1618,7 +1620,7 @@ def getYoutubeUrl(video,flag,mostpopular, IsAllintitle = True):
             else:
                 misses = 1
                 if( flag == 0):
-                    return getYoutubeUrl(video,1,mostpopular, False)
+                    return getYoutubeUrl(video,1,mostpopular)
         except Exception as e:
             logger_error.exception('getYoutubeUrl')
             logger_error.exception(e)
