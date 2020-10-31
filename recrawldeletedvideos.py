@@ -69,7 +69,7 @@ def getVideo(oldsong):
 	#if searchResult.has_key('items') and len(searchResult['items'])!= 0:
 	if( Video != None ):
 		oldsong.rating = Video['rating']
-		if( oldsong.rating == None or oldsong['rating'] == 0):
+		if( oldsong.rating == None or oldsong.rating == 0):
 			oldsong.rating = 0.0
 		oldsong.url = Video['Url']
 		oldsong.match = Video['Match']
