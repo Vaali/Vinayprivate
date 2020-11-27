@@ -7,6 +7,7 @@ import time
 import re
 from fuzzywuzzy import fuzz
 from config import IsSoundCloud
+#import songs_api as api
 
 
 reload(sys)
@@ -74,6 +75,20 @@ def GetYearFromTitle(vid_title,song_name):
             returnYear = 0
 
     return returnYear
+
+def resetZeroTagsFix(oldsong):
+    if( oldsong.rating == None ):
+        oldsong.rating = 0
+    if( oldsong.viewcountRate == None ):
+        oldsong.viewcountRate = 0
+    if( oldsong.totalMatch == None ):
+        oldsong.totalMatch = 0
+    if( oldsong.songMatch == None ):
+        oldsong.songMatch = 0
+    if( oldsong.artistMatch == None ):
+        oldsong.artistMatch = 0
+    return oldsong
+
 
 def RemoveStemCharactersforComparison(currString):
     currString = currString.replace('"','').strip()
