@@ -4,7 +4,7 @@ import os
 import glob
 import loggingmodule
 from itertools import repeat
-from songsutils import CombineAlbums
+from songsutils import CombineAlbums,resetZeroTagsFix
 import shutil
 import songs_api as api
 import codecs
@@ -21,7 +21,9 @@ def movefiles1((src,dest)):
     else:
             try:
                 oldsong = api.parse(destfname)
+                oldsong = resetZeroTagsFix(oldsong)
                 mysong = api.parse(src)
+                mysong = resetZeroTagsFix(mysong)
                 print "checking "+destfname
                 if(oldsong.isCompilation == True and mysong.isCompilation == False):
                     print "With this :"
@@ -65,6 +67,8 @@ if __name__ == '__main__':
     logger_matrix = loggingmodule.initialize_logger('copyxmls','copyxmls.log')
     directory = raw_input("Enter source directory: ")
     destination = raw_input("Enter destination directory: ")
+    if(not os.path.exists(destination)):
+		os.mkdir(destination)
     try:
         currdir = directory
         filelist = glob.glob(currdir+"/*.xml")
