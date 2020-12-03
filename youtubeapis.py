@@ -9,6 +9,11 @@ import youtube_dl
 import json
 from config import CacheDir
 logger_youtube = loggingmodule.initialize_logger('youtubeapis','youtubeapis.log')
+import warnings
+warnings.simplefilter("error")
+import random
+import os
+
 
 
 
@@ -263,8 +268,9 @@ class youtubedlcalls():
 
             ydl_opts = {
                 'noplaylist': True,
-                'cachedir': CacheDir,
-                'ignoreerrors': True
+                'cachedir': os.path.join(CacheDir,str(random.randint(0,1000000))),
+                'ignoreerrors': False,
+                'skipdownload': True
                 }
             url = 'ytsearch5:{}'.format(url)
             print url
@@ -337,8 +343,9 @@ class youtubedlcalls():
         url = self.youtubebaseurl+str(videoid)
         ydl_opts = {
             'noplaylist': True,
-            'cachedir': CacheDir,
-            'ignoreerrors': True
+            'cachedir': os.path.join(CacheDir,str(random.randint(0,1000000))),
+            'ignoreerrors': False,
+            'skipdownload': True
         }
         videoResult = {}
         try:
@@ -387,11 +394,13 @@ class youtubedlcalls():
             print searchUrl
             ydl_opts = {
                     'noplaylist': True,
-                    'cachedir': CacheDir,
-                    'ignoreerrors': True
+                    'cachedir': os.path.join(CacheDir,str(random.randint(0,1000000))),
+                    'ignoreerrors': False,
+                    'skipdownload': True
                     }
             url = 'ytsearch5:{}'.format(searchUrl)
             Video =None
+            iindex = -1
             with youtube_dl.YoutubeDL(ydl_opts) as ydl:
                 meta = ydl.extract_info(url, download=False)
                 if( meta != None and 'entries' in meta and len(meta['entries']) > 0 ):
