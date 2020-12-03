@@ -26,7 +26,7 @@ import glob
 import loggingmodule
 import random
 import managekeys
-from songsutils import moveFiles,movefilestodeleted
+from songsutils import moveFiles,movefilestodeleted,resetZeroTagsFix
 from youtubeapis import youtubecalls,youtubedlcalls
 from config import IsYoutudeApi,RecrawlDirectory, NumberOfProcesses, RecrawlOutputDirectory
 
@@ -80,6 +80,7 @@ def getVideo(oldsong):
 		oldsong.published = Video['PublishedDate']
 		oldsong.videoId = Video['VideoId']
 		oldsong.length = Video['Duration']
+		oldsong.youtubeId = Video['VideoId']
 		if( IsYoutudeApi == 1):
 			m = re.search(re.compile("[0-9]{4}[-][0-9]{2}[-][0-9]{2}"),oldsong.published)
 			n = re.search(re.compile("[0-9]{2}[:][0-9]{2}[:][0-9]{2}"),oldsong.published)
@@ -115,6 +116,7 @@ def getNewVideo(filename):
 	try:
 		print filename
 		oldsong = api.parse(filename)
+		oldsong = resetZeroTagsFix(oldsong)
 		newsong = getVideo(oldsong)
 		if(newsong == None):
 			logging.error(filename)

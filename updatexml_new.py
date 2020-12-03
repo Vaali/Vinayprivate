@@ -14,6 +14,7 @@ from solr.core import SolrException
 from itertools import repeat
 import random
 from songsutils import is_songname_same_artistname,movefilestodeleted,movefilestofailed,movefilestowrong
+from songsutils import resetZeroTagsFix
 from youtubeapis import youtubecalls,youtubedlcalls
 import managekeys
 from config import IsYoutudeApi,DataDirectory, NumberOfProcesses, IsUpdateViewCounts
@@ -69,6 +70,7 @@ def updateXml(filename):
             ytubecalls = youtubedlcalls()
         try:
             oldsong = api.parse(filename,silence=True)
+            oldsong = resetZeroTagsFix(oldsong)
             if(is_songname_same_artistname(oldsong.songName,oldsong.artist.artistName[0]) == True):
                 movefilestowrong(filename)
                 return
@@ -110,7 +112,7 @@ def updateXml(filename):
                 logger_matrix.exception("Error :No items returned "+ filename + "\n")
                 movefilestodeleted(filename)
                 return
-            if(int(currentVideolikes) !=0 and int(currentVideodislikes)!=0):
+            if(int(currentVideolikes) !=0 or int(currentVideodislikes)!=0):
                 currentVideorating = (float(currentVideolikes)*5)/(float(currentVideolikes)+float(currentVideodislikes))
             else:
                 currentVideorating =0.0
@@ -171,7 +173,7 @@ def updateGenreTags( args ):
     (filename,cutoff) = args
     try:
         oldsong = api.parse(filename)
-
+        oldsong = resetZeroTagsFix(oldsong)
         print('getting genres')
         '''try:
             genreTag = oldsong.genreTag
@@ -250,6 +252,7 @@ def updatexmls_youtubedl():
         print(filename)
         try:
             oldsong = api.parse(filename)
+            oldsong = resetZeroTagsFix(oldsong)
             if(is_songname_same_artistname(oldsong.songName,oldsong.artist.artistName[0]) == True):
                 movefilestowrong(filename)
                 return
