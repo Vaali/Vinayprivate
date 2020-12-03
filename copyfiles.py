@@ -17,7 +17,7 @@ def movefiles1((src,dest)):
     destfname = os.path.join(dest, fname)
     if(not os.path.exists(destfname)):
         print "copying "+destfname
-        shutil.move(src,dest)
+        shutil.copy(src,dest)
     else:
             try:
                 oldsong = api.parse(destfname)
