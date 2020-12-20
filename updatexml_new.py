@@ -17,7 +17,7 @@ from songsutils import is_songname_same_artistname,movefilestodeleted,movefilest
 from songsutils import resetZeroTagsFix
 from youtubeapis import youtubecalls,youtubedlcalls
 import managekeys
-from config import IsYoutudeApi,DataDirectory, NumberOfProcesses, IsUpdateViewCounts
+from config import IsYoutudeApi,DataDirectory, NumberOfProcesses, IsUpdateViewCounts, CrawlDaysWindow
 
 def getMonths(currentPublishedDate):
     now = datetime.now()
@@ -147,7 +147,7 @@ def updateXml(filename):
         oldsong.export(fx,0)
         fx.close()
     except Exception as e:
-        logger_matrix.exception("Error")
+        logger_matrix.exception(e)
         return
 
 def GetgenreTag(oldsong):
@@ -257,7 +257,7 @@ def updatexmls_youtubedl():
                 movefilestowrong(filename)
                 return
         except Exception as e:
-            logger_matrix.exception("Error")
+            logger_matrix.exception(e)
             return
         
     except Exception as e:
@@ -285,9 +285,10 @@ if __name__ == '__main__':
     #updateXml('solr_newData11_old/0000aiYfOWu5ZhY.xml')
     try:
         filelist = glob.glob(directory+"/*.xml")
+        result = filter(lambda x:datetime.now()-timedelta(CrawlDaysWindow) < datetime.fromtimestamp(os.path.getmtime(x)), filelist )
         p =Pool(processes=int(NumberOfProcesses))
         if(choiceUpdate == 1):
-            p.map(updateXml,filelist)
+            p.map(updateXml, result)
         else:
             cutoff = int(raw_input("Enter the cutoff point\n"))
             print(cutoff)
@@ -295,6 +296,6 @@ if __name__ == '__main__':
         p.close()
         p.join()
     except Exception as e:
-        logger_matrix.exception("Error")
+        logger_matrix.exception(e)
     
     print(time.time()-t1)
