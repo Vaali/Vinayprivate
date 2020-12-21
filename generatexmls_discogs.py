@@ -1115,7 +1115,7 @@ def generatexmls(dirlist):
 
 if __name__ == '__main__':
     t2=datetime.now()
-    connection_genre = SolrConnection('http://aurora.cs.rutgers.edu:8181/solr/similar_genres')    
+    connection_genre = SolrConnection(SolrSimilarGenresUrl)    
     with codecs.open('rock.json', 'r','utf-8') as f:
         genres_list_dict = json.load(f)
     directory = DiscogsDataDirectory
