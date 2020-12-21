@@ -18,6 +18,7 @@ from songsutils import resetZeroTagsFix
 from youtubeapis import youtubecalls,youtubedlcalls
 import managekeys
 from config import IsYoutudeApi,DataDirectory, NumberOfProcesses, IsUpdateViewCounts, CrawlDaysWindow
+from config import SolrGenreTagsUrl,SolrSimilarArtistsUrl
 
 def getMonths(currentPublishedDate):
     now = datetime.now()
@@ -280,12 +281,12 @@ if __name__ == '__main__':
     filelist = list()
     
     t1=time.time()
-    connection_genre = SolrConnection('http://aurora.cs.rutgers.edu:8181/solr/genretags')
-    connection_artist = SolrConnection('http://aurora.cs.rutgers.edu:8181/solr/similar_artists1')
+    connection_genre = SolrConnection(SolrGenreTagsUrl)
+    connection_artist = SolrConnection(SolrSimilarArtistsUrl)
     #updateXml('solr_newData11_old/0000aiYfOWu5ZhY.xml')
     try:
         filelist = glob.glob(directory+"/*.xml")
-        result = filter(lambda x:datetime.now()-timedelta(CrawlDaysWindow) < datetime.fromtimestamp(os.path.getmtime(x)), filelist )
+        result = filter(lambda x:datetime.now()-timedelta(CrawlDaysWindow) > datetime.fromtimestamp(os.path.getmtime(x)), filelist )
         p =Pool(processes=int(NumberOfProcesses))
         if(choiceUpdate == 1):
             p.map(updateXml, result)
