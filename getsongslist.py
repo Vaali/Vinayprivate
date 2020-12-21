@@ -31,7 +31,7 @@ logger_decisions = loggingmodule.initialize_logger1('decisions_songs','decisions
 logger_error = loggingmodule.initialize_logger('errors','errors_getsongs.log')
 
 
-solrConnection = SolrConnection('http://aurora.cs.rutgers.edu:8181/solr/discogs_artists')
+solrConnection = SolrConnection(SolrDiscogsArtistsUrl)
 
 
 
@@ -190,7 +190,7 @@ def changeName(artName):
 
 def CheckifSongsExistsinSolr(sname,aname,fname):
     try:
-        solrConnection1 = SolrConnection('http://aurora.cs.rutgers.edu:8181/solr/discogs_data_test')
+        solrConnection1 = SolrConnection(SolrDataUrl)
         songName = 'stringSongName:"'+sname+'"'
         artistName = 'artistName:"'+changeName(aname)+'"'
         facet_query = [songName,artistName]
