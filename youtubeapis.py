@@ -186,7 +186,7 @@ class youtubecalls():
                     youtubeVideoId = searchEntry['id']['videoId']
                     #videoUrl = "https://www.googleapis.com/youtube/v3/videos?id="+str(youtubeVideoId)+"&key="+key+"&part=statistics,contentDetails,status"
                     videoResult = self.getyoutubevideodetails(youtubeVideoId)
-                    if(videoResult.has_key('items') and  (len(videoResult['items'])>0)):
+                    if(videoResult != None and videoResult.has_key('items') and  (len(videoResult['items'])>0)):
                         videoEntry = videoResult['items'][0]
                         currentVideo['ViewCount'] = videoEntry['statistics']['viewCount']
                         if('likeCount' in videoEntry['statistics']):

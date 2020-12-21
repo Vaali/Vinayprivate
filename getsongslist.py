@@ -19,7 +19,7 @@ from multiprocessing import Pool
 import operator
 from itertools import repeat
 from config import DiscogsDataDirectory, NumberOfProcesses, NumberofFolders, IsIncremental, SkipRecentlyCrawledDirectories
-from config import IsSoundCloud,NumberofThreads
+from config import IsSoundCloud,NumberofThreads,SolrDiscogsArtistsUrl,SolrDataUrl
 from songsutils import GetSize,stemwords_uniquelist
 
 

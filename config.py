@@ -9,7 +9,7 @@ IsCrawlingYoutube = 1
 
 #crawling freshness
 SkipRecentlyCrawledDirectories = 0
-CrawlDaysWindow = 19
+CrawlDaysWindow = 10
 
 
 #step 1: get uniques songs list from discogs data
@@ -18,7 +18,7 @@ CrawlDaysWindow = 19
 #getvideosfinal.py
 #step 3: generate xmls from the dump file.
 #generatexmls_discogs.py
-DiscogsDataDirectory = 'smalldata'
+DiscogsDataDirectory = 'twoartists1'
 NumberofFolders = 2
 IsSoundCloud = 0
 # 1 for using youtubeapi 0 for using youtube dl
@@ -32,7 +32,7 @@ TopSongs = 10 # used to calculat averages of counts etc
 # 1 for updating viewcounts , 0 for updating genre tags
 IsUpdateViewCounts = 1
 #directory where xmls are present
-DataDirectory = 'solr_newData1222/deletedvideos'
+DataDirectory = 'solr_newData1222'
 
 
 #recrawling
@@ -44,7 +44,7 @@ RecrawlOutputDirectory = 'solr_newData1122/xxxx'
 #solr url connections
 SolrDataUrl = 'http://aurora.cs.rutgers.edu:8181/solr/discogs_data_test'
 SolrDiscogsArtistsUrl = 'http://aurora.cs.rutgers.edu:8181/solr/discogs_artists'
-SolrGenresUrl = 'http://aurora.cs.rutgers.edu:8181/solr/similar_genres'
+SolrSimilarGenresUrl = 'http://aurora.cs.rutgers.edu:8181/solr/similar_genres'
 SolrGenreTagsUrl = 'http://aurora.cs.rutgers.edu:8181/solr/genretags'
 SolrSimilarArtistsUrl = 'http://aurora.cs.rutgers.edu:8181/solr/similar_artists1'
 

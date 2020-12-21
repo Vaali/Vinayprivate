@@ -21,7 +21,7 @@ from solr import SolrConnection
 from solr.core import SolrException
 from songsutils import CombineAlbums
 import loggingmodule
-from config import DiscogsDataDirectory, NumberOfProcesses, IsIncremental, TopSongs
+from config import DiscogsDataDirectory, NumberOfProcesses, IsIncremental, TopSongs,SolrSimilarGenresUrl
 
 config = ConfigParser.ConfigParser()
 reload(sys)
