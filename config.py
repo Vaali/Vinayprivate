@@ -44,7 +44,6 @@ RecrawlOutputDirectory = 'solr_newData1122/xxxx'
 #solr url connections
 SolrDataUrl = 'http://aurora.cs.rutgers.edu:8181/solr/discogs_data_test'
 SolrDiscogsArtistsUrl = 'http://aurora.cs.rutgers.edu:8181/solr/discogs_artists'
-SolrArtistsUrl = 
 SolrGenresUrl = 'http://aurora.cs.rutgers.edu:8181/solr/similar_genres'
 SolrGenreTagsUrl = 'http://aurora.cs.rutgers.edu:8181/solr/genretags'
 SolrSimilarArtistsUrl = 'http://aurora.cs.rutgers.edu:8181/solr/similar_artists1'
