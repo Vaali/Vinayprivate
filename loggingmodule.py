@@ -36,4 +36,8 @@ def initialize_logger1(loggername,logfilename):
         currlogger.addHandler(hdlr)
         return currlogger
 
-
+def initialize_logger_stdout(loggername):
+        currlogger = logging.getLogger(loggername)
+        handler = logging.StreamHandler(sys.stdout)
+        currlogger.addHandler(handler)
+        return currlogger
