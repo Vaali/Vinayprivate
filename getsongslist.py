@@ -29,6 +29,7 @@ reload(sys)
 sys.setdefaultencoding('utf8')
 logger_decisions = loggingmodule.initialize_logger1('decisions_songs','decisions_songs.log')
 logger_error = loggingmodule.initialize_logger('errors','errors_getsongs.log')
+logger_std_out = loggingmodule.initialize_logger_stdout('stdoutmodule')
 
 
 solrConnection = SolrConnection(SolrDiscogsArtistsUrl)
@@ -137,16 +138,16 @@ def getArtistAliasList(sorted_list):
     artist_alias_list = {}
     final_artist_alias_list = []
     for song in sorted_list:
-		if(song['artist_id'] in artist_alias_list):
-			artist_alias_list[song['artist_id']] = artist_alias_list[song['artist_id']] + 1
-		else:
-			artist_alias_list[song['artist_id']] = 1
+        if(song['artist_id'] in artist_alias_list):
+            artist_alias_list[song['artist_id']] = artist_alias_list[song['artist_id']] + 1
+        else:
+            artist_alias_list[song['artist_id']] = 1
     for i in artist_alias_list:
-		artist_alias_list[i] = (artist_alias_list[i]*100)/len(sorted_list)
+        artist_alias_list[i] = (artist_alias_list[i]*100)/len(sorted_list)
     artist_alias_list = sorted(artist_alias_list.iteritems(), key=lambda (k,v): (v,k),reverse = True)
     for artist in artist_alias_list:
-		if(artist[1] > 100.0):
-			final_artist_alias_list = getAliasFromArtistsSolr(final_artist_alias_list,artist[0])
+        if(artist[1] > 100.0):
+            final_artist_alias_list = getAliasFromArtistsSolr(final_artist_alias_list,artist[0])
     return final_artist_alias_list
 
 
@@ -189,7 +190,7 @@ def changeName(artName):
 
 
 def CheckifSongsExistsinSolr(sname,aname,fname):
-    try:
+    '''try:
         solrConnection1 = SolrConnection(SolrDataUrl)
         songName = 'stringSongName:"'+sname+'"'
         artistName = 'artistName:"'+changeName(aname)+'"'
@@ -208,8 +209,9 @@ def CheckifSongsExistsinSolr(sname,aname,fname):
         #    print '---Found song---'
         #    return True
     except Exception as e:
-        sys.exc_clear()
+        #sys.exc_clear()
         #logger_error.exception(e)
+        x = "error"'''
     return False
 
 def check(date1,date2):
@@ -330,7 +332,7 @@ def get_song_list_normal_new(directory,songs_list,full_country_list,aliases,ear_
                         curr_album = json.load(input1)
                         releases_list.append(curr_album)'''
                 releases_list.append(filename)
-        print len(releases_list)
+        logger_std_out.error( len( releases_list ) )
         with concurrent.futures.ThreadPoolExecutor(max_workers=NumberofThreads) as executor:
             return_pool = executor.map(get_list_from_normal_release,zip(releases_list,repeat(ear_count),repeat(ear_year),repeat(ear_rel)))
         #print len(releases_list)
@@ -340,9 +342,9 @@ def get_song_list_normal_new(directory,songs_list,full_country_list,aliases,ear_
         for result in return_pool:
             songs_list = result[0]
             final_song_list = GetUniquesongs(result[0],final_song_list,False,False,result[1],full_songs_list)
-            print len(songs_list)
-            print len(final_song_list)
-        print directory
+            logger_std_out.error(len(songs_list))
+            logger_std_out.error(len(final_song_list))
+        logger_std_out.error(directory)
         
         logger_decisions.error('completed normal files '+str(datetime.now() - start_time))#directory+"------------ completed----normal"
     except Exception as e:
@@ -438,7 +440,7 @@ def get_list_from_normal_release((release,ear_count,ear_year,ear_rel)):
                         song['artistName'] = retlist[0]
                         song['artist_id'] = retlist[1]
                 if(bskip == True):
-                    print 'skipping4'
+                    logger_std_out.error('skipping4')
                     continue
                 if('extraartists' in track and track['extraartists'] != None):
                         extartists = track['extraartists']
@@ -492,7 +494,7 @@ def get_list_from_normal_release((release,ear_count,ear_year,ear_rel)):
                         ear_year = curr_album['released_date']
         except Exception as e:
             logger_error.exception(e)
-        print len(songs_list)
+        logger_std_out.error(len(songs_list))
         return songs_list,ear_count
 
 
@@ -604,7 +606,7 @@ def get_list_from_release((release,ear_count,ear_year,ear_rel)):
                     song['styles'] = curr_album['styles']
                     song['genres'] = curr_album['genres']
                     song['year'] = curr_album['released_date']
-                    print song['year']
+                    logger_std_out.error(song['year'])
                     song['country'] = curr_album['country']
                     song['featArtists'] = []
                     song['connectors'] = []
@@ -733,7 +735,7 @@ def checkIfSongExists(curr_song,songs_list):
      for s in songs_list:
         #print song
         song = songs_list[s]['name']
-        print song
+        logger_std_out.error(song)
         if(len(song) > len(song_name)):
             soundex = fuzzy.Soundex(len(song))
         else:
@@ -794,7 +796,7 @@ def GetUniquesongs(songs_list,final_song_list,isMaster,same_album,ear_count,full
             ''' First check in the full songlist. '''
             #isPresentSong,matchedsong = checkIfSongExists(song,full_songs_list)
             if(keySong in full_songs_list):
-                print 'Skipping'
+                logger_std_out.error('Skipping')
                 continue
             #if(isPresentSong == True):
             #    continue
@@ -939,15 +941,15 @@ def crawlArtist(directorylist):
                 logger_error.exception(e)
         logger_decisions.error(directory + " -- Full songs list  -- "+str(len(full_song_list)))
         songs_list,full_country_list,aliases,ear_count,ear_year,ear_rel,ear_conflict,final_song_list = get_song_list_master_new(directory,songs_list,full_country_list,aliases,ear_count,ear_year,ear_rel,full_song_list)
-        print ear_count
-        print ear_year
+        logger_std_out.error(ear_count)
+        logger_std_out.error(ear_year)
         if(len(songs_list) != 0):
             master_ear_count = ear_count
             master_ear_year = ear_year
             bskipflag = 1
         songs_list,final_song_list,full_country_list,aliases,ear_count,ear_year,ear_rel = get_song_list_normal_new(directory,songs_list,full_country_list,aliases,ear_count,ear_year,ear_rel,final_song_list,full_song_list)
-        print ear_count
-        print ear_year
+        logger_std_out.error(ear_count)
+        logger_std_out.error(ear_year)
         if(bskipflag == 1):
             ear_count = master_ear_count
             ear_year = master_ear_year
@@ -1016,8 +1018,8 @@ def crawlArtist(directorylist):
                 parallel_songs_list.append(curr_elem)
 
         t3= time.time()
-        print 'parallel_songs_list'
-        print len(parallel_songs_list)
+        logger_std_out.error('parallel_songs_list')
+        logger_std_out.error(len(parallel_songs_list))
         if(IsIncremental == 0 or IsIncremental ==2):
             with open(directory + '/last_full_part1.txt', 'wb') as f1:
                 f1.write(str(int(t3)))
@@ -1026,7 +1028,7 @@ def crawlArtist(directorylist):
                 pickle.dump(parallel_songs_list, f)
                 f.close()
         else:
-            print "incremental"
+            logger_std_out.error("incremental")
             with open(directory + '/songslist_incr.txt', 'wb') as f:
                 pickle.dump(parallel_songs_list, f)
                 f.close()
@@ -1070,7 +1072,7 @@ if __name__ == '__main__':
                 with open(timeFile,"r") as f:
                     prev_time = int(f.read())
             except IOError as e:
-                print e
+                logger_std_out.error(e)
         directorylist = list()
         if(os.path.exists(directory+'/lastdirectory.txt')):
             fread = codecs.open(directory+'/lastdirectory.txt','r','utf-8')
@@ -1090,7 +1092,7 @@ if __name__ == '__main__':
         directorylist = sorted(directorylist)
         splitlist = list(itertools.izip_longest(*(iter(directorylist),) * folders))
         logger_error.debug(splitlist)
-        print splitlist
+        logger_std_out.error(splitlist)
         for split in splitlist:
             foldlist = {}
             foldercompletelist = {}
@@ -1103,16 +1105,19 @@ if __name__ == '__main__':
                             strg = curr_dir
                             foldlist[strg] = GetSize(strg)
             sortedfolders = sorted(foldlist.iteritems(), key=lambda (k,v): (v,k),reverse = True)
-            print sortedfolders
+            logger_std_out.error(sortedfolders)
             logger_error.debug("Folders List:")
             n = len(sortedfolders)
             logger_error.debug("Starting Processes:")
-            songs_pool = Pool()
-            songs_pool =Pool(processes=m1)
-            songs_pool.imap(crawlArtist,sortedfolders)
-            songs_pool.close()
-            songs_pool.join()
-            print datetime.now()-t1
+            try:
+                songs_pool = Pool()
+                songs_pool =Pool(processes=m1)
+                songs_pool.imap(crawlArtist,sortedfolders)
+            finally:
+                songs_pool.close()
+                songs_pool.join()
+                logger_std_out.error(datetime.now()-t1)
+
             logger_error.debug("completed for split : "+','.join(map(str,split)))
             fwrite.write(str(split[0]))
             fwrite.write("\n")
@@ -1123,6 +1128,6 @@ if __name__ == '__main__':
         fwrite.close()
     except Exception as e:
         logger_error.exception(e)
-        print e
+        logger_std_out.error(e)
     t2=datetime.now()
-    print "time=" +str(t2-t1)
+    logger_std_out.error("time=" +str(t2-t1))
