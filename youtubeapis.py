@@ -268,7 +268,7 @@ class youtubedlcalls():
 
             ydl_opts = {
                 'noplaylist': True,
-                'cachedir': os.path.join(CacheDir,str(random.randint(0,1000000))),
+                'cachedir': CacheDir,#os.path.join(CacheDir,str(random.randint(0,1000000))),
                 'ignoreerrors': False,
                 'skipdownload': True
                 }
@@ -343,7 +343,7 @@ class youtubedlcalls():
         url = self.youtubebaseurl+str(videoid)
         ydl_opts = {
             'noplaylist': True,
-            'cachedir': os.path.join(CacheDir,str(random.randint(0,1000000))),
+            'cachedir': CacheDir,#os.path.join(CacheDir,str(random.randint(0,1000000))),
             'ignoreerrors': False,
             'skipdownload': True
         }
@@ -394,7 +394,7 @@ class youtubedlcalls():
             print searchUrl
             ydl_opts = {
                     'noplaylist': True,
-                    'cachedir': os.path.join(CacheDir,str(random.randint(0,1000000))),
+                    'cachedir': CacheDir,#os.path.join(CacheDir,str(random.randint(0,1000000))),
                     'ignoreerrors': False,
                     'skipdownload': True
                     }
