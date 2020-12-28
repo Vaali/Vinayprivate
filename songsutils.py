@@ -61,6 +61,8 @@ def movefilestofailed(filename):
 def movefilestowrong(filename):
     moveFiles(filename,'wrongvideos')
 
+def movefilestocompleted(filename):
+    moveFiles(filename,'completedvideos')
 
 def GetYearFromTitle(vid_title,song_name):
     returnYear = 0

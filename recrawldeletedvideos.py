@@ -26,7 +26,7 @@ import glob
 import loggingmodule
 import random
 import managekeys
-from songsutils import moveFiles,movefilestodeleted,resetZeroTagsFix
+from songsutils import moveFiles,movefilestodeleted,resetZeroTagsFix,movefilestocompleted
 from youtubeapis import youtubecalls,youtubedlcalls
 from config import IsYoutudeApi,RecrawlDirectory, NumberOfProcesses, RecrawlOutputDirectory
 
@@ -122,6 +122,8 @@ def getNewVideo(filename):
 			logging.error(filename)
 			movefilestodeleted(filename)
 			return
+		else:
+			movefilestocompleted(filename)
 		url = newsong.url
 		filename1 = RecrawlOutputDirectory + "/0000" +url[-11:] + ".xml"
 		fx = codecs.open(filename1,"w","utf-8")
