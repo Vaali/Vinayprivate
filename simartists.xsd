@@ -1,0 +1,66 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+<xs:element name="artist">
+  <xs:complexType>
+      <xs:element name="artistName" type="xs:string"/>
+      <xs:element name="artistId" type="xs:integer"/>
+      <xs:element name="artistPopularityAll" type="xs:integer"/>
+      <xs:element name="earliestDate" type="xs:string"/>
+
+	  <xs:element name="similarArtists" maxOccurs="unbounded">
+			<xs:complextype >
+				<xs:element name="artistName" type="xs:string"/>
+				<xs:element name="artistId" type="xs:integer"/>
+				<xs:element name="artistPopularityAll" type="xs:integer"/>
+			    <xs:element name="earliestDate" type="xs:string"/>
+				<xs:element name="cosineDistance"  type="xs:decimal"/>
+				<xs:element name="euclideanDistance"  type="xs:decimal"/>
+				<xs:element name="pearsonDistance"  type="xs:decimal"/>
+				<xs:element name="simSongCount"  type="xs:integer"/>
+				<xs:element name="similarsongsIds" type="xs:string"/>
+				<!-- <xs:element name="methods" maxOccurs="unbounded">	
+						<xs:sequence>
+							<xs:element name="Percentage"  type="xs:decimal"/>
+							<xs:element name="methodName"  type="xs:string"/>
+						</xs:sequence>
+				</xs:element> -->
+			</xs:complextype>
+       </xs:element>
+  </xs:complexType>
+</xs:element>
+
+<xs:element name="song">
+  <xs:complexType>
+      <xs:element name="songName" type="xs:string"/>
+      <xs:element name="songId" type="xs:string"/>
+      <xs:element name="songPopularityAll" type="xs:integer"/>
+      <xs:element name="earliestDate" type="xs:string"/>
+	  <xs:element name="artistName" type="xs:string"/>
+      <xs:element name="artistId" type="xs:integer"/>
+
+	  <xs:element name="similarSongs" maxOccurs="unbounded">
+			<xs:complextype >
+				<xs:element name="songName" type="xs:string"/>
+				<xs:element name="songId" type="xs:string"/>
+				<xs:element name="songPopularityAll" type="xs:integer"/>
+			    <xs:element name="earliestDate" type="xs:string"/>
+				<xs:element name="cosineDistance"  type="xs:decimal"/>
+				<xs:element name="euclideanDistance"  type="xs:decimal"/>
+				<xs:element name="pearsonDistance"  type="xs:decimal"/>
+				<xs:element name="artistName" type="xs:string"/>
+      			<xs:element name="artistId" type="xs:integer"/>
+
+				<!-- <xs:element name="methods" maxOccurs="unbounded">	
+						<xs:sequence>
+							<xs:element name="Percentage"  type="xs:decimal"/>
+							<xs:element name="methodName"  type="xs:string"/>
+						</xs:sequence>
+				</xs:element> -->
+			</xs:complextype>
+       </xs:element>
+  </xs:complexType>
+</xs:element>
+
+</xs:schema>
+
