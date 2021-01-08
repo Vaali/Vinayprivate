@@ -36,6 +36,15 @@ def initialize_logger1(loggername,logfilename):
         currlogger.addHandler(hdlr)
         return currlogger
 
+def initialize_logger_withoutrolling(loggername,logfilename):
+        formatter = logging.Formatter('%(asctime)s %(message)s')
+        currlogger = logging.getLogger(loggername)
+        hdlr = logging.FileHandler(
+            'logs/'+logfilename, mode='a')
+        hdlr.setFormatter(formatter)
+        currlogger.addHandler(hdlr)
+        return currlogger
+
 def initialize_logger_stdout(loggername):
         currlogger = logging.getLogger(loggername)
         handler = logging.StreamHandler(sys.stdout)

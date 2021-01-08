@@ -8,7 +8,7 @@ import simplejson
 import youtube_dl
 import json
 from config import CacheDir
-logger_youtube = loggingmodule.initialize_logger('youtubeapis','youtubeapis.log')
+logger_youtube = loggingmodule.initialize_logger_withoutrolling('youtubeapis','youtubeapis.log')
 import warnings
 warnings.simplefilter("error")
 import random

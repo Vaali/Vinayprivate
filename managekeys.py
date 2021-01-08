@@ -11,7 +11,7 @@ class ManageKeys():
     blocked_keys = manager.dict()
     curr_keys = manager.list()
     proj_keys = []
-    logger_managedkeys = loggingmodule.initialize_logger1('Managedkeyslog','errorkeys.log')
+    logger_managedkeys = loggingmodule.initialize_logger_withoutrolling('Managedkeyslog','errorkeys.log')
     def __init__(self,mode =1):
         self.proj_keys = [ "AIzaSyBTTnptHRDud60a-h3buMcPwzKhdrGZ1S0" ]
         '''if(mode ==0):
