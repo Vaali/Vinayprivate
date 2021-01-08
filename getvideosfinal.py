@@ -4,14 +4,13 @@ import os
 import json
 import simplejson
 import re
+import ast
 import codecs
 import urllib
 from urllib2 import Request,urlopen, URLError, HTTPError
 from datetime import datetime, date, timedelta
 import time
 from multiprocessing import Pool
-import logging
-import logging.handlers
 import pickle
 from fuzzywuzzy import fuzz
 from multiprocessing.pool import ThreadPool
@@ -23,16 +22,17 @@ from solr import SolrConnection
 from solr.core import SolrException
 import operator
 import loggingmodule
-import random
-from functools import partial
 import managekeys
 from songsutils import is_songname_same_artistname, CalculateMatch, GetYearFromTitle, GetSize
 from songsutils import stemwords_uniquelist
 import soundcloud
 from config import IsYoutudeApi,IsSoundCloud, NumberofThreads
-from config import DiscogsDataDirectory, NumberOfProcesses, NumberofFolders, IsIncremental, IsCrawlingYoutube
-from config import SkipRecentlyCrawledDirectories, CrawlDaysWindow
+from config import DiscogsDataDirectory, NumberOfProcesses, NumberofFolders, IsIncremental
+from config import SkipRecentlyCrawledDirectories, CrawlDaysWindow, SolrDiscogsArtistsUrl, SolrDataUrl
 from youtubeapis import youtubecalls,youtubedlcalls
+from itertools import repeat
+import collections
+from subprocess import Popen, PIPE
 
 
 reload(sys)
@@ -42,11 +42,11 @@ Initialising the loggers
 
 '''
 
-logger_decisions = loggingmodule.initialize_logger1('decisions','decisions_new.log')
-logger_error = loggingmodule.initialize_logger('errors','errors_getVideos.log')
+logger_decisions = loggingmodule.initialize_logger_withoutrolling('decisions','decisions_new.log')
+logger_error = loggingmodule.initialize_logger_withoutrolling('errors','errors_getVideos.log')
+logger_std_out = loggingmodule.initialize_logger_stdout('stdoutmodule')
 
-
-solrConnection = SolrConnection('http://aurora.cs.rutgers.edu:8181/solr/discogs_artists')
+solrConnection = SolrConnection(SolrDiscogsArtistsUrl)
 
 #class
 #proj_keys =['AIzaSyBX-WCpgMHu_9OGpfkdQJD3SMsJTcDCscE']
@@ -526,10 +526,10 @@ def get_song_list(directory,songs_list,full_country_list,aliases,ear_count,ear_y
         except Exception, e:
             logger_error.exception(e)
         final_song_list = GetUniquesongs(songs_list,final_song_list,False,False,ear_count,full_songs_list)
-        print len(songs_list)
-        print len(final_song_list)
-        print directory
-        print "------------"
+        logger_std_out.error(len(songs_list))
+        logger_std_out.error(len(final_song_list))
+        logger_std_out.error(directory)
+        logger_std_out.error("------------")
     return songs_list,final_song_list,full_country_list,aliases,ear_count,ear_year,ear_rel
 
 def get_song_list_master(directory,songs_list,full_country_list,aliases,ear_count,ear_year,ear_rel,full_song_list):
@@ -738,7 +738,7 @@ def get_song_list_master(directory,songs_list,full_country_list,aliases,ear_coun
 
 def CheckifSongsExistsinSolr(sname,aname,fname):
     try:
-        solrConnection1 = SolrConnection('http://aurora.cs.rutgers.edu:8181/solr/discogs_data_test')
+        solrConnection1 = SolrConnection(SolrDataUrl)
         songName = 'stringSongName:"'+sname+'"'
         artistName = 'artistName:"'+changeName(aname)+'"'
         facet_query = [songName,artistName]
@@ -768,152 +768,6 @@ def CheckifSongsExistsinSolr(sname,aname,fname):
         sys.exc_clear()
         #logger_error.exception(e)
     return False
-
-
-def crawlArtist(directorylist):
-    start_time = datetime.now()
-    directory,count = directorylist
-    logger_decisions.error(directory + " ---- started ---")
-    if(os.path.basename(directory) == '194' or os.path.basename(directory) == '355'):
-        logger_decisions.error('skipping ' +directory)
-        return
-    try:
-        curr_artist_dir = os.path.basename(directory)
-        songs_list = list()
-        global IsIncremental
-        full_lang_list = {}
-        full_country_list ={}
-        aliases = []
-        ear_count = ""
-        ear_year = 1001
-        ear_rel = False
-        master_ear_count = ""
-        master_ear_rel = ""
-        bskipflag = 0
-        final_song_list = {}
-        ear_conflict = False
-        full_song_list = []
-        ##Get the songs from the full trial
-        retVal = checkpreviousfull(directory)
-
-        if((IsIncremental == 1 or IsIncremental == 3) and retVal == 1):
-            infile = directory + '/songslist.txt'
-            try:
-                fread = open(infile,'r')
-            except IOError as e:
-                logger_error.exception(e)
-
-            parallel_songs_list = pickle.load(fread)
-            full_song_list = GetSongsFromFullList(parallel_songs_list)
-        songs_list,full_country_list,aliases,ear_count,ear_year,ear_rel,ear_conflict,final_song_list = get_song_list_master(directory,songs_list,full_country_list,aliases,ear_count,ear_year,ear_rel,full_song_list)
-        print ear_count
-        print ear_year
-        if(len(songs_list) != 0):
-            master_ear_count = ear_count
-            master_ear_year = ear_year
-            bskipflag = 1
-        songs_list,final_song_list,full_country_list,aliases,ear_count,ear_year,ear_rel = get_song_list(directory,songs_list,full_country_list,aliases,ear_count,ear_year,ear_rel,final_song_list,full_song_list)
-        print ear_count
-        print ear_year
-        if(bskipflag == 1):
-            ear_count = master_ear_count
-            ear_year = master_ear_year
-        sorted_list_country = sorted(full_country_list.items(), key=operator.itemgetter(1),reverse = True)
-        #sorted(full_country_list,key = lambda x:x['name'].lower())
-        artist_country = ear_count
-        if(len(sorted_list_country) > 0):
-            artist_country = sorted_list_country[0][0]
-        if(ear_conflict == True):
-            ear_count = artist_country
-        sorted_list = sorted(songs_list,key = lambda x:x['name'].lower())
-        hits = 0
-        misses = 0
-        if(len(sorted_list) == 0):
-            logger_decisions.error(directory + " -- Completed with time -- " + str(datetime.now() - start_time))
-            return
-    except Exception, e:
-        logger_error.exception(e)
-        logger_decisions.error(directory + " -- Completed with time -- " + str(datetime.now() - start_time))
-        return
-    try:
-        curr_time = "2020-14-33"
-        curr_language = ""
-        curr_song = {}
-        artist_alias_list = []
-        artist_alias_list = getArtistAliasList(sorted_list)
-
-        total_count = 0
-        for i in full_lang_list:
-            total_count = total_count + full_lang_list[i]
-        percent_lang = {}
-        change_language = ''
-        '''for s in final_song_list:
-            logger_decisions.error(s)
-            logger_decisions.error(final_song_list[s]['year'])
-            logger_decisions.error(final_song_list[s]['genres'])
-            logger_decisions.error(final_song_list[s]['styles'])
-            logger_decisions.error(final_song_list[s]['country'])
-            logger_decisions.error(final_song_list[s]['albumInfo'])
-            logger_decisions.error('----------------------------------------')'''
-        vid = list()
-        if(IsIncremental == 0 or IsIncremental == 2):
-            with open(directory + '/uniquelist.txt', 'wb') as f:
-			    pickle.dump(final_song_list, f)
-        else:
-            with open(directory + '/uniquelist_incr.txt', 'wb') as f:
-			    pickle.dump(final_song_list, f)
-        parallel_songs_list = []
-        finalsongs = final_song_list.values()
-        for s in finalsongs:
-            """if('people are ' in s['name'].lower()):
-                        print ' xxxxxxxxxxxxxxxxxx '
-                        print s['year']
-                        print s['name']
-                        print 'xxxxxxxxxxxxxxxxxx' """
-            curr_elem = dict(s)
-            #print curr_elem['songcountry']
-            if(not s.has_key('artistName')):# or s['artistName'] not in aliases):
-                continue
-            if(s['artistName'] in artist_alias_list):
-                for art_alias in  artist_alias_list:
-                    curr_elem = dict(s)
-                    curr_elem['artistName'] = art_alias
-                    curr_elem['songcountry'] = ear_count
-                    parallel_songs_list.append(curr_elem)
-            else:
-                curr_elem['songcountry'] = ear_count
-                parallel_songs_list.append(curr_elem)
-
-        t3= time.time()
-        print len(parallel_songs_list)
-        if(IsIncremental == 0 or IsIncremental ==2):
-            with open(directory + '/last_full_part1.txt', 'wb') as f1:
-                f1.write(str(int(t3)))
-                f1.close()
-            with open(directory + '/songslist.txt', 'wb') as f:
-                pickle.dump(parallel_songs_list, f)
-                f.close()
-        else:
-            print "incremental"
-            with open(directory + '/songslist_incr.txt', 'wb') as f:
-                pickle.dump(parallel_songs_list, f)
-                f.close()
-            with open(directory + '/last_incr_part1.txt', 'wb') as f1:
-                f1.write(str(int(t3)))
-                f1.close()
-    except Exception, e:
-        logger_error.exception(e)
-    logger_decisions.error(directory + " -- Completed with time -- " + str(datetime.now() - start_time))
-    #print parallel_songs_list
-    if(IsIncremental == 0 or IsIncremental == 2):
-        with open(directory + '/getyoutubelist.txt', 'wb') as f:
-			pickle.dump(parallel_songs_list, f)
-    else:
-        with open(directory + '/getyoutubelist_incr.txt', 'wb') as f:
-			pickle.dump(parallel_songs_list, f)
-    
-    #runYoutubeApi(directory)
-
 
 def IsCrawlingDone(directory):
     try:
@@ -947,7 +801,7 @@ def IsDumpFileExists(directory):
         return True
     return False
 
-def runYoutubeApi(directorycount):
+def runYoutubeApiThreads(directorycount):
     try:
         #print fl
         directory,cc = directorycount
@@ -974,7 +828,7 @@ def runYoutubeApi(directorycount):
             fread.close()
         except Exception as e:
             sys.exc_clear()
-        print str(lasttime)+'----lttt'
+        logger_std_out.error(str(lasttime)+'----lttt')
         currtime =0
         if(IsIncremental == 0 or IsIncremental == 2):
             infile = directory + '/getyoutubelist.txt'
@@ -985,7 +839,7 @@ def runYoutubeApi(directorycount):
             if(currtime < lasttime):
                 logger_decisions.error(directory + " -- runYoutubeApi Completed with time -- " + str(datetime.now() - start_time))
                 return'''
-        print str(currtime)+'------'
+        logger_std_out.error(str(currtime)+'------')
         try:
             fread = open(infile,'r')
         except IOError as e:
@@ -998,8 +852,8 @@ def runYoutubeApi(directorycount):
         hits = 0
         found = 0
         fullComplete = checkpreviousfull(directory)
-        print 'fullcomplete'
-        print fullComplete
+        logger_std_out.error('fullcomplete')
+        logger_std_out.error(fullComplete)
         '''if(IsIncremental == 0 or fullComplete == 0):
             infile = directory + '/songslist.txt'
         else:
@@ -1011,7 +865,7 @@ def runYoutubeApi(directorycount):
         parallel_songs_list = pickle.load(fread)'''
         #songs_pool = Pool()
         #songs_pool =ThreadPool(processes=5)
-        print len(parallel_songs_list)
+        logger_std_out.error(len(parallel_songs_list))
         #print parallel_songs_list
         with concurrent.futures.ThreadPoolExecutor(max_workers=NumberofThreads) as executor:
                 return_pool = executor.map(getVideoFromYoutube,parallel_songs_list)
@@ -1053,13 +907,130 @@ def runYoutubeApi(directorycount):
                 f1.write(str(int(time.time())))
                 f1.close()
         with open(lastrunfile, 'wb') as f2:
-            print 'dumping '+str(int(time.time()))
+            logger_std_out.error('dumping '+str(int(time.time())))
             pickle.dump(str(int(time.time())),f2)
     except Exception as e:
-        print e
+        logger_std_out.error(e)
+        logger_error.exception(e)
+    logger_decisions.error(directory + " -- runYoutubeApi Completed with time -- " + str(datetime.now() - start_time))
+
+def runYoutubeApiProcesses(directorycount):
+    try:
+        #print fl
+        directory,cc = ast.literal_eval(directorycount)
+        #directory,cc = directorycount.split(',')[0]
+        start_time = datetime.now()
+        logger_decisions.error(directory + " ---- runYoutubeApi started ---")
+        global request_count
+        global misses
+        global hits
+        request_count = 0
+        if( SkipRecentlyCrawledDirectories == True and IsCrawlingDone(directory) == True and  IsDumpFileExists(directory) ):
+            logger_decisions.error(directory + " -- runYoutubeApi already Completed with time -- " + str(datetime.now() - start_time))
+            return
+
+        curr_artist_dir = os.path.basename(directory)
+        if(IsIncremental == 0 or IsIncremental ==2):
+            lastrunfile = directory + '/lastrun.txt'
+        else:
+            lastrunfile = directory + '/lastrun_incr.txt'
+        lasttime =0
+        try:
+            fread = open(lastrunfile,'r')
+            lasttime = pickle.load(fread)
+            fread.close()
+        except Exception as e:
+            sys.exc_clear()
+        logger_std_out.error(str(lasttime)+'----lttt')
+        currtime =0
+        if(IsIncremental == 0 or IsIncremental == 2):
+            infile = directory + '/getyoutubelist.txt'
+            if(os.path.exists(directory+"/dump")):
+                os.remove(directory+"/dump")
+        else:
+            infile = directory + '/getyoutubelist_incr.txt'
+            if(os.path.exists(directory+"/dump_incr")):
+                os.remove(directory+"/dump_incr")
+        '''if(os.path.exists(infile)):
+            currtime = int(os.path.getmtime(infile))
+            if(currtime < lasttime):
+                logger_decisions.error(directory + " -- runYoutubeApi Completed with time -- " + str(datetime.now() - start_time))
+                return'''
+        logger_std_out.error(str(currtime)+'------')
+        try:
+            fread = open(infile,'r')
+        except IOError as e:
+            logger_error.error(e)
+            logger_decisions.error(directory + " -- runYoutubeApi Completed with time -- " + str(datetime.now() - start_time))
+            return
+        parallel_songs_list = pickle.load(fread)
+        vid = list()
+        misses = 0
+        hits = 0
+        found = 0
+        fullComplete = checkpreviousfull(directory)
+        logger_std_out.error('fullcomplete')
+        logger_std_out.error(fullComplete)
+        '''if(IsIncremental == 0 or fullComplete == 0):
+            infile = directory + '/songslist.txt'
+        else:
+            infile = directory + '/songslist_incr.txt'
+        try:
+            fread = open(infile,'r')
+        except IOError as e:
+            return
+        parallel_songs_list = pickle.load(fread)'''
+        
+        logger_std_out.error(len(parallel_songs_list))
+        
+        songs_pools = Pool()
+        songs_pools =Pool(processes=NumberOfProcesses)
+        return_pool = songs_pools.imap(getVideoFromYoutube,parallel_songs_list)
+        songs_pools.close()
+        songs_pools.join()
+        for ret_val in return_pool:
+            if(ret_val[2] == True):
+                    found = found + 1
+                    continue
+            if(ret_val[0] == None ):
+                misses = misses+1
+            else:
+                for rv in ret_val[0]:
+                    if(rv == None):
+                        continue
+                    if('url' not in rv.__dict__):
+                        misses = misses + 1
+                    else:
+                        hits = hits + 1
+                        if(rv.__dict__['artist_id'] == curr_artist_dir):
+                            rv.__dict__['same_artist'] = True
+                        else:
+                            rv.__dict__['same_artist'] = False
+
+                        #print rv.__dict__
+                        #tv = collections.OrderedDict(rv.__dict__)
+                        vid.append(rv.__dict__)
+        logger_std_out.error("Hits:"+str(hits)+" Misses:"+str(misses) + " Found : "+ str(found))
+        logger_decisions.error(directory +  "Hits:"+str(hits)+" Misses:"+str(misses) + " Found : "+ str(found))
+        if(IsIncremental == 0 or IsIncremental ==2):
+            write(vid,directory+"/dump")
+            with open(directory + '/last_full_part2.txt', 'wb') as f1:
+                f1.write(str(int(time.time())))
+                f1.close()
+        else:
+            write(vid,directory+"/dump_incr")
+            with open(directory + '/last_incr_part2.txt', 'wb') as f1:
+                f1.write(str(int(time.time())))
+                f1.close()
+        with open(lastrunfile, 'wb') as f2:
+            logger_std_out.error('dumping '+str(int(time.time())))
+            pickle.dump(str(int(time.time())),f2)
+    except Exception as e:
+        logger_std_out.error(e)
         logger_error.exception(e)
     logger_decisions.error(directory + " -- runYoutubeApi Completed with time -- " + str(datetime.now() - start_time))
     
+
 
 def checkIfSongExists(curr_song,songs_list):
     retVal = False
@@ -1157,7 +1128,6 @@ def checkFtArtist(ftartist1,ftartist2):
 
 
 def getVideoFromYoutube(curr_elem):
-    global IsIncremental
     retvid = None
     bret = False
     artname = curr_elem['artistName']
@@ -1198,12 +1168,7 @@ def getVideoFromYoutube(curr_elem):
                 curr_elem['artistName'] = artname
                 retvid,bret = getVideo(curr_elem,1)
     except Exception as e:
-        logger_error.exception('getVideoFromYoutube')
-    '''if(retvid != None):
-        tempDictionary = retvid[0].__dict__
-        if('errorstr' in tempDictionary):
-            logger_decisions.error(tempDictionary['errorstr'])
-            logger_decisions.error('-----------------')'''
+        logger_error.exception(e)
     return retvid,bret,False
 
 
@@ -1298,8 +1263,8 @@ def getVideo(curr_elem,flag):
     return [video1],bret
 
 def write(self,filename):
-	with codecs.open(filename,"w","utf-8") as output:
-		json.dump(self,output)
+    with codecs.open(filename,"w","utf-8") as output:
+        json.dump(self,output)
 
 class Video():
 	pass
@@ -1364,7 +1329,7 @@ def getsoundcloudId(video,flag,mostpopular):
         key = "MMajjeox7VxGUdf7Audm3eQuwx1oPhGY"
         client = soundcloud.Client(client_id=key)
         searchUrl = urllib.quote_plus(str(allArtists))+"+"+urllib.quote_plus(str(video.name))
-        print searchUrl
+        logger_std_out.error(searchUrl)
         try:
             tracks = client.get('/tracks', q=searchUrl , limit = 6);
         except HTTPError as e:            
@@ -1423,7 +1388,7 @@ def getsoundcloudId(video,flag,mostpopular):
                         currentVideoTags = track.track_type
                         currentVideoHashTags = track.tag_list
                         currentVideoGenres = track.genre
-                        print currentVideoHashTags
+                        logger_std_out.error(currentVideoHashTags)
                         if(currentVideoEmbedded != 'all' or currentVideoStatus == False):
                             continue
                         
@@ -1498,7 +1463,7 @@ def getsoundcloudId(video,flag,mostpopular):
                         m = re.search(re.compile("[0-9]{4}[-][0-9]{2}[-][0-9]{2}"),video.published)
                         n = re.search(re.compile("[0-9]{2}[:][0-9]{2}[:][0-9]{2}"),video.published)
                         ydate = m.group()+" "+n.group()
-                        print ydate
+                        logger_std_out.error(ydate)
                         dd = ydate
                         yy = int(str(dd)[0:4])
                         mm = int(str(dd)[5:7])
@@ -1637,7 +1602,6 @@ def checkpreviousfull(directory):
     #    retVal = 1
     return retVal
 
-
 if __name__ == '__main__':
     reload(sys)
     sys.setdefaultencoding('utf8')
@@ -1645,20 +1609,12 @@ if __name__ == '__main__':
     t1 = datetime.now()
     manager = managekeys.ManageKeys()
     manager.reset_projkeys()
-    
-    try:
+    '''try:
         lastdirectory = 0
-        logger_error.debug("Discogs Main Program Starting")
+        logger_error.error("Discogs Main Program Starting")
         directory = DiscogsDataDirectory
-        m1 = NumberOfProcesses
         folders = NumberofFolders
         folders = int(folders)
-        m1=int(m1)
-        crawlyoutube = IsCrawlingYoutube
-        crawlyoutube = int(crawlyoutube)
-        incr = IsIncremental
-        incr = int(incr)
-        IsIncremental = incr
         prev_time = 0
         timeFile = directory + "/timelog.txt"
         if(IsIncremental == 1 or IsIncremental == 3):
@@ -1679,14 +1635,14 @@ if __name__ == '__main__':
         else:
             fwrite = codecs.open(directory+'/lastdirectory.txt','w','utf-8')
 
-        ''' Folders list count to control the numebr of folders done'''
+        #Folders list count to control the numebr of folders done
         for dirs in os.listdir(directory):
             found = re.search(r'[0-9]+',str(dirs),0)
             if (found and (lastdirectory <= int(dirs))):
                 directorylist.append(int(dirs))
         directorylist = sorted(directorylist)
         splitlist = list(itertools.izip_longest(*(iter(directorylist),) * folders))
-        logger_error.debug(splitlist)
+        logger_error.error(splitlist)
         for split in splitlist:
             #foldlist = list()
             foldlist = {}
@@ -1701,28 +1657,33 @@ if __name__ == '__main__':
                             strg = curr_dir
                             foldlist[strg] = GetSize(strg)
             sortedfolders = sorted(foldlist.iteritems(), key=lambda (k,v): (v,k),reverse = True)
-            logger_error.debug("Folders List:")
+            logger_error.error("Folders List:")
             n = len(sortedfolders)
-            logger_error.debug("Starting Processes:")
-            songs_pool = Pool()
-            songs_pool =Pool(processes=m1)
-            if(crawlyoutube == 0):
-                songs_pool.imap(crawlArtist,sortedfolders)
-            else:
-                songs_pool.imap(runYoutubeApi,sortedfolders)
-                
-            songs_pool.close()
-            songs_pool.join()
-            print datetime.now()-t1
-            logger_error.debug("completed for split : "+','.join(map(str,split)))
-            fwrite.write(str(split[0]))
-            fwrite.write("\n")
-            if(split[-1]!= None):
-                fwrite.write(str(split[-1]))
-                logger_decisions.error(str(split[-1]))
+            logger_error.error("Starting Processes:")
+            processes = True
+            if(processes == False):
+                songs_pool = Pool()
+                songs_pool =Pool(processes=NumberOfProcesses)
+                #if(crawlyoutube == 0):
+                #    songs_pool.imap(crawlArtist,sortedfolders)
+                #else:
+                songs_pool.imap(runYoutubeApiThreads,sortedfolders)
+                songs_pool.close()
+                songs_pool.join()
+                print datetime.now()-t1
+                logger_error.error("completed for split : "+','.join(map(str,split)))
+                fwrite.write(str(split[0]))
                 fwrite.write("\n")
+                if(split[-1]!= None):
+                    fwrite.write(str(split[-1]))
+                    logger_decisions.error(str(split[-1]))
+                    fwrite.write("\n")
+
         fwrite.close()
     except Exception as e:
-        logger_error.exception(e)
+        logger_error.exception(e)'''
+    logger_error.error(sys.argv[1])
+    runYoutubeApiProcesses(sys.argv[1])
+
     t2=datetime.now()
     print "time=" +str(t2-t1)
