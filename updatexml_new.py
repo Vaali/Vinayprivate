@@ -136,6 +136,8 @@ def updateXml(filename):
         oldsong.crawlDate =  datetime.now()
         oldsong.viewcountRate = float(currentVideoViewCount)/getMonths(currentPublishedDate)
         oldsong.viewcount = int(currentVideoViewCount)
+        ydate = datetime.strptime(currentPublishedDate,'%Y%m%d')
+        oldsong.set_youtubeDate(ydate)
         oldsong.set_youtubedldata(currentYoutubedldata)
         print(currentYoutubedldata)
         genreTag = oldsong.genreTag

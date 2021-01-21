@@ -22,6 +22,7 @@ from solr.core import SolrException
 from songsutils import CombineAlbums
 import loggingmodule
 from config import DiscogsDataDirectory, NumberOfProcesses, IsIncremental, TopSongs,SolrSimilarGenresUrl
+from config import IsYoutudeApi
 
 config = ConfigParser.ConfigParser()
 reload(sys)
@@ -229,15 +230,20 @@ def genXML(vid,avgcnt,avgcntrece,artistId,genreCountList,artistTopGenres,country
             return
         url = vid['url'].replace('https','http',1)
         #print url[-11:]
-        if vid.has_key('published'):
+        try:
             m = re.search(re.compile("[0-9]{4}[-][0-9]{2}[-][0-9]{2}"),vid['published'])
             n = re.search(re.compile("[0-9]{2}[:][0-9]{2}[:][0-9]{2}"),vid['published'])
             if(m != None):
                 ydate = m.group()+" "+n.group()
             else:
-                ydate = '2001-01-01 00:00:00'
-        else:
-			ydate = '2001-01-01 00:00:00'
+                if(IsYoutudeApi != 1):
+                    pbdate = datetime.strptime(vid['published'], '%Y%m%d')
+                    ydate = pbdate.strftime("%Y-%m-%d %H:%M:%S")
+                else:
+                    ydate = '2001-01-01 00:00:00'
+        except Exception as ex:
+            print ex
+            ydate = '2001-01-01 00:00:00'
         #mysong.set_youtubeId(url[-11:])
         mysong.set_youtubeId(str(vid['id']))
         mysong.set_artistId(int(curr_artist_id))

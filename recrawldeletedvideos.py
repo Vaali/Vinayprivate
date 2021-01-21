@@ -81,6 +81,7 @@ def getVideo(oldsong):
 		oldsong.videoId = Video['VideoId']
 		oldsong.length = Video['Duration']
 		oldsong.youtubeId = Video['VideoId']
+		oldsong.viewcount = int(Video['ViewCount'])
 		if( IsYoutudeApi == 1):
 			m = re.search(re.compile("[0-9]{4}[-][0-9]{2}[-][0-9]{2}"),oldsong.published)
 			n = re.search(re.compile("[0-9]{2}[:][0-9]{2}[:][0-9]{2}"),oldsong.published)
@@ -106,7 +107,6 @@ def getVideo(oldsong):
 		else:
 			dd = str(now.day)
 		oldsong.crawldate = str(now.year)+"-"+mm+"-"+dd
-		oldsong.viewcount = int(Video['ViewCount'])
 		return oldsong
 	else:
 		return None
