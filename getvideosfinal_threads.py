@@ -30,7 +30,7 @@ from songsutils import is_songname_same_artistname, CalculateMatch, GetYearFromT
 from songsutils import stemwords_uniquelist
 import soundcloud
 from config import IsYoutudeApi,IsSoundCloud, NumberofThreads
-from config import DiscogsDataDirectory, NumberOfProcesses, NumberofFolders, IsIncremental, IsCrawlingYoutube
+from config import DiscogsDataDirectory, NumberOfProcesses, NumberofFolders, IsIncremental
 from config import SkipRecentlyCrawledDirectories, CrawlDaysWindow
 from youtubeapis import youtubecalls,youtubedlcalls
 
@@ -93,16 +93,16 @@ def getArtistAliasList(sorted_list):
     artist_alias_list = {}
     final_artist_alias_list = []
     for song in sorted_list:
-		if(song['artist_id'] in artist_alias_list):
-			artist_alias_list[song['artist_id']] = artist_alias_list[song['artist_id']] + 1
-		else:
-			artist_alias_list[song['artist_id']] = 1
+        if(song['artist_id'] in artist_alias_list):
+            artist_alias_list[song['artist_id']] = artist_alias_list[song['artist_id']] + 1
+        else:
+            artist_alias_list[song['artist_id']] = 1
     for i in artist_alias_list:
-		artist_alias_list[i] = (artist_alias_list[i]*100)/len(sorted_list)
+        artist_alias_list[i] = (artist_alias_list[i]*100)/len(sorted_list)
     artist_alias_list = sorted(artist_alias_list.iteritems(), key=lambda (k,v): (v,k),reverse = True)
     for artist in artist_alias_list:
-		if(artist[1] > 100.0):
-			final_artist_alias_list = getAliasFromArtistsSolr(final_artist_alias_list,artist[0])
+        if(artist[1] > 100.0):
+            final_artist_alias_list = getAliasFromArtistsSolr(final_artist_alias_list,artist[0])
     return final_artist_alias_list
 
 
@@ -1654,8 +1654,6 @@ if __name__ == '__main__':
         folders = NumberofFolders
         folders = int(folders)
         m1=int(m1)
-        crawlyoutube = IsCrawlingYoutube
-        crawlyoutube = int(crawlyoutube)
         incr = IsIncremental
         incr = int(incr)
         IsIncremental = incr
@@ -1706,11 +1704,10 @@ if __name__ == '__main__':
             logger_error.debug("Starting Processes:")
             songs_pool = Pool()
             songs_pool =Pool(processes=m1)
-            if(crawlyoutube == 0):
+            '''if(crawlyoutube == 0):
                 songs_pool.imap(crawlArtist,sortedfolders)
-            else:
-                songs_pool.imap(runYoutubeApi,sortedfolders)
-                
+            else:'''
+            songs_pool.imap(runYoutubeApi,sortedfolders)
             songs_pool.close()
             songs_pool.join()
             print datetime.now()-t1
